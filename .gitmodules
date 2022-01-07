@@ -1,0 +1,3 @@
+[submodule "modules/easyocr"]
+	path = modules/easyocr
+	url = git@github.com:martindbp/EasyOCR.git
