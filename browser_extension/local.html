@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            video, input {
+                display: block;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            .info {
+                background-color: aqua;
+            }
+
+            .error {
+                background-color: red;
+                color: white;
+            }
+        </style>
+        <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
+    </head>
+    <body>
+        <h1>你好html5 local video file player example</h1>
+        <div id="message"></div>
+        <input type="file" accept="video/*"/>
+        <div style="position: relative; display: inline-block">
+            <video id="player" playsinline controls autoplay></video>
+        </div>
+        <script>
+            function byteArrayToWordArray(ba) {
+                var wa = [],
+                    i;
+                for (i = 0; i < ba.length; i++) {
+                    wa[(i / 4) | 0] |= ba[i] << (24 - 8 * i);
+                }
+
+                return CryptoJS.lib.WordArray.create(wa, ba.length);
+            }
+
+            const player = new Plyr('#player');
+            (function localFileVideoPlayer() {
+                'use strict'
+                var URL = window.URL || window.webkitURL
+                var displayMessage = function (message, isError) {
+                    var element = document.querySelector('#message')
+                    element.innerHTML = message
+                    element.className = isError ? 'error' : 'info'
+                }
+                var playSelectedFile = function (event) {
+                    var file = this.files[0]
+                    var type = file.type
+                    var videoNode = document.querySelector('video')
+                    var canPlay = videoNode.canPlayType(type)
+                    if (canPlay === '') canPlay = 'no'
+                        var message = 'Can play type "' + type + '": ' + canPlay
+                    var isError = canPlay === 'no'
+                    displayMessage(message, isError)
+
+                    if (isError) {
+                        return
+                    }
+
+                    var fileURL = URL.createObjectURL(file)
+                    videoNode.src = fileURL;
+                    var oReq = new XMLHttpRequest();
+                    oReq.open("GET", fileURL, true);
+                    oReq.responseType = "arraybuffer";
+                    oReq.onload = function (oEvent) {
+                        var arrayBuffer = oReq.response;
+                        if (arrayBuffer) {
+                            var byteArray = new Uint8Array(arrayBuffer);
+                            var result = CryptoJS.MD5(byteArrayToWordArray(byteArray)).toString();
+                            // Send an event to the browser extension
+                            const event = new CustomEvent('zimuviewlocal', { detail: result });
+                            window.dispatchEvent(event);
+                        }
+                    };
+
+                    oReq.send(null);
+                }
+                var inputNode = document.querySelector('input')
+                inputNode.addEventListener('change', playSelectedFile, false)
+            })()
+        </script>
+    </body>
+</html>
+

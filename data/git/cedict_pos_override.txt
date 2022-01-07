@@ -1,0 +1,14 @@
+4226 None # 了 [liao3] /to finish/to achieve/variant of 瞭|了[liao3]/to understand clearly/
+73337 None # 了 [liao3] /(of eyes) bright/clear-sighted/to understand clearly/
+73338 None # 了 [liao4] /unofficial variant of 瞭[liao4]/
+100665 None # 过 [guo5] /(experienced action marker)/
+92451 None # 要 [yao1] /to demand/to request/to coerce/
+79252 None # 累 [lei3] /to accumulate/to involve or implicate (Taiwan pr. [lei4])/continuous/repeated/ NOTE: jieba often classifies lei4 as a verb. eg. in 我很累, so need to set None here
+81173 None # 累 [lei2] /rope/to bind together/to twist around/
+57285 None # 比 [bi4] /to associate with/to be near
+41499 n # 打 [da2] /dozen (loanword)/
+36764 v # 别 [bie4] /to make sb change their ways, opinions etc/
+19112 n # 吧 [ba1] /bar (loanword) (serving drinks, or providing Internet access etc)/to puff (on a pipe etc)/(onom.) bang/abbr. for 貼吧|贴吧[tie1 ba1]/
+20302 v 哦 [e2] /to chant/
+20303 None 哦 [o2] /oh (interjection indicating doubt or surprise)/
+20304 None 哦 [o4] /oh (interjection indicating that one has just learned sth)/

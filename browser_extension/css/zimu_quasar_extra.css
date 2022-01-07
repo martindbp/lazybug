@@ -1,0 +1,22 @@
+.zimu {
+  all: initial;
+}
+
+zimu::before,
+zimu::after,
+zimu *::before,
+zimu *::after {
+  all: unset;
+}
+
+
+/*
+#zimuroot {
+  box-sizing: border-box;
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  word-break: normal;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+*/

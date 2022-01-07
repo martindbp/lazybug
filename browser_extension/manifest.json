@@ -1,0 +1,69 @@
+{
+    "name": "zimu.ai",
+    "version": "0.1",
+    "description": "",
+    "permissions": [
+        "storage",
+        "unlimitedStorage"
+    ],
+    "host_permissions": [
+        "http://cdn.zimu.ai/*",
+        "https://cdn.zimu.ai/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/16.png",
+            "32": "images/32.png",
+            "48": "images/48.png",
+            "128": "images/128.png"
+        },
+        "css": [],
+        "js": []
+    },
+    "icons": {
+        "16": "images/16.png",
+        "32": "images/32.png",
+        "48": "images/48.png",
+        "128": "images/128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtu.be/*",
+                "file:///*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "dist/zimu_quasar.css",
+                "css/google.css",
+                "dist/CaptionManager.css"
+             ],
+            "js": [
+                "vue.runtime.global.prod.min.js",
+                "vuex.global.js",
+                "quasar.umd.prod.js",
+                "shared.js",
+                "store.js",
+                "devtools.js",
+                "dist/CaptionManager.umd.js",
+                "main.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "CaptionManager.vue",
+                "dist/CaptionManager.umd.js.map"
+            ],
+            "matches": []
+        }
+    ],
+    "options_page": "options.html",
+    "manifest_version": 3
+}
