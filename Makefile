@@ -72,9 +72,9 @@ segmentation-model:
 	merkl run train_predict.train_pipeline
 
 diff:
-	PREV_HASH=$$(git diff data/remote/public/subtitles/${id}.hash | grep -E '^[+-][a-z0-9]+$$' | sed -E 's/[+-]//g' | head -1) ;\
-	NEXT_HASH=$$(git diff data/remote/public/subtitles/${id}.hash | grep -E '^[+-][a-z0-9]+$$' | sed -E 's/[+-]//g' | tail -1) ;\
-	vimdiff data/remote/public/subtitles/${id}-$$PREV_HASH.json data/remote/public/subtitles/${id}-$$NEXT_HASH.json
+	NEXT_FILE=$$(ls -t data/remote/public/subtitles/${id}*.json | head -n 2 | head -1); \
+	PREV_FILE=$$(ls -t data/remote/public/subtitles/${id}*.json | head -n 2 | tail -1); \
+	vimdiff $$PREV_FILE $$NEXT_FILE
 
 diff-test-cases:
 	make diff id="youtube-GEKmB3elfTE"
