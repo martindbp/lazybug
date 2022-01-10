@@ -1,5 +1,3 @@
-cnocr
-clize
 numpy
 opencv-python==4.5.4.60
 hanziconv
@@ -9,14 +7,7 @@ torchvision
 transformers
 jieba_fast
 mxnet
-flask
 webvtt-py
-Django
-django-appconf
-django-debug-toolbar
-django-dotenv
-gunicorn
-jsonschema
 zhon
 wordfreq
 sklearn
@@ -28,3 +19,4 @@ iteration_utilities
 word_forms
 ckip_transformers
 yt-dlp
+b2
