@@ -8,7 +8,7 @@ function clearBadgeStatus() {
 }
 
 
-const CDN_URL = "http://cdn.zimu.ai/";
+const CDN_URL = "https://cdn.zimu.ai/file/zimu-public/";
 
 function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
     let [filename, ext] = resourceFilename.split('.');

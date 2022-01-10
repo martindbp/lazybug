@@ -17,15 +17,19 @@ dataset:
 test:
 	python -m unittest discover -s helpers/ -p 'test_*.py'
 
-sync-up:
+sync-up-public:
 	touch synced.txt
-	aws s3 sync --cache-control max-age=31536000,immutable data/remote/public/ s3://cdn.zimu.ai/public >> synced.txt
-	aws s3 sync data/remote/private s3://cdn.zimu.ai/private >> synced.txt
+	b2 sync data/remote/public b2://zimu-public | tee synced.txt
 	make purge-cloudflare
 
-sync-down:
-	aws s3 sync s3://cdn.zimu.ai/public data/remote/public
-	aws s3 sync s3://cdn.zimu.ai/private data/remote/private
+sync-up-private:
+	b2 sync data/remote/private b2://zimu-private
+
+sync-down-public:
+	b2 sync b2://zimu-public data/remote/public
+
+sync-down-private:
+	b2 sync b2://zimu-private data/remote/private
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID
