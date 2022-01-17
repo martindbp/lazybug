@@ -13,13 +13,12 @@
             </tr>
             <tr class="centerrow">
                 <td
-                    :class="{captioncard: true, highlight: isPeeking && ! hzShowStates[i] }"
+                    :class="{captioncard: true, highlight: isPeeking && ! hzShowStates[i], captioncardhidden: !(hzShowStates[i] || isPeeking) }"
                     @click="clickCenter($event, i)"
                     v-for="(hz, i) in hzs"
                     :key="i"
                 >
-                    <span :class="{captioncardhidden: !(hzShowStates[i] || isPeeking)}">{{ hz }}</span>
-                    <span class="cardplaceholder" v-if="! (hzShowStates[i] || isPeeking)">‧</span>
+                    <span>{{ hz }}</span>
                 </td>
             </tr>
             <tr class="bottomrow">
@@ -308,6 +307,8 @@ export default {
     user-select: none; /* Standard */
     white-space: nowrap;
     font-family: myFirstFont;
+    border: 1px solid black;
+    border-radius: 5px;
 }
 
 .captioncard:hover {
@@ -319,31 +320,20 @@ export default {
 }
 
 .captioncard.highlight {
-    text-decoration: underline;
+    border: 1px dashed white;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .captioncardhidden {
     color: transparent;
-}
-
-.centerrow .cardplaceholder {
-    position: absolute;
-    width: 100%;
-    left: 0;
-}
-
-.cardplaceholder.learning {
-    color: orange;
+    border: 1px dashed white;
 }
 
 .fulltranslation {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     text-align: center;
-}
-
-.fulltranslation.showborder {
-    border-top: 0.1em solid white;
 }
 
 .fulltranslation.placeholder {
