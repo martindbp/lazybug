@@ -298,11 +298,6 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                     )
 
                     for transl_idx, transl in enumerate(transls):
-                        if full_joined_hz in global_known_name_hzs_set:
-                            joined_py = global_known_names[global_known_name_hzs.index(full_joined_hz)][1]
-                            transl_matches[transl_idx].append((full_joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, i, None, None, None))
-                            break
-
                         match = re.search(pinyin_and_wade_giles_regex, transl)
                         if match is not None and match.groups():
                             group_indices = []
@@ -351,20 +346,23 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                                 joined_idx_start, joined_idx_end, i,
                                 transl_idx_start, transl_idx_end
                             ))
+                        elif full_joined_hz in global_known_name_hzs_set:
+                            joined_py = global_known_names[global_known_name_hzs.index(full_joined_hz)][1]
+                            transl_matches[transl_idx].append((full_joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, i, None, None))
 
         for transl_idx, matches in enumerate(transl_matches):
             matches = list(sorted(matches, key=lambda x: (-len(x[0]), -get_difficulty(x[0], x[1]))))
             non_conflicting_matches = []
             for match in matches:
-                *_, transl_idx_start, transl_idx_end = match
-                if transl_idx_end is None:
-                    continue  # Added from global known names, not because it was found in translation
+                _, _, _, hz_idx_start, hz_idx_end, *_, transl_idx_start, transl_idx_end = match
+                was_global_name_match = transl_idx_end is None
 
-                if True in taken_transl[transl_idx][transl_idx_start:transl_idx_end]:
+                if not was_global_name_match and True in taken_transl[transl_idx][transl_idx_start:transl_idx_end]:
                     continue
 
                 non_conflicting_matches.append(match)
-                taken_transl[transl_idx][transl_idx_start:transl_idx_end] = [True] * (transl_idx_end - transl_idx_start)
+                if not was_global_name_match:
+                    taken_transl[transl_idx][transl_idx_start:transl_idx_end] = [True] * (transl_idx_end - transl_idx_start)
 
             transl_matches[transl_idx] = non_conflicting_matches
 
@@ -374,7 +372,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
         taken_chars = [False] * len(full_sentence_hz)
         non_conflicting_matches = []
         for match in matches:
-            *_, _, start_idx, end_idx, _, transl_idx_start, transl_idx_end = match
+            _, _, _, start_idx, end_idx, _, transl_idx_start, transl_idx_end = match
             if True in taken_chars[start_idx:end_idx]:
                 continue
             taken_chars[start_idx:end_idx] = [True] * (end_idx - start_idx)
@@ -388,17 +386,20 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
             joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, component_idx_start, *_ = match
             component_idx_end = component_idx_start + window_size
 
-            # We only want to add names to confirmed_names if it's not a dictionary word, and it's not super easy
-            confirmed = False
-            if joined_hz in CEDICT.v:
-                if is_name_according_to_cedict(joined_hz, None, strict=False) and get_difficulty(joined_hz, None) > 0.7:
+            was_global_name_match = match[-1] is None
+
+            if not was_global_name_match:
+                # We only want to add names to confirmed_names if it's not a dictionary word, and it's not super easy
+                confirmed = False
+                if joined_hz in CEDICT.v:
+                    if is_name_according_to_cedict(joined_hz, None, strict=False) and get_difficulty(joined_hz, None) > 0.7:
+                        confirmed_names.append((joined_hz, joined_py))
+                        confirmed = True
+                else:
                     confirmed_names.append((joined_hz, joined_py))
                     confirmed = True
-            else:
-                confirmed_names.append((joined_hz, joined_py))
-                confirmed = True
 
-            print(f'Joining name (confirmed={confirmed}): {joined_hz} {joined_py} {transls}, {" ".join(ws[-1] for ws in ws_sentence)}, {window_size} {i} {j}')
+                print(f'Joining name (confirmed={confirmed}): {joined_hz} {joined_py} {transls}, {" ".join(ws[-1] for ws in ws_sentence)}, {window_size} {i} {j}')
 
             new_ws_sentence += ws_sentence[last_idx:component_idx_start] + [(joined_idx_start, joined_idx_end, joined_hz)]
             new_pos_sentence += psos_sentence[last_idx:component_idx_start] + ['']
