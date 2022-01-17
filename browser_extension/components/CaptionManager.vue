@@ -111,7 +111,7 @@ export default {
         if (this.resizeObserver !== null) this.resizeObserver.disconnect();
     },
     beforeUpdate: function() {
-        if (this.$refs.captionroot === undefined) return;
+        if (this.$refs.captionroot === undefined || this.$refs.captionroot.$el === undefined) return;
 
         let currMinHeight = this.$refs.captionroot.$el.style.minHeight;
         if (currMinHeight === '') currMinHeight = 0;
