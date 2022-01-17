@@ -42,7 +42,7 @@
             @click="clickTranslation"
             :class="{
                 captioncard: true,
-                highlight: isPeeking && ! translationShowState,
+                highlight: isPeeking,
                 fulltranslation: true,
                 placeholder: !translationShowState,
                 showborder: showData !== null,
@@ -319,8 +319,7 @@ export default {
 }
 
 .captioncard.highlight {
-    background-color: #cccc00;
-    color: black;
+    text-decoration: underline;
 }
 
 .captioncardhidden {
