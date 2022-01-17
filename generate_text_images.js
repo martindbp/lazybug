@@ -3,9 +3,9 @@ const { registerFont, createCanvas } = require('canvas')
 const UtfString = require('utfstring');
 
 let fonts = []
-fs.readdirSync('fonts/').forEach(file => {
+fs.readdirSync('data/remote/private/fonts/').forEach(file => {
     const name = file.split('.')[0];
-    const path = 'fonts/' + file;
+    const path = 'data/remote/private/fonts/' + file;
     registerFont(path, { family: name });
     fonts.push(name);
 });
