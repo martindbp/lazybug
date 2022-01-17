@@ -30,10 +30,10 @@
                     :key="i"
                 >
                     <div
-                        :title="(trShowStates[i] || isPeeking) && tr.length > truncateTrLengths[i] ? tr : null"
+                        :title="(trShowStates[i] || isPeeking) && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
                         :style="{opacity: trShowStates[i] || isPeeking ? 1 : 0}"
                     >
-                        {{ trShowStates[i] || isPeeking ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
+                        {{ tr !== null && trShowStates[i] || isPeeking ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </div>
                 </td>
             </tr>
@@ -219,7 +219,7 @@ export default {
                 const hzKey = `hz-${hz}`;
                 const pyKey = `py-${hz}-${py}`;
                 let trKey = `tr-${hz}-${py}`;
-                if (/[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
+                if (tr !== null && /[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
                     // If the translation is capitalized, we want it to be tracked separately
                     trKey = `tr-${hz}-${py}-${tr}`;
                 }
