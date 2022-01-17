@@ -290,7 +290,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                     # like "Long Kodo", where "Long" should be "Lung" if the whole name was Wade Giles as "Kodo" suggests.
                     pinyin_and_wade_giles_regex = (
                         '([^a-zA-Z]|^)' +
-                        '[ -\']?'.join(
+                        '[ \-\']*'.join(
                             _combine_options(options)
                             for options in final_py_options
                         ) +
