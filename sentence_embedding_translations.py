@@ -14,7 +14,7 @@ import torch
 import torch.nn.functional as F
 from wordfreq import word_frequency
 from word_forms.word_forms import get_word_forms
-from data import pinyin_classifiers
+from data.git import pinyin_classifiers
 
 from merkl import task, batch, Eval
 
@@ -571,7 +571,6 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                             final_option_indices[current_segmentation_idx:current_segmentation_idx+2] = [option_idx1, option_idx2]
                             combined_translations.append(_get_combined_translation(final_option_indices, new_order, new_translation_options))
                             combined_pys.append(_get_combined_pys(final_option_indices, new_order, new_translation_options))
-
 
             if len(combined_translations) > 1 or (len(combined_translations) == 1 and operation == 'split_word'):
                 max_similarity, max_idx, cosine_similarity = get_similarity(base_translations, combined_translations, print_iterations=print_iterations)
