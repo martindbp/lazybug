@@ -19,8 +19,8 @@ test:
 
 sync-up-public:
 	touch synced.txt
-	b2 sync data/remote/public b2://zimu-public | tee synced.txt
-	make purge-cloudflare
+	b2 sync --noProgress data/remote/public b2://zimu-public | tee synced.txt
+	make purge-cloudflare-public
 
 sync-up-private:
 	b2 sync data/remote/private b2://zimu-private
@@ -43,7 +43,7 @@ purge-cloudflare-public: check-cloudflare-env
      -H "X-Auth-Key: $$CLOUDFLARE_AUTH_KEY" \
      -H "Content-Type: application/json" \
      -H "Origin: chrome-extension://ackcmdammmejmpannblpninboapjkcgm" \
-     --data '{"files":["https://{}"]}'
+     --data '{"files":["https://cdn.zimu.ai/zimu-public/{}"]}'
 	echo "Synced" && cat synced.txt && rm synced.txt
 
 cedict:
