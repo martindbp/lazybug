@@ -60,7 +60,7 @@ process-translations:
 	merkl -v run predict_video.process_translations ${show}
 
 process-segmentation-alignments:
-	merkl -v run predict_video.process_segmentation_alignment ${show}
+	merkl -v run predict_video.process_segmentation_alignment ${show} ${video}
 
 show-list:
 	ls data/remote/public/subtitles/*.hash | xargs -I{} basename {} .hash | python text_list_to_json_array.py > data/remote/public/show_list.json 
