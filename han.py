@@ -334,6 +334,8 @@ def clean_cedict_translation(tr, py=None, split_or=True):
             #' sth' in tr or
             #' sb' in tr or
             '(archaic)' in tr or
+            'euphemism ' in tr or
+            '(euphemism' in tr or
             'Kangxi radical' in tr or
             re.match('adjective.+', tr) is not None or  # adjective plus space comma
             tr.endswith('-') or
