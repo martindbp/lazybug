@@ -8,7 +8,7 @@ function clearBadgeStatus() {
 }
 
 
-const CDN_URL = "https://cdn.zimu.ai/file/zimu-public/";
+const CDN_URL = "https://cdn.zimu.ai/file/";
 
 function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
     let [filename, ext] = resourceFilename.split('.');
@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message.type === 'fetchVersionedResource') {
-        fetchVersionedResource('client', message.filename, function (data) {
+        fetchVersionedResource('zimu-public', message.filename, function (data) {
             sendResponse({'data': data});
         }, function(error) {
             // do nothing
@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     else if (message.type == 'getCaptions') {
         clearBadgeStatus();
-        fetchVersionedResource('client/subtitles', `${message.data.captionId}.json`, function (data) {
+        fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data) {
             showBadgeStatus();
             sendResponse({'data': data});
             chrome.runtime.sendMessage({'type': 'requestSucceeded'});
