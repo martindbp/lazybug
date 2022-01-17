@@ -32,7 +32,7 @@ NON_HANZI_CHARS = [
 
 
 @task
-def get_corpus(path=FileRef('data/remote/private/backup/WeiboSentiment2019.csv'), seed=42):
+def get_corpus(path=FileRef('data/remote/private/WeiboSentiment2019.csv'), seed=42):
     random.seed(seed)
     corpus = []
     with open(path, 'r') as f:

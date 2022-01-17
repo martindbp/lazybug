@@ -41,7 +41,7 @@ num_correct_tr, num_incorrect_tr = 0, 0
 num_correct_py, num_incorrect_py = 0, 0
 num_segmentation_errors = 0
 
-for filename in glob.glob('data/remote/private/backup/caption_data/test/*.json'):
+for filename in glob.glob('data/remote/private/caption_data/test/*.json'):
     with open(filename, 'r') as f:
         test_data = json.load(f)
 

@@ -40,7 +40,7 @@ def add_probs_images_to_captions(
 
         caption_id = f'youtube-{video_id}'
         print('Processing', caption_id)
-        raw_captions_file = f'data/remote/private/backup/caption_data/raw_captions/{caption_id}.json'
+        raw_captions_file = f'data/remote/private/caption_data/raw_captions/{caption_id}.json'
         redo_sections = []
         data = None
         with open(raw_captions_file, 'r') as f:
@@ -113,9 +113,9 @@ def add_probs_images_to_captions(
                     top10_chars = [predict_video.ocr._alphabet[idx] for idx in top10_indices]
                     top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
 
-                img_path = f'data/remote/private/backup/caption_data/images/{data_hash}.jpg'
-                caption_probs_path = f'data/remote/private/backup/caption_data/segmentation_probs/{data_hash}.png'
-                prob_distributions_path = f'data/remote/private/backup/caption_data/char_probability_distributions/{data_hash}.pickle'
+                img_path = f'data/remote/private/caption_data/images/{data_hash}.jpg'
+                caption_probs_path = f'data/remote/private/caption_data/segmentation_probs/{data_hash}.png'
+                prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
                 cv2.imwrite(img_path, pred_caption.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
                 cv2.imwrite(caption_probs_path, (pred_caption.probs * 255).astype('uint8'))
                 with open(prob_distributions_path, 'wb') as f:

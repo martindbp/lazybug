@@ -24,7 +24,7 @@ seconds = float(seconds)
 time = seconds + 60*minutes
 
 
-with open(f'data/remote/private/backup/caption_data/test/{video_id}.json') as f:
+with open(f'data/remote/private/caption_data/test/{video_id}.json') as f:
     data = json.load(f)
 
 lines = data['lines']
@@ -66,7 +66,7 @@ for line in lines:
 
 
 if input(f'Commit changes{" as correct" if commit_as_correct else ""}? Y/n: ') == 'Y':
-    with open(f'data/remote/private/backup/caption_data/test/{video_id}.json', 'w') as f:
+    with open(f'data/remote/private/caption_data/test/{video_id}.json', 'w') as f:
         json.dump(data, f)
 else:
     print('Aborting...')

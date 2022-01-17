@@ -2,7 +2,7 @@ import os
 from wrapped_json import json
 import glob
 
-for filename in glob.glob('data/remote/private/backup/caption_data/raw_captions/*.json'):
+for filename in glob.glob('data/remote/private/caption_data/raw_captions/*.json'):
     if filename.endswith('merkl'):
         continue
 

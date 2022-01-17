@@ -28,7 +28,7 @@ def fix_missing_data(
             continue
 
         caption_id = f'youtube-{video_id}'
-        raw_captions_file = f'data/remote/private/backup/caption_data/raw_captions/{caption_id}.json'
+        raw_captions_file = f'data/remote/private/caption_data/raw_captions/{caption_id}.json'
         data = None
         with open(raw_captions_file, 'r') as f:
             data = json.loads(f.read())

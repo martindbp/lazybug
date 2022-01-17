@@ -68,7 +68,7 @@ def train_pipeline():
     images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 30000, 1024, 80, seed=seed)
 
     net = train_unet(images_dir, masks_dir)
-    net >> 'data/remote/private/required/text_segmentation_model.pth'
+    net >> 'data/remote/private/text_segmentation_model.pth'
     return net
 
 

@@ -14,7 +14,7 @@ else:
 
 for video_id in ids:
     video_id = f'youtube-{video_id}'
-    with open(f'data/remote/private/backup/caption_data/raw_captions/{video_id}.json', 'r') as f:
+    with open(f'data/remote/private/caption_data/raw_captions/{video_id}.json', 'r') as f:
         data = json.loads(f.read())
 
     lines = data['lines']
@@ -25,7 +25,7 @@ for video_id in ids:
         sys.exit()
     """
 
-    out_file = f'data/remote/private/backup/caption_data/machine_translations/{video_id}.txt'
+    out_file = f'data/remote/private/caption_data/machine_translations/{video_id}.txt'
     if os.path.exists(out_file):
         with open(out_file, 'r') as f:
             out_lines = [line for line in f.read().strip().split('\n')]

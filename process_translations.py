@@ -135,7 +135,7 @@ def get_machine_translations(caption_data):
     and copy/paste back the translations. Why? Cheaper than using the API """
     all_lines = [' '.join(line[0]) for line in caption_data['lines']]
     translation_lines = get_translations(all_lines)
-    translation_lines >> f'data/remote/private/backup/translation_cache/{caption_data["caption_id"]}_{translation_lines.hash}.json'
+    translation_lines >> f'data/remote/private/translation_cache/{caption_data["caption_id"]}_{translation_lines.hash}.json'
     translation_lines = translation_lines.eval()
     return translation_lines
 
@@ -216,7 +216,7 @@ def get_alignment_translations(caption_data, global_known_names=[]):
 
     out_line_is_empty = [out == '' for out in out_lines]
     translation_lines = get_translations([out for out in out_lines if out != ''])
-    translation_lines >> f'data/remote/private/backup/translation_cache/{caption_data["caption_id"]}_{translation_lines.hash}_alignments.json'
+    translation_lines >> f'data/remote/private/translation_cache/{caption_data["caption_id"]}_{translation_lines.hash}_alignments.json'
     translation_lines = translation_lines.eval()
 
     translation_lines_final = []

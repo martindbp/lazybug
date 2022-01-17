@@ -16,10 +16,10 @@ def print_data(caption_data, translations):
 class TestAlignment(unittest.TestCase):
 
     def test_alignment(self):
-        with open('data/remote/private/backup/caption_data/raw_captions/youtube-YtzqsA-a8MM.json', 'r') as f:
+        with open('data/remote/private/caption_data/raw_captions/youtube-YtzqsA-a8MM.json', 'r') as f:
             caption_data_orig = json.load(f)
 
-        translations_orig = webvtt.read('data/remote/private/backup/caption_data/translations/youtube-YtzqsA-a8MM.en.vtt')
+        translations_orig = webvtt.read('data/remote/private/caption_data/translations/youtube-YtzqsA-a8MM.en.vtt')
 
         print_data(caption_data_orig, translations_orig)
 

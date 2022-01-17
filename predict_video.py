@@ -403,13 +403,13 @@ def save_caption_data(caption_line, alphabet):
         top10_chars = [alphabet[idx] for idx in top10_indices]
         top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
 
-    os.makedirs('data/remote/private/backup/caption_data/images', exist_ok=True)
-    os.makedirs('data/remote/private/backup/caption_data/segmentation_probs', exist_ok=True)
-    os.makedirs('data/remote/private/backup/caption_data/char_probability_distributions', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/images', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/segmentation_probs', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/char_probability_distributions', exist_ok=True)
 
-    img_path = f'data/remote/private/backup/caption_data/images/{data_hash}.jpg'
-    caption_probs_path = f'data/remote/private/backup/caption_data/segmentation_probs/{data_hash}.png'
-    prob_distributions_path = f'data/remote/private/backup/caption_data/char_probability_distributions/{data_hash}.pickle'
+    img_path = f'data/remote/private/caption_data/images/{data_hash}.jpg'
+    caption_probs_path = f'data/remote/private/caption_data/segmentation_probs/{data_hash}.png'
+    prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
     cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
     cv2.imwrite(caption_probs_path, (caption_line.probs * 255).astype('uint8'))
     with open(prob_distributions_path, 'wb') as f:
@@ -923,7 +923,7 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
     show_data = None
     video_ids = None
     if show_name is not None:
-        with open(f'data/remote/private/backup/shows/{show_name}.json') as f:
+        with open(f'data/remote/private/shows/{show_name}.json') as f:
             show_data = json.load(f)
             video_ids = []
             for season in show_data['seasons']:
@@ -1017,17 +1017,17 @@ def make_cedict_db():
     return cedict_with_freqs
 
 
-def process_show(
+def process_video_captions(
     show_name: str,
     videos_path: str,
 ):
-    os.makedirs('data/remote/private/backup/caption_data/raw_captions', exist_ok=True)
-    os.makedirs('data/remote/private/backup/caption_data/meta_trimmed_captions', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/raw_captions', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/meta_trimmed_captions', exist_ok=True)
     videos = get_video_paths(show_name=show_name, videos_path=videos_path)
 
     start_time_s = 0
     end_time_s = None
-    with open(f'data/remote/public/shows/{show_name}.json', 'r') as f:
+    with open(f'data/remote/private/shows/{show_name}.json', 'r') as f:
         show_data = json.load(f)
 
     out = []
@@ -1044,18 +1044,18 @@ def process_show(
                 caption_type=param['type'],
             )
             json_captions = caption_lines_to_json(captions, frame_size, param['caption_top'], video_length)
-            json_captions >> f'data/remote/private/backup/caption_data/raw_captions/{video_id}-{param["type"]}.json'
+            json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param["type"]}.json'
             meta_captions = add_metadata(json_captions, video_id)
             trimmed_captions = trim_bad_captions(meta_captions)
-            trimmed_captions >> f'data/remote/private/backup/caption_data/meta_trimmed_captions/{video_id}-{param["type"]}.json'
+            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-{param["type"]}.json'
             out.append(trimmed_captions)
 
     return out
 
 
 def extract_names():
-    os.makedirs('data/remote/private/backup/caption_data/captions_all_translations', exist_ok=True)
-    videos = get_video_paths(from_folder='data/remote/private/backup/caption_data/captions_all_translations/')
+    os.makedirs('data/remote/private/caption_data/captions_all_translations', exist_ok=True)
+    videos = get_video_paths(from_folder='data/remote/private/caption_data/captions_all_translations/')
     all_names = []
     for video_id, file_path in videos:
         json_captions_all_translations = Future.from_file(file_path)
@@ -1066,43 +1066,43 @@ def extract_names():
 
 
 def process_translations(show_name=None, *, remove_unmatched_captions: bool=True):
-    os.makedirs('data/remote/private/backup/caption_data/captions_human_translations', exist_ok=True)
-    os.makedirs('data/remote/private/backup/caption_data/machine_translations', exist_ok=True)
-    os.makedirs('data/remote/private/backup/caption_data/captions_all_translations', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/captions_human_translations', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/machine_translations', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/captions_all_translations', exist_ok=True)
 
-    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/backup/caption_data/meta_trimmed_captions/')
+    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/meta_trimmed_captions/')
     out = []
     for video_id, file_path, params in videos:
         try:
             trimmed_captions = Future.from_file(file_path)
         except FileNotFoundError:
             continue
-        human_translations_path = f'data/remote/private/backup/caption_data/translations/{video_id}.en.vtt'
+        human_translations_path = f'data/remote/private/caption_data/translations/{video_id}.en.vtt'
         human_translations = None
         if os.path.exists(human_translations_path):
             human_translations = convert_vtt_to_caption_format(human_translations_path)
         else:
-            english_path = f'data/remote/private/backup/caption_data/raw_captions/{video_id}-english.json'
+            english_path = f'data/remote/private/caption_data/raw_captions/{video_id}-english.json'
             if os.path.exists(english_path):
                 human_translations = Future.from_file(english_path)
 
         json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, human_translations, remove_unmatched_captions)
-        json_captions_human_translations >> f'data/remote/private/backup/caption_data/captions_human_translations/{video_id}.json'
+        json_captions_human_translations >> f'data/remote/private/caption_data/captions_human_translations/{video_id}.json'
         machine_translations = get_machine_translations(json_captions_human_translations)
-        machine_translations >> f'data/remote/private/backup/caption_data/machine_translations/{video_id}.json'
+        machine_translations >> f'data/remote/private/caption_data/machine_translations/{video_id}.json'
         json_captions_all_translations = add_machine_translations(json_captions_human_translations, machine_translations)
-        json_captions_all_translations >> f'data/remote/private/backup/caption_data/captions_all_translations/{video_id}.json'
+        json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{video_id}.json'
         out.append(json_captions_all_translations)
 
     return out
 
 
 def process_segmentation_alignment(show_name=None, video_id=None):
-    os.makedirs('data/remote/private/backup/caption_data/alignment_translations', exist_ok=True)
+    os.makedirs('data/remote/private/caption_data/alignment_translations', exist_ok=True)
     os.makedirs('data/remote/public/subtitles/', exist_ok=True)
 
-    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/backup/caption_data/captions_all_translations/', file_type=None)
-    pinyin_freq_db = Future.from_file('data/remote/private/required/pinyin_freqs.json')
+    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/captions_all_translations/', file_type=None)
+    pinyin_freq_db = Future.from_file('data/remote/private/pinyin_freqs.json')
     global_known_names = extract_names()
     out = []
     for vid, file_path, params in videos:
@@ -1113,7 +1113,7 @@ def process_segmentation_alignment(show_name=None, video_id=None):
         except FileNotFoundError:
             continue
         alignment_translations = get_alignment_translations(json_captions_all_translations, global_known_names)
-        alignment_translations >> f'data/remote/private/backup/caption_data/alignment_translations/{vid}.json'
+        alignment_translations >> f'data/remote/private/caption_data/alignment_translations/{vid}.json'
         json_captions_final = add_segmentation_and_alignment(json_captions_all_translations, alignment_translations)
         json_captions_final >> f'data/remote/public/subtitles/{vid}-{json_captions_final.hash}.json'
         with open(f'data/remote/public/subtitles/{vid}.hash', 'w') as f:

@@ -35,7 +35,7 @@ def trim_ends(
         video_length, _ = get_video_length_size(video_path)
 
         caption_id = f'youtube-{video_id}'
-        raw_captions_file = f'data/remote/private/backup/caption_data/raw_captions/{caption_id}.yaml'
+        raw_captions_file = f'data/remote/private/caption_data/raw_captions/{caption_id}.yaml'
         redo_sections = []
         data = None
         with open(raw_captions_file, 'r') as f:

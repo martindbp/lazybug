@@ -5,7 +5,7 @@ import glob
 print('filename \t\t\t n_l \t mean_l  max_l')
 total_num_chars = 0
 total_num_sentences = 0
-for filename in glob.glob('data/remote/private/backup/caption_data/raw_captions/*.json'):
+for filename in glob.glob('data/remote/private/caption_data/raw_captions/*.json'):
     if filename.endswith('merkl'):
         continue
 

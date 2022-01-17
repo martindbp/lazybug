@@ -31,7 +31,7 @@ def fix_zero_timings_for_videos(
             continue
 
         caption_id = f'youtube-{video_id}'
-        raw_captions_file = f'data/remote/private/backup/caption_data/raw_captions/{caption_id}.json'
+        raw_captions_file = f'data/remote/private/caption_data/raw_captions/{caption_id}.json'
         redo_sections = []
         data = None
         with open(raw_captions_file, 'r') as f:
