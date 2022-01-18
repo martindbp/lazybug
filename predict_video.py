@@ -11,8 +11,6 @@ import cv2
 import numpy as np
 
 import mxnet as mx
-from cnocr import CnOcr
-from cnocr.fit.ctc_metrics import CtcMetrics
 import torch
 from torch.nn import functional as F
 import webvtt
@@ -430,6 +428,10 @@ def replace_or_add_line(
 
     if last_line is not None and last_line.text != '' and new_line.text != '':
         def _subst_cost(s1, s2, i, j):
+            if i >= len(last_line.prob_distributions) or j >= len(new_line.prob_distributions):
+                # This happened when ocr output "[blank]". Keep this just in case
+                print('WARNING: out of bounds')
+                return 1.0
             return jeffrey_div(new_line.prob_distributions[j], last_line.prob_distributions[i])
 
         dist, ops = weighted_levenshtein(last_line.text, new_line.text, _subst_cost, return_ops=True)
@@ -688,7 +690,7 @@ def predict_video_captions(
 
     # Need to save the last caption (the rest are saved in `replace_or_add_line` before zeroing out)
     if caption_lines[-1].text != '' and do_save_caption_data:
-        save_caption_data(caption_lines[-1])
+        save_caption_data(caption_lines[-1], alphabet)
 
     return [line for line in caption_lines if line.text != ''], return_frame_size
 
