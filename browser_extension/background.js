@@ -7,14 +7,40 @@ function clearBadgeStatus() {
     chrome.action.setBadgeText({text:''})
 }
 
+function getStorageData(key) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get([key], (items) => {
+            if (chrome.runtime.lastError) {
+                return reject(chrome.runtime.lastError);
+            }
+            console.log('Got', key, items);
+            resolve(items[key]);
+        });
+    });
+}
+
+function setStorageData(data) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.set(data, function() {
+            if (chrome.runtime.lastError) {
+                return reject(chrome.runtime.lastError);
+            }
+            console.log('Stored', data);
+            resolve();
+        });
+    });
+}
 
 const CDN_URL = "https://cdn.zimu.ai/file/";
 
 function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
     let [filename, ext] = resourceFilename.split('.');
     
+    const storageHashKey = `${folder}/${filename}.hash`;
+    const storageFileKey = `${folder}/${filename}.${ext}`;
+
     // NOTE: never cache the hash files, we purge those manually from Cloudflare
-    fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
+    const fetchHashPromise = fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
     .then(function(response) {
         if (!response.ok) {
             failCallback(response);
@@ -22,18 +48,36 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
         }
         return response;
     })
-    .then(response => response.text())
-    .then(function(hash) {
-        return fetch(CDN_URL + `${folder}/${filename}-${hash}.${ext}`, {cache: 'default'})
-    })
-    .then(function(response) {
-        if (!response.ok) {
-            failCallback(response);
-            return null;
+    .then(response => response.text());
+
+    const getStorageHashPromise = getStorageData(storageHashKey);
+
+    Promise.all([fetchHashPromise, getStorageHashPromise])
+    .then(function(values) {
+        const fetchHash = values[0].trim();
+        const storageHash = values[1];
+        console.log('Checking hash', fetchHash, storageHash);
+        if (fetchHash !== storageHash) {
+            return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
+                .then(function(response) {
+                    if (!response.ok) {
+                        failCallback(response);
+                        return null;
+                    }
+                    return response;
+                })
+                .then((response) => response.json())
+                .then(function(data) {
+                    const storeData = {};
+                    storeData[storageFileKey] = data;
+                    storeData[storageHashKey] = fetchHash;
+                    return setStorageData(storeData)
+                        .then(() => data);
+                });
+        } else {
+            return getStorageData(storageFileKey);
         }
-        return response;
     })
-    .then(response => response.json())
     .then(function(data) {
         callback(data);
     }).catch((error) => {
@@ -50,7 +94,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         fetchVersionedResource('zimu-public', message.filename, function (data) {
             sendResponse({'data': data});
         }, function(error) {
-            // do nothing
+            console.log('ERROR');
+            console.log(error);
         });
     }
     else if (message.type == 'getCaptions') {
@@ -62,7 +107,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         }, function(response) {
             chrome.runtime.sendMessage({'type': 'requestFailed'});
             sendResponse('error');
-            //clearBadgeStatus();
         });
     }
 
