@@ -134,7 +134,7 @@ export default {
                 self.$refs.captionroot.$el.style.minHeight = self.minHeight === null ? '0px' : self.minHeight + 'px';
 
                 // Make sure the root is always as wide as the menu
-                const menuWidth = self.$refs.captionroot.$refs.leftmenu.$el.getBoundingClientRect().width;
+                const menuWidth = self.$refs.captionroot.$refs.menu.$el.getBoundingClientRect().width;
                 self.$refs.captionroot.$el.style.minWidth = menuWidth + 'px';
             }
         });

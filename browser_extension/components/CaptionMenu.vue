@@ -1,5 +1,5 @@
 <template>
-    <div class="captionleftmenu">
+    <div class="captionmenu">
         <div>
             <SvgButton
                 name="move"
@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style>
-.captionleftmenu {
+.captionmenu {
     background: black;
     position: absolute;
     top: -44px;
@@ -116,12 +116,12 @@ export default {
     transition: opacity 150ms ease-in;
 }
 
-.captionleftmenu.show {
+.captionmenu.show {
     opacity: 1;
     transition-delay: 0ms;
 }
 
-.captionleftmenu > div {
+.captionmenu > div {
     padding: 3px;
 }
 </style>

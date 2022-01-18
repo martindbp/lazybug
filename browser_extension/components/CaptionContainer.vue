@@ -1,7 +1,7 @@
 <template>
     <div @mouseover="mouseOver" @mouseout="mouseOut" class="zimucaptiondiv">
-        <CaptionLeftMenu
-            ref="leftmenu"
+        <CaptionMenu
+            ref="menu"
             :class="{ show: showMenu }"
             v-bind="$props"
             v-on:seeked="$emit('seeked')"
@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import CaptionLeftMenu from './CaptionLeftMenu.vue'
+import CaptionMenu from './CaptionMenu.vue'
 import CaptionContent from './CaptionContent.vue'
 
 export default {
     props: ['prevCaption', 'currCaption', 'nextCaption', 'currTime', 'paused', 'AVElement'],
-    components: {CaptionContent, CaptionLeftMenu},
+    components: {CaptionContent, CaptionMenu},
     data: function() { return {
         showMenu: false,
     }},
