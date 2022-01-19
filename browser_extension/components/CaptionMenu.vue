@@ -108,12 +108,13 @@ export default {
 .captionmenu {
     background: black;
     position: absolute;
-    top: -44px;
+    top: -30px;
     display: inline-block;
     vertical-align: top;
     font-size: 18px !important;
     opacity: 0;
     transition: opacity 150ms ease-in;
+    height: 30px;
 }
 
 .captionmenu.show {
@@ -121,7 +122,7 @@ export default {
     transition-delay: 0ms;
 }
 
-.captionmenu > div {
-    padding: 3px;
+.captionmenu .svgbutton {
+    top: -4px; /* WHYYYY? */
 }
 </style>

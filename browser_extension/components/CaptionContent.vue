@@ -3,7 +3,7 @@
         <table class="contenttable">
             <tr class="toprow">
                 <td
-                    :class="{captioncard: true, highlight: isPeeking && ! pyShowStates[i] }"
+                    :class="{captioncard: true, highlight: isPeeking && ! pyShowStates[i], captioncardhidden: !(pyShowStates[i] || isPeeking) }"
                     @click="clickTop($event, i)"
                     v-for="(py, i) in pys"
                     :key="i"
@@ -25,7 +25,7 @@
             </tr>
             <tr class="bottomrow">
                 <td
-                    :class="{captioncard: true, highlight: isPeeking && ! trShowStates[i] }"
+                    :class="{captioncard: true, highlight: isPeeking && ! trShowStates[i], captioncardhidden: !(trShowStates[i] || isPeeking) }"
                     @click="clickBottom($event, i)"
                     v-for="(tr, i) in trs"
                     :key="i"
@@ -208,9 +208,6 @@ export default {
         setKnownBatch: function(keys, vals) {
             this.$store.commit('setKnowledgeKeys', {'keys': keys, 'vals': vals});
         },
-        applyHz: function(hz) {
-
-        },
         applyKnownHSKLevels: function() {
             let keys = [];
             let vals = [];
@@ -330,7 +327,12 @@ export default {
 }
 
 .captioncardhidden {
+    line-height: 18px; /* NOTE: same as eye icon size */
+}
+
+.centerrow .captioncardhidden {
     border: 1px dashed white;
+    line-height: 1.25em;
 }
 
 .peekcard {
