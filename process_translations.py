@@ -1,9 +1,10 @@
 import re
 import os
 import sys
-from wrapped_json import json
-import pyperclip
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
+import pyperclip
+from wrapped_json import json
 from merkl import task, Eval, batch
 import transformer_segmentation
 from transformer_segmentation import segment_sentences, segmentations_to_pinyin, join_names_present_in_translations
@@ -100,18 +101,53 @@ def match_fixed_translation(hz, py):
     return None
 
 
-def _get_translations(all_lines):
-    print('\n'.join(all_lines))
-    print('\nLines have been copied to clipboard')
-    pyperclip.copy('\n'.join(all_lines))
-    print("\nPaste the translation here:\n")
-    input_translation_lines = []
-    try:
-        while True:
-            input_translation_lines.append(input())
-    except KeyboardInterrupt:
-        pass
-    print('')
+def _get_translations(all_lines, automated=True):
+    if automated:
+        # Create a temporary server that receives the polling for input from
+        # the DeepL automation browser extension, sends the text to be
+        # translated, then waits for the POST reply with the translation
+        text = '\n'.join(all_lines)
+        print('Waiting to get translation from extension: ')
+        print(text)
+        print('')
+        translation = None
+
+        class DeeplRequestHandler(BaseHTTPRequestHandler):
+
+            def do_GET(self):
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(bytes(text, 'utf-8'))
+                print('Sent text to extension')
+
+            def do_POST(self):
+                nonlocal translation
+                content_length = int(self.headers['Content-Length'])
+                translation = str(self.rfile.read(content_length), 'utf-8')
+                self.send_response(200)
+                self.end_headers()
+                raise KeyboardInterrupt
+
+        httpd = HTTPServer(('localhost', 8000), DeeplRequestHandler)
+
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print('Shutdown, have translation: ', translation)
+            input_translation_lines = translation.split('\n')
+
+    else:  # manual copy/paste
+        print('\n'.join(all_lines))
+        print('\nLines have been copied to clipboard')
+        pyperclip.copy('\n'.join(all_lines))
+        print("\nPaste the translation here:\n")
+        input_translation_lines = []
+        try:
+            while True:
+                input_translation_lines.append(input())
+        except KeyboardInterrupt:
+            pass
+        print('')
 
     if len(input_translation_lines) != len(all_lines):
         raise Exception
