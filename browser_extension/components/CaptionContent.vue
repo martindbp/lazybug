@@ -9,6 +9,7 @@
                     :key="i"
                 >
                     <span :style="{opacity: pyShowStates[i] || isPeeking ? 1 : 0}">{{ pyShowStates[i] || isPeeking ? py : '-' }}</span>
+                    <span v-if="!(pyShowStates[i] || isPeeking)" class="peekcard" v-html="eyecon"></span>
                 </td>
             </tr>
             <tr class="centerrow">
@@ -18,7 +19,8 @@
                     v-for="(hz, i) in hzs"
                     :key="i"
                 >
-                    <span>{{ hz }}</span>
+                    <span :style="{opacity: hzShowStates[i] || isPeeking ? 1 : 0}">{{ hz }}</span>
+                    <span v-if="!(hzShowStates[i] || isPeeking)" class="peekcard" v-html="eyecon"></span>
                 </td>
             </tr>
             <tr class="bottomrow">
@@ -28,12 +30,13 @@
                     v-for="(tr, i) in trs"
                     :key="i"
                 >
-                    <div
+                    <span
                         :title="(trShowStates[i] || isPeeking) && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
                         :style="{opacity: trShowStates[i] || isPeeking ? 1 : 0}"
                     >
                         {{ tr !== null && trShowStates[i] || isPeeking ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
-                    </div>
+                    </span>
+                    <span v-if="!(trShowStates[i] || isPeeking)" class="peekcard" v-html="eyecon"></span>
                 </td>
             </tr>
         </table>
@@ -60,6 +63,7 @@ export default {
     data: function () { return {
         showData: this.data,
         fadeOut: false,  // NOTE: we set fadeOut based on currTime in a watch instead of computed, because a computed makes the component re-render every frame
+        eyecon: getIconSvg("eye", 18),
     }},
     computed: {
         truncateTrLengths: function() {
@@ -326,8 +330,18 @@ export default {
 }
 
 .captioncardhidden {
-    color: transparent;
     border: 1px dashed white;
+}
+
+.peekcard {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    visibility: hidden;
+}
+
+.captioncard:hover .peekcard {
+    visibility: visible;
 }
 
 .fulltranslation {
