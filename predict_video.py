@@ -83,7 +83,7 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def ocr_for_single_lines_probs(ocr, img, smooth_distributions=True):
+def ocr_for_single_lines_probs(ocr, img, smooth_distributions=False):
     result = ocr.readtext(img)
 
     # Take the max confidence bbox
@@ -94,6 +94,7 @@ def ocr_for_single_lines_probs(ocr, img, smooth_distributions=True):
 
     if smooth_distributions:
         # Smooth out OCR distribution a bit, because it tends to be over confident
+        # NOTE: correction: this was true for CnOCR, but not for EasyOCR
         for i in range(len(text)):
             prob_distributions[i, :] = np.sqrt(prob_distributions[i, :])
             prob_distributions[i, :] = prob_distributions[i, :] / prob_distributions[i, :].sum()
@@ -436,7 +437,6 @@ def replace_or_add_line(
 
         dist, ops = weighted_levenshtein(last_line.text, new_line.text, _subst_cost, return_ops=True)
         mean_dist = dist / min(len(new_line.text), len(last_line.text))
-
         if mean_dist < replace_levenshtein_threshold:
             # We think this line is not new, just noise on the previous line, so
             #  * pick the highest prob characters between the two when replaced
@@ -884,7 +884,7 @@ def trim_bad_captions(caption_data):
         text = line[0]
         suspicious_count = sum(text.count(char) for char in suspicious_chars)
 
-        if suspicious_count > 1 and suspicious_count / len(text) > 0.6:
+        if (suspicious_count > 1 and suspicious_count / len(text) > 0.6) or '[blank]' in text:
             if first_suspicious is None:
                 first_suspicious = i
         else:
