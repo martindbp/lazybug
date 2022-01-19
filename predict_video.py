@@ -346,7 +346,7 @@ def find_next_diff(line, buffer_frames, threshold=10):
     return None
 
 
-def predict_line(ocr, frame, frame_t):
+def predict_line(ocr, frame, frame_t, font_height):
     mask, probs = predict_img_pipeline(frame)
     mask.cache = None
     probs.cache = None
@@ -375,6 +375,16 @@ def predict_line(ocr, frame, frame_t):
         cv2.rectangle(frame_copy, (min_x, min_y),(max_x, max_y), (0, 255, 0), 3)
 
         bounding_rect = (min_x, max_x, min_y, max_y)
+
+        desired_ratio = font_height / frame.shape[0]
+        actual_ratio = (max_y - min_y) / frame.shape[0]
+        if len(contours) == 0 or abs(actual_ratio - desired_ratio) > 0.05:
+            print(f'{actual_ratio = } {desired_ratio = }')
+            text = ''
+            char_probs = None
+            prob_distributions = None
+            logprob = None
+
 
     cv2.imshow('frame', frame_copy)
     cv2.imshow('probs', (255*probs).astype('uint8'))
@@ -540,13 +550,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, line=None, frame_t=None, threshold=10):
+def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr, frame, frame_t)
+        line = predict_line(ocr, frame, frame_t, font_height)
 
     if line.text == '':
         if last_line is None:
@@ -563,9 +573,9 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, line=None, fram
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr, diff_frame, diff_t)
+        diff_line = predict_line(ocr, diff_frame, diff_t, font_height)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr, diff_line, frame_buffer[diff_idx:], line, frame_t, threshold=threshold) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(ocr, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
@@ -576,7 +586,7 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, line=None, fram
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr, last_line, frames_left, threshold=threshold) + [line]
+        return extract_lines_from_framebuffer(ocr, last_line, frames_left, font_height, threshold=threshold) + [line]
 
 
 @task
@@ -642,7 +652,7 @@ def predict_video_captions(
 
             print('diff')
 
-            frame_buffer_lines = extract_lines_from_framebuffer(ocr, last_line, frame_buffer)
+            frame_buffer_lines = extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height)
             for line in frame_buffer_lines:
                 if line.text != '':
                     dominant_caption_color = np.median(line.img[line.mask], axis=0)
@@ -884,7 +894,7 @@ def trim_bad_captions(caption_data):
         text = line[0]
         suspicious_count = sum(text.count(char) for char in suspicious_chars)
 
-        if (suspicious_count > 1 and suspicious_count / len(text) > 0.6) or '[blank]' in text:
+        if suspicious_count > 1 and suspicious_count / len(text) > 0.6:
             if first_suspicious is None:
                 first_suspicious = i
         else:
