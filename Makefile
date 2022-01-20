@@ -51,7 +51,8 @@ cedict:
 
 download-yt:
 	mkdir -p $(out)/$(show)
-	cat data/remote/private/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\"/\1/g" | xargs -I {} yt-dlp -o "data/remote/private/caption_data/translations/youtube-%(id)s.%(ext)s" --write-srt --all-subs -- {}
+	cat data/remote/private/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\"/\1/g" | xargs -I {} yt-dlp -o "../videos/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs -- {}
+	mv ../videos/$(show)/*.vtt data/remote/private/caption_data/translations/
 
 process-video-captions:
 	merkl -v run predict_video.process_video_captions ${show} ${videos}
