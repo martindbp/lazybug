@@ -9,7 +9,6 @@
             <SvgButton @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
             <SvgButton @click="prev" name="play-track-prev" />
             <SvgButton @click="redo" name="redo" />
-            <SvgButton @click="slowRedo" name="slow" />
             <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
             <SvgButton @click="next" name="play-track-next" style="margin-right: 10px" />
             <SvgButton @mousedown="peek(true)" @mouseup="peek(false)" @mouseout="peek(false)" name="eye" style="margin-right: 10px" />
@@ -80,9 +79,6 @@ export default {
             this.AVElement.currentTime = goToCaption.t0 + 1e-3;
             this.AVElement.play();
             this.$emit('seeked');
-        },
-        slowRedo: function() {
-
         },
         playPause: function(event) {
             if (this.paused) this.AVElement.play();
