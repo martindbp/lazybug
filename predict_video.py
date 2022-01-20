@@ -985,7 +985,7 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                 episode_ocr_params = (
                     episode.get('ocr_params', None) or
                     season.get('ocr_params', None) or
-                    show.get('ocr_params', None)
+                    show_data.get('ocr_params', None)
                 )
                 ocr_params.append(episode_ocr_params)
 
