@@ -109,7 +109,7 @@ def _get_translations(all_lines, automated=True):
         text = '\n'.join(all_lines)
         print('Waiting to get translation from extension: ')
         print(text)
-        print('')
+        print('Open URL: https://www.deepl.com/translator#zh/en/')
         translation = None
 
         class DeeplRequestHandler(BaseHTTPRequestHandler):
