@@ -90,7 +90,7 @@ def ocr_for_single_lines_probs(ocr, img, smooth_distributions=False):
     if len(result) == 0:
         return '', np.array([]), np.array([])
     else:
-        box, text, confidence, prob_indices, prob_distributions = max(result, key=lambda x: x[2])
+        box, text, confidence, prob_indices, prob_distributions = max(result, key=lambda x: len(x[1]))
 
     if smooth_distributions:
         # Smooth out OCR distribution a bit, because it tends to be over confident
