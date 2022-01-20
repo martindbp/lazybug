@@ -294,11 +294,6 @@ export default {
     font-family: sans-serif;
 }
 
-@font-face {
-    font-family: myFirstFont;
-    src: url(../fonts/fangzhengheiti.ttf);
-}
-
 .captioncard {
     position: relative;
     cursor: pointer;
@@ -307,7 +302,6 @@ export default {
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
     white-space: nowrap;
-    font-family: myFirstFont;
     border: 1px solid black;
     border-radius: 5px;
 }
