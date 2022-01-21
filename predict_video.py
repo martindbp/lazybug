@@ -83,14 +83,25 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def ocr_for_single_lines_probs(ocr, img, smooth_distributions=False):
-    result = ocr.readtext(img)
-
-    # Take the max confidence bbox
+def _max_len_prediction(result):
     if len(result) == 0:
-        return '', np.array([]), np.array([])
+        return None, '', 0, np.array([]), np.array([])
     else:
-        box, text, confidence, prob_indices, prob_distributions = max(result, key=lambda x: len(x[1]))
+        return max(result, key=lambda x: len(x[1]))  # length of text
+
+
+def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=False):
+    result = ocr.readtext(segmentation, min_size=10)
+    result = _max_len_prediction(result)
+    box, text, confidence, prob_indices, prob_distributions = result
+    if confidence < 0.6:
+        result = ocr.readtext(img)
+        result = _max_len_prediction(result)
+        img_confidence = result[2]
+        img_text = result[1]
+        print(f"{img_confidence = } {confidence = } {img_text = } {text = }")
+        if img_confidence > confidence:
+            box, text, confidence, prob_indices, prob_distributions = result
 
     if smooth_distributions:
         # Smooth out OCR distribution a bit, because it tends to be over confident
@@ -112,18 +123,20 @@ def srt_timestamp(t):
     return f'{hours:02}:{minutes:02}:{seconds:.3f}'.replace('.', ',')
 
 
-def predict_chars(ocr, mask, probs, window_buffer=10):
+def predict_chars(ocr, mask, probs, img, window_buffer=10):
     if mask.sum() == 0:
         return '', None, None
     ys, xs = np.where(mask > 0)
     x_max, x_min = xs.max()+1, xs.min()
     y_max, y_min = ys.max()+1, ys.min()
     probs_crop = probs[y_min:y_max, x_min:x_max]
+    img_crop = img[y_min-window_buffer:y_max+window_buffer, x_min-window_buffer:x_max+window_buffer, :]
 
-    larger = np.zeros((probs_crop.shape[0]+2*window_buffer, probs_crop.shape[1]+2*window_buffer), 'uint8')
-    larger[window_buffer:-window_buffer, window_buffer:-window_buffer] = (255*probs_crop).astype('uint8')
-    larger = 255 - larger
-    res, line_prob, prob_distributions = ocr_for_single_lines_probs(ocr, larger)
+    probs_larger = np.zeros((probs_crop.shape[0]+2*window_buffer, probs_crop.shape[1]+2*window_buffer), 'uint8')
+    probs_larger[window_buffer:-window_buffer, window_buffer:-window_buffer] = (255*probs_crop).astype('uint8')
+    probs_larger = 255 - probs_larger
+
+    res, line_prob, prob_distributions = ocr_for_single_lines_probs(ocr, probs_larger, img_crop)
     return res, line_prob, prob_distributions
 
 
@@ -363,7 +376,7 @@ def predict_line(ocr, frame, frame_t, font_height):
     probs.cache = None
     mask = mask.eval()
     probs = probs.eval()
-    text, char_probs, prob_distributions = predict_chars(ocr, mask, probs)
+    text, char_probs, prob_distributions = predict_chars(ocr, mask, probs, frame)
 
     logprob = None
     if char_probs is not None:

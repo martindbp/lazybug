@@ -334,6 +334,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                                         break
 
                                 if cedict_py == None:
+                                    breakpoint()
                                     raise Exception()
 
                                 joined_py.append(cedict_py)
