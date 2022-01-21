@@ -313,7 +313,7 @@ def is_name_according_to_cedict(hz, py, strict=True):
     return False
 
 
-def clean_cedict_translation(tr, py=None, split_or=True):
+def clean_cedict_translation(tr, py=None, split_or=True, remove_parens=True):
     if tr == '!':
         return []
 
@@ -357,7 +357,11 @@ def clean_cedict_translation(tr, py=None, split_or=True):
     if _filter_translation(tr):
         return []
 
-    tr = re.sub('\(.*\)', '', tr)  # remove parens
+    if remove_parens:
+        tr = re.sub('\(.*\)', '', tr)
+    else:
+        tr = tr.replace('(', '').replace(')', '')
+
     tr = re.sub('-', ' ', tr)  # replace hyphens by space, e.g. "narrow-minded" -> "narrow minded", so we can match individual words
     tr = tr.strip()
     lstrip = ['to ', 'the ', 'be ', 'to be ', "one's ", 'a ', 'an ']
@@ -377,7 +381,6 @@ def clean_cedict_translation(tr, py=None, split_or=True):
             tr = re.split(';| or ', tr)
         else:
             tr = re.split(';', tr)
-
 
     transls_out = []
     for tr_split in tr:

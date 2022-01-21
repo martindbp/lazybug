@@ -177,7 +177,14 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
                 options.insert(0, ([''], False, entry_py))
                 continue
 
-            for tr_split in clean_cedict_translation(tr, entry_py, split_or=split_or):
+            # We include options with and without parenthesised text, e.g. 九 -> "(long) time", we want
+            # both "long", and "long time" options
+            trs = (
+                clean_cedict_translation(tr, entry_py, split_or=split_or, remove_parens=True) +
+                clean_cedict_translation(tr, entry_py, split_or=split_or, remove_parens=False)
+            )
+
+            for tr_split in trs:
                 if ' sb' in tr_split or ' sth' in tr_split or " one's" in tr_split:
                     # We want to allow the text before and after to be matched separately
                     split_options = re.split(" sb| sth| one's", tr_split)
