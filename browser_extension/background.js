@@ -13,7 +13,6 @@ function getStorageData(key) {
             if (chrome.runtime.lastError) {
                 return reject(chrome.runtime.lastError);
             }
-            console.log('Got', key, items);
             resolve(items[key]);
         });
     });
@@ -25,7 +24,6 @@ function setStorageData(data) {
             if (chrome.runtime.lastError) {
                 return reject(chrome.runtime.lastError);
             }
-            console.log('Stored', data);
             resolve();
         });
     });
@@ -56,7 +54,6 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     .then(function(values) {
         const fetchHash = values[0].trim();
         const storageHash = values[1];
-        console.log('Checking hash', fetchHash, storageHash);
         if (fetchHash !== storageHash) {
             return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
                 .then(function(response) {
