@@ -253,6 +253,8 @@ def get_video_caption_area(
         video_length = frame_count / fps
         end_time_s = video_length + end_time_s
 
+    last_delta = 0
+    last_time = 0
     while cap.isOpened():
         ret, frame = cap.read()
 
@@ -277,6 +279,15 @@ def get_video_caption_area(
         assert crop.shape[0] == out_height
 
         curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+        if curr_time > 0 and last_time > 0:
+            last_delta = curr_time - last_time
+
+        # NOTE: OK, weirdest thing I had to debug: the above call returns 0.0 every 12th frame, which fucks up all manner of things
+        # so interpolate the time using the last frame delta we saw
+        if curr_time == 0 and last_delta != 0:
+            curr_time = last_time + last_delta / 2
+
+        last_time = curr_time
         yield curr_time, crop, frame.shape[:2], frame
 
         if end_time_s is not None and curr_time >= end_time_s:
