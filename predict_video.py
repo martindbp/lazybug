@@ -91,11 +91,22 @@ def _max_len_prediction(result):
 
 
 def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=False):
-    result = ocr.readtext(segmentation, min_size=10)
+    margin = 0.1
+    text_threshold = 0.7
+    min_size = 20
+    result = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
     result = _max_len_prediction(result)
+    if result[0] == None:
+        # Wider margin, lower thresholds seems to be needed for single chars
+        margin = 0.5
+        text_threshold = 0.3
+        min_size = 10
+        result = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+        result = _max_len_prediction(result)
+
     box, text, confidence, prob_indices, prob_distributions = result
     if confidence < 0.6:
-        result = ocr.readtext(img)
+        result = ocr.readtext(img, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
         result = _max_len_prediction(result)
         img_confidence = result[2]
         img_text = result[1]
