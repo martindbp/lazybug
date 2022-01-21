@@ -1,16 +1,13 @@
-function getSetKnowledgeValue(state, keyVal) {
-    const delta = keyVal.val ? 1 : -1;
-    let oldValue = state.knowledge[keyVal.key];
-    if (oldValue === undefined) oldValue = 0;
-    return oldValue + delta;
-}
+const KnowledgeUnknown = 0;
+const KnowledgeKnown = 1;
+const KnowledgeLearning = 2;
 
 const store = new Vuex.Store({
     state: {
         knowledge: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
-        isPeeking: false,
+        peekStates: Vue.ref({'py': [], 'hz': [], 'tr': [], 'translation': false}),
         showOptions: false,
         options: Vue.ref({
             pauseAfterCaption: true,
@@ -24,12 +21,12 @@ const store = new Vuex.Store({
             state.showOptions = val;
         },
         setKnowledgeKey(state, keyVal) {
-            state.knowledge[keyVal.key] = getSetKnowledgeValue(state, keyVal);
+            state.knowledge[keyVal.key] = keyVal.val;
         },
         setKnowledgeKeys(state, keysVals) {
             for (let i = 0; i < keysVals.keys.length; i++) {
                 const keyVal = {key: keysVals.keys[i], val: keysVals.vals[i]};
-                state.knowledge[keyVal.key] = getSetKnowledgeValue(state, keyVal);
+                state.knowledge[keyVal.key] = keyVal.val;
             }
         },
         increaseCaptionFontScale(state) {
@@ -41,8 +38,16 @@ const store = new Vuex.Store({
         setCaptionOffset(state, offset) {
             state.captionOffset = offset;
         },
-        setPeeking(state, peeking) {
-            state.isPeeking = peeking;
+        setPeekState(state, val) {
+            if (val.i === undefined || val.i === null) {
+                state.peekStates[val.type] = true;
+            }
+            else {
+                state.peekStates[val.type][val.i] = true;
+            }
+        },
+        setPeekStates(state, val) {
+            state.peekStates = val;
         },
         setOption(state, option) {
             state.options[option.key] = option.value;
@@ -50,9 +55,9 @@ const store = new Vuex.Store({
     },
     getters: {
         getKnowledgeState: (state) => (key) => {
-            const k = state.knowledge[key];
-            if (k === undefined) return k;
-            else return k > 0;
+            const knowledgeState = state.knowledge[key];
+            if (knowledgeState  === undefined) return KnowledgeUnknown;
+            return knowledgeState;
         }
     }
 })

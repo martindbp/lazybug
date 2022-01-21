@@ -52,5 +52,8 @@ const ICON_SVG = {
 }
 
 function getIconSvg(name, size) {
+    if (ICON_SVG[name] === undefined) {
+        console.log('No icon named', name);
+    }
     return ICON_SVG[name].replace('${width}', size).replace('${height}', size);
 }

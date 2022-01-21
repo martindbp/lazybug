@@ -11,7 +11,7 @@
             <SvgButton @click="redo" name="redo" />
             <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
             <SvgButton @click="next" name="play-track-next" style="margin-right: 10px" />
-            <SvgButton @mousedown="peek(true)" @mouseup="peek(false)" @mouseout="peek(false)" name="eye" style="margin-right: 10px" />
+            <SvgButton @click="peekAll" name="eye" style="margin-right: 10px" />
             <SvgButton @click="showOptions" name="options" style="margin-right: 10px" />
             <OptionsDialog />
         </div>
@@ -90,8 +90,15 @@ export default {
             this.AVElement.play();
             this.$emit('seeked');
         },
-        peek: function(peeking) {
-            this.$store.commit('setPeeking', peeking);
+        peekAll: function() {
+            const states = this.$store.state.peekStates;
+            states['translation'] = true;
+            for (var i = 0; i < states['hz'].length; i++) {
+                states['hz'][i] = true;
+                states['py'][i] = true;
+                states['tr'][i] = true;
+            }
+            this.$store.commit('setPeekStates', states);
         },
     },
     computed: {
