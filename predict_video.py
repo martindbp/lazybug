@@ -105,7 +105,7 @@ def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=Fals
         result = _max_len_prediction(result)
 
     box, text, confidence, prob_indices, prob_distributions = result
-    if confidence < 0.6:
+    if confidence < 0.6 and len(img) > 0:
         result = ocr.readtext(img, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
         result = _max_len_prediction(result)
         img_confidence = result[2]
