@@ -143,9 +143,15 @@ def render_final_image_and_mask(
         # Sometimes blur the image a bit
         rendered = cv2.blur(rendered, (3, 3))
 
-    if down_upscale_after_render:
+    if down_upscale_after_render > 1:
         orig_shape = rendered.shape[:2][::-1]
-        downscaled = cv2.resize(rendered, (orig_shape[0] // 2, orig_shape[1] // 2))
+        downscaled = cv2.resize(
+            rendered,
+            (
+                orig_shape[0] // down_upscale_after_render,
+                orig_shape[1] // down_upscale_after_render
+            )
+        )
         rendered = cv2.resize(downscaled, (*orig_shape,))
 
     mask = 255*(text_mask > 0.3*255).astype('uint8')
@@ -216,7 +222,16 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
         background_image_path = random.choice(background_image_paths)
         blur_background = random.random() < 0.3
         blur_after_render = random.random() < 0.1
-        down_upscale_after_render = random.random() < 0.05
+        down_upscale_after_render = 1
+        if random.random() < 0.05:
+            r = random.random()
+            if r < 0.33:
+                down_upscale_after_render = 2
+            elif r < 0.66:
+                down_upscale_after_render = 3
+            else:
+                down_upscale_after_render = 4
+
         bg_x_offset_percent = random.random()
         bg_y_offset_percent = random.random()
         text_x_offset_percent = random.random()
