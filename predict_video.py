@@ -482,7 +482,7 @@ def replace_or_add_line(
 
         dist, ops = weighted_levenshtein(last_line.text, new_line.text, _subst_cost, return_ops=True)
         mean_dist = dist / min(len(new_line.text), len(last_line.text))
-        if mean_dist < replace_levenshtein_threshold:
+        if mean_dist < replace_levenshtein_threshold or last_line.text == new_line.text:
             # We think this line is not new, just noise on the previous line, so
             #  * pick the highest prob characters between the two when replaced
             #  * if a low probability character is inserted or deleted, we delete them
