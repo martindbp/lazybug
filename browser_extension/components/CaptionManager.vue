@@ -30,7 +30,7 @@
 import CaptionContainer from './CaptionContainer.vue'
 import CaptionBlur from './CaptionBlur.vue'
 
-const DEFAULT_FONT_SIZE = 16;
+const DEFAULT_FONT_SIZE = 32;
 const DEFAULT_WIDTH = 916;
 const CAPTION_END_BUFFER_TIME = 1;
 
@@ -376,7 +376,10 @@ export default {
 
             // We scale the font size with the width of the video element and the font scale selected by the user.
             // At width=DEFAULT_WIDTH and fontScale=0.5 we want fontSize=DEFAULT_FONT_SIZE
-            this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale * (this.AVElement.getBoundingClientRect().width / DEFAULT_WIDTH));
+            //this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale * (this.AVElement.getBoundingClientRect().width / DEFAULT_WIDTH));
+
+            // Actually, scaling is not working well, let's just keep it constant
+            this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale);
         },
     },
     computed: {
