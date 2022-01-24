@@ -30,7 +30,7 @@
 import CaptionContainer from './CaptionContainer.vue'
 import CaptionBlur from './CaptionBlur.vue'
 
-const DEFAULT_FONT_SIZE = 32;
+const DEFAULT_FONT_SIZE = 24;
 const DEFAULT_WIDTH = 916;
 const CAPTION_END_BUFFER_TIME = 1;
 

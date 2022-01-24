@@ -4,7 +4,7 @@
             <tr class="toprow">
                 <td
                     :class="{captioncard: true, peeking: peekStates['py'][i], captioncardhidden: !finalShowStates['py'][i], nonhanzi: this.pys[i] === '' }"
-                    @click="peek('py', i)"
+                    @click="click('py', i)"
                     v-for="(py, i) in pys"
                     :key="i"
                     v-if="pys[i] !== ''"
@@ -16,7 +16,7 @@
             <tr class="centerrow">
                 <td
                     :class="{captioncard: true, peeking: peekStates['hz'][i], captioncardhidden: !finalShowStates['hz'][i], nonhanzi: this.pys[i] === '' }"
-                    @click="peek('hz', i)"
+                    @click="click('hz', i)"
                     v-for="(hz, i) in hzs"
                     :key="i"
                     v-if="pys[i] !== ''"
@@ -28,7 +28,7 @@
             <tr class="bottomrow">
                 <td
                     :class="{captioncard: true, peeking: peekStates['tr'][i], captioncardhidden: !finalShowStates['tr'][i], nonhanzi: this.pys[i] === '' }"
-                    @click="peek('tr', i)"
+                    @click="click('tr', i)"
                     v-for="(tr, i) in trs"
                     :key="i"
                     v-if="pys[i] !== ''"
@@ -44,7 +44,7 @@
             </tr>
         </table>
         <div
-            @click="peek('translation')"
+            @click="click('translation')"
             :class="{
                 captioncard: true,
                 peeking: peekStates['translation'],
@@ -138,13 +138,14 @@ export default {
                 const py = this.pys[i];
                 const tr = this.trs[i];
                 for (var type of ['hz', 'py', 'tr']) {
-                    const isUnknown = this.$store.getters.getKnowledgeState(this.knowledgeKey(type, hz, py, tr)) === KnowledgeUnknown;
+                    const isUnknown = [KnowledgeUnknown, undefined].includes(this.$store.getters.getKnowledgeState(this.knowledgeKey(type, hz, py, tr)));
                     states[type].push(isUnknown);
                 }
             }
             return states;
         },
         finalShowStates: function() {
+            // Show states that include the peek states
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.showStates['translation'] || this.peekStates['translation']};
             for (let i = 0; i < this.hzs.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
@@ -170,10 +171,12 @@ export default {
                     const pyPeekStates = [];
                     const hzPeekStates = [];
                     const trPeekStates = [];
+                    this.clickedKnow = [];
                     for (let i = 0; i < this.hzs.length; i++) {
                         pyPeekStates.push(false);
                         hzPeekStates.push(false);
                         trPeekStates.push(false);
+                        this.clickedKnow.push(false);
                     }
                     this.$store.commit('setPeekStates', {
                         'py': pyPeekStates,
@@ -210,35 +213,23 @@ export default {
             if (type == 'translation') key = `tr-${hz}`;
             return key;
         },
-        peek: function(type, i = null) {
+        click: function(type, i = null) {
+            if (type === 'translation' && this.showStates[type] === false) {
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
+                return;
+            }
+
             if (this.pys[i] === '') return;
-            this.$store.commit('setPeekState', {'type': type, 'i': i});
-        },
-        /*
-        clickKey: function(key, defaultValue = true) {
-            if (this.$store.getters.getKnowledgeState(key) === undefined) {
-                this.$store.commit('setKnowledgeKey', {'key': key, 'val': ! defaultValue});
+
+            if (this.showStates[type][i] === false) {
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
             else {
-                this.$store.commit('setKnowledgeKey', {'key': key, 'val': ! this.$store.getters.getKnowledgeState(key)});
+                const key = this.knowledgeKey(type, this.hzs[i], this.pys[i], this.trs[i])
+                this.$store.commit('setKnowledgeKey', {'key': key, 'val': KnowledgeKnown});
+                this.clickedKnow[type][i] = true;
             }
         },
-        clickIdx: function(type, i) {
-            this.clickKey(this.knowledgeKey(type, this.hzs[i], this.pys[i], this.trs[i]));
-        },
-        clickTranslation: function() {
-            this.clickKey(this.knowledgeKey('full', this.text, null, null));
-        },
-        clickTop: function(event, i) {
-            this.clickIdx('py', i);
-        },
-        clickCenter: function(event, i) {
-            this.clickIdx('hz', i);
-        },
-        clickBottom: function(event, i) {
-            this.clickIdx('tr', i);
-        },
-        */
         setKnown: function(key, known) {
             this.$store.commit('setKnowledgeKey', {'key': key, 'val': known});
         },
@@ -253,28 +244,25 @@ export default {
                 if (hz.length === 0) continue;
                 const py = this.pys[i] === '' ? this.hzs[i] : this.pys[i];
                 const tr = this.trs[i];
-                const hzKey = `hz-${hz}`;
-                const pyKey = `py-${hz}-${py}`;
-                let trKey = `tr-${hz}-${py}`;
+                const itemKeys = {
+                    'hz': `hz-${hz}`,
+                    'py': `py-${hz}-${py}`,
+                    'tr': `tr-${hz}-${py}`,
+                };
                 if (tr !== null && /[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
                     // If the translation is capitalized, we want it to be tracked separately
-                    trKey = `tr-${hz}-${py}-${tr}`;
+                    itemKeys['tr'] = `tr-${hz}-${py}-${tr}`;
                 }
                 let wordLevel = getWordLevel(hz); // eslint-disable-line
                 if (wordLevel !== null) {
-                    if (this.$store.getters.getKnowledgeState(hzKey) === KnowledgeUnknown && wordLevel <= this.$store.state.options.hanziKnowLevel) {
-                        keys.push(hzKey);
-                        vals.push(KnowledgeKnown);
-                    }
-
-                    if (this.$store.getters.getKnowledgeState(pyKey) === KnowledgeUnknown && wordLevel <= this.$store.state.options.pinyinKnowLevel) {
-                        keys.push(pyKey);
-                        vals.push(KnowledgeKnown);
-                    }
-
-                    if (this.$store.getters.getKnowledgeState(trKey) === KnowledgeUnknown && wordLevel <= this.$store.state.options.translationKnowLevel) {
-                        keys.push(trKey);
-                        vals.push(KnowledgeKnown);
+                    for (var type of ['hz', 'py', 'tr']) {
+                        if (
+                            [KnowledgeUnknown, undefined].includes(this.$store.getters.getKnowledgeState(itemKeys[type])) &&
+                            wordLevel <= this.$store.state.options.knownLevels[type]
+                        ) {
+                            keys.push(itemKeys[type]);
+                            vals.push(KnowledgeKnown);
+                        }
                     }
                 }
             }
@@ -358,19 +346,18 @@ export default {
     padding-right: 2px;
 }
 
-.captioncardhidden {
-    line-height: 18px; /* NOTE: same as eye icon size */
-}
-
 .centerrow .captioncardhidden {
     border: 1px dashed white;
-    line-height: 1.25em;
 }
 
 .peekcard {
     position: absolute;
     width: 100%;
     left: 0;
+    line-height: 0;
+    height: 18px;
+    top: 50%;
+    margin-top: -9px;
     visibility: hidden;
 }
 

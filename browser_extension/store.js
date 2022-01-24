@@ -11,9 +11,11 @@ const store = new Vuex.Store({
         showOptions: false,
         options: Vue.ref({
             pauseAfterCaption: true,
-            hanziKnowLevel: 2,
-            pinyinKnowLevel: 4,
-            translationKnowLevel: 4,
+            knownLevels: {
+                py: 4,
+                hz: 2,
+                tr: 4,
+            },
         }),
     },
     mutations: {
@@ -56,7 +58,7 @@ const store = new Vuex.Store({
     getters: {
         getKnowledgeState: (state) => (key) => {
             const knowledgeState = state.knowledge[key];
-            if (knowledgeState  === undefined) return KnowledgeUnknown;
+            if (knowledgeState  === undefined) return undefined;
             return knowledgeState;
         }
     }
