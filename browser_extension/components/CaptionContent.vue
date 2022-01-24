@@ -3,10 +3,11 @@
         <table class="contenttable">
             <tr class="toprow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['py'][i], captioncardhidden: !finalShowStates['py'][i] }"
+                    :class="{captioncard: true, peeking: peekStates['py'][i], captioncardhidden: !finalShowStates['py'][i], nonhanzi: this.pys[i] === '' }"
                     @click="peek('py', i)"
                     v-for="(py, i) in pys"
                     :key="i"
+                    v-if="pys[i] !== ''"
                 >
                     <span :style="{opacity: finalShowStates['py'][i] ? 1 : 0}">{{ finalShowStates['py'][i] ? py : '-' }}</span>
                     <span :style="{opacity: finalShowStates['py'][i] ? 0 : 1}" class="peekcard" v-html="eyecon"></span>
@@ -14,10 +15,11 @@
             </tr>
             <tr class="centerrow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['hz'][i], captioncardhidden: !finalShowStates['hz'][i] }"
+                    :class="{captioncard: true, peeking: peekStates['hz'][i], captioncardhidden: !finalShowStates['hz'][i], nonhanzi: this.pys[i] === '' }"
                     @click="peek('hz', i)"
                     v-for="(hz, i) in hzs"
                     :key="i"
+                    v-if="pys[i] !== ''"
                 >
                     <span :style="{opacity: finalShowStates['hz'][i] ? 1 : 0}">{{ hz }}</span>
                     <span :style="{opacity: finalShowStates['hz'][i] ? 0 : 1}" class="peekcard" v-html="eyecon"></span>
@@ -25,10 +27,11 @@
             </tr>
             <tr class="bottomrow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['tr'][i], captioncardhidden: !finalShowStates['tr'][i] }"
+                    :class="{captioncard: true, peeking: peekStates['tr'][i], captioncardhidden: !finalShowStates['tr'][i], nonhanzi: this.pys[i] === '' }"
                     @click="peek('tr', i)"
                     v-for="(tr, i) in trs"
                     :key="i"
+                    v-if="pys[i] !== ''"
                 >
                     <span
                         :title="finalShowStates['tr'][i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
@@ -208,6 +211,7 @@ export default {
             return key;
         },
         peek: function(type, i = null) {
+            if (this.pys[i] === '') return;
             this.$store.commit('setPeekState', {'type': type, 'i': i});
         },
         /*
@@ -336,15 +340,15 @@ export default {
     border-radius: 5px;
 }
 
-.captioncard:not(.peeking) {
+.captioncard:not(.peeking):not(.nonhanzi) {
     cursor: pointer;
 }
 
-.captioncard:not(.peeking):hover {
+.captioncard:not(.peeking):not(.nonhanzi):hover {
     background-color: gray;
 }
 
-.captioncard:not(.peeking):active {
+.captioncard:not(.peeking):not(.nonhanzi):active {
     background-color: lightgray;
 }
 
