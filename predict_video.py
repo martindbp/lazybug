@@ -440,13 +440,6 @@ def save_caption_data(caption_line, alphabet):
     data_hash = h.hexdigest()
     caption_line.data_hash = data_hash
 
-    top10_char_probs = []
-    for prob_distribution in caption_line.prob_distributions:
-        top10_indices = np.argpartition(prob_distribution, -10)[-10:]
-        top10_probs = [float(p) for p in prob_distribution[top10_indices]]
-        top10_chars = [alphabet[idx] for idx in top10_indices]
-        top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
-
     os.makedirs('data/remote/private/caption_data/images', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/segmentation_probs', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/char_probability_distributions', exist_ok=True)
@@ -455,9 +448,19 @@ def save_caption_data(caption_line, alphabet):
     caption_probs_path = f'data/remote/private/caption_data/segmentation_probs/{data_hash}.png'
     prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
     cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
-    cv2.imwrite(caption_probs_path, (caption_line.probs * 255).astype('uint8'))
-    with open(prob_distributions_path, 'wb') as f:
-        pickle.dump(top10_char_probs, f)
+
+    if caption_line.text == '':
+        cv2.imwrite(caption_probs_path, (caption_line.probs * 255).astype('uint8'))
+
+        top10_char_probs = []
+        for prob_distribution in caption_line.prob_distributions:
+            top10_indices = np.argpartition(prob_distribution, -10)[-10:]
+            top10_probs = [float(p) for p in prob_distribution[top10_indices]]
+            top10_chars = [alphabet[idx] for idx in top10_indices]
+            top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
+
+        with open(prob_distributions_path, 'wb') as f:
+            pickle.dump(top10_char_probs, f)
 
 
 def replace_or_add_line(
@@ -571,7 +574,7 @@ def replace_or_add_line(
     if not replaced:
         if len(caption_lines) > 0 and not already_zeroed_out_and_saved:
             # Need to save the caption data before zeroing out
-            if caption_lines[-1].text != '' and do_save_caption_data:
+            if do_save_caption_data:
                 print(f'Saving {len(caption_lines)}')
                 save_caption_data(caption_lines[-1], alphabet)
 
@@ -737,7 +740,7 @@ def predict_video_captions(
     if caption_lines[-1].text != '' and do_save_caption_data:
         save_caption_data(caption_lines[-1], alphabet)
 
-    return [line for line in caption_lines if line.text != ''], return_frame_size
+    return caption_lines, return_frame_size
 
 
 @task(ignore_args=['args', 'kwargs'])
@@ -927,6 +930,10 @@ def trim_bad_captions(caption_data):
     first_suspicious = None
     for i, line in enumerate(lines):
         text = line[0]
+        if text == '':
+            keep[j] = False
+            continue
+
         suspicious_count = sum(text.count(char) for char in suspicious_chars)
 
         if suspicious_count > 1 and suspicious_count / len(text) > 0.6:

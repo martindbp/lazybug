@@ -32,8 +32,9 @@ def predict_img(net, img, threshold):
 
 class NetSerializer:
     @classmethod
-    def dumps(cls, net):
-        torch.save(net.state_dict())
+    def dumps(cls, net_path):
+        with open(net_path, 'rb') as f:
+            return f.read()
 
     @classmethod
     def loads(cls, data):
@@ -44,7 +45,7 @@ class NetSerializer:
         return net
 
 
-@task
+@task(serializer=NetSerializer)
 def train_unet(images_dir, masks_dir, epochs=1, lr=0.001, batch_size=4):
     net = UNet(n_channels=3, n_classes=1, bilinear=True)
     net.to(device=device)
