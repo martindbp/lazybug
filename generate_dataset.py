@@ -148,9 +148,10 @@ def render_final_image_and_mask(
         downscaled = cv2.resize(
             rendered,
             (
-                orig_shape[0] // down_upscale_after_render,
-                orig_shape[1] // down_upscale_after_render
-            )
+                int(orig_shape[0] // down_upscale_after_render),
+                int(orig_shape[1] // down_upscale_after_render)
+            ),
+            interpolation=cv2.INTER_LANCZOS4
         )
         rendered = cv2.resize(downscaled, (*orig_shape,))
 
@@ -226,11 +227,11 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
         if random.random() < 0.05:
             r = random.random()
             if r < 0.33:
-                down_upscale_after_render = 2
+                down_upscale_after_render = 1.5
             elif r < 0.66:
-                down_upscale_after_render = 3
+                down_upscale_after_render = 2
             else:
-                down_upscale_after_render = 4
+                down_upscale_after_render = 2.5
 
         bg_x_offset_percent = random.random()
         bg_y_offset_percent = random.random()
