@@ -44,8 +44,8 @@ class NetSerializer:
         return net
 
 
-@task(serializer=NetSerializer)
-def train_unet(images_dir, masks_dir, epochs=8, lr=0.001, batch_size=4):
+@task
+def train_unet(images_dir, masks_dir, epochs=1, lr=0.001, batch_size=4):
     net = UNet(n_channels=3, n_classes=1, bilinear=True)
     net.to(device=device)
     return train_net(
@@ -68,7 +68,7 @@ def train_pipeline():
     images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 30000, 1024, 80, seed=seed)
 
     net = train_unet(images_dir, masks_dir)
-    net >> 'data/remote/private/text_segmentation_model.pth'
+    net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
     return net
 
 
