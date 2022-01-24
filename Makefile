@@ -71,7 +71,7 @@ show-list:
 	mv data/remote/public/show_list.json "data/remote/public/show_list-$$LIST_HASH.json"
 
 segmentation-model:
-	merkl run train_predict.train_pipeline
+	merkl -v run train_predict.train_pipeline
 
 diff:
 	NEXT_FILE=$$(ls -t data/remote/public/subtitles/${id}*.json | head -n 2 | head -1); \
