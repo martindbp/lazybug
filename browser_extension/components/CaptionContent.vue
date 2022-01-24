@@ -53,7 +53,8 @@
                 showborder: showData !== null,
             }"
         >
-            {{ translation }}
+            <span v-if="finalShowStates['translation']"> {{ translation }}</span>
+            <span v-if="!finalShowStates['translation']" v-html="eyecon"></span>
         </div>
     </div>
 </template>
@@ -89,8 +90,7 @@ export default {
         },
         translation: function() {
             if (this.showData == null) return '';
-            if (this.finalShowStates['translation']) return this.showData.translations[0];
-            return '...';
+            return this.showData.translations[0];
         },
         text: function() { return this.showData.texts.join(' '); },
         hzs: function() { return this.hzsPysTrsIndices.hzs; },
