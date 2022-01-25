@@ -111,6 +111,8 @@ def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=Fals
         img_confidence = result[2]
         img_text = result[1]
         print(f"{img_confidence = } {confidence = } {img_text = } {text = }")
+        #cv2.imshow("img", img)
+        #cv2.waitKey()
         if img_confidence > confidence:
             box, text, confidence, prob_indices, prob_distributions = result
 
@@ -141,13 +143,16 @@ def predict_chars(ocr, mask, probs, img, window_buffer=10):
     x_max, x_min = xs.max()+1, xs.min()
     y_max, y_min = ys.max()+1, ys.min()
     probs_crop = probs[y_min:y_max, x_min:x_max]
-    img_crop = img[y_min-window_buffer:y_max+window_buffer, x_min-window_buffer:x_max+window_buffer, :]
+    img_crop = img[y_min:y_max, x_min:x_max, :]
 
     probs_larger = np.zeros((probs_crop.shape[0]+2*window_buffer, probs_crop.shape[1]+2*window_buffer), 'uint8')
     probs_larger[window_buffer:-window_buffer, window_buffer:-window_buffer] = (255*probs_crop).astype('uint8')
     probs_larger = 255 - probs_larger
 
-    res, line_prob, prob_distributions = ocr_for_single_lines_probs(ocr, probs_larger, img_crop)
+    img_crop_larger = np.zeros((img_crop.shape[0]+2*window_buffer, img_crop.shape[1]+2*window_buffer, 3), 'uint8')
+    img_crop_larger[window_buffer:-window_buffer, window_buffer:-window_buffer, :] = img_crop
+
+    res, line_prob, prob_distributions = ocr_for_single_lines_probs(ocr, probs_larger, img_crop_larger)
     return res, line_prob, prob_distributions
 
 
@@ -447,9 +452,10 @@ def save_caption_data(caption_line, alphabet):
     img_path = f'data/remote/private/caption_data/images/{data_hash}.jpg'
     caption_probs_path = f'data/remote/private/caption_data/segmentation_probs/{data_hash}.png'
     prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
-    cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
+    if len(caption_line.img) > 0:
+        cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
 
-    if caption_line.text == '':
+    if caption_line.text != '':
         cv2.imwrite(caption_probs_path, (caption_line.probs * 255).astype('uint8'))
 
         top10_char_probs = []
@@ -1011,7 +1017,6 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                 video_path = None
 
             if video_path is None:
-                breakpoint()
                 print(f'Found no video for id {video_id}')
                 continue
 
