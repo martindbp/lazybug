@@ -1,4 +1,5 @@
 let AVElement = null;
+let videoMenu = null;
 
 let captionTop = null;
 let captionBottom = null;
@@ -13,7 +14,10 @@ chrome.runtime.onMessage.addListener(msgObj => {
 
         if (AVElement === null) {
             AVElement = document.querySelector("video");
+            videoMenu = document.querySelector('.ytp-chrome-bottom');
         }
+
+        videoMenu.style.visibility = 'hidden';
 
         let clientX = null;
         let clientY = null;
@@ -37,6 +41,7 @@ chrome.runtime.onMessage.addListener(msgObj => {
             window.removeEventListener("mousemove", moveHandler);
             moveHandler = null;
             mouseDownClientY = null;
+            videoMenu.style.visibility = 'visible';
 
             const data = {
                 "ocr_params": [
@@ -75,22 +80,11 @@ chrome.runtime.onMessage.addListener(msgObj => {
                 upEvent.stopPropagation();
                 stopMeasuring();
             }, { once: true });
-            window.addEventListener("keyup", (keyUpEvent) => {
-                keyUpEvent.preventDefault();
-                keyUpEvent.stopPropagation();
-                stopMeasuring();
-            }, { once: true });
         }
 
         window.addEventListener("mousedown", (downEvent) => {
             downEvent.preventDefault();
             downEvent.stopPropagation();
-            startMeasuring();
-        }, { once: true });
-
-        window.addEventListener("keydown", (keyDownEvent) => {
-            keyDownEvent.preventDefault();
-            keyDownEvent.stopPropagation();
             startMeasuring();
         }, { once: true });
     }
