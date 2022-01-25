@@ -46,7 +46,7 @@ class NetSerializer:
 
 
 @task(serializer=NetSerializer)
-def train_unet(images_dir, masks_dir, epochs=1, lr=0.001, batch_size=4):
+def train_unet(images_dir, masks_dir, epochs=8, lr=0.001, batch_size=4):
     net = UNet(n_channels=3, n_classes=1, bilinear=True)
     net.to(device=device)
     return train_net(
