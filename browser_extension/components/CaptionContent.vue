@@ -3,43 +3,53 @@
         <table class="contenttable">
             <tr class="toprow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['py'][i], captioncardhidden: !finalShowStates['py'][i], nonhanzi: this.pys[i] === '' }"
+                    :class="getClasses('py', i)"
                     @click="click('py', i)"
-                    v-for="(py, i) in pys"
+                    v-for="(py, i) in wordData.py"
                     :key="i"
-                    v-if="pys[i] !== ''"
+                    v-if="wordData.py[i] !== ''"
                 >
-                    <span :style="{opacity: finalShowStates['py'][i] ? 1 : 0}">{{ finalShowStates['py'][i] ? py : '-' }}</span>
-                    <span :style="{opacity: finalShowStates['py'][i] ? 0 : 1}" class="peekcard" v-html="eyecon"></span>
+                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.py[i] && knownStates.py[i]"></span>
+                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.py[i]"></span>
+                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.py[i]"></span>
+                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.py[i] && learningStates.py[i]"></span>
+                    <span class="cardcontent" :style="{opacity: finalShowStates.py[i] ? 1 : 0}">{{ finalShowStates.py[i] ? py : '-' }}</span>
                 </td>
             </tr>
             <tr class="centerrow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['hz'][i], captioncardhidden: !finalShowStates['hz'][i], nonhanzi: this.pys[i] === '' }"
+                    :class="getClasses('hz', i)"
                     @click="click('hz', i)"
-                    v-for="(hz, i) in hzs"
+                    v-for="(hz, i) in wordData.hz"
                     :key="i"
-                    v-if="pys[i] !== ''"
+                    v-if="wordData.py[i] !== ''"
                 >
-                    <span :style="{opacity: finalShowStates['hz'][i] ? 1 : 0}">{{ hz }}</span>
-                    <span :style="{opacity: finalShowStates['hz'][i] ? 0 : 1}" class="peekcard" v-html="eyecon"></span>
+                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.hz[i] && knownStates.hz[i]"></span>
+                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.hz[i]"></span>
+                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.hz[i]"></span>
+                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.hz[i] && learningStates.hz[i]"></span>
+                    <span class="cardcontent" :style="{opacity: finalShowStates.hz[i] ? 1 : 0}">{{ hz }}</span>
                 </td>
             </tr>
             <tr class="bottomrow">
                 <td
-                    :class="{captioncard: true, peeking: peekStates['tr'][i], captioncardhidden: !finalShowStates['tr'][i], nonhanzi: this.pys[i] === '' }"
+                    :class="getClasses('tr', i)"
                     @click="click('tr', i)"
-                    v-for="(tr, i) in trs"
+                    v-for="(tr, i) in wordData.tr"
                     :key="i"
-                    v-if="pys[i] !== ''"
+                    v-if="wordData.py[i] !== ''"
                 >
+                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.tr[i] && knownStates.tr[i]"></span>
+                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.tr[i]"></span>
+                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.tr[i]"></span>
+                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.tr[i] && learningStates.tr[i]"></span>
                     <span
-                        :title="finalShowStates['tr'][i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
-                        :style="{opacity: finalShowStates['tr'][i] ? 1 : 0}"
+                        class="cardcontent"
+                        :title="finalShowStates.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
+                        :style="{opacity: finalShowStates.tr[i] ? 1 : 0}"
                     >
-                        {{ tr !== null && finalShowStates['tr'][i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
+                        {{ tr !== null && finalShowStates.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
-                    <span :style="{opacity: finalShowStates['tr'][i] ? 0 : 1}" class="peekcard" v-html="eyecon"></span>
                 </td>
             </tr>
         </table>
@@ -68,22 +78,26 @@ export default {
         showData: this.data,
         fadeOut: false,  // NOTE: we set fadeOut based on currTime in a watch instead of computed, because a computed makes the component re-render every frame
         eyecon: getIconSvg("eye", 18),
+        bookIcon: getIconSvg("book", 18),
+        checkIcon: getIconSvg("check", 18),
+        closeIcon: getIconSvg("close", 18),
+        undoIcon: getIconSvg("undo", 18),
     }},
     computed: {
         peekStates: function() {
             const states = this.$store.state.peekStates;
             states['translation'] = states['translation'] && !this.showStates['translation'];
-            for (var i = 0; i < this.hzs.length; i++) {
-                states['py'][i] = states['py'][i] && !this.showStates['py'][i];
-                states['hz'][i] = states['hz'][i] && !this.showStates['hz'][i];
-                states['tr'][i] = states['tr'][i] && !this.showStates['tr'][i];
+            for (var i = 0; i < this.wordData.hz.length; i++) {
+                states.py[i] = states.py[i] && !this.showStates.py[i];
+                states.hz[i] = states.hz[i] && !this.showStates.hz[i];
+                states.tr[i] = states.tr[i] && !this.showStates.tr[i];
             }
             return states;
         },
         truncateTrLengths: function() {
             let outLengths = [];
             for (let i = 0; i < this.showData.alignments.length; i++) {
-                const trunateLength = Math.max(15, Math.ceil(Math.max(this.pys[i].length, this.hzs[i].length) * 2))  // add 100% to longest
+                const trunateLength = Math.max(15, Math.ceil(Math.max(this.wordData.py[i].length, this.wordData.hz[i].length) * 2))  // add 100% to longest
                 outLengths.push(trunateLength);
             }
             return outLengths;
@@ -93,52 +107,47 @@ export default {
             return this.showData.translations[0];
         },
         text: function() { return this.showData.texts.join(' '); },
-        hzs: function() { return this.hzsPysTrsIndices.hzs; },
-        pys: function() { return this.hzsPysTrsIndices.pys; },
-        trs: function() { return this.hzsPysTrsIndices.trs; },
-        alignmentIndices: function() { return this.hzsPysTrsIndices.alignments; },
-        hzsPysTrsIndices: function() {
+        wordData: function() {
+            const data = {hz: [], py: [], tr: [], translation: null};
             if (this.showData === null) {
-                return {hzs: [], pys: [], trs: [], alignments: []};
+                return data;
             }
 
+            data.translation = this.showData.translations[0];
+
             let nextIdx = 0;
-            let hanzis = [];
-            let pinyins = [];
-            let translations = [];
-            let alignmentIndices = [];
             for (let i = 0; i < this.showData.alignments.length; i++) {
                 let [startIdx, endIdx, _, pinyinParts, wordTranslation] = this.showData.alignments[i];
                 if (startIdx > nextIdx) {
-                    hanzis.push(this.text.substring(nextIdx, startIdx));
-                    pinyins.push(null);
-                    translations.push(null);
-                    alignmentIndices.push(null);
+                    data.hz.push(this.text.substring(nextIdx, startIdx));
+                    data.py.push(null);
+                    data.tr.push(null);
                 }
                 const hz = this.text.substring(startIdx, endIdx);
-                hanzis.push(hz);
+                data.hz.push(hz);
                 const diacriticalPinyins = pinyinParts.map((part) => part[0]);
                 const displayPinyin = diacriticalPinyins.join('');
-                pinyins.push(displayPinyin);
-                translations.push(wordTranslation);
-                alignmentIndices.push(i);
+                data.py.push(displayPinyin);
+                data.tr.push(wordTranslation);
                 nextIdx = endIdx;
             }
             if (nextIdx < this.text.length) {
-                hanzis.push(this.text.substring(nextIdx, this.text.length));
-                pinyins.push(null);
-                translations.push(null);
+                data.hz.push(this.text.substring(nextIdx, this.text.length));
+                data.py.push(null);
+                data.tr.push(null);
             }
-            return {hzs: hanzis, pys: pinyins, trs: translations, alignments: alignmentIndices};
+            return data;
         },
         showStates: function() {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': false};
-            for (let i = 0; i < this.hzs.length; i++) {
-                const hz = this.hzs[i];
-                const py = this.pys[i];
-                const tr = this.trs[i];
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const hz = this.wordData.hz[i];
+                const py = this.wordData.py[i];
+                const tr = this.wordData.tr[i];
                 for (var type of ['hz', 'py', 'tr']) {
-                    const isUnknown = [KnowledgeUnknown, undefined].includes(this.$store.getters.getKnowledgeState(this.knowledgeKey(type, hz, py, tr)));
+                    const isUnknown = [KnowledgeUnknown, undefined].includes(
+                        this.$store.getters.getKnowledgeState(this.knowledgeKey(type, i))
+                    );
                     states[type].push(isUnknown);
                 }
             }
@@ -147,12 +156,18 @@ export default {
         finalShowStates: function() {
             // Show states that include the peek states
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.showStates['translation'] || this.peekStates['translation']};
-            for (let i = 0; i < this.hzs.length; i++) {
+            for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
                     states[type][i] = this.showStates[type][i] || this.peekStates[type][i];
                 }
             }
             return states;
+        },
+        knownStates: function() {
+            return this.getStates(KnowledgeKnown);
+        },
+        learningStates: function() {
+            return this.getStates(KnowledgeLearning);
         },
     },
     watch: {
@@ -168,20 +183,14 @@ export default {
                     this.applyKnownCompounds();
                     this.updateFadeout();
 
-                    const pyPeekStates = [];
-                    const hzPeekStates = [];
-                    const trPeekStates = [];
-                    this.clickedKnow = [];
-                    for (let i = 0; i < this.hzs.length; i++) {
-                        pyPeekStates.push(false);
-                        hzPeekStates.push(false);
-                        trPeekStates.push(false);
-                        this.clickedKnow.push(false);
+                    const allFalse = [];
+                    for (let i = 0; i < this.wordData.hz.length; i++) {
+                        allFalse.push(false);
                     }
                     this.$store.commit('setPeekStates', {
-                        'py': pyPeekStates,
-                        'hz': hzPeekStates,
-                        'tr': trPeekStates,
+                        'py': allFalse.slice(),
+                        'hz': allFalse.slice(),
+                        'tr': allFalse.slice(),
                         'translation': false
                     });
                 }
@@ -197,20 +206,38 @@ export default {
         },
     },
     methods: {
+        getClasses: function(type, i) {
+            const cl = {
+                captioncard: true,
+                peeking: this.peekStates[type][i],
+                captioncardhidden: ! this.finalShowStates[type][i],
+                nonhanzi: this.wordData.py[i] === '',
+                learning: this.learningStates[type][i],
+                known: this.knownStates[type][i]
+            };
+            return cl;
+        },
+        getStates: function(compareTo) {
+            const states = {'py': [], 'hz': [], 'tr': []};
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                for (var type of ['hz', 'py', 'tr']) {
+                    const state = this.$store.getters.getKnowledgeState(this.knowledgeKey(type, i));
+                    states[type].push(state === compareTo);
+                }
+            }
+            return states;
+        },
         updateFadeout: function() {
             this.fadeOut = this.showData !== null && (this.currTime > this.showData.t1 + CAPTION_FADEOUT_TIME || this.currTime < this.showData.t0); // eslint-disable-line
         },
-        resolveTypeIdx: function(type, idx) {
-            if (type === 'hz') return this.hzs[idx];
-            if (type === 'py') return this.pys[idx];
-            if (type === 'tr') return this.trs[idx];
-        },
-        knowledgeKey: function(type, hz, py, tr) {
+        knowledgeKey: function(type, i) {
             let key = null;
+            const hz = this.wordData.hz[i];
+            const py = this.wordData.py[i];
             if (type == 'hz') key = `hz-${hz}`;
             if (type == 'py') key = `py-${hz}-${py}`;
             if (type == 'tr') key = `tr-${hz}-${py}`;
-            if (type == 'translation') key = `tr-${hz}`;
+            if (type == 'translation') key = `tr-${this.wordData.translation}`;
             return key;
         },
         click: function(type, i = null) {
@@ -219,15 +246,23 @@ export default {
                 return;
             }
 
-            if (this.pys[i] === '') return;
+            if (this.wordData.py[i] === '') return;
 
+            const key = this.knowledgeKey(type, i)
             if (this.showStates[type][i] === false) {
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
+                if (! this.peekStates[type][i]) {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                }
+                else if (this.knownStates[type][i]) {
+                    this.$store.commit('setKnowledgeKey', {'key': key, 'val': KnowledgeLearning});
+                }
+                else if (this.learningStates[type][i]) {
+                    this.$store.commit('setKnowledgeKey', {'key': key, 'val': KnowledgeUnknown});
+                }
             }
             else {
-                const key = this.knowledgeKey(type, this.hzs[i], this.pys[i], this.trs[i])
                 this.$store.commit('setKnowledgeKey', {'key': key, 'val': KnowledgeKnown});
-                this.clickedKnow[type][i] = true;
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
         },
         setKnown: function(key, known) {
@@ -239,11 +274,11 @@ export default {
         applyKnownHSKLevels: function() {
             let keys = [];
             let vals = [];
-            for (let i = 0; i < this.hzs.length; i++) {
-                const hz = this.pys[i] === '' ? '' : this.hzs[i];
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const hz = this.wordData.py[i] === '' ? '' : this.wordData.hz[i];
                 if (hz.length === 0) continue;
-                const py = this.pys[i] === '' ? this.hzs[i] : this.pys[i];
-                const tr = this.trs[i];
+                const py = this.wordData.py[i] === '' ? this.wordData.hz[i] : this.wordData.py[i];
+                const tr = this.wordData.tr[i];
                 const itemKeys = {
                     'hz': `hz-${hz}`,
                     'py': `py-${hz}-${py}`,
@@ -251,7 +286,7 @@ export default {
                 };
                 if (tr !== null && /[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
                     // If the translation is capitalized, we want it to be tracked separately
-                    itemKeys['tr'] = `tr-${hz}-${py}-${tr}`;
+                    itemKeys.tr = `tr-${hz}-${py}-${tr}`;
                 }
                 let wordLevel = getWordLevel(hz); // eslint-disable-line
                 if (wordLevel !== null) {
@@ -328,11 +363,15 @@ export default {
     border-radius: 5px;
 }
 
-.captioncard:not(.peeking):not(.nonhanzi) {
+.captioncard:not(.nonhanzi) {
     cursor: pointer;
 }
 
 .captioncard:not(.peeking):not(.nonhanzi):hover {
+    background-color: gray;
+}
+
+.captioncard.peeking:not(.nonhanzi):hover {
     background-color: gray;
 }
 
@@ -341,7 +380,6 @@ export default {
 }
 
 .captioncard.peeking {
-    color: rgb(169,169,169);
     padding-left: 2px;
     padding-right: 2px;
 }
@@ -350,18 +388,67 @@ export default {
     border: 1px dashed white;
 }
 
-.peekcard {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    line-height: 0;
-    height: 18px;
-    top: 50%;
-    margin-top: -9px;
-    visibility: hidden;
+.captioncard.learning .cardcontent {
+    color: darkorange;
 }
 
-.captioncard:hover .peekcard {
+.captioncard.known .cardcontent {
+    color: #32de84;
+}
+
+.iconcard {
+    position: absolute;
+    line-height: 0;
+    height: 20px;
+    visibility: hidden;
+    z-index: 999;
+}
+
+.iconcard.peek {
+    left: 0;
+    top: 50%;
+    width: 100%;
+    margin-top: -10px;
+}
+
+.iconcard.learn {
+    top: -10px;
+    right: -7px;
+    width: 20px;
+}
+
+.iconcard.learn svg {
+    background: darkorange;
+}
+
+.iconcard.know {
+    top: -10px;
+    right: -7px;
+    width: 20px;
+}
+
+
+.iconcard.know svg {
+    background: limegreen;
+}
+
+.iconcard.remove {
+    top: -10px;
+    right: -7px;
+    width: 20px;
+}
+
+.iconcard.remove svg {
+    background: red;
+}
+
+.iconcard > svg {
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.captioncard:hover .iconcard {
+    cursor: pointer;
     visibility: visible;
 }
 
