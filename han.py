@@ -397,7 +397,7 @@ def clean_cedict_translation(tr, py=None, split_or=True, remove_parens=True):
     return transls_out
 
 
-CEDICT = Future.from_file('data/remote/public/cedict_with_freqs.json', raise_file_not_found=False)
+CEDICT = Future.from_file('data/remote/private/cedict_with_freqs.json', raise_file_not_found=False)
 if CEDICT is None:
     CEDICT = make_cedict()
 

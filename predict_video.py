@@ -27,6 +27,7 @@ from process_translations import get_alignment_translations, get_machine_transla
 from word_alignment import add_segmentation_and_alignment
 from caption_translation_alignment import align_translations_and_captions, make_caption_lines_lists
 from han import filter_text_hanzi, make_cedict
+from pinyin import normalized_to_diacritical, extract_normalized_pinyin
 from levenshtein import weighted_levenshtein, OpType
 
 from pinyin_freq_db import make_pinyin_freq_db
@@ -1056,12 +1057,12 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
 
 
 def _store_cedict(cedict_with_freqs):
-    cedict_with_freqs >> 'data/public/cedict_with_freqs.json'
+    cedict_with_freqs >> 'data/remote/private/cedict_with_freqs.json'
 
 
 def make_pinyin_db_classifiers():
     pinyin_freq_db = make_pinyin_freq_db()
-    pinyin_freq_db >> 'data/remote/pinyin_freqs.json'
+    pinyin_freq_db >> 'data/remote/private/pinyin_freqs.json'
     pinyin_classifiers = train_pinyin_classifiers(pinyin_freq_db)
     pinyin_classifiers >> 'data/git/pinyin_classifiers.py'
     cedict_with_freqs = make_cedict(freqs=pinyin_freq_db)
@@ -1070,10 +1071,35 @@ def make_pinyin_db_classifiers():
 
 
 def make_cedict_db():
-    pinyin_freq_db = Future.from_file('data/remote/pinyin_freqs.json')
+    pinyin_freq_db = Future.from_file('data/remote/private/pinyin_freqs.json')
     cedict_with_freqs = make_cedict(freqs=pinyin_freq_db)
     _store_cedict(cedict_with_freqs)
     return cedict_with_freqs
+
+
+@task(serializer=json)
+def _make_public_cedict(cedict):
+    out = {}
+    for sm, (_, entries, *_) in cedict.items():
+        out_items = []
+        for tr, py, transl, freq, difficulty in entries:
+            py_parts = extract_normalized_pinyin(py)
+            py_parts_diacriticals = [normalized_to_diacritical(pp) for pp in py_parts]
+            out_items.append((py_parts, py_parts_diacriticals, transl.split('/')))
+
+        out[sm] = out_items
+
+    return out
+
+
+def make_public_cedict_db():
+    cedict = Future.from_file('data/remote/private/cedict_with_freqs.json')
+    public_cedict = _make_public_cedict(cedict)
+    public_cedict >> f'data/remote/public/public_cedict-{public_cedict.hash}.json'
+    with open(f'data/remote/public/public_cedict.hash', 'w') as f:
+        f.write(public_cedict.hash)
+
+    return public_cedict
 
 
 def process_video_captions(
