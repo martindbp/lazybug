@@ -3,16 +3,17 @@
         <div>
             <SvgButton
                 name="move"
+                title="Move"
                 @mousedown.stop.prevent="moveMouseDown"
             />
-            <SvgButton @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
-            <SvgButton @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
-            <SvgButton @click="prev" name="play-track-prev" />
-            <SvgButton @click="redo" name="redo" />
+            <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
+            <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
+            <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
+            <SvgButton title="Replay this line" @click="redo" name="redo" />
             <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
-            <SvgButton @click="next" name="play-track-next" style="margin-right: 10px" />
-            <SvgButton @click="peekAll" name="eye" style="margin-right: 10px" />
-            <SvgButton @click="showOptions" name="options" style="margin-right: 10px" />
+            <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
+            <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
+            <SvgButton title="Options" @click="showOptions" name="options" />
             <OptionsDialog />
         </div>
     </div>
