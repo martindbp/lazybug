@@ -14,7 +14,9 @@
             <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
             <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
             <SvgButton title="Options" @click="showOptions" name="options" />
+            <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" />
             <OptionsDialog />
+            <DictionaryDialog v-bind:caption="currCaption" />
         </div>
     </div>
 </template>
@@ -22,12 +24,14 @@
 <script>
 import SvgButton from './SvgButton.vue'
 import OptionsDialog from './OptionsDialog.vue'
+import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
     props: ['prevCaption', 'currCaption', 'nextCaption', 'currTime', 'paused', 'AVElement'],
     components: {
         SvgButton,
         OptionsDialog,
+        DictionaryDialog,
     },
     data: function() { return {
         dragging: false,
@@ -38,6 +42,11 @@ export default {
     methods: {
         showOptions: function(event) {
             this.$store.commit('setShowOptions', true);
+        },
+        showDictionary: function(event) {
+            if (this.currCaption && ! this.currCaption.dummy) {
+                this.$store.commit('setShowDictionary', true);
+            }
         },
         moveMouseDown: function(event) {
             this.dragging = true;

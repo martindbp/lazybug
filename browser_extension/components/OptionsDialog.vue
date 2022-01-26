@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="show" dark>
-        <q-card style="width: 300px" class="q-px-sm q-pb-md">
+        <q-card style="width: 600px" class="q-px-sm q-pb-md">
             <q-card-section>
                 <div class="text-h6">Hanzi known level</div>
             </q-card-section>

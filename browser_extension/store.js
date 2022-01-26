@@ -9,6 +9,7 @@ const store = new Vuex.Store({
         captionOffset: [0, 0],
         peekStates: Vue.ref({'py': [], 'hz': [], 'tr': [], 'translation': false}),
         showOptions: false,
+        showDictionary: false,
         options: Vue.ref({
             pauseAfterCaption: true,
             knownLevels: {
@@ -21,6 +22,9 @@ const store = new Vuex.Store({
     mutations: {
         setShowOptions(state, val) {
             state.showOptions = val;
+        },
+        setShowDictionary(state, val) {
+            state.showDictionary = val;
         },
         setKnowledgeKey(state, keyVal) {
             state.knowledge[keyVal.key] = keyVal.val;
