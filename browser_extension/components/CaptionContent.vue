@@ -78,9 +78,9 @@ export default {
         showData: this.data,
         fadeOut: false,  // NOTE: we set fadeOut based on currTime in a watch instead of computed, because a computed makes the component re-render every frame
         eyecon: getIconSvg("eye", 18),
-        bookIcon: getIconSvg("book", 18),
+        bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
-        closeIcon: getIconSvg("close", 18),
+        closeIcon: getIconSvg("undo", 18),
         undoIcon: getIconSvg("undo", 18),
     }},
     computed: {
@@ -439,7 +439,7 @@ export default {
 }
 
 .iconcard.remove svg {
-    background: red;
+    background: darkgray;
 }
 
 .iconcard > svg {
