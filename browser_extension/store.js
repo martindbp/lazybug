@@ -15,6 +15,12 @@ const store = new Vuex.Store({
         showDictionary: false,
         options: Vue.ref({
             pauseAfterCaption: true,
+            show: {
+                hz: null,
+                py: null,
+                tr: null,
+                fullTr: false,
+            },
             knownLevels: {
                 py: 4,
                 hz: 2,
@@ -70,8 +76,8 @@ const store = new Vuex.Store({
             state.options[option.key] = option.value;
             optionsChanged = true;
         },
-        setKnownLevel(state, val) {
-            state.options.knownLevels[val.type] = val.level;
+        setDeepOption(state, option) {
+            state.options[option.key][option.key2] = option.value;
             optionsChanged = true;
         },
     },

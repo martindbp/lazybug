@@ -431,7 +431,7 @@ export default {
     padding: 2px;
 }
 
-.captioncard:hover .iconcard {
+.captioncard:hover:not(.nonhanzi) .iconcard {
     cursor: pointer;
     visibility: visible;
 }

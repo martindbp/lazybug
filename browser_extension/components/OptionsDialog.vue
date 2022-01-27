@@ -1,29 +1,75 @@
 <template>
-    <q-dialog v-model="show" dark>
-        <q-card style="width: 400px" class="q-px-sm q-pb-md">
-            <q-card-section>
-                <div class="text-h6">Knowledge Levels</div>
-            </q-card-section>
-            <q-item-label header>Hanzi</q-item-label>
-            <q-item dense>
-                <q-item-section>
-                    <q-slider color="teal" v-model="hanziKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
-                </q-item-section>
-            </q-item>
+    <q-dialog v-model="show" dark style="min-height: 500px">
+        <q-card class="q-px-sm q-pb-md">
+            <q-tabs
+              v-model="tab"
+              dense
+              class="text-white shadow-2"
+            >
+                <q-tab name="knowledge" label="Knowledge" />
+                <q-tab name="display" label="Display" />
+                <q-tab name="content" label="Content" />
+                <q-tab name="keyboard" label="Keyboard" />
+            </q-tabs>
 
-            <q-item-label header>Pinyin</q-item-label>
-            <q-item dense>
-                <q-item-section>
-                    <q-slider color="teal" v-model="pinyinKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
-                </q-item-section>
-            </q-item>
+            <q-tab-panels v-model="tab">
+                <q-tab-panel name="knowledge" style="width: 400px">
+                    Select the HSK level you know and want to hide
+                    <q-item-label header>Hanzi</q-item-label>
+                    <q-item dense>
+                        <q-item-section>
+                            <q-slider color="teal" v-model="hanziKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                        </q-item-section>
+                    </q-item>
 
-            <q-item-label header>Word Translation</q-item-label>
-            <q-item dense>
-                <q-item-section>
-                    <q-slider color="teal" v-model="translationKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
-                </q-item-section>
-            </q-item>
+                    <q-item-label header>Pinyin</q-item-label>
+                    <q-item dense>
+                        <q-item-section>
+                            <q-slider color="teal" v-model="pinyinKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                        </q-item-section>
+                    </q-item>
+
+                    <q-item-label header>Word translation</q-item-label>
+                    <q-item dense>
+                        <q-item-section>
+                            <q-slider color="teal" v-model="translationKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                        </q-item-section>
+                    </q-item>
+                </q-tab-panel>
+                <q-tab-panel name="display" :style="{width: '400px'}">
+                    Override what content to display
+                    <q-item-label header>Hanzi</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="showHz" :val="null" label="Auto" />
+                        <q-radio v-model="showHz" :val="false" label="Always off" />
+                        <q-radio v-model="showHz" :val="true" label="Always on" />
+                    </div>
+
+                    <q-item-label header>Pinyin</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="showPy" :val="null" label="Auto" />
+                        <q-radio v-model="showPy" :val="false" label="Always off" />
+                        <q-radio v-model="showPy" :val="true" label="Always on" />
+                    </div>
+
+                    <q-item-label header>Word translation</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="showTr" :val="null" label="Auto" />
+                        <q-radio v-model="showTr" :val="false" label="Always off" />
+                        <q-radio v-model="showTr" :val="true" label="Always on" />
+                    </div>
+
+                    <q-item-label header>Full sentence translation</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="showFullTr" :val="false" label="Always off" />
+                        <q-radio v-model="showFullTr" :val="true" label="Always on" />
+                    </div>
+                </q-tab-panel>
+                <q-tab-panel name="content" :style="{width: '400px'}">
+                </q-tab-panel>
+                <q-tab-panel name="keyboard" :style="{width: '400px'}">
+                </q-tab-panel>
+            </q-tab-panels>
             <q-card-actions align="right" class="text-teal">
                 <q-btn flat label="OK" @click="clickClose"></q-btn>
             </q-card-actions>
@@ -35,28 +81,40 @@
 export default {
     components: { },
     data: function() { return {
-        levels: ['None', 'HSK1', 'HSK2', 'HSK3', 'HSK4', 'HSK5', 'HSK6', 'All'],
-        sliders: false,
-        slideAlarm: 0,
-        slideVol: 0,
-        slideVibration: 0,
+        tab: Vue.ref('knowledge'),
     }},
     computed: {
+        showHz: {
+            get: function() { return this.$store.state.options.show.hz; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'hz', value: val}); },
+        },
+        showPy: {
+            get: function() { return this.$store.state.options.show.py; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'py', value: val}); },
+        },
+        showTr: {
+            get: function() { return this.$store.state.options.show.tr; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'tr', value: val}); },
+        },
+        showFullTr: {
+            get: function() { return this.$store.state.options.show.fullTr; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'fullTr', value: val}); },
+        },
         show: {
             get: function() { return this.$store.state.showOptions; },
             set: function(val) { this.$store.commit('setShowOptions', val); },
         },
         hanziKnownLevel: {
             get: function() { return this.$store.state.options.knownLevels.hz; },
-            set: function(val) { this.$store.commit('setKnownLevel', {type: 'hz', level: val}); },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'knownLevels', key2: 'hz', value: val}); },
         },
         pinyinKnownLevel: {
             get: function() { return this.$store.state.options.knownLevels.py; },
-            set: function(val) { this.$store.commit('setKnownLevel', {type: 'py', level: val}); },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'knownLevels', key2: 'py', value: val}); },
         },
         translationKnownLevel: {
             get: function() { return this.$store.state.options.knownLevels.tr; },
-            set: function(val) { this.$store.commit('setKnownLevel', {type: 'tr', level: val}); },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'knownLevels', key2: 'tr', value: val}); },
         },
         options: function() { return this.$store.state.options; },
     },
