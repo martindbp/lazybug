@@ -1,13 +1,16 @@
 <template>
     <q-dialog v-model="show" dark>
         <q-card style="width: 600px" class="q-px-sm q-pb-md">
-            <q-card-section>
-                <div class="text-h4">Dictionary</div>
-            </q-card-section>
             <q-card-section align="center">
-                <div class="text-h4">
+                <div class="text-h4" :style="{ color: '#E8E8E8' }">
                     <span
-                        :class="{char: true, highlight: i >= highlightRange[0] && i < highlightRange[1], firstchar: i == highlightRange[0], lastchar: i == highlightRange[1] - 1}"
+                        :class="{
+                            char: true,
+                            selected: i >= showRange[0] && i < showRange[1],
+                            highlight: i >= highlightRange[0] && i < highlightRange[1],
+                            firstchar: i == highlightRange[0],
+                            lastchar: i == highlightRange[1] - 1
+                        }"
                         v-for="(char, i) in text"
                         @mouseover="mouseoverChar = i"
                         @click="clickChar(i)"
@@ -16,11 +19,11 @@
                     </span>
                 </div>
             </q-card-section>
-            <q-card-section align="left" style="padding: 25px; max-height: 500px; height: 500px" class="scroll">
+            <q-card-section align="left" style="padding: 25px; max-height: 400px; height: 400px" class="scroll">
                 <q-separator color="orange" v-if="showEntries.length > 0"/>
                 <div v-for="entry in showEntries">
-                    <div class="text-h4" :style="{ color: 'lightgray' }">{{ entry.hz }}</div>
-                    <div class="text-h6" v-for="item in entry.items">
+                    <div class="text-h4">{{ entry.hz }}</div>
+                    <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
                         <span v-for="(py, i) in item[1]" :style="{ color: COLORS[parseInt(item[0][i].slice(-1))] }">
                             {{ py }}
                         </span>: {{ item[2].join(' ‧ ') }}</div>
@@ -46,6 +49,7 @@ export default {
     data: function() { return {
         mouseoverChar: null,
         showEntries: [],
+        showRange: [-1, -1],
         COLORS: [
             null,
             '#DC143C', // red
@@ -91,6 +95,7 @@ export default {
     watch: {
         caption: function(newVal, oldVal) {
             this.showEntries = [];
+            this.showRange = [-1, -1];
             this.mouseoverChar = null;
         },
     },
@@ -101,6 +106,7 @@ export default {
             this.show = false;
         },
         clickChar: function(event) {
+            this.showRange = this.highlightRange;
             this.showEntries = this.dictEntries;
         },
     },
@@ -132,6 +138,11 @@ export default {
 
 .firstchar.lastchar {
     border-radius: 5px;
+}
+
+.selected {
+    text-decoration: underline;
+    text-decoration-color: orange;
 }
 
 </style>
