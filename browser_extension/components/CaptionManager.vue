@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="captionId">
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
@@ -238,11 +238,6 @@ export default {
             this.captionData = null;
             if (this.captionId === null) return;
 
-            if (this.showList === null || ! this.showList.includes(this.captionId)) {
-                // TODO: if list changes, we need to check again
-                return;
-            }
-
             const self = this;
             chrome.runtime.sendMessage({'type': 'getCaptions', 'data': {
                 'captionId': self.captionId,
@@ -390,16 +385,20 @@ export default {
         captionOffset: function() { return this.$store.state.captionOffset; },
         captionFontScale: function() { return this.$store.state.captionFontScale; },
         captionId: function() {
+            let captionId = null;
             if (this.localVideoHash !== null) {
-                return 'local-' + this.localVideoHash;
+                captionId = 'local-' + this.localVideoHash;
             }
 
             let videoId = getYoutubeIdFromURL(this.url); // eslint-disable-line
             if (videoId !== null) {
-                return 'youtube-' + videoId;
+                captionId = 'youtube-' + videoId;
+            }
+            if (this.showList === null || ! this.showList.includes(captionId)) {
+                return null;
             }
 
-            return null;
+            return captionId;
         },
         videoFrameSize: function() {
             if (this.captionData === null) return null;
