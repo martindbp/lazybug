@@ -8,8 +8,10 @@ function clearBadgeStatus() {
 }
 
 function getStorageData(key) {
+    console.log('Get storage', key);
     return new Promise((resolve, reject) => {
         chrome.storage.local.get([key], (items) => {
+            console.log('Done', key);
             if (chrome.runtime.lastError) {
                 return reject(chrome.runtime.lastError);
             }
@@ -32,14 +34,17 @@ function setStorageData(data) {
 const CDN_URL = "https://cdn.zimu.ai/file/";
 
 function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
+    console.log(folder, resourceFilename);
     let [filename, ext] = resourceFilename.split('.');
     
     const storageHashKey = `${folder}/${filename}.hash`;
     const storageFileKey = `${folder}/${filename}.${ext}`;
 
     // NOTE: never cache the hash files, we purge those manually from Cloudflare
+    console.log('Fetching hash for ', folder);
     const fetchHashPromise = fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
     .then(function(response) {
+        console.log('Fetching done for ', folder);
         if (!response.ok) {
             failCallback(response);
             return null;
@@ -55,8 +60,10 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
         const fetchHash = values[0].trim();
         const storageHash = values[1];
         if (fetchHash !== storageHash) {
+            console.log('Fetching', folder, filename, fetchHash);
             return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
                 .then(function(response) {
+                    chrome.action.setBadgeText({text:''});
                     if (!response.ok) {
                         failCallback(response);
                         return null;
@@ -65,6 +72,8 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
                 })
                 .then((response) => response.json())
                 .then(function(data) {
+                    console.log('Fetching done for', folder, filename, fetchHash);
+
                     const storeData = {};
                     storeData[storageFileKey] = data;
                     storeData[storageHashKey] = fetchHash;
@@ -83,10 +92,6 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message.type === 'contentOpened') {
-        clearBadgeStatus();
-    }
-
     if (message.type === 'fetchVersionedResource') {
         fetchVersionedResource('zimu-public', message.filename, function (data) {
             sendResponse({'data': data});
@@ -96,9 +101,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type == 'getCaptions') {
-        clearBadgeStatus();
         fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data) {
-            showBadgeStatus();
             sendResponse({'data': data});
             chrome.runtime.sendMessage({'type': 'requestSucceeded'});
         }, function(response) {

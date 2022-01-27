@@ -1,5 +1,5 @@
 <template>
-    <div v-if="captionData !== null">
+    <div>
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
@@ -15,6 +15,7 @@
         <CaptionBlur
             id="blurroot"
             ref="blurroot"
+            v-if="captionData !== null"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
             v-bind:nextCaption="nextCaption"
@@ -372,7 +373,9 @@ export default {
             // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
             this.$refs.captionroot.$el.style.left = (videoRect.left + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
             this.$refs.captionroot.$el.style.top = (0.8 * videoRect.bottom + this.captionOffset[1]) + 'px';
-            this.$refs.blurroot.updateBlurStyle();
+            if (this.$refs.blurroot) {
+                this.$refs.blurroot.updateBlurStyle();
+            }
 
             // We scale the font size with the width of the video element and the font scale selected by the user.
             // At width=DEFAULT_WIDTH and fontScale=0.5 we want fontSize=DEFAULT_FONT_SIZE
