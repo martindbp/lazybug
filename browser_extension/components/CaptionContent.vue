@@ -423,7 +423,7 @@ export default {
 }
 
 .iconcard.remove svg {
-    background: darkgray;
+    background: lightgray;
 }
 
 .iconcard > svg {
