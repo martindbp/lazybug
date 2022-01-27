@@ -16,7 +16,7 @@
             <SvgButton title="Options" @click="showOptions" name="options" />
             <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" />
             <OptionsDialog />
-            <DictionaryDialog v-bind:caption="currCaption" />
+            <DictionaryDialog v-bind:caption="data" />
         </div>
     </div>
 </template>
@@ -27,7 +27,7 @@ import OptionsDialog from './OptionsDialog.vue'
 import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
-    props: ['prevCaption', 'currCaption', 'nextCaption', 'currTime', 'paused', 'AVElement'],
+    props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'AVElement'],
     components: {
         SvgButton,
         OptionsDialog,
@@ -44,7 +44,7 @@ export default {
             this.$store.commit('setShowOptions', true);
         },
         showDictionary: function(event) {
-            if (this.currCaption && ! this.currCaption.dummy) {
+            if (this.data && ! this.data.dummy) {
                 this.$store.commit('setShowDictionary', true);
             }
         },
@@ -83,7 +83,7 @@ export default {
             }
         },
         redo: function(event) {
-            const goToCaption = this.currCaption !== null ? this.currCaption : this.prevCaption;
+            const goToCaption = this.data !== null ? this.data : this.prevCaption;
             if (goToCaption === null) return;
 
             this.AVElement.currentTime = goToCaption.t0 + 1e-3;

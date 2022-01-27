@@ -1,5 +1,5 @@
 <template>
-    <div :class="{captioncontent: true, fadeout: fadeOut, notransition: showData !== null && showData.dummy === true }">
+    <div :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
         <table class="contenttable">
             <tr class="toprow">
                 <td
@@ -60,7 +60,7 @@
                 peeking: peekStates['translation'],
                 fulltranslation: true,
                 placeholder: !finalShowStates['translation'],
-                showborder: showData !== null,
+                showborder: data !== null,
             }"
         >
             <span v-if="finalShowStates['translation']"> {{ translation }}</span>
@@ -73,10 +73,9 @@ export default {
     props: {
         data: { default: null },
         currTime: { default: null },
+        fadeOut: { default: false },
     },
     data: function () { return {
-        showData: this.data,
-        fadeOut: false,  // NOTE: we set fadeOut based on currTime in a watch instead of computed, because a computed makes the component re-render every frame
         eyecon: getIconSvg("eye", 18),
         bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
@@ -96,47 +95,47 @@ export default {
         },
         truncateTrLengths: function() {
             let outLengths = [];
-            for (let i = 0; i < this.showData.alignments.length; i++) {
+            for (let i = 0; i < this.data.alignments.length; i++) {
                 const trunateLength = Math.max(15, Math.ceil(Math.max(this.wordData.py[i].length, this.wordData.hz[i].length) * 2))  // add 100% to longest
                 outLengths.push(trunateLength);
             }
             return outLengths;
         },
         translation: function() {
-            if (this.showData == null) return '';
-            return this.showData.translations[0];
+            if (this.data == null) return '';
+            return this.data.translations[0];
         },
-        text: function() { return this.showData.texts.join(' '); },
+        text: function() { return this.data.texts.join(' '); },
         wordData: function() {
-            const data = {hz: [], py: [], tr: [], translation: null};
-            if (this.showData === null) {
-                return data;
+            const wordData = {hz: [], py: [], tr: [], translation: null};
+            if (this.data === null) {
+                return wordData;
             }
 
-            data.translation = this.showData.translations[0];
+            wordData.translation = this.data.translations[0];
 
             let nextIdx = 0;
-            for (let i = 0; i < this.showData.alignments.length; i++) {
-                let [startIdx, endIdx, _, pinyinParts, wordTranslation] = this.showData.alignments[i];
+            for (let i = 0; i < this.data.alignments.length; i++) {
+                let [startIdx, endIdx, _, pinyinParts, wordTranslation] = this.data.alignments[i];
                 if (startIdx > nextIdx) {
-                    data.hz.push(this.text.substring(nextIdx, startIdx));
-                    data.py.push(null);
-                    data.tr.push(null);
+                    wordData.hz.push(this.text.substring(nextIdx, startIdx));
+                    wordData.py.push(null);
+                    wordData.tr.push(null);
                 }
                 const hz = this.text.substring(startIdx, endIdx);
-                data.hz.push(hz);
+                wordData.hz.push(hz);
                 const diacriticalPinyins = pinyinParts.map((part) => part[0]);
                 const displayPinyin = diacriticalPinyins.join('');
-                data.py.push(displayPinyin);
-                data.tr.push(wordTranslation);
+                wordData.py.push(displayPinyin);
+                wordData.tr.push(wordTranslation);
                 nextIdx = endIdx;
             }
             if (nextIdx < this.text.length) {
-                data.hz.push(this.text.substring(nextIdx, this.text.length));
-                data.py.push(null);
-                data.tr.push(null);
+                wordData.hz.push(this.text.substring(nextIdx, this.text.length));
+                wordData.py.push(null);
+                wordData.tr.push(null);
             }
-            return data;
+            return wordData;
         },
         showStates: function() {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': false};
@@ -174,14 +173,10 @@ export default {
         data: {
             immediate: true,
             handler: function(newData, oldData) {
-                if (newData !== null) {
-                    this.showData = newData;
-                }
                 if (newData !== oldData) {
                     if (newData !== null && newData.dummy === true) return;
                     this.applyKnownHSKLevels();
                     this.applyKnownCompounds();
-                    this.updateFadeout();
 
                     const allFalse = [];
                     for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -193,14 +188,6 @@ export default {
                         'tr': allFalse.slice(),
                         'translation': false
                     });
-                }
-            },
-        },
-        currTime: {
-            immediate: true,
-            handler: function(newTime, oldTime) {
-                if (newTime !== oldTime) {
-                    this.updateFadeout();
                 }
             },
         },
@@ -226,9 +213,6 @@ export default {
                 }
             }
             return states;
-        },
-        updateFadeout: function() {
-            this.fadeOut = this.showData !== null && (this.currTime > this.showData.t1 + CAPTION_FADEOUT_TIME || this.currTime < this.showData.t0); // eslint-disable-line
         },
         knowledgeKey: function(type, i) {
             let key = null;
