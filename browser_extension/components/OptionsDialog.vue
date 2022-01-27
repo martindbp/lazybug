@@ -1,42 +1,29 @@
 <template>
     <q-dialog v-model="show" dark>
-        <q-card style="width: 600px" class="q-px-sm q-pb-md">
+        <q-card style="width: 400px" class="q-px-sm q-pb-md">
             <q-card-section>
-                <div class="text-h6">Hanzi known level</div>
+                <div class="text-h6">Knowledge Levels</div>
             </q-card-section>
-            <q-select filled v-model="hanziKnownLevel" :options="levels" label="Filled" />
-
-
-            <q-item-label header>Media volume</q-item-label>
+            <q-item-label header>Hanzi</q-item-label>
             <q-item dense>
-                <q-item-section avatar>
-                    <q-icon name="volume_up"></q-icon>
-                </q-item-section>
                 <q-item-section>
-                    <q-slider color="teal" v-model="slideVol" :step="0"></q-slider>
+                    <q-slider color="teal" v-model="hanziKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
                 </q-item-section>
             </q-item>
 
-            <q-item-label header>Alarm volume</q-item-label>
+            <q-item-label header>Pinyin</q-item-label>
             <q-item dense>
-                <q-item-section avatar>
-                    <q-icon name="alarm"></q-icon>
-                </q-item-section>
                 <q-item-section>
-                    <q-slider color="teal" v-model="slideAlarm" :step="0"></q-slider>
+                    <q-slider color="teal" v-model="pinyinKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
                 </q-item-section>
             </q-item>
 
-            <q-item-label header>Ring volume</q-item-label>
+            <q-item-label header>Word Translation</q-item-label>
             <q-item dense>
-                <q-item-section avatar>
-                    <q-icon name="vibration"></q-icon>
-                </q-item-section>
                 <q-item-section>
-                    <q-slider color="teal" v-model="slideVibration" :step="0"></q-slider>
+                    <q-slider color="teal" v-model="translationKnownLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
                 </q-item-section>
             </q-item>
-            <q-input filled label="Filled"></q-input>
             <q-card-actions align="right" class="text-teal">
                 <q-btn flat label="OK" @click="clickClose"></q-btn>
             </q-card-actions>
@@ -60,16 +47,16 @@ export default {
             set: function(val) { this.$store.commit('setShowOptions', val); },
         },
         hanziKnownLevel: {
-            get: function() { return this.$store.state.options.hanziKnownLevel; },
-            set: function(val) { this.$store.commit('setOption', {key: 'hanziKnownLevel', val: val}); },
+            get: function() { return this.$store.state.options.knownLevels.hz; },
+            set: function(val) { this.$store.commit('setKnownLevel', {type: 'hz', level: val}); },
         },
         pinyinKnownLevel: {
-            get: function() { return this.$store.state.options.pinyinKnownLevel; },
-            set: function(val) { this.$store.commit('setOption', {key: 'pinyinKnownLevel', val: val}); },
+            get: function() { return this.$store.state.options.knownLevels.py; },
+            set: function(val) { this.$store.commit('setKnownLevel', {type: 'py', level: val}); },
         },
         translationKnownLevel: {
-            get: function() { return this.$store.state.options.translationKnownLevel; },
-            set: function(val) { this.$store.commit('setOption', {key: 'translationKnownLevel', val: val}); },
+            get: function() { return this.$store.state.options.knownLevels.tr; },
+            set: function(val) { this.$store.commit('setKnownLevel', {type: 'tr', level: val}); },
         },
         options: function() { return this.$store.state.options; },
     },

@@ -58,6 +58,9 @@ const store = new Vuex.Store({
         setOption(state, option) {
             state.options[option.key] = option.value;
         },
+        setKnownLevel(state, val) {
+            state.options.knownLevels[val.type] = val.level;
+        },
     },
     getters: {
         getKnowledgeState: (state) => (key) => {
