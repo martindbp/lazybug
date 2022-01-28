@@ -85,11 +85,11 @@ export default {
     computed: {
         peekStates: function() {
             const states = this.$store.state.peekStates;
-            states['translation'] = states['translation'] && !this.showStates['translation'];
+            states['translation'] = (states['translation'] || this.$store.state.options.show['translation']) && !this.showStates['translation'];
             for (var i = 0; i < this.wordData.hz.length; i++) {
-                states.py[i] = states.py[i] && !this.showStates.py[i];
-                states.hz[i] = states.hz[i] && !this.showStates.hz[i];
-                states.tr[i] = states.tr[i] && !this.showStates.tr[i];
+                for (var type of ['hz', 'py', 'tr']) {
+                    states[type][i] = (states[type][i] || this.$store.state.options.show[type]) && !this.showStates[type][i];
+                }
             }
             return states;
         },

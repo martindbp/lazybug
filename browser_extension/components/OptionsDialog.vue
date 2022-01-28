@@ -1,6 +1,6 @@
 <template>
-    <q-dialog v-model="show" dark style="min-height: 500px">
-        <q-card class="q-px-sm q-pb-md">
+    <q-dialog v-model="show" dark>
+        <q-card class="q-px-sm q-pb-md" style="min-height: 600px">
             <q-tabs
               v-model="tab"
               dense
@@ -36,7 +36,7 @@
                         </q-item-section>
                     </q-item>
                 </q-tab-panel>
-                <q-tab-panel name="display" :style="{width: '400px'}">
+                <q-tab-panel name="display" style="width: 400px">
                     Override what content to display
                     <q-item-label header>Hanzi</q-item-label>
                     <div class="q-gutter-sm">
@@ -65,13 +65,13 @@
                         <q-radio v-model="showFullTr" :val="true" label="Always on" />
                     </div>
                 </q-tab-panel>
-                <q-tab-panel name="content" :style="{width: '400px'}">
+                <q-tab-panel name="content" style="width: 400px">
                 </q-tab-panel>
-                <q-tab-panel name="keyboard" :style="{width: '400px'}">
+                <q-tab-panel name="keyboard" style="width: 400px">
                 </q-tab-panel>
             </q-tab-panels>
-            <q-card-actions align="right" class="text-teal">
-                <q-btn flat label="OK" @click="clickClose"></q-btn>
+            <q-card-actions align="right" class="text-teal absolute-bottom">
+                <q-btn flat label="Close" @click="clickClose"></q-btn>
             </q-card-actions>
         </q-card>
     </q-dialog>
