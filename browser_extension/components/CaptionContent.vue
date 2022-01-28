@@ -28,7 +28,7 @@
                     <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.hz[i]"></span>
                     <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.hz[i]"></span>
                     <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.hz[i] && learningStates.hz[i]"></span>
-                    <span class="cardcontent" :style="{opacity: finalShowStates.hz[i] ? 1 : 0}">{{ hz }}</span>
+                    <span class="cardcontent" :style="{opacity: finalShowStates.hz[i] ? 1 : 0}">{{ sm2tr(hz) }}</span>
                 </td>
             </tr>
             <tr class="bottomrow">
@@ -85,7 +85,7 @@ export default {
     computed: {
         peekStates: function() {
             const states = this.$store.state.peekStates;
-            states['translation'] = (states['translation'] || this.$store.state.options.show['translation']) && !this.showStates['translation'];
+            states['translation'] = (states['translation'] || this.$store.state.options.show['fullTr']) && !this.showStates['translation'];
             for (var i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
                     states[type][i] = (states[type][i] || this.$store.state.options.show[type]) && !this.showStates[type][i];
@@ -105,7 +105,16 @@ export default {
             if (this.data == null) return '';
             return this.data.translations[0];
         },
-        text: function() { return this.data.texts.join(' '); },
+        text: function() {
+            return this.texts.tr;
+        },
+        texts: function() {
+            const sm = this.data.texts.join(' ');
+            return {
+                sm: sm,
+                tr: this.sm2tr(sm),
+            };
+        },
         wordData: function() {
             const wordData = {hz: [], py: [], tr: [], translation: null};
             if (this.data === null) {
@@ -118,11 +127,11 @@ export default {
             for (let i = 0; i < this.data.alignments.length; i++) {
                 let [startIdx, endIdx, _, pinyinParts, wordTranslation] = this.data.alignments[i];
                 if (startIdx > nextIdx) {
-                    wordData.hz.push(this.text.substring(nextIdx, startIdx));
+                    wordData.hz.push(this.texts.sm.substring(nextIdx, startIdx));
                     wordData.py.push(null);
                     wordData.tr.push(null);
                 }
-                const hz = this.text.substring(startIdx, endIdx);
+                const hz = this.texts.sm.substring(startIdx, endIdx);
                 wordData.hz.push(hz);
                 const diacriticalPinyins = pinyinParts.map((part) => part[0]);
                 const displayPinyin = diacriticalPinyins.join('');
@@ -131,7 +140,7 @@ export default {
                 nextIdx = endIdx;
             }
             if (nextIdx < this.text.length) {
-                wordData.hz.push(this.text.substring(nextIdx, this.text.length));
+                wordData.hz.push(this.texts.sm.substring(nextIdx, this.text.length));
                 wordData.py.push(null);
                 wordData.tr.push(null);
             }
@@ -272,7 +281,7 @@ export default {
                     // If the translation is capitalized, we want it to be tracked separately
                     itemKeys.tr = `tr-${hz}-${py}-${tr}`;
                 }
-                let wordLevel = getWordLevel(hz); // eslint-disable-line
+                let wordLevel = this.getWordLevel(hz); // eslint-disable-line
                 if (wordLevel !== null) {
                     for (var type of ['hz', 'py', 'tr']) {
                         if (

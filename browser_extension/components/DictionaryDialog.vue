@@ -24,9 +24,9 @@
                 <div v-for="entry in showEntries">
                     <div class="text-h4">{{ entry.hz }}</div>
                     <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
-                        <span v-for="(py, i) in item[1]" :style="{ color: COLORS[parseInt(item[0][i].slice(-1))] }">
+                        <span v-for="(py, i) in item.pysDiacriticals" :style="{ color: COLORS[parseInt(item.pys[i].slice(-1))] }">
                             {{ py }}
-                        </span>: {{ item[2].join(' ‧ ') }}</div>
+                        </span>: {{ item.translations.join(' ‧ ') }}</div>
                     <q-separator color="orange" />
                 </div>
                 <div class="text-h5" v-if="showEntries.length === 0 && text !== ''">
@@ -60,32 +60,40 @@ export default {
     }},
     computed: {
         text: function() {
+            return this.texts.tr;
+        },
+        texts: function() {
             if (this.caption.dummy) return '';
-            return this.caption.texts.join(' ');
+            const sm = this.caption.texts.join(' ');
+            return {
+                sm: sm,
+                tr: this.sm2tr(sm),
+            };
         },
         show: {
             get: function() { return this.$store.state.showDictionary; },
             set: function(val) { this.$store.commit('setShowDictionary', val); },
         },
         dictEntries: function() {
-            if (this.highlightRange[0] < 0) return [];
+            if (this.$store.state.DICT === null || this.highlightRange[0] < 0) return [];
 
             const entries = []
             for (var i = this.highlightRange[0]+1; i <= this.highlightRange[1]; i++) {
                 const text = this.text.substring(this.highlightRange[0], i)
-                if (DICT[text] !== undefined) {
-                    entries.push({hz: text, items: DICT[text]});
+                const textSm = this.texts.sm.substring(this.highlightRange[0], i)
+                if (this.$store.state.DICT[textSm] !== undefined) {
+                    entries.push({hz: text, items: dictItemsToDict(this.$store.state.DICT[textSm])});
                 }
             }
 
             return entries.reverse();
         },
         highlightRange: function() {
-            if (this.mouseoverChar === null) return [-1, -1];
+            if (this.$store.state.DICT === null || this.mouseoverChar === null) return [-1, -1];
 
             let range = [-1, -1];
-            for (var i = this.mouseoverChar+1; i < this.text.length+1; i++) {
-                if (DICT[this.text.substring(this.mouseoverChar, i)] !== undefined) {
+            for (var i = this.mouseoverChar+1; i < this.texts.sm.length+1; i++) {
+                if (this.$store.state.DICT[this.texts.sm.substring(this.mouseoverChar, i)] !== undefined) {
                     range = [this.mouseoverChar, i];
                 }
             }

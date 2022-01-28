@@ -1,18 +1,4 @@
-let DICT = null;
-let HSK_WORDS = null;
-
 const CAPTION_FADEOUT_TIME = 5;
-function getWordLevel(hz) {
-    let wordLevel = null;
-    for (let lvl = 0; lvl <= 5; lvl++) {
-        if (HSK_WORDS[lvl].includes(hz)) {
-            wordLevel = lvl+1;
-            break;
-        }
-    }
-    return wordLevel;
-};
-
 const fetchVersionedResource = function (filename, callback) {
     chrome.runtime.sendMessage({'type': 'fetchVersionedResource', 'filename': filename}, function onResponse(message) {
         if (message === 'error') {
@@ -26,9 +12,6 @@ const fetchVersionedResource = function (filename, callback) {
         return true;
     });
 };
-
-fetchVersionedResource('public_cedict.json', function (data) { DICT = data; });
-fetchVersionedResource('hsk_words.json', function (data) { HSK_WORDS = data; });
 
 const YOUTUBE_REGEXP = /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/;
 function getYoutubeIdFromURL(url) {
@@ -64,3 +47,39 @@ function getIconSvg(name, size) {
     }
     return ICON_SVG[name].replace('${width}', size).replace('${height}', size);
 }
+
+function dictArrayToDict(arr) {
+    return {
+        hzTrad: arr[0],
+        pys: arr[1],
+        pysDiacriticals: arr[2],
+        translations: arr[3],
+    };
+}
+
+function dictItemsToDict(items) {
+    const out = [];
+    for (var item of items) {
+        out.push(dictArrayToDict(item));
+    }
+    return out;
+}
+
+function captionArrayToDict(arr) {
+    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments] = arr;
+
+    return {
+        texts: texts,
+        t0s: t0s,
+        t1s: t1s,
+        t0: t0s[0],
+        t1: t1s[t1s.length-1],
+        boundingRects: boundingRects,
+        charProbs: charProbs,
+        logprob: logprob,
+        data_hash: data_hash,
+        translations: translations,
+        alignments: alignments,
+    };
+}
+

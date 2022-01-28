@@ -6,8 +6,8 @@
               dense
               class="text-white shadow-2"
             >
+                <q-tab name="subtitle" label="Subtitle" />
                 <q-tab name="knowledge" label="Knowledge" />
-                <q-tab name="display" label="Display" />
                 <q-tab name="content" label="Content" />
                 <q-tab name="keyboard" label="Keyboard" />
             </q-tabs>
@@ -36,33 +36,41 @@
                         </q-item-section>
                     </q-item>
                 </q-tab-panel>
-                <q-tab-panel name="display" style="width: 400px">
-                    Override what content to display
+                <q-tab-panel name="subtitle" style="width: 400px">
+                    <div class="text-h8">Show or hide content by default</div>
                     <q-item-label header>Hanzi</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showHz" :val="null" label="Auto" />
-                        <q-radio v-model="showHz" :val="false" label="Always off" />
-                        <q-radio v-model="showHz" :val="true" label="Always on" />
+                        <q-radio v-model="showHz" :val="false" label="Hide" />
+                        <q-radio v-model="showHz" :val="true" label="Show" />
                     </div>
 
                     <q-item-label header>Pinyin</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showPy" :val="null" label="Auto" />
-                        <q-radio v-model="showPy" :val="false" label="Always off" />
-                        <q-radio v-model="showPy" :val="true" label="Always on" />
+                        <q-radio v-model="showPy" :val="false" label="Hide" />
+                        <q-radio v-model="showPy" :val="true" label="Show" />
                     </div>
 
                     <q-item-label header>Word translation</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showTr" :val="null" label="Auto" />
-                        <q-radio v-model="showTr" :val="false" label="Always off" />
-                        <q-radio v-model="showTr" :val="true" label="Always on" />
+                        <q-radio v-model="showTr" :val="false" label="Hide" />
+                        <q-radio v-model="showTr" :val="true" label="Show" />
                     </div>
 
                     <q-item-label header>Full sentence translation</q-item-label>
                     <div class="q-gutter-sm">
-                        <q-radio v-model="showFullTr" :val="false" label="Always off" />
-                        <q-radio v-model="showFullTr" :val="true" label="Always on" />
+                        <q-radio v-model="showFullTr" :val="false" label="Hide" />
+                        <q-radio v-model="showFullTr" :val="true" label="Show" />
+                    </div>
+
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;"/>
+
+                    <div class="text-h8">Chinese characters</div>
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="characterSet" val="sm" label="Simplified" />
+                        <q-radio v-model="characterSet" val="tr" label="Traditional" />
                     </div>
                 </q-tab-panel>
                 <q-tab-panel name="content" style="width: 400px">
@@ -116,7 +124,10 @@ export default {
             get: function() { return this.$store.state.options.knownLevels.tr; },
             set: function(val) { this.$store.commit('setDeepOption', {key: 'knownLevels', key2: 'tr', value: val}); },
         },
-        options: function() { return this.$store.state.options; },
+        characterSet: {
+            get: function() { return this.$store.state.options.characterSet; },
+            set: function(val) { this.$store.commit('setOption', {key: 'characterSet', value: val}); },
+        },
     },
     methods: {
         clickClose: function(event) {

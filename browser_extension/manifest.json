@@ -51,7 +51,8 @@
                 "store.js",
                 "devtools.js",
                 "dist/CaptionManager.umd.js",
-                "main.js"
+                "main.js",
+                "mixins.js"
             ]
         }
     ],

@@ -1085,7 +1085,7 @@ def _make_public_cedict(cedict):
         for tr, py, transl, freq, difficulty in entries:
             py_parts = extract_normalized_pinyin(py)
             py_parts_diacriticals = [normalized_to_diacritical(pp) for pp in py_parts]
-            out_items.append((py_parts, py_parts_diacriticals, transl.split('/')))
+            out_items.append((tr, py_parts, py_parts_diacriticals, transl.split('/')))
 
         out[sm] = out_items
 

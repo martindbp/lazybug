@@ -37,23 +37,6 @@ const CAPTION_END_BUFFER_TIME = 1;
 
 let lastCaptionIdxGlobal = 0;
 
-function captionArrayToDict(arr) {
-    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments] = arr;
-    return {
-        texts: texts,
-        t0s: t0s,
-        t1s: t1s,
-        t0: t0s[0],
-        t1: t1s[t1s.length-1],
-        boundingRects: boundingRects,
-        charProbs: charProbs,
-        logprob: logprob,
-        data_hash: data_hash,
-        translations: translations,
-        alignments: alignments,
-    };
-}
-
 export default {
     components: {CaptionContainer, CaptionBlur},
     data: function() {

@@ -7,6 +7,8 @@ let optionsChanged = false;
 
 const store = new Vuex.Store({
     state: {
+        DICT: null,
+        HSK_WORDS: null,
         knowledge: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
@@ -15,6 +17,7 @@ const store = new Vuex.Store({
         showDictionary: false,
         options: Vue.ref({
             pauseAfterCaption: true,
+            characterSet: 'sm',
             show: {
                 hz: null,
                 py: null,
@@ -80,6 +83,12 @@ const store = new Vuex.Store({
             state.options[option.key][option.key2] = option.value;
             optionsChanged = true;
         },
+        setDict(state, dict) {
+            state.DICT = dict;
+        },
+        setHskWords(state, words) {
+            state.HSK_WORDS = words;
+        },
     },
     getters: {
         getKnowledgeState: (state) => (key) => {
@@ -88,7 +97,7 @@ const store = new Vuex.Store({
             return knowledgeState;
         }
     }
-})
+});
 
 // Read current knowledge/options
 chrome.storage.local.get(['knowledge', 'options'], (items) => {
@@ -109,3 +118,6 @@ setInterval(function() {
         });
     }
 }, 5000);
+
+fetchVersionedResource('public_cedict.json', function (data) { store.commit('setDict', data); });
+fetchVersionedResource('hsk_words.json', function (data) { store.commit('setHskWords', data); });
