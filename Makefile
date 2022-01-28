@@ -44,7 +44,7 @@ purge-cloudflare-public: check-cloudflare-env
      -H "X-Auth-Key: $$CLOUDFLARE_AUTH_KEY" \
      -H "Content-Type: application/json" \
      -H "Origin: chrome-extension://ackcmdammmejmpannblpninboapjkcgm" \
-     --data '{"files":["https://cdn.zimu.ai/zimu-public/{}"]}'
+     --data '{"files":["https://cdn.zimu.ai/file/zimu-public/{}"]}'
 	echo "Synced" && cat synced.txt && rm synced.txt
 
 cedict:
