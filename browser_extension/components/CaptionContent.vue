@@ -322,6 +322,12 @@ export default {
             }
             this.setKnownBatch(keys, vals);
         },
+        applyKnownHzTranslationComponents: function() {
+            // If a word is a component of a known word, we mark them as known
+            // For example, if we know "家庭", we know "家" and "庭" if they show up separately
+            // This may be wrong, but more often that not it's right. If it's wrong, the user can just "un-know" it.
+
+        }
     }
 };
 </script>

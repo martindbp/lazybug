@@ -42,6 +42,8 @@ app.mixin({
     },
     computed: {
         knownPysHSK: function() {
+            if (this.$store.state.DICT === null) return {};
+
             const known = {};
             for (let lvl = 0; lvl < this.$store.state.options.knownLevels.py; lvl++) {
                 for (const word of this.$store.state.HSK_WORDS[lvl]) {

@@ -72,6 +72,9 @@
                         <q-radio v-model="characterSet" val="sm" label="Simplified" />
                         <q-radio v-model="characterSet" val="tr" label="Traditional" />
                     </div>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="autoPause" label="Auto-pause" />
+                    </div>
                 </q-tab-panel>
                 <q-tab-panel name="content" style="width: 400px">
                 </q-tab-panel>
@@ -127,6 +130,10 @@ export default {
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },
             set: function(val) { this.$store.commit('setOption', {key: 'characterSet', value: val}); },
+        },
+        autoPause: {
+            get: function() { return this.$store.state.options.autoPause; },
+            set: function(val) { this.$store.commit('setOption', {key: 'autoPause', value: val}); },
         },
     },
     methods: {

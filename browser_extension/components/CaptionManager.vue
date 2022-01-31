@@ -328,7 +328,7 @@ export default {
                 const isDummy = self.currCaption !== null && self.currCaption.dummy === true;
 
                 if (
-                    self.options.pauseAfterCaption &&
+                    self.options.autoPause &&
                     ! self.automaticallyPausedThisCaption &&
                     ! self.paused &&
                     captionChanged &&

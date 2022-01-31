@@ -32,8 +32,6 @@ function setPinyinKnown(state, key, value) {
                 }
             }
 
-            console.log('Known Py:', key, currKnownPys);
-            console.log('Learnign Py:', key, currLearningPys);
             state.knownPys[key] = currKnownPys;
             state.learningPys[key] = currLearningPys;
         }
@@ -53,7 +51,7 @@ const store = new Vuex.Store({
         showOptions: false,
         showDictionary: false,
         options: Vue.ref({
-            pauseAfterCaption: true,
+            autoPause: true,
             characterSet: 'sm',
             show: {
                 hz: null,
