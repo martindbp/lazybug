@@ -5,11 +5,48 @@ const KnowledgeLearning = 2;
 let knowledgeChanged = false;
 let optionsChanged = false;
 
+function setPinyinKnown(state, key, value) {
+    const prevValue = state.knowledge[key];
+    const [type, hz, pysStr] = key.split('-');
+    if (type === 'py') {
+        const pys = pysStr.split('/');
+        for (let i = 0; i < pys.length; i++) {
+            let hzChar = hz[i];
+            let py = pys[i];
+            const key = `${hzChar}-${py}`;
+            let currKnownPys = state.knownPys[key];
+            let currLearningPys = state.learningPys[key];
+            if (currKnownPys === undefined) currKnownPys = 0;
+            if (currLearningPys === undefined) currLearningPys = 0;
+
+            if (value === KnowledgeKnown) {
+                currKnownPys += 1;
+                if (prevValue === KnowledgeLearning) {
+                    currLearningPys -= 1;
+                }
+            }
+            else if (value === KnowledgeLearning) {
+                currLearningPys += 1;
+                if (prevValue === KnowledgeKnown) {
+                    currKnownPys -= 1;
+                }
+            }
+
+            console.log('Known Py:', key, currKnownPys);
+            console.log('Learnign Py:', key, currLearningPys);
+            state.knownPys[key] = currKnownPys;
+            state.learningPys[key] = currLearningPys;
+        }
+    }
+}
+
 const store = new Vuex.Store({
     state: {
         DICT: null,
         HSK_WORDS: null,
         knowledge: Vue.ref({}),
+        knownPys: Vue.ref({}),
+        learningPys: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
         peekStates: Vue.ref({'py': [], 'hz': [], 'tr': [], 'translation': false}),
@@ -40,15 +77,20 @@ const store = new Vuex.Store({
         },
         setKnowledge(state, knowledge) {
             state.knowledge = knowledge;
+            for (const [key, value] of Object.entries(knowledge)) {
+                setPinyinKnown(state, key, value);
+            }
         },
         setKnowledgeKey(state, keyVal) {
             state.knowledge[keyVal.key] = keyVal.val;
+            setPinyinKnown(state, keyVal.key, keyVal.val);
             knowledgeChanged = true;
         },
         setKnowledgeKeys(state, keysVals) {
             for (let i = 0; i < keysVals.keys.length; i++) {
                 const keyVal = {key: keysVals.keys[i], val: keysVals.vals[i]};
                 state.knowledge[keyVal.key] = keyVal.val;
+                setPinyinKnown(state, keyVal.key, keyVal.val);
             }
             knowledgeChanged = true;
         },

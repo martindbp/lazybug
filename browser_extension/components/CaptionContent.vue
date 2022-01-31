@@ -105,9 +105,6 @@ export default {
             if (this.data == null) return '';
             return this.data.translations[0];
         },
-        text: function() {
-            return this.texts.tr;
-        },
         texts: function() {
             const sm = this.data.texts.join(' ');
             return {
@@ -116,7 +113,7 @@ export default {
             };
         },
         wordData: function() {
-            const wordData = {hz: [], py: [], tr: [], translation: null};
+            const wordData = {hz: [], py: [], tr: [], translation: null, pys: [], pysDiacritical: []};
             if (this.data === null) {
                 return wordData;
             }
@@ -125,7 +122,7 @@ export default {
 
             let nextIdx = 0;
             for (let i = 0; i < this.data.alignments.length; i++) {
-                let [startIdx, endIdx, _, pinyinParts, wordTranslation] = this.data.alignments[i];
+                let [startIdx, endIdx, _, pyParts, wordTranslation] = this.data.alignments[i];
                 if (startIdx > nextIdx) {
                     wordData.hz.push(this.texts.sm.substring(nextIdx, startIdx));
                     wordData.py.push(null);
@@ -133,14 +130,17 @@ export default {
                 }
                 const hz = this.texts.sm.substring(startIdx, endIdx);
                 wordData.hz.push(hz);
-                const diacriticalPinyins = pinyinParts.map((part) => part[0]);
-                const displayPinyin = diacriticalPinyins.join('');
+                const pysDiacritical = pyParts.map((part) => part[0]);
+                const displayPinyin = pysDiacritical.join('');
+                const pys = pyParts.map((part) => part[1]);
                 wordData.py.push(displayPinyin);
                 wordData.tr.push(wordTranslation);
+                wordData.pysDiacritical.push(pysDiacritical);
+                wordData.pys.push(pys);
                 nextIdx = endIdx;
             }
-            if (nextIdx < this.text.length) {
-                wordData.hz.push(this.texts.sm.substring(nextIdx, this.text.length));
+            if (nextIdx < this.texts.sm.length) {
+                wordData.hz.push(this.texts.sm.substring(nextIdx, this.texts.sm.length));
                 wordData.py.push(null);
                 wordData.tr.push(null);
             }
@@ -149,9 +149,6 @@ export default {
         showStates: function() {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': false};
             for (let i = 0; i < this.wordData.hz.length; i++) {
-                const hz = this.wordData.hz[i];
-                const py = this.wordData.py[i];
-                const tr = this.wordData.tr[i];
                 for (var type of ['hz', 'py', 'tr']) {
                     const isUnknown = [KnowledgeUnknown, undefined].includes(
                         this.$store.getters.getKnowledgeState(this.knowledgeKey(type, i))
@@ -185,7 +182,7 @@ export default {
                 if (newData !== oldData) {
                     if (newData !== null && newData.dummy === true) return;
                     this.applyKnownHSKLevels();
-                    this.applyKnownCompounds();
+                    this.applyKnownPinyinCompounds();
 
                     const allFalse = [];
                     for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -224,14 +221,9 @@ export default {
             return states;
         },
         knowledgeKey: function(type, i) {
-            let key = null;
             const hz = this.wordData.hz[i];
-            const py = this.wordData.py[i];
-            if (type == 'hz') key = `hz-${hz}`;
-            if (type == 'py') key = `py-${hz}-${py}`;
-            if (type == 'tr') key = `tr-${hz}-${py}`;
-            if (type == 'translation') key = `tr-${this.wordData.translation}`;
-            return key;
+            const pys = this.wordData.pys[i];
+            return getKnowledgeKey(type, hz, pys, this.wordData.translation);
         },
         click: function(type, i = null) {
             if (type === 'translation' && this.showStates[type] === false) {
@@ -268,14 +260,15 @@ export default {
             let keys = [];
             let vals = [];
             for (let i = 0; i < this.wordData.hz.length; i++) {
-                const hz = this.wordData.py[i] === '' ? '' : this.wordData.hz[i];
+                const isEmpty = this.wordData.py[i] === '';
+                const hz = isEmpty ? '' : this.wordData.hz[i];
                 if (hz.length === 0) continue;
-                const py = this.wordData.py[i] === '' ? this.wordData.hz[i] : this.wordData.py[i];
+                const py = isEmpty ? this.wordData.hz[i] : this.wordData.py[i];
                 const tr = this.wordData.tr[i];
                 const itemKeys = {
-                    'hz': `hz-${hz}`,
-                    'py': `py-${hz}-${py}`,
-                    'tr': `tr-${hz}-${py}`,
+                    'hz': this.knowledgeKey('hz', i),
+                    'py': this.knowledgeKey('py', i),
+                    'tr': this.knowledgeKey('tr', i),
                 };
                 if (tr !== null && /[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
                     // If the translation is capitalized, we want it to be tracked separately
@@ -296,8 +289,38 @@ export default {
             }
             this.setKnownBatch(keys, vals);
         },
-        applyKnownCompounds: function() {
+        applyKnownPinyinCompounds: function() {
             // For pinyins, if all the pinyins of all the characters of a word are known, we mark the whole pinyin as known
+            // More specifically, the compound knowledge level is the minimum of the constituent parts
+
+            let keys = [];
+            let vals = [];
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                let hasUnknown = false;
+                let hasLearning = false;
+                const hzChars = this.wordData.hz[i];
+                const pys = this.wordData.pys[i];
+                for (let j = 0; j < pys.length; j++) {
+                    const py = pys[j];
+                    const hz = hzChars[j];
+                    const key = getKnowledgeKey('py', hz, [py], null);
+                    const isKnown = this.$store.state.knownPys[key] == true;
+                    const isKnownHSK = this.knownPysHSK[key] == true;
+                    const isLearning = this.$store.state.learningPys[key] == true;
+                    hasUnknown = hasUnknown || (! isKnown && !isKnownHSK && ! isLearning);
+                    hasLearning = hasLearning || isLearning;
+                }
+                const pyKey = this.knowledgeKey('py', i);
+                if (hasLearning) {
+                    keys.push(pyKey);
+                    vals.push(KnowledgeLearning);
+                }
+                else if (! hasUnknown) {
+                    keys.push(pyKey);
+                    vals.push(KnowledgeKnown);
+                }
+            }
+            this.setKnownBatch(keys, vals);
         },
     }
 };

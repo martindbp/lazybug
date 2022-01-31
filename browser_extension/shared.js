@@ -83,3 +83,12 @@ function captionArrayToDict(arr) {
     };
 }
 
+function getKnowledgeKey(type, hz, pys, translation) {
+    let key = null;
+    var pysWithoutTones = ['py', 'tr'].includes(type) ? pys.map(py => py.slice(0, -1)) : null;
+    if (type == 'hz') key = `hz-${hz}`;
+    if (type == 'py') key = `py-${hz}-${pysWithoutTones.join('/')}`;
+    if (type == 'tr') key = `tr-${hz}-${pysWithoutTones.join('/')}`;
+    if (type == 'translation') key = `tr-${translation}`;
+    return key;
+}
