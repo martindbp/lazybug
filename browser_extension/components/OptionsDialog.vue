@@ -37,43 +37,43 @@
                     </q-item>
                 </q-tab-panel>
                 <q-tab-panel name="subtitle" style="width: 400px">
-                    <div class="text-h8">Show or hide content by default</div>
-                    <q-item-label header>Hanzi</q-item-label>
+                    <q-item-label header>Show hanzi</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showHz" :val="null" label="Auto" />
                         <q-radio v-model="showHz" :val="false" label="Hide" />
                         <q-radio v-model="showHz" :val="true" label="Show" />
                     </div>
 
-                    <q-item-label header>Pinyin</q-item-label>
+                    <q-item-label header>Show pinyin</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showPy" :val="null" label="Auto" />
                         <q-radio v-model="showPy" :val="false" label="Hide" />
                         <q-radio v-model="showPy" :val="true" label="Show" />
                     </div>
 
-                    <q-item-label header>Word translation</q-item-label>
+                    <q-item-label header>Show word translation</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showTr" :val="null" label="Auto" />
                         <q-radio v-model="showTr" :val="false" label="Hide" />
                         <q-radio v-model="showTr" :val="true" label="Show" />
                     </div>
 
-                    <q-item-label header>Full sentence translation</q-item-label>
+                    <q-item-label header>Show full sentence translation</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="showFullTr" :val="false" label="Hide" />
                         <q-radio v-model="showFullTr" :val="true" label="Show" />
                     </div>
 
-                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;"/>
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
 
-                    <div class="text-h8">Chinese characters</div>
+                    Other
+                    <q-item-label header>Chinese characters</q-item-label>
                     <div class="q-gutter-sm">
                         <q-radio v-model="characterSet" val="sm" label="Simplified" />
                         <q-radio v-model="characterSet" val="tr" label="Traditional" />
                     </div>
                     <div class="q-gutter-sm">
-                        <q-checkbox v-model="autoPause" label="Auto-pause" />
+                        <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
                     </div>
                 </q-tab-panel>
                 <q-tab-panel name="content" style="width: 400px">
