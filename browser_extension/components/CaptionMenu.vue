@@ -9,7 +9,7 @@
             <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
             <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
             <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
-            <SvgButton title="Replay this line" @click="redo" name="redo" />
+            <SvgButton title="Replay this line" @click="replay" name="replay" />
             <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
             <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
             <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
@@ -38,7 +38,51 @@ export default {
         dragStart: null,
         origCaptionOffset: null,
         isPrevMouseOver: false,
+        keyboardListener: null,
     }},
+    mounted: function() {
+        const self = this;
+        this.keyboardListener = window.addEventListener("keydown", function(event) {
+            if (self.$store.state.showOptions || ! self.$store.state.options.keyboardShortcutsToggle) {
+                return;
+            }
+
+            let shortcut = null;
+            for (const [key, val] of Object.entries(self.$store.state.options.keyboardShortcuts)) {
+                if (event.code === val) {
+                    shortcut = key;
+                    break;
+                }
+            }
+            if (shortcut === null) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            if (shortcut === 'peek') {
+                self.peekAll();
+            }
+            else if (shortcut === 'next') {
+                self.next();
+            }
+            else if (shortcut === 'prev') {
+                self.prev();
+            }
+            else if (shortcut === 'replay') {
+                self.replay();
+            }
+            else if (shortcut === 'dictionary') {
+                self.showDictionary();
+            }
+            else if (shortcut === 'translation') {
+                self.$store.commit('setPeekState', {type: 'translation'});
+            }
+        }, {capture: true});
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('keydown', this.keyboardListener);
+    },
     methods: {
         showOptions: function(event) {
             this.$store.commit('setShowOptions', true);
@@ -82,7 +126,7 @@ export default {
                 this.$emit('seeked');
             }
         },
-        redo: function(event) {
+        replay: function(event) {
             const goToCaption = this.data !== null ? this.data : this.prevCaption;
             if (goToCaption === null) return;
 

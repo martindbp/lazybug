@@ -312,10 +312,12 @@ export default {
                 }
                 const pyKey = this.knowledgeKey('py', i);
                 if (hasLearning) {
+                    console.log('Marking pinyin', hzChars, pys, 'as learning');
                     keys.push(pyKey);
                     vals.push(KnowledgeLearning);
                 }
                 else if (! hasUnknown) {
+                    console.log('Marking pinyin', hzChars, pys, 'as known');
                     keys.push(pyKey);
                     vals.push(KnowledgeKnown);
                 }
@@ -327,6 +329,7 @@ export default {
             // For example, if we know "家庭", we know "家" and "庭" if they show up separately
             // This may be wrong, but more often that not it's right. If it's wrong, the user can just "un-know" it.
 
+            // 
         }
     }
 };

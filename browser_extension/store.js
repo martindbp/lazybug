@@ -64,6 +64,15 @@ const store = new Vuex.Store({
                 hz: 2,
                 tr: 4,
             },
+            keyboardShortcutsToggle: true,
+            keyboardShortcuts: {
+                peek: 'KeyP',
+                next: 'ArrowRight',
+                prev: 'ArrowLeft',
+                replay: 'KeyR',
+                dictionary: 'KeyD',
+                translation: 'KeyT',
+            }
         }),
     },
     mutations: {

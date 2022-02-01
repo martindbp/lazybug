@@ -1,5 +1,5 @@
 <template>
-    <q-dialog v-model="show" dark>
+    <q-dialog v-model="show" dark ref="optionmodal">
         <q-card class="q-px-sm q-pb-md" style="min-height: 600px">
             <q-tabs
               v-model="tab"
@@ -8,7 +8,6 @@
             >
                 <q-tab name="subtitle" label="Subtitle" />
                 <q-tab name="knowledge" label="Knowledge" />
-                <q-tab name="content" label="Content" />
                 <q-tab name="keyboard" label="Keyboard" />
             </q-tabs>
 
@@ -76,9 +75,24 @@
                         <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
                     </div>
                 </q-tab-panel>
-                <q-tab-panel name="content" style="width: 400px">
-                </q-tab-panel>
                 <q-tab-panel name="keyboard" style="width: 400px">
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="keyboardShortcutsToggle" label="Toggle Keyboard Shortcuts"></q-checkbox>
+                    </div>
+
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
+
+                    <div class="q-gutter-sm" v-for="shortcut in shortcuts">
+                        <q-btn
+                            style="margin-top: 10px"
+                            color="primary"
+                            :disable="!keyboardShortcutsToggle || choosingShortcut !== null"
+                            :label="choosingShortcut === shortcut[0] ? (shortcut[1] + ': <Press Key> (ESC to clear)') : (shortcut[1] + ': ' + (shortcutValues[shortcut[0]] || 'Unset'))"
+                            @click="clickShortcut(shortcut[0])"
+                        >
+                        </q-btn>
+                        <br>
+                    </div>
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -93,6 +107,8 @@ export default {
     components: { },
     data: function() { return {
         tab: Vue.ref('knowledge'),
+        shortcuts: [["peek", "Peek"], ["next", "Next"], ["prev", "Previous"], ["replay", "Replay"], ["dictionary", "Dictionary"]],
+        choosingShortcut: null,
     }},
     computed: {
         showHz: {
@@ -135,13 +151,31 @@ export default {
             get: function() { return this.$store.state.options.autoPause; },
             set: function(val) { this.$store.commit('setOption', {key: 'autoPause', value: val}); },
         },
+        keyboardShortcutsToggle: {
+            get: function() { return this.$store.state.options.keyboardShortcutsToggle; },
+            set: function(val) { this.$store.commit('setOption', {key: 'keyboardShortcutsToggle', value: val}); },
+        },
+        shortcutValues: function() {
+            return this.$store.state.options.keyboardShortcuts;
+        },
     },
     methods: {
         clickClose: function(event) {
             // Remove the "zimuquasardialog" class from the dialog parent, otherwise there's some flickering
             document.querySelector('.zimuquasardialog').classList.remove('zimuquasardialog');
             this.show = false;
-        }
+        },
+        clickShortcut: function(shortcut) {
+            this.choosingShortcut = shortcut;
+            const self = this;
+            window.addEventListener("keydown", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const val = event.code === 'Escape' ? null : event.code;
+                self.$store.commit('setDeepOption', {key: 'keyboardShortcuts', key2: shortcut, value: val});
+                self.choosingShortcut = null;
+            }, {once: true, capture: true});
+        },
     },
 }
 </script>

@@ -6,12 +6,6 @@ let captionBottom = null;
 
 chrome.runtime.onMessage.addListener(msgObj => {
     if (msgObj === 'measurecaption') {
-        window.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-        }, { once: true });
-
         if (AVElement === null) {
             AVElement = document.querySelector("video");
             videoMenu = document.querySelector('.ytp-chrome-bottom');
@@ -79,14 +73,14 @@ chrome.runtime.onMessage.addListener(msgObj => {
                 upEvent.preventDefault();
                 upEvent.stopPropagation();
                 stopMeasuring();
-            }, { once: true });
+            }, { once: true, capture: true });
         }
 
         window.addEventListener("mousedown", (downEvent) => {
             downEvent.preventDefault();
             downEvent.stopPropagation();
             startMeasuring();
-        }, { once: true });
+        }, { once: true, capture: true });
     }
     else if (msgObj === 'printplaylist') {
         const title = document.querySelector('#header-description > h3:nth-child(1) > yt-formatted-string > a').innerText;
