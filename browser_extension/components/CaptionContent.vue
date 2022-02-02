@@ -2,6 +2,10 @@
     <div :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
         <table class="contenttable">
             <tr class="toprow">
+                <td title="Peek pinyin row" :class="getClasses('py', null)" @click="peekAll('py')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
+                    <span class="cardcontent">PY</span>
+                </td>
                 <td
                     :class="getClasses('py', i)"
                     @click="click('py', i)"
@@ -17,6 +21,10 @@
                 </td>
             </tr>
             <tr class="centerrow">
+                <td title="Peek hanzi row" :class="getClasses('hz', null)" @click="peekAll('hz')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
+                    <span class="cardcontent">HZ</span>
+                </td>
                 <td
                     :class="getClasses('hz', i)"
                     @click="click('hz', i)"
@@ -32,6 +40,10 @@
                 </td>
             </tr>
             <tr class="bottomrow">
+                <td title="Peek word translation row" :class="getClasses('tr', null)" @click="peekAll('tr')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
+                    <span class="cardcontent">TR</span>
+                </td>
                 <td
                     :class="getClasses('tr', i)"
                     @click="click('tr', i)"
@@ -69,7 +81,12 @@
     </div>
 </template>
 <script>
+import SvgButton from './SvgButton.vue'
+
 export default {
+    components: {
+        SvgButton,
+    },
     props: {
         data: { default: null },
         currTime: { default: null },
@@ -202,11 +219,12 @@ export default {
         getClasses: function(type, i) {
             const cl = {
                 captioncard: true,
-                peeking: this.peekStates[type][i],
-                captioncardhidden: ! this.finalShowStates[type][i],
-                nonhanzi: this.wordData.py[i] === '',
-                learning: this.learningStates[type][i],
-                known: this.knownStates[type][i]
+                peeking: i !== null && this.peekStates[type][i],
+                captioncardhidden: i !== null && ! this.finalShowStates[type][i],
+                nonhanzi: i !== null && this.wordData.py[i] === '',
+                learning: i !== null && this.learningStates[type][i],
+                known: i !== null && this.knownStates[type][i],
+                peekall: i === null,
             };
             return cl;
         },
@@ -248,6 +266,19 @@ export default {
             else {
                 this.$store.commit('setKnowledgeKey', {'key': key, 'val': KnowledgeKnown});
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
+            }
+        },
+        peek: function(type, i) {
+            const key = this.knowledgeKey(type, i)
+            if (this.showStates[type][i] === false) {
+                if (! this.peekStates[type][i]) {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                }
+            }
+        },
+        peekAll: function(type) {
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                this.peek(type, i);
             }
         },
         setKnown: function(key, known) {
@@ -336,9 +367,14 @@ export default {
 </script>
 
 <style>
+.peekall {
+    width: 1.5em;
+    margin-right: 3em;
+}
+
 .captioncontent {
     display: inline-block;
-    padding-left: 2em !important;
+    padding-left: 0.25em !important;
     padding-right: 2em !important;
     padding-bottom: 0.5em !important;
     opacity: 1;
@@ -358,23 +394,24 @@ export default {
     text-align: center;
     table-layout: fixed;
     border-spacing: 0.3em;
+    font-family: sans-serif;
 }
 
-.toprow {
+.toprow td:not(:first-child) {
     font-size: 1em;
-    font-family: sans-serif;
+}
+
+.centerrow td:not(:first-child) {
+    font-size: 1.25em;
+    line-height: 1.25em;
 }
 
 .centerrow {
-    font-size: 1.25em;
-    font-family: sans-serif;
-    line-height: 1.25em;
     vertical-align: bottom;
 }
 
-.bottomrow {
+.bottomrow td:not(:first-child) {
     font-size: 0.8em;
-    font-family: sans-serif;
 }
 
 .captioncard {
@@ -421,6 +458,21 @@ export default {
     color: #32de84;
 }
 
+.peekall .cardcontent {
+    font-size: 0.5em;
+    color: lightgray;
+    position: absolute;
+    line-height: 0;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    margin-top: 0em;
+}
+
+.peekall:hover .cardcontent {
+    visibility: hidden;
+}
+
 .iconcard {
     position: absolute;
     line-height: 0;
@@ -452,7 +504,6 @@ export default {
     width: 20px;
 }
 
-
 .iconcard.know svg {
     background: limegreen;
 }
@@ -478,6 +529,7 @@ export default {
 }
 
 .fulltranslation {
+    margin-left: 2em;
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     text-align: center;

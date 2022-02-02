@@ -8,6 +8,7 @@
             v-on:seeked="$emit('seeked')"
         />
         <CaptionContent
+            :class="{ showpeekall: showMenu }"
             v-bind:data="showData"
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"

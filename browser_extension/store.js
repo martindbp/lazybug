@@ -105,7 +105,7 @@ const store = new Vuex.Store({
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
         },
         decreaseCaptionFontScale(state) {
-            state.captionFontScale = Math.max(state.captionFontScale - 0.1, 0.0);
+            state.captionFontScale = Math.max(state.captionFontScale - 0.1, 0.3);
         },
         setCaptionOffset(state, offset) {
             state.captionOffset = offset;
