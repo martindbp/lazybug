@@ -53,6 +53,7 @@ const store = new Vuex.Store({
         options: Vue.ref({
             autoPause: true,
             characterSet: 'sm',
+            blurCaptions: true,
             show: {
                 hz: null,
                 py: null,

@@ -42,10 +42,11 @@ export default {
         blurSidePadding: { default: 20 },
         blurTimeBuffer: { default: 0.15 },
     },
-    data: function() { return {
-        toggleOn: true,
-    }},
     computed: {
+        toggleOn: {
+            get: function() { return this.$store.state.options.blurCaptions; },
+            set: function(val) { this.$store.commit('setOption', {key: 'blurCaptions', value: val}); },
+        },
         currRect: function() {
             let rects = this.currCaption !== null ? this.currCaption.boundingRects : [];
             if (this.prevCaption !== null) {

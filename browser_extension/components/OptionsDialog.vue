@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="show" dark ref="optionmodal">
-        <q-card class="q-px-sm q-pb-md" style="min-height: 600px">
+        <q-card class="q-px-sm q-pb-md" style="min-height: 650px">
             <q-tabs
               v-model="tab"
               dense
@@ -73,6 +73,9 @@
                     </div>
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
+                    </div>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="blurCaptions" label="Blur Captions" />
                     </div>
                 </q-tab-panel>
                 <q-tab-panel name="keyboard" style="width: 400px">
@@ -150,6 +153,10 @@ export default {
         autoPause: {
             get: function() { return this.$store.state.options.autoPause; },
             set: function(val) { this.$store.commit('setOption', {key: 'autoPause', value: val}); },
+        },
+        blurCaptions: {
+            get: function() { return this.$store.state.options.blurCaptions; },
+            set: function(val) { this.$store.commit('setOption', {key: 'blurCaptions', value: val}); },
         },
         keyboardShortcutsToggle: {
             get: function() { return this.$store.state.options.keyboardShortcutsToggle; },
