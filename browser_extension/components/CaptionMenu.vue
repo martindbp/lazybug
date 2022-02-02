@@ -75,8 +75,17 @@ export default {
             else if (shortcut === 'dictionary') {
                 self.showDictionary();
             }
-            else if (shortcut === 'translation') {
+            else if (shortcut === 'peekFullTr') {
                 self.$store.commit('setPeekState', {type: 'translation'});
+            }
+            else if (shortcut === 'peekPy') {
+                self.$store.commit('setPeekState', {type: 'py'});
+            }
+            else if (shortcut === 'peekHz') {
+                self.$store.commit('setPeekState', {type: 'hz'});
+            }
+            else if (shortcut === 'peekTr') {
+                self.$store.commit('setPeekState', {type: 'tr'});
             }
         }, {capture: true});
     },

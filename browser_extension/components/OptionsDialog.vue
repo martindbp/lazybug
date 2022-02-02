@@ -87,7 +87,7 @@
 
                     <div class="q-gutter-sm" v-for="shortcut in shortcuts">
                         <q-btn
-                            style="margin-top: 10px"
+                            style="margin-top: 10px; width: 80%"
                             color="primary"
                             :disable="!keyboardShortcutsToggle || choosingShortcut !== null"
                             :label="choosingShortcut === shortcut[0] ? (shortcut[1] + ': <Press Key> (ESC to clear)') : (shortcut[1] + ': ' + (shortcutValues[shortcut[0]] || 'Unset'))"
@@ -96,6 +96,8 @@
                         </q-btn>
                         <br>
                     </div>
+                    <br>
+                    <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -110,7 +112,17 @@ export default {
     components: { },
     data: function() { return {
         tab: Vue.ref('knowledge'),
-        shortcuts: [["peek", "Peek"], ["next", "Next"], ["prev", "Previous"], ["replay", "Replay"], ["dictionary", "Dictionary"]],
+        shortcuts: [
+            ["next", "Next"],
+            ["prev", "Previous"],
+            ["replay", "Replay"],
+            ["dictionary", "Dictionary"],
+            ["peek", "Peek"],
+            ["peekFullTr", "Peek Full Translation"],
+            ["peekPy", "Peek Pinyin Row"],
+            ["peekHz", "Peek Hanzi Row"],
+            ["peekTr", "Peek Word Translation Row"],
+        ],
         choosingShortcut: null,
     }},
     computed: {
@@ -183,6 +195,9 @@ export default {
                 self.choosingShortcut = null;
             }, {once: true, capture: true});
         },
+        resetShortcuts: function() {
+            this.$store.commit('setOption', {key: 'keyboardShortcuts', value: DEFAULT_SHORTCUTS});
+        }
     },
 }
 </script>

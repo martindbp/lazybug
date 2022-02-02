@@ -38,6 +38,18 @@ function setPinyinKnown(state, key, value) {
     }
 }
 
+const DEFAULT_SHORTCUTS = {
+    next: 'ArrowRight',
+    prev: 'ArrowLeft',
+    replay: 'KeyR',
+    dictionary: 'KeyD',
+    peek: 'KeyP',
+    peekFullTr: 'KeyT',
+    peekPy: 'KeyY',
+    peekHz: 'KeyH',
+    peekTr: 'KeyN',
+}
+
 const store = new Vuex.Store({
     state: {
         DICT: null,
@@ -66,14 +78,7 @@ const store = new Vuex.Store({
                 tr: 4,
             },
             keyboardShortcutsToggle: true,
-            keyboardShortcuts: {
-                peek: 'KeyP',
-                next: 'ArrowRight',
-                prev: 'ArrowLeft',
-                replay: 'KeyR',
-                dictionary: 'KeyD',
-                translation: 'KeyT',
-            }
+            keyboardShortcuts: DEFAULT_SHORTCUTS,
         }),
     },
     mutations: {
@@ -113,7 +118,15 @@ const store = new Vuex.Store({
         },
         setPeekState(state, val) {
             if (val.i === undefined || val.i === null) {
-                state.peekStates[val.type] = true;
+                if (val.type === 'translation') {
+                    state.peekStates[val.type] = true;
+                }
+                else {
+                    // Set peek state for all words
+                    for (let i = 0; i < state.peekStates[val.type].length; i++) {
+                        state.peekStates[val.type][i] = true;
+                    }
+                }
             }
             else {
                 state.peekStates[val.type][val.i] = true;
