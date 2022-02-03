@@ -1,3 +1,15 @@
+try {
+  importScripts('dexie.min.js');
+} catch (e) {
+  console.error(e);
+}
+
+db = new Dexie('zimuai');
+db.version(1).stores({
+  network: 'id',
+});
+
+
 function showBadgeStatus() {
     chrome.action.setBadgeBackgroundColor({color:[0, 150, 0, 255]});
     chrome.action.setBadgeText({text:'✓'});
@@ -9,26 +21,27 @@ function clearBadgeStatus() {
 
 function getStorageData(key) {
     console.log('Get storage', key);
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get([key], (items) => {
-            console.log('Done', key);
-            if (chrome.runtime.lastError) {
-                return reject(chrome.runtime.lastError);
-            }
-            resolve(items[key]);
-        });
-    });
+    return db.network.get({id: key}).then((data) => data.value);
 }
 
-function setStorageData(data) {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.set(data, function() {
-            if (chrome.runtime.lastError) {
-                return reject(chrome.runtime.lastError);
-            }
-            resolve();
-        });
-    });
+function setStorageData(data, update) {
+    const entries = [];
+    for (const [key, value] of Object.entries(data)) {
+        console.log('Set storage', key);
+        if (update) {
+            entries.push(db.network.update(key, {value: value}));
+        }
+        else {
+            entries.push({id: key, value: value});
+        }
+    }
+
+    if (update) {
+        return entries; // promises
+    }
+    else {
+        return [db.network.bulkAdd(entries)];
+    }
 }
 
 const CDN_URL = "https://cdn.zimu.ai/file/";
@@ -41,7 +54,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     const storageFileKey = `${folder}/${filename}.${ext}`;
 
     // NOTE: never cache the hash files, we purge those manually from Cloudflare
-    console.log('Fetching hash for ', folder);
+    console.log('Fetching hash for ', `${folder}/${filename}.hash`);
     const fetchHashPromise = fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
     .then(function(response) {
         console.log('Fetching done for ', folder);
@@ -59,6 +72,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     .then(function(values) {
         const fetchHash = values[0].trim();
         const storageHash = values[1];
+        console.log('Got hashes', fetchHash, storageHash);
         if (fetchHash !== storageHash) {
             console.log('Fetching', folder, filename, fetchHash);
             return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
@@ -77,7 +91,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
                     const storeData = {};
                     storeData[storageFileKey] = data;
                     storeData[storageHashKey] = fetchHash;
-                    return setStorageData(storeData)
+                    return Promise.all(setStorageData(storeData, storageHashKey !== undefined))
                         .then(() => data);
                 });
         } else {

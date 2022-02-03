@@ -19,6 +19,8 @@ test:
 
 sync-up-public:
 	make show-list
+	make cedict
+	make public-cedict
 	touch synced.txt
 	b2 sync --noProgress data/remote/public b2://zimu-public | tee synced.txt
 	make purge-cloudflare-public
