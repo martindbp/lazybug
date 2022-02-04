@@ -1,14 +1,14 @@
 try {
-  importScripts('dexie.min.js');
+    importScripts('dexie.min.js');
 } catch (e) {
-  console.error(e);
+    console.error(e);
 }
 
 db = new Dexie('zimuai');
 db.version(1).stores({
-  network: 'id',
-  knowledge: 'id',
-  other: 'id',
+    network: 'id',
+    knowledge: 'id',
+    other: 'id',
 });
 
 function showBadgeStatus() {
