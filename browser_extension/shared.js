@@ -1,6 +1,6 @@
 const CAPTION_FADEOUT_TIME = 5;
-const fetchVersionedResource = function (filename, callback) {
-    chrome.runtime.sendMessage({'type': 'fetchVersionedResource', 'filename': filename}, function onResponse(message) {
+function fetchVersionedResource(filename, callback) {
+    chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
         if (message === 'error') {
             return false;
         }
@@ -12,6 +12,30 @@ const fetchVersionedResource = function (filename, callback) {
         return true;
     });
 };
+
+function getIndexedDbData(storageName, keys, callback) {
+    chrome.runtime.sendMessage({type: 'getIndexedDbData', storage: storageName, keys: keys}, function onResponse(message) {
+        if (message === 'error') {
+            return false;
+        }
+        if (message === undefined || message == null) {
+            console.log('Failed to get data ' + keys);
+            return false;
+        }
+        callback(message.data);
+        return true;
+    });
+}
+
+function setIndexedDbData(storageName, keys, values, callback) {
+    chrome.runtime.sendMessage({type: 'setIndexedDbData', storage: storageName, keys: keys, values: values}, function onResponse(message) {
+        if (message === 'error') {
+            return false;
+        }
+        if (callback) callback();
+        return true;
+    });
+}
 
 const YOUTUBE_REGEXP = /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/;
 function getYoutubeIdFromURL(url) {

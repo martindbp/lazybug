@@ -95,7 +95,7 @@ export default {
         if (this.resizeObserver !== null) this.resizeObserver.disconnect();
     },
     beforeUpdate: function() {
-        if (this.$refs.captionroot === undefined || this.$refs.captionroot.$el === undefined) return;
+        if ([null, undefined].includes(this.$refs.captionroot) || [null, undefined].includes(this.$refs.captionroot.$el)) return;
 
         let currMinHeight = this.$refs.captionroot.$el.style.minHeight;
         if (currMinHeight === '') currMinHeight = 0;
@@ -114,7 +114,7 @@ export default {
         const self = this;
         this.$nextTick(function () {
             self.updateCaptionPositionBlurFontSize();
-            if (self.$refs.captionroot !== undefined && self.$refs.captionroot.$el !== undefined) {
+            if (! [null, undefined].includes(self.$refs.captionroot) && ! [null, undefined].includes(self.$refs.captionroot.$el)) {
                 self.$refs.captionroot.$el.style.minHeight = self.minHeight === null ? '0px' : self.minHeight + 'px';
 
                 // Make sure the root is always as wide as the menu
@@ -219,7 +219,7 @@ export default {
     methods: {
         fetchCaptionMaybe: function() {
             this.captionData = null;
-            if (this.captionId === null) return;
+            if (this.captionId === null || [null, undefined].includes(chrome.runtime)) return;
 
             const self = this;
             chrome.runtime.sendMessage({'type': 'getCaptions', 'data': {
@@ -346,7 +346,7 @@ export default {
             }, 10);
         },
         updateCaptionPositionBlurFontSize: function() {
-            if (this.AVElement === null || this.$refs.captionroot === undefined) return;
+            if (this.AVElement === null || [null, undefined].includes(this.$refs.captionroot)) return;
             var videoRect = this.AVElement.getBoundingClientRect();
             // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
             this.$refs.captionroot.$el.style.left = (videoRect.left + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';

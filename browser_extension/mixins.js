@@ -42,7 +42,7 @@ app.mixin({
     },
     computed: {
         knownPysHSK: function() {
-            if (this.$store.state.DICT === null) return {};
+            if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
 
             const known = {};
             for (let lvl = 0; lvl < this.$store.state.options.knownLevels.py; lvl++) {

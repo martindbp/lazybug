@@ -7,8 +7,9 @@ try {
 db = new Dexie('zimuai');
 db.version(1).stores({
   network: 'id',
+  knowledge: 'id',
+  other: 'id',
 });
-
 
 function showBadgeStatus() {
     chrome.action.setBadgeBackgroundColor({color:[0, 150, 0, 255]});
@@ -19,30 +20,38 @@ function clearBadgeStatus() {
     chrome.action.setBadgeText({text:''})
 }
 
-function getStorageData(key) {
-    console.log('Get storage', key);
-    return db.network.get({id: key}).then((data) => data.value);
+function getStorageData(keys, store) {
+    if (keys === null) {
+        return store.toArray().then();
+    }
+    console.log('Get storage', keys);
+    return store.bulkGet(keys).then(function(data) {
+        if (data) return data.map((item) => item ? item.value : null);
+        return null;
+    });
 }
 
-function setStorageData(data, update) {
+function updateStorageData(keys, values, store) {
     const entries = [];
-    for (const [key, value] of Object.entries(data)) {
-        console.log('Set storage', key);
-        if (update) {
-            entries.push(db.network.update(key, {value: value}));
-        }
-        else {
-            entries.push({id: key, value: value});
-        }
+    for (let i = 0; i < keys.length; i++) {
+        console.log('Update storage', keys[i]);
+        entries.push(store.update(keys[i], {value: values[i]}));
     }
 
-    if (update) {
-        return entries; // promises
-    }
-    else {
-        return [db.network.bulkAdd(entries)];
-    }
+    console.log('Update', entries);
+    return Promise.all(entries);
 }
+
+function addStorageData(keys, values, store) {
+    const entries = [];
+    for (let i = 0; i < keys.length; i++) {
+        entries.push({id: keys[i], value: values[i]});
+    }
+
+    console.log('Add', entries);
+    return store.bulkAdd(entries);
+}
+
 
 const CDN_URL = "https://cdn.zimu.ai/file/";
 
@@ -66,7 +75,8 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     })
     .then(response => response.text());
 
-    const getStorageHashPromise = getStorageData(storageHashKey);
+    const getStorageHashPromise = getStorageData([storageHashKey], db.network)
+        .then((data) => data[0]);
 
     Promise.all([fetchHashPromise, getStorageHashPromise])
     .then(function(values) {
@@ -88,14 +98,20 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
                 .then(function(data) {
                     console.log('Fetching done for', folder, filename, fetchHash);
 
-                    const storeData = {};
-                    storeData[storageFileKey] = data;
-                    storeData[storageHashKey] = fetchHash;
-                    return Promise.all(setStorageData(storeData, storageHashKey !== undefined))
-                        .then(() => data);
+                    const keys = [storageFileKey, storageHashKey];
+                    const values = [data, fetchHash];
+                    if (storageHashKey) {
+                        return updateStorageData(keys, values, db.network)
+                            .then(() => data);
+                    }
+                    else {
+                        return addStorageData(keys, values, db.network)
+                            .then(() => data);
+                    }
                 });
         } else {
-            return getStorageData(storageFileKey);
+            return getStorageData([storageFileKey], db.network)
+                .then((data) => data[0]);
         }
     })
     .then(function(data) {
@@ -108,42 +124,57 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.type === 'fetchVersionedResource') {
         fetchVersionedResource('zimu-public', message.filename, function (data) {
-            sendResponse({'data': data});
+            sendResponse({data: data});
         }, function(error) {
             console.log('ERROR');
             console.log(error);
         });
     }
-    else if (message.type == 'getCaptions') {
+    else if (message.type === 'getCaptions') {
         fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data) {
-            sendResponse({'data': data});
-            chrome.runtime.sendMessage({'type': 'requestSucceeded'});
+            sendResponse({data: data});
+            chrome.runtime.sendMessage({type: 'requestSucceeded'});
         }, function(response) {
-            chrome.runtime.sendMessage({'type': 'requestFailed'});
+            chrome.runtime.sendMessage({type: 'requestFailed'});
             sendResponse('error');
         });
     }
+    else if (message.type === 'getIndexedDbData') {
+        const storage = db[message.storage];
+        getStorageData(message.keys, storage)
+            .then(function(data) {
+                console.log(message.keys, 'got', data);
+                sendResponse({data: data});
+            })
+            .catch((error) => sendResponse('error'));
+    }
+    else if (message.type === 'setIndexedDbData') {
+        const storage = db[message.storage];
+        const data = {};
+        let keys = message.keys;
+        let values = message.values;
+        if (message.keys === null) {
+            // No keys set means that keys and values are in message.values
+            keys = Object.keys(message.values);
+            values = keys.map((key) => message.values[key]);
+        }
+        addStorageData(keys, values, storage)
+            .then(function() {
+                sendResponse();
+            })
+            .catch(function(error) {
+                console.log("Adding didn't work, trying updating instead");
+                // Adding didn't work, try updating
+                return updateStorageData(keys, values, storage)
+                    .then(function() {
+                        sendResponse();
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                        sendResponse('error');
+                    });
+            });
+    }
 
     return true;
-});
-
-let defaultOptions = {
-};
-
-
-// Set any missing option values to default value (for first time starting the extension)
-// Can't do this from the options page, since it will probably not be opened before content/background
-chrome.storage.sync.get('options', function(result) {
-    if (result.options === undefined) {
-        result.options = {};
-    }
-    for (let key of Object.keys(defaultOptions)) {
-        if (! (key in result.options)) {
-            result.options[key] = defaultOptions[key];
-        }
-    }
-
-    chrome.storage.sync.set({
-        options: result.options
-    }, function() {});
 });

@@ -2,9 +2,6 @@ const KnowledgeUnknown = 0;
 const KnowledgeKnown = 1;
 const KnowledgeLearning = 2;
 
-let knowledgeChanged = false;
-let optionsChanged = false;
-
 function setPinyinKnown(state, key, value) {
     const prevValue = state.knowledge[key];
     const [type, hz, pysStr] = key.split('-');
@@ -93,19 +90,22 @@ const store = new Vuex.Store({
             for (const [key, value] of Object.entries(knowledge)) {
                 setPinyinKnown(state, key, value);
             }
+            setIndexedDbData('knowledge', null, knowledge, function() {});
         },
         setKnowledgeKey(state, keyVal) {
             state.knowledge[keyVal.key] = keyVal.val;
             setPinyinKnown(state, keyVal.key, keyVal.val);
-            knowledgeChanged = true;
+            setIndexedDbData('knowledge', [keyVal.key], [keyVal.val], function() {});
         },
         setKnowledgeKeys(state, keysVals) {
             for (let i = 0; i < keysVals.keys.length; i++) {
-                const keyVal = {key: keysVals.keys[i], val: keysVals.vals[i]};
-                state.knowledge[keyVal.key] = keyVal.val;
-                setPinyinKnown(state, keyVal.key, keyVal.val);
+                const key = keysVals.keys[i];
+                const val = keysVals.vals[i];
+                state.knowledge[key] = val;
+                setPinyinKnown(state, key, val);
             }
-            knowledgeChanged = true;
+
+            setIndexedDbData('knowledge', keysVals.keys, keysVals.vals, function() {});
         },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
@@ -137,14 +137,15 @@ const store = new Vuex.Store({
         },
         setOptions(state, options) {
             state.options = options;
+            setIndexedDbData('other', ['options'], [state.options], function() {});
         },
         setOption(state, option) {
             state.options[option.key] = option.value;
-            optionsChanged = true;
+            setIndexedDbData('other', ['options'], [state.options], function() {});
         },
         setDeepOption(state, option) {
             state.options[option.key][option.key2] = option.value;
-            optionsChanged = true;
+            setIndexedDbData('other', ['options'], [state.options], function() {});
         },
         setDict(state, dict) {
             state.DICT = dict;
@@ -162,25 +163,17 @@ const store = new Vuex.Store({
     }
 });
 
-// Read current knowledge/options
-chrome.storage.local.get(['knowledge', 'options'], (items) => {
-    if (items.knowledge) store.commit('setKnowledge', items.knowledge);
-    if (items.options) store.commit('setOptions', items.options);
-});
-
-
-setInterval(function() {
-    if (knowledgeChanged) {
-        chrome.storage.local.set({knowledge: store.state.knowledge}, function() {
-            knowledgeChanged = false;
-        });
-    }
-    if (optionsChanged) {
-        chrome.storage.local.set({options: store.state.options}, function() {
-            optionsChanged = false;
-        });
-    }
-}, 5000);
-
 fetchVersionedResource('public_cedict.json', function (data) { store.commit('setDict', data); });
 fetchVersionedResource('hsk_words.json', function (data) { store.commit('setHskWords', data); });
+getIndexedDbData('knowledge', null, function (data) {
+    if (data) {
+        const dict = {};
+        for (const item of data) {
+            dict[item.id] = item.value;
+        }
+        store.commit('setKnowledge', dict);
+    }
+});
+getIndexedDbData('other', ['options'], function (data) {
+    if (data[0]) store.commit('setOptions', data[0]);
+});
