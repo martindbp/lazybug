@@ -453,7 +453,7 @@ def save_caption_data(caption_line, alphabet):
     img_path = f'data/remote/private/caption_data/images/{data_hash}.jpg'
     caption_probs_path = f'data/remote/private/caption_data/segmentation_probs/{data_hash}.png'
     prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
-    if len(caption_line.img) > 0:
+    if caption_line.img is not None and len(caption_line.img) > 0:
         cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
 
     if caption_line.text != '':
@@ -764,8 +764,16 @@ def caption_lines_to_json(lines, frame_size, caption_top, video_length):
     json_lines = []
 
     for line in lines:
-        char_probs = [float(prob) for prob in line.char_probs]
-        json_lines.append([line.text, line.t0, line.t1, line.bounding_rect, char_probs, float(line.logprob), line.data_hash])
+        char_probs = [float(prob) for prob in line.char_probs] if line.char_probs is not None else None
+        json_lines.append([
+            line.text,
+            line.t0,
+            line.t1,
+            line.bounding_rect,
+            char_probs,
+            float(line.logprob) if line.logprob is not None else None,
+            line.data_hash
+        ])
         print(line.text)
 
     return {
@@ -938,7 +946,7 @@ def trim_bad_captions(caption_data):
     for i, line in enumerate(lines):
         text = line[0]
         if text == '':
-            keep[j] = False
+            keep[i] = False
             continue
 
         suspicious_count = sum(text.count(char) for char in suspicious_chars)
