@@ -28,37 +28,37 @@ app.mixin({
 
             return trText;
         },
-        getWordLevel(hz) {
-            if (this.$store.state.HSK_WORDS === null) return null;
-            let wordLevel = null;
-            for (let lvl = 0; lvl <= 5; lvl++) {
-                if (this.$store.state.HSK_WORDS[lvl].includes(hz)) {
-                    wordLevel = lvl+1;
-                    break;
-                }
-            }
-            return wordLevel;
-        },
     },
     computed: {
-        knownPysHSK: function() {
+        lvlKnowledge: function() {
             if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
+            const d = this.$store.state.DICT;
+            const knowledge = {};
+            for (let lvl = 0; lvl < 6; lvl++) {
+                const knowPy = lvl <= this.$store.state.options.knownLevels.py;
+                const knowHz = lvl <= this.$store.state.options.knownLevels.hz;
+                const knowTr = lvl <= this.$store.state.options.knownLevels.tr;
 
-            const known = {};
-            for (let lvl = 0; lvl < this.$store.state.options.knownLevels.py; lvl++) {
-                for (const word of this.$store.state.HSK_WORDS[lvl]) {
-                    for (const hzChar of word) {
-                        const entries = this.$store.state.DICT[hzChar];
-                        for (const entry of entries) {
-                            const pys = dictArrayToDict(entry).pys;
-                            const key = getKnowledgeKey('py', hzChar, pys, null);
-                            known[key] = true;
+                for (const hz of this.$store.state.HSK_WORDS[lvl]) {
+                    if (knowHz) applyKnowledge(d, knowledge, 'hz', hz, null, null, null, KnowledgeKnown);
+                    const entries = d[hz];
+                    if (entries === undefined) continue;
+
+                    for (let entry of entries) {
+                        entry = dictArrayToDict(entry);
+                        const pys = entry.pys;
+                        if (knowPy) applyKnowledge(d, knowledge, 'py', hz, pys, null, null, KnowledgeKnown);
+                        if (knowTr) applyKnowledge(d, knowledge, 'tr', hz, pys, null, null, KnowledgeKnown);
+                        /*
+                        for (const translation of entry.translations) {
+                            if (knowTr) applyKnowledge(knowledge, 'tr', hz, pys, translation);
                         }
+                        */
                     }
                 }
             }
-            return known;
-        }
+            return knowledge;
+        },
     },
 });
 

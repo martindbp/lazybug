@@ -113,12 +113,77 @@ function captionArrayToDict(arr) {
     };
 }
 
-function getKnowledgeKey(type, hz, pys, translation) {
+function getKnowledgeKey(type, hz, pys, tr, translation) {
     let key = null;
+    if (pys === null && ['py', 'tr'].includes(type)) return null;
     var pysWithoutTones = ['py', 'tr'].includes(type) ? pys.map(py => py.slice(0, -1)) : null;
     if (type == 'hz') key = `hz-${hz}`;
     if (type == 'py') key = `py-${hz}-${pysWithoutTones.join('/')}`;
-    if (type == 'tr') key = `tr-${hz}-${pysWithoutTones.join('/')}`;
+    if (type == 'tr') {
+
+        if (tr && /[A-Z]/.test(tr.charAt(0)) && !(tr.startsWith('I') || tr.startsWith("I'"))) {
+            // If the translation is capitalized, we want it to be tracked separately
+            key = `tr-${hz}-${pysWithoutTones.join('/')}-${tr}`;
+        }
+        else {
+            key = `tr-${hz}-${pysWithoutTones.join('/')}`;
+        }
+    }
     if (type == 'translation') key = `tr-${translation}`;
     return key;
+}
+
+function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, knowledgeVal) {
+    setKnowledge(knowledge, getKnowledgeKey(type, hz, pys, tr, translation), knowledgeVal);
+
+    if (['hz', 'py', 'tr'].includes(type)) {
+        // Add all the individual char/pys
+        for (let startIdx = 0; startIdx < hz.length; startIdx++) {
+            for (let endIdx = startIdx+1; endIdx < hz.length+1; endIdx++) {
+                const hzSub = hz.substring(startIdx, endIdx);
+                const pysSub = pys !== null ? pys.slice(startIdx, endIdx) : null;
+                if (DICT[hzSub] === undefined) continue;
+
+                setKnowledge(
+                    knowledge,
+                    getKnowledgeKey(type, hzSub, pysSub, tr, translation),
+                    knowledgeVal
+                );
+            }
+        }
+    }
+}
+
+const KnowledgeUnknown = 0;
+const KnowledgeKnown = 1;
+const KnowledgeLearning = 2;
+
+function setKnowledge(dict, key, val) {
+    let currCounts = dict[key];
+    if (currCounts === undefined) {
+        currCounts = [0, 0];
+    }
+    if (val === KnowledgeUnknown) {
+        // If we're setting as unknown, must have been "learning before"
+        currCounts[KnowledgeLearning-1] -= 1;
+    }
+    else if (val === KnowledgeKnown) {
+        currCounts[KnowledgeKnown-1] += 1;
+    }
+    else if (val === KnowledgeLearning) {
+        // If we're setting "learning", must have been "known" before
+        currCounts[KnowledgeKnown-1] -= 1;
+        currCounts[KnowledgeLearning-1] += 1;
+    }
+    //console.log('Setting', key, currCounts);
+    dict[key] = currCounts;
+    return currCounts;
+}
+
+function getKnowledgeState(dict, key) {
+    const knowledgeState = dict[key];
+    if (knowledgeState  === undefined) return undefined;
+    if (knowledgeState[0] > 0) return KnowledgeKnown;
+    if (knowledgeState[1] > 0) return KnowledgeLearning;
+    return KnowledgeUnknown;
 }
