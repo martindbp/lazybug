@@ -9,6 +9,7 @@
                 <q-tab name="subtitle" label="Subtitle" />
                 <q-tab name="knowledge" label="Knowledge" />
                 <q-tab name="keyboard" label="Keyboard" />
+                <q-tab name="other" label="Other" />
             </q-tabs>
 
             <q-tab-panels v-model="tab">
@@ -98,6 +99,9 @@
                     </div>
                     <br>
                     <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
+                </q-tab-panel>
+                <q-tab-panel name="other" style="width: 400px">
+                    <q-btn color="secondary" label="Clear data" @click="clearData"/>
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -197,6 +201,9 @@ export default {
         },
         resetShortcuts: function() {
             this.$store.commit('setOption', {key: 'keyboardShortcuts', value: DEFAULT_SHORTCUTS});
+        },
+        clearData: function() {
+            clearIndexedDb();
         }
     },
 }

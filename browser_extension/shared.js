@@ -37,6 +37,12 @@ function setIndexedDbData(storageName, keys, values, callback) {
     });
 }
 
+function clearIndexedDb() {
+    chrome.runtime.sendMessage({type: 'clearIndexedDb'}, function onResponse(message) {
+        return true;
+    });
+}
+
 const YOUTUBE_REGEXP = /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/;
 function getYoutubeIdFromURL(url) {
     const match = url.match(YOUTUBE_REGEXP);

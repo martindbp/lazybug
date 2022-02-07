@@ -4,12 +4,23 @@ try {
     console.error(e);
 }
 
-db = new Dexie('zimuai');
-db.version(1).stores({
-    network: 'id',
-    knowledge: 'id',
-    other: 'id',
-});
+let db = null;
+
+function initIndexedDb() {
+    db = new Dexie('zimuai');
+    db.version(1).stores({
+        network: 'id',
+        knowledge: 'id',
+        other: 'id',
+    });
+}
+
+initIndexedDb();
+
+function clearIndexedDb() {
+    db.delete()
+    initIndexedDb();
+}
 
 function showBadgeStatus() {
     chrome.action.setBadgeBackgroundColor({color:[0, 150, 0, 255]});
@@ -122,7 +133,11 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message.type === 'fetchVersionedResource') {
+    if (message.type === 'clearIndexedDb') {
+        clearIndexedDb();
+        sendResponse();
+    }
+    else if (message.type === 'fetchVersionedResource') {
         fetchVersionedResource('zimu-public', message.filename, function (data) {
             sendResponse({data: data});
         }, function(error) {
