@@ -349,8 +349,8 @@ export default {
             if (this.AVElement === null || [null, undefined].includes(this.$refs.captionroot)) return;
             var videoRect = this.AVElement.getBoundingClientRect();
             // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
-            this.$refs.captionroot.$el.style.left = (videoRect.left + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
-            this.$refs.captionroot.$el.style.top = (0.8 * videoRect.bottom + this.captionOffset[1]) + 'px';
+            this.$refs.captionroot.$el.style.left = ((videoRect.left+window.scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
+            this.$refs.captionroot.$el.style.top = (0.8 * (videoRect.bottom+window.scrollY) + this.captionOffset[1]) + 'px';
             if (this.$refs.blurroot) {
                 this.$refs.blurroot.updateBlurStyle();
             }
