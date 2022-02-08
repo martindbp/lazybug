@@ -892,7 +892,7 @@ def timestamp_to_seconds(timestamp):
     return parts[0] * 60 * 60 + parts[1] * 60 + parts[2]
 
 
-def convert_vtt_to_caption_format(translations_path):
+def convert_vtt_to_caption_format(translations_path, params=None):
     translations = [t for t in webvtt.read(translations_path)]
     # Convert newlines to spaces
     lines = []
@@ -900,11 +900,16 @@ def convert_vtt_to_caption_format(translations_path):
         text = caption.text.replace('\n', ' ')
         t0 = timestamp_to_seconds(caption.start)
         t1 = timestamp_to_seconds(caption.end)
-        lines.append([text, t0, t1])
+        lines.append([text, t0, t1, None, None, None, None])
 
-    return {
+    data = {
         'lines': lines
     }
+    if params is not None:
+        data['caption_top'] = params[0]['caption_top']
+        data['caption_bottom'] = params[0]['caption_bottom']
+
+    return data
 
 
 @task(serializer=json)
@@ -1044,9 +1049,10 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                     file_path_type = t
 
             ps = []
-            for param in params:
-                if file_path_type is None or param['type'] == file_path_type:
-                    ps.append(param)
+            if params is not None:
+                for param in params:
+                    if file_path_type is None or ('type' in param and param['type'] == file_path_type):
+                        ps.append(param)
 
             out.append((video_id, file_path, ps))
 
@@ -1109,13 +1115,16 @@ def process_video_captions(
     os.makedirs('data/remote/private/caption_data/meta_trimmed_captions', exist_ok=True)
     videos = get_video_paths(show_name=show_name, videos_path=videos_path)
 
-    start_time_s = 0
-    end_time_s = None
-    with open(f'data/remote/private/shows/{show_name}.json', 'r') as f:
-        show_data = json.load(f)
-
     out = []
     for (video_id, video_path, params) in videos:
+        captions_vtt_path = f'data/remote/private/caption_data/translations/{video_id}.zh.vtt'
+        if os.path.exists(captions_vtt_path):
+            json_captions = convert_vtt_to_caption_format(captions_vtt_path, params)
+            meta_captions = add_metadata(json_captions, video_id)
+            meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-hanzi.json'
+            out.append(meta_captions)
+            continue
+
         video_length, _ = get_video_length_size(video_path)
         for param in params:
             captions, frame_size = predict_video_captions(
