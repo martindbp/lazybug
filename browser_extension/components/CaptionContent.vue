@@ -272,7 +272,7 @@ export default {
                     applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeLearning, true);
                 }
                 else if (this.learningStates[type][i]) {
-                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
+                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeUnknown, true);
                 }
             }
             else {
