@@ -5,13 +5,15 @@ try {
 }
 
 let db = null;
+const VERSION = 1;
 
 function initIndexedDb() {
     db = new Dexie('zimuai');
-    db.version(1).stores({
+    db.version(VERSION).stores({
         network: 'id',
         knowledge: 'id',
         other: 'id',
+        interactionLog: 'date',
     });
 }
 
