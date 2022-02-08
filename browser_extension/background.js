@@ -46,7 +46,7 @@ function updateStorageData(keys, values, store) {
     const entries = [];
     for (let i = 0; i < keys.length; i++) {
         console.log('Update storage', keys[i]);
-        entries.push(store.update(keys[i], {value: values[i]}));
+        entries.push(store.update(keys[i], {value: values[i], timestamp: Date.now()}));
     }
 
     console.log('Update', entries);
@@ -56,7 +56,7 @@ function updateStorageData(keys, values, store) {
 function addStorageData(keys, values, store) {
     const entries = [];
     for (let i = 0; i < keys.length; i++) {
-        entries.push({id: keys[i], value: values[i]});
+        entries.push({id: keys[i], value: values[i], timestamp: Date.now()});
     }
 
     console.log('Add', entries);
