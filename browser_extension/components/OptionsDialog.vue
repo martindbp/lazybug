@@ -37,41 +37,71 @@
                     </q-item>
                 </q-tab-panel>
                 <q-tab-panel name="subtitle" style="width: 400px">
-                    <q-item-label header>Show hanzi</q-item-label>
-                    <div class="q-gutter-sm">
-                        <q-radio v-model="showHz" :val="null" label="Auto" />
-                        <q-radio v-model="showHz" :val="false" label="Hide" />
-                        <q-radio v-model="showHz" :val="true" label="Show" />
-                    </div>
-
                     <q-item-label header>Show pinyin</q-item-label>
-                    <div class="q-gutter-sm">
-                        <q-radio v-model="showPy" :val="null" label="Auto" />
-                        <q-radio v-model="showPy" :val="false" label="Hide" />
-                        <q-radio v-model="showPy" :val="true" label="Show" />
-                    </div>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="showPy"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Auto', value: null},
+                            {label: 'Hide All', value: false},
+                            {label: 'Show All', value: true}
+                        ]"
+                    />
+
+                    <q-item-label header>Show hanzi</q-item-label>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="showHz"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Auto', value: null},
+                            {label: 'Hide All', value: false},
+                            {label: 'Show All', value: true}
+                        ]"
+                    />
 
                     <q-item-label header>Show word translation</q-item-label>
-                    <div class="q-gutter-sm">
-                        <q-radio v-model="showTr" :val="null" label="Auto" />
-                        <q-radio v-model="showTr" :val="false" label="Hide" />
-                        <q-radio v-model="showTr" :val="true" label="Show" />
-                    </div>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="showTr"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Auto', value: null},
+                            {label: 'Hide All', value: false},
+                            {label: 'Show All', value: true}
+                        ]"
+                    />
 
                     <q-item-label header>Show full sentence translation</q-item-label>
-                    <div class="q-gutter-sm">
-                        <q-radio v-model="showFullTr" :val="false" label="Hide" />
-                        <q-radio v-model="showFullTr" :val="true" label="Show" />
-                    </div>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="showFullTr"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Hide', value: false},
+                            {label: 'Show', value: true}
+                        ]"
+                    />
 
                     <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
 
                     Other
                     <q-item-label header>Chinese characters</q-item-label>
-                    <div class="q-gutter-sm">
-                        <q-radio v-model="characterSet" val="sm" label="Simplified" />
-                        <q-radio v-model="characterSet" val="tr" label="Traditional" />
-                    </div>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="characterSet"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Simplified', value: 'sm'},
+                            {label: 'Traditional', value: 'tr'}
+                        ]"
+                    />
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
                     </div>
