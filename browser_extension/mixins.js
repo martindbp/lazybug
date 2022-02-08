@@ -40,18 +40,18 @@ app.mixin({
                 const knowTr = lvl <= this.$store.state.options.knownLevels.tr;
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl]) {
-                    if (knowHz) applyKnowledge(d, knowledge, 'hz', hz, null, null, null, KnowledgeKnown);
+                    if (knowHz) applyKnowledge(d, knowledge, 'hz', hz, null, null, null, KnowledgeKnown, false);
                     const entries = d[hz];
                     if (entries === undefined) continue;
 
                     for (let entry of entries) {
                         entry = dictArrayToDict(entry);
                         const pys = entry.pys;
-                        if (knowPy) applyKnowledge(d, knowledge, 'py', hz, pys, null, null, KnowledgeKnown);
-                        if (knowTr) applyKnowledge(d, knowledge, 'tr', hz, pys, null, null, KnowledgeKnown);
+                        if (knowPy) applyKnowledge(d, knowledge, 'py', hz, pys, null, null, KnowledgeKnown, false);
+                        if (knowTr) applyKnowledge(d, knowledge, 'tr', hz, pys, null, null, KnowledgeKnown, false);
                         /*
                         for (const translation of entry.translations) {
-                            if (knowTr) applyKnowledge(knowledge, 'tr', hz, pys, translation);
+                            if (knowTr) applyKnowledge(knowledge, 'tr', hz, pys, translation, false);
                         }
                         */
                     }

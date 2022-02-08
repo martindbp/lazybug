@@ -50,20 +50,6 @@ const store = new Vuex.Store({
             state.knowledge = knowledge;
             setIndexedDbData('knowledge', null, knowledge, function() {});
         },
-        setKnowledgeKey(state, keyVal) {
-            const newCounts = setKnowledge(state.knowledge, keyVal.key, keyVal.val);
-            setIndexedDbData('knowledge', [keyVal.key], [newCounts], function() {});
-        },
-        setKnowledgeKeys(state, keysVals) {
-            const newCounts = [];
-            for (let i = 0; i < keysVals.keys.length; i++) {
-                const key = keysVals.keys[i];
-                const val = keysVals.vals[i];
-                newCounts.push(setKnowledge(state.knowledge, key, val));
-            }
-
-            setIndexedDbData('knowledge', keysVals.keys, newCounts, function() {});
-        },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
         },

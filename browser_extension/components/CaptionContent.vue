@@ -202,6 +202,7 @@ export default {
                     if (newData !== null && newData.dummy === true) return;
                     this.applyKnownLvls();
                     this.applyKnownPinyinCompounds();
+                    this.applyKnownCompoundWordsNotInDict();
 
                     const allFalse = [];
                     for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -268,14 +269,14 @@ export default {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
                 }
                 else if (this.knownStates[type][i]) {
-                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeLearning);
+                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeLearning, true);
                 }
                 else if (this.learningStates[type][i]) {
-                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown);
+                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
                 }
             }
             else {
-                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown);
+                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
         },
@@ -306,7 +307,7 @@ export default {
                         getKnowledgeState(this.lvlKnowledge, key) == KnowledgeKnown
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as known');
-                        applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown);
+                        applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
                     }
                 }
             }
@@ -322,6 +323,10 @@ export default {
                 const hzChars = this.wordData.hz[i];
                 const pys = this.wordData.pys[i];
                 if (pys === null) continue;
+                if ([KnowledgeKnown, KnowledgeLearning].includes(getKnowledgeState(k, this.knowledgeKey('py', i)))) {
+                    continue;
+                }
+
                 const tr = this.wordData.tr[i];
                 for (let j = 0; j < pys.length; j++) {
                     const py = pys[j];
@@ -332,14 +337,60 @@ export default {
                     hasUnknown = hasUnknown || ([KnowledgeUnknown, undefined].includes(knowledgeState) && [KnowledgeUnknown, undefined].includes(lvlKnowledgeState));
                     hasLearning = hasLearning || (knowledgeState == KnowledgeLearning || lvlKnowledgeState == KnowledgeLearning);
                 }
-                const pyKey = this.knowledgeKey('py', i);
+
                 if (hasLearning) {
                     console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as learning');
-                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeLearning);
+                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeLearning, true);
                 }
                 else if (! hasUnknown) {
                     console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as known');
-                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeKnown);
+                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeKnown, true);
+                }
+            }
+        },
+        applyKnownCompoundWordsNotInDict: function() {
+            const d = this.$store.state.DICT;
+            const k = this.$store.state.knowledge;
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const hz = this.wordData.hz[i];
+                const pys = this.wordData.pys[i];
+                const tr = this.wordData.tr[i];
+                if (d[hz] !== undefined || pys === null || isName(tr)) continue;
+
+                const taken = [];
+                for (let j = 0; j < hz.length; j++) taken.push(false);
+
+                let words = [];
+                for (let w = 5; w >= 1; w--) {
+                    for (let startIdx = 0; startIdx < hz.length-w+1; startIdx++) {
+                        const endIdx = startIdx + w;
+                        if (taken.slice(startIdx, endIdx).includes(true)) continue;
+
+                        const hzSub = hz.substring(startIdx, endIdx);
+                        if (d[hzSub] === undefined) continue;
+
+                        for (let k = 0; k < w; k++) taken[startIdx+k] = true;
+                        words.push([hzSub, pys.slice(startIdx, endIdx)]);
+                    }
+                }
+
+                let knowAll = {hz: true, tr: true};
+                for (const [wordHz, wordPys] of words) {
+                    for (const type of ['hz', 'tr']) {
+                        const key = getKnowledgeKey(type, wordHz, wordPys, null, null);
+                        knowAll[type] = knowAll[type] && (getKnowledgeState(this.lvlKnowledge, key) === KnowledgeKnown || getKnowledgeState(this.$store.state.knowledge, key) === KnowledgeKnown);
+                    }
+                }
+
+                for (const type of ['hz', 'tr']) {
+                    if ([KnowledgeKnown, KnowledgeLearning].includes(getKnowledgeState(k, this.knowledgeKey(type, i)))) {
+                        continue;
+                    }
+
+                    if (knowAll[type]) {
+                        console.log('applyKnownCompoundWordsNotInDict', type, hz, pys);
+                        applyKnowledge(d, k, type, hz, pys, null, null, KnowledgeKnown, true);
+                    }
                 }
             }
         },
