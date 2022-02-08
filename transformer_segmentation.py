@@ -180,7 +180,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
 
     # These chars have simple translations that may show up spuriously in the target translation
     DISALLOW_HZ = '了啦吧呢啊吗呗嘛呀'
-    DISALLOW_PY = ['you', 'a', 'e', 'yu', 'i', 'to', 'so', 'no']
+    DISALLOW_PY = ['you', 'a', 'e', 'yu', 'i', 'to', 'so', 'no', 'me']
     TITLES = [
         ('经理', 'post'),
         ('院长', 'post'),
