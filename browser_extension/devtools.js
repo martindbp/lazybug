@@ -7,7 +7,7 @@ let captionBottom = null;
 chrome.runtime.onMessage.addListener(msgObj => {
     if (msgObj === 'measurecaption') {
         if (AVElement === null) {
-            AVElement = document.querySelector("video");
+            AVElement = document.querySelector("#primary video");
             videoMenu = document.querySelector('.ytp-chrome-bottom');
         }
 
@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener(msgObj => {
         }, { once: true, capture: true });
     }
     else if (msgObj === 'printplaylist') {
-        const title = document.querySelector('#header-description > h3:nth-child(1) > yt-formatted-string > a').innerText;
+        const title = document.querySelector('#playlist #video-title');
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
         const playlistId = params["list"];
