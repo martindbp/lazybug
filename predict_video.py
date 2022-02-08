@@ -971,16 +971,6 @@ def trim_bad_captions(caption_data):
 
 
 @task(serializer=json)
-def combine_fast_captions(caption_data, max_width=30, max_time=10):
-    # Greedily combine captions that are back-to-back, as long as time and width requirements are met
-    time_so_far = 0
-    width_so_far = 0
-    for line in caption_data['lines']:
-        pass
-    return None
-
-
-@task(serializer=json)
 def add_metadata(caption_data, caption_id):
     caption_data['caption_id'] = caption_id
     caption_data['version'] = 1
