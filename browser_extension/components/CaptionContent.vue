@@ -117,7 +117,8 @@ export default {
         },
         translation: function() {
             if (this.data == null) return '';
-            return this.data.translations[0];
+            const useTranslationIdx = Math.min(this.$store.state.options.displayTranslation, this.data.translations.length-1);
+            return this.data.translations[useTranslationIdx];
         },
         texts: function() {
             const sm = this.data.texts.join(' ');
@@ -132,7 +133,7 @@ export default {
                 return wordData;
             }
 
-            wordData.translation = this.data.translations[0];
+            wordData.translation = this.translation;
 
             let nextIdx = 0;
             for (let i = 0; i < this.data.alignments.length; i++) {

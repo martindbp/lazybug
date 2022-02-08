@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="show" dark ref="optionmodal">
-        <q-card class="q-px-sm q-pb-md" style="min-height: 650px">
+        <q-card class="q-px-sm q-pb-md" style="min-height: 750px">
             <q-tabs
               v-model="tab"
               dense
@@ -102,6 +102,17 @@
                             {label: 'Traditional', value: 'tr'}
                         ]"
                     />
+                    <q-item-label header>Display translation (if available)</q-item-label>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="displayTranslation"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'Human', value: 0},
+                            {label: 'Machine', value: 1}
+                        ]"
+                    />
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
                     </div>
@@ -195,6 +206,10 @@ export default {
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },
             set: function(val) { this.$store.commit('setOption', {key: 'characterSet', value: val}); },
+        },
+        displayTranslation: {
+            get: function() { return this.$store.state.options.displayTranslation; },
+            set: function(val) { this.$store.commit('setOption', {key: 'displayTranslation', value: val}); },
         },
         autoPause: {
             get: function() { return this.$store.state.options.autoPause; },

@@ -30,6 +30,7 @@ const store = new Vuex.Store({
                 tr: null,
                 fullTr: false,
             },
+            displayTranslation: 0, // index into [human, machine][min(idx, length)]
             knownLevels: {
                 py: 4,
                 hz: 2,
