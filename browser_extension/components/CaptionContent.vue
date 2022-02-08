@@ -482,6 +482,10 @@ export default {
     border: 1px dashed white;
 }
 
+.captioncardhidden.learning {
+    border: 1px dashed darkorange;
+}
+
 .captioncard.learning .cardcontent {
     color: darkorange;
 }
