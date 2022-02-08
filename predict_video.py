@@ -983,6 +983,7 @@ def combine_fast_captions(caption_data, max_width=30, max_time=10):
 @task(serializer=json)
 def add_metadata(caption_data, caption_id):
     caption_data['caption_id'] = caption_id
+    caption_data['version'] = 1
     return caption_data
 
 
