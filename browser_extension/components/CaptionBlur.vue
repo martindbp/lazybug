@@ -18,6 +18,7 @@ const DEFAULT_WIDTH = 916;
 function rectsUnion(rects) {
     let r = [Infinity, 0, Infinity, 0];
     for (let rect of rects) {
+        if (rect === null) continue;
         const [xMin, xMax, yMin, yMax] = rect;
         r[0] = Math.min(r[0], xMin);
         r[1] = Math.max(r[1], xMax);

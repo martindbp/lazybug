@@ -95,8 +95,23 @@ function dictItemsToDict(items) {
     return out;
 }
 
-function captionArrayToDict(arr) {
+function captionArrayToDict(arr, captionData) {
     let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments] = arr;
+
+    if (boundingRects.length === 1 && boundingRects[0] === null) {
+        // The video has soft captions
+        if (captionData.caption_top !== undefined && captionData.caption_bottom !== undefined) {
+            // But the video also has hard captions that need to be blurred
+            const xMin = captionData.frame_size[1] * 0.2;
+            const xMax = captionData.frame_size[1] * 0.8;
+            const yMin = 0;
+            const yMax = captionData.frame_size[0] * (captionData.caption_bottom - captionData.caption_top);
+            boundingRects = [[xMin, xMax, yMin, yMax]];
+        }
+        else {
+            boundingRects = [];
+        }
+    }
 
     return {
         texts: texts,

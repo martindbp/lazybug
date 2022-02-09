@@ -177,11 +177,11 @@ export default {
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const prevIdx = this.currentCaptionIdx[0];
                 if (prevIdx !== null) {
-                    this.prevCaption = captionArrayToDict(this.captionData.lines[prevIdx]);
+                    this.prevCaption = captionArrayToDict(this.captionData.lines[prevIdx], this.captionData);
                 }
             }
             else if (this.currentCaptionIdx > 0) {
-                this.prevCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx - 1]);
+                this.prevCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx - 1], this.captionData);
             }
             else {
                 this.prevCaption = null;
@@ -194,7 +194,7 @@ export default {
                 }
             }
             else {
-                this.currCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx]);
+                this.currCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx], this.captionData);
                 this.minHeight = null;  // when the caption changes we reset any min height set
                 this.automaticallyPausedThisCaption = false;
             }
@@ -205,11 +205,11 @@ export default {
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const nextIdx = this.currentCaptionIdx[1];
                 if (nextIdx !== null) {
-                    this.nextCaption = captionArrayToDict(this.captionData.lines[nextIdx]);
+                    this.nextCaption = captionArrayToDict(this.captionData.lines[nextIdx], this.captionData);
                 }
             }
             else if (this.currentCaptionIdx < this.captionData.lines.length - 1) {
-                this.nextCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx + 1]);
+                this.nextCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx + 1], this.captionData);
             }
             else {
                 this.nextCaption = null;
@@ -385,7 +385,7 @@ export default {
         },
         videoFrameSize: function() {
             if (this.captionData === null) return null;
-            return this.captionData['frame_size']
+            return this.captionData['frame_size'];
         },
         videoCaptionTopPx: function() {
             if (this.captionData === null || this.videoFrameSize === undefined) return null;
@@ -395,15 +395,15 @@ export default {
             if (this.captionData === null) return null;
 
             const lines = this.captionData.lines
-            const lastCaption = captionArrayToDict(lines[lastCaptionIdxGlobal]);
+            const lastCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], this.captionData);
             if (this.currTime < lastCaption.t0) {
                 // Start over search from the beginning
                 lastCaptionIdxGlobal = 0;
             }
 
             for (var i = lastCaptionIdxGlobal; i < lines.length; i++) {
-                let caption = captionArrayToDict(lines[i]);
-                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1]) : null;
+                let caption = captionArrayToDict(lines[i], this.captionData);
+                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], this.captionData) : null;
                 if (this.currTime >= caption.t0 && this.currTime <= caption.t1) {
                     lastCaptionIdxGlobal = i;
                     return i;
@@ -420,10 +420,10 @@ export default {
                 }
             }
 
-            if (this.currTime < captionArrayToDict(lines[0]).t0) {
+            if (this.currTime < captionArrayToDict(lines[0], this.captionData).t0) {
                 return [null, 0];
             }
-            else if (this.currTime > captionArrayToDict(lines[lines.length-1]).t1) {
+            else if (this.currTime > captionArrayToDict(lines[lines.length-1], this.captionData).t1) {
                 return [lines.length-1, null];
             }
             return null;
