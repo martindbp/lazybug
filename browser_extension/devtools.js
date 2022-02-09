@@ -114,6 +114,7 @@ chrome.runtime.onMessage.addListener(msgObj => {
                 "id": "youtube-" + videoId
             });
         }
-        prompt('Copy:', JSON.stringify(data, null, 2));
+
+        console.log(JSON.stringify(data, null, 2));
     }
 });
