@@ -1,5 +1,5 @@
 <template>
-    <div v-if="captionId">
+    <div v-if="captionId && AVElement">
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
