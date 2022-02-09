@@ -262,7 +262,9 @@ def get_video_length_size(path):
     if fps == 0:
         return 0, size_bytes
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    return round(frame_count/fps, 2), size_bytes
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    return round(frame_count/fps, 2), size_bytes, (height, width)
 
 
 def get_video_caption_area(
@@ -892,7 +894,7 @@ def timestamp_to_seconds(timestamp):
     return parts[0] * 60 * 60 + parts[1] * 60 + parts[2]
 
 
-def convert_vtt_to_caption_format(translations_path, params=None):
+def convert_vtt_to_caption_format(translations_path, params=None, video_length=None, frame_size=None):
     translations = [t for t in webvtt.read(translations_path)]
     # Convert newlines to spaces
     lines = []
@@ -908,6 +910,10 @@ def convert_vtt_to_caption_format(translations_path, params=None):
     if params is not None:
         data['caption_top'] = params[0]['caption_top']
         data['caption_bottom'] = params[0]['caption_bottom']
+    if video_length is not None:
+        data['video_length'] = video_length;
+    if frame_size is not None:
+        data['frame_size'] = frame_size;
 
     return data
 
@@ -1117,15 +1123,15 @@ def process_video_captions(
 
     out = []
     for (video_id, video_path, params) in videos:
+        video_length, _, frame_size = get_video_length_size(video_path)
         captions_vtt_path = f'data/remote/private/caption_data/translations/{video_id}.zh.vtt'
         if os.path.exists(captions_vtt_path):
-            json_captions = convert_vtt_to_caption_format(captions_vtt_path, params)
+            json_captions = convert_vtt_to_caption_format(captions_vtt_path, params, video_length, frame_size)
             meta_captions = add_metadata(json_captions, video_id)
             meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-hanzi.json'
             out.append(meta_captions)
             continue
 
-        video_length, _ = get_video_length_size(video_path)
         for param in params:
             captions, frame_size = predict_video_captions(
                 video_path,
