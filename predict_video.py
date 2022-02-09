@@ -421,7 +421,8 @@ def predict_line(ocr, frame, frame_t, font_height):
 
         desired_ratio = font_height / frame.shape[0]
         actual_ratio = (max_y - min_y) / frame.shape[0]
-        if len(contours) == 0 or abs(actual_ratio - desired_ratio) > 0.05:
+        print('actual_ratio', actual_ratio)
+        if len(contours) == 0 or abs(actual_ratio - desired_ratio) > 0.15:
             print(f'{actual_ratio = } {desired_ratio = }')
             text = ''
             char_probs = None
