@@ -43,6 +43,11 @@ export default {
     mounted: function() {
         const self = this;
         this.keyboardListener = window.addEventListener("keydown", function(event) {
+            if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                // Turn off shortcuts when we're focused to an input element
+                return;
+            }
+
             if (self.$store.state.showOptions || ! self.$store.state.options.keyboardShortcutsToggle) {
                 return;
             }

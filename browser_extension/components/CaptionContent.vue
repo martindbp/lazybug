@@ -296,6 +296,8 @@ export default {
         applyKnownLvls: function() {
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
+            if (d === null || k === null) return;
+
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 const hz = this.wordData.pys[i] == null ? '' : this.wordData.hz[i];
                 if (hz.length === 0) continue;
@@ -318,6 +320,8 @@ export default {
             // More specifically, the compound knowledge level is the minimum of the constituent parts
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
+            if (d === null || k === null) return;
+
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 let hasUnknown = false;
                 let hasLearning = false;
@@ -352,6 +356,8 @@ export default {
         applyKnownCompoundWordsNotInDict: function() {
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
+            if (d === null || k === null) return;
+
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 const hz = this.wordData.hz[i];
                 const pys = this.wordData.pys[i];
