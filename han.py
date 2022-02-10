@@ -296,6 +296,7 @@ def is_name_according_to_cedict(hz, py, strict=True):
                 tr.startswith('Kangxi') or
                 tr.endswith('?') or
                 tr.endswith('!') or
+                '...' in tr or
                 tr.startswith('OK') or
                 tr.startswith('I')
             ):
@@ -313,9 +314,23 @@ def is_name_according_to_cedict(hz, py, strict=True):
     return False
 
 
-def clean_cedict_translation(tr, py=None, split_or=True, remove_parens=True):
+def clean_cedict_translation(tr, hz=None, py=None, split_or=True, remove_parens=True):
     if tr == '!':
         return []
+
+    if py is not None and hz is not None:
+        if (
+            not is_name_according_to_cedict(hz, py) and
+            tr[0].isupper() and
+            tr not in ['I', 'OK'] and
+            not tr.startswith('CL') and
+            not tr.startswith('I ') and
+            not tr.startswith("I'") and
+            not tr.startswith("OK") and
+            not tr.startswith('Kangxi') and
+            not tr.upper() == tr  # if all letters are uppercase then it's probably an acronym
+        ):
+            tr = tr[0].lower() + tr[1:]
 
     if py is not None:
         py_regex = (
@@ -412,7 +427,7 @@ def get_idioms():
         for (tr, py, transl, _, _) in entries:
             transls = [t for t in transl.split('/') if t != '']
             entry_transls += transls
-            cleaned_transls = sum([clean_cedict_translation(tr, py) for tr in transls], [])
+            cleaned_transls = sum([clean_cedict_translation(tr, py=py) for tr in transls], [])
             entry_cleaned_transls += cleaned_transls
 
             for tr in transls:

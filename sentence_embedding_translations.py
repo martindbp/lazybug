@@ -6,7 +6,7 @@ import itertools
 import numpy as np
 from iteration_utilities import unique_everseen
 from sentence_transformers import SentenceTransformer
-from han import filter_text_hanzi, CEDICT, clean_cedict_translation
+from han import filter_text_hanzi, CEDICT, clean_cedict_translation, is_name_according_to_cedict
 from misc import get_punctuation
 from pinyin import extract_normalized_pinyin
 from transformers import AutoTokenizer, AutoModel
@@ -169,6 +169,7 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
             continue
 
         transls = transl.split('/')
+
         # By convention, anyting after ! is for exact matching only
         rest_is_exact_match_only = False
         for tr in transls:
@@ -180,8 +181,8 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
             # We include options with and without parenthesised text, e.g. 九 -> "(long) time", we want
             # both "long", and "long time" options
             trs = (
-                clean_cedict_translation(tr, entry_py, split_or=split_or, remove_parens=True) +
-                clean_cedict_translation(tr, entry_py, split_or=split_or, remove_parens=False)
+                clean_cedict_translation(tr, hz, entry_py, split_or=split_or, remove_parens=True) +
+                clean_cedict_translation(tr, hz, entry_py, split_or=split_or, remove_parens=False)
             )
 
             for tr_split in trs:
