@@ -39,8 +39,12 @@ const store = new Vuex.Store({
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
         }),
+        captionData: null,
     },
     mutations: {
+        setCaptionData(state, val) {
+            state.captionData = val;
+        },
         setShowOptions(state, val) {
             state.showOptions = val;
         },

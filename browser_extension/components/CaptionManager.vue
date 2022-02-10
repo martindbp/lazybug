@@ -15,7 +15,7 @@
         <CaptionBlur
             id="blurroot"
             ref="blurroot"
-            v-if="captionData !== null"
+            v-if="$store.state.captionData !== null"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
             v-bind:nextCaption="nextCaption"
@@ -43,7 +43,6 @@ export default {
         return {
             AVElementSelector: '#primary video',
             url: window.location.href,
-            captionData: null,
             localVideoHash: null,
             currTime: -1000.5,
             AVElement: null,
@@ -171,45 +170,47 @@ export default {
         currentCaptionIdx: function(newIdx, oldIdx) {
             if (newIdx === oldIdx) return;
 
-            if (this.captionData === null || this.currentCaptionIdx === null) {
+            const captionData = this.$store.state.captionData;
+
+            if (captionData === null || this.currentCaptionIdx === null) {
                 this.prevCaption = null;
             }
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const prevIdx = this.currentCaptionIdx[0];
                 if (prevIdx !== null) {
-                    this.prevCaption = captionArrayToDict(this.captionData.lines[prevIdx], this.captionData);
+                    this.prevCaption = captionArrayToDict(captionData.lines[prevIdx], captionData);
                 }
             }
             else if (this.currentCaptionIdx > 0) {
-                this.prevCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx - 1], this.captionData);
+                this.prevCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx - 1], captionData);
             }
             else {
                 this.prevCaption = null;
             }
 
-            if (this.captionData === null || this.currentCaptionIdx === null || Array.isArray(this.currentCaptionIdx)) {
+            if (captionData === null || this.currentCaptionIdx === null || Array.isArray(this.currentCaptionIdx)) {
                 if (this.currCaption !== null && this.currCaption.dummy !== true) {
                     this.currCaption = null;
                     this.minHeight = null;  // when the caption changes we reset any min height set
                 }
             }
             else {
-                this.currCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx], this.captionData);
+                this.currCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx], captionData);
                 this.minHeight = null;  // when the caption changes we reset any min height set
                 this.automaticallyPausedThisCaption = false;
             }
 
-            if (this.captionData === null || this.currentCaptionIdx === null) {
+            if (captionData === null || this.currentCaptionIdx === null) {
                 this.nextCaption = null;
             }
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const nextIdx = this.currentCaptionIdx[1];
                 if (nextIdx !== null) {
-                    this.nextCaption = captionArrayToDict(this.captionData.lines[nextIdx], this.captionData);
+                    this.nextCaption = captionArrayToDict(captionData.lines[nextIdx], captionData);
                 }
             }
-            else if (this.currentCaptionIdx < this.captionData.lines.length - 1) {
-                this.nextCaption = captionArrayToDict(this.captionData.lines[this.currentCaptionIdx + 1], this.captionData);
+            else if (this.currentCaptionIdx < captionData.lines.length - 1) {
+                this.nextCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx + 1], captionData);
             }
             else {
                 this.nextCaption = null;
@@ -218,7 +219,7 @@ export default {
     },
     methods: {
         fetchCaptionMaybe: function() {
-            this.captionData = null;
+            this.$store.commit('setCaptionData', null);
             if (this.captionId === null || [null, undefined].includes(chrome.runtime)) return;
 
             const self = this;
@@ -228,7 +229,7 @@ export default {
                 if (message === 'error') {
                     return false;
                 }
-                self.captionData = message.data;
+                self.$store.state.captionData = message.data;
                 return true;
             });
         },
@@ -311,7 +312,7 @@ export default {
         setUpdateInterval: function() {
             const self = this;
             self.currentTimeInterval = setInterval(() => {
-                if (self.AVElement === null || self.captionData == null) return;
+                if (self.AVElement === null || self.$store.state.captionData == null) return;
                 const newTime = self.AVElement.currentTime;
                 if (self.paused && self.automaticallyPausedThisCaption && ! self.seeked && ! self.seekedFromMenu) {
                     return;
@@ -384,26 +385,27 @@ export default {
             return captionId;
         },
         videoFrameSize: function() {
-            if (this.captionData === null) return null;
-            return this.captionData['frame_size'];
+            if (this.$store.state.captionData === null) return null;
+            return this.$store.state.captionData['frame_size'];
         },
         videoCaptionTopPx: function() {
-            if (this.captionData === null || this.videoFrameSize === undefined) return null;
-            return Math.round(this.captionData['caption_top'] * this.videoFrameSize[0]);
+            if (this.$store.state.captionData === null || this.videoFrameSize === undefined) return null;
+            return Math.round(this.$store.state.captionData['caption_top'] * this.videoFrameSize[0]);
         },
         currentCaptionIdx: function() {
-            if (this.captionData === null) return null;
+            const captionData = this.$store.state.captionData;
+            if (captionData === null) return null;
 
-            const lines = this.captionData.lines
-            const lastCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], this.captionData);
+            const lines = captionData.lines
+            const lastCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], captionData);
             if (this.currTime < lastCaption.t0) {
                 // Start over search from the beginning
                 lastCaptionIdxGlobal = 0;
             }
 
             for (var i = lastCaptionIdxGlobal; i < lines.length; i++) {
-                let caption = captionArrayToDict(lines[i], this.captionData);
-                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], this.captionData) : null;
+                let caption = captionArrayToDict(lines[i], captionData);
+                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], captionData) : null;
                 if (this.currTime >= caption.t0 && this.currTime <= caption.t1) {
                     lastCaptionIdxGlobal = i;
                     return i;
@@ -420,10 +422,10 @@ export default {
                 }
             }
 
-            if (this.currTime < captionArrayToDict(lines[0], this.captionData).t0) {
+            if (this.currTime < captionArrayToDict(lines[0], captionData).t0) {
                 return [null, 0];
             }
-            else if (this.currTime > captionArrayToDict(lines[lines.length-1], this.captionData).t1) {
+            else if (this.currTime > captionArrayToDict(lines[lines.length-1], captionData).t1) {
                 return [lines.length-1, null];
             }
             return null;

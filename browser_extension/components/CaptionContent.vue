@@ -34,7 +34,13 @@
                     <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.hz[i]"></span>
                     <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.hz[i]"></span>
                     <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.hz[i] && learningStates.hz[i]"></span>
-                    <span class="cardcontent" :style="{opacity: finalShowStates.hz[i] ? 1 : 0}">{{ sm2tr(hz) }}</span>
+                    <span
+                        class="cardcontent"
+                        :style="{opacity: finalShowStates.hz[i] ? 1 : 0}"
+                        :title="wordStats[i]"
+                    >
+                        {{ sm2tr(hz) }}
+                    </span>
                 </td>
             </tr>
             <tr class="bottomrow">
@@ -97,6 +103,14 @@ export default {
         undoIcon: getIconSvg("undo", 18),
     }},
     computed: {
+        wordStats: function() {
+            const stats = [];
+            for (var i = 0; i < this.wordData.hz.length; i++) {
+                const key = `${this.wordData.hz[i]}-${this.wordData.py[i]}`;
+                stats.push(this.finalShowStates.hz[i] ? this.videoWordStats[key] : null);
+            }
+            return stats;
+        },
         peekStates: function() {
             const states = this.$store.state.peekStates;
             states['translation'] = (states['translation'] || this.$store.state.options.show['fullTr']) && !this.showStates['translation'];

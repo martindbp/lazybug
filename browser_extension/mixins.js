@@ -59,6 +59,24 @@ app.mixin({
             }
             return knowledge;
         },
+        videoWordStats: function() {
+            if (this.$store.state.captionData === null) return {};
+            const wordStats = {};
+            for (let line of this.$store.state.captionData.lines) {
+                line = captionArrayToDict(line, this.$store.state.captionData);
+                for (let alignment of line.alignments) {
+                    const hz = alignment[2];
+                    const py = alignment[3].map((item) => item[0]).join('');
+                    const key = `${hz}-${py}`;
+                    if (wordStats[key] === undefined) {
+                        wordStats[key] = 0;
+                    }
+                    wordStats[key] += 1;
+                }
+            }
+
+            return wordStats;
+        },
     },
 });
 
