@@ -180,8 +180,35 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
 
     # These chars have simple translations that may show up spuriously in the target translation
     DISALLOW_HZ = '了啦吧呢啊吗呗嘛呀'
-    DISALLOW_PY = ['you', 'a', 'e', 'yu', 'i', 'to', 'so', 'no', 'me']
+    # These are pinyin/wade-giles that are common words in english or tend to show up in translations
+    DISALLOW_SINGLE_PY = [
+        'you',
+        'a',
+        'e',
+        'yu',
+        'i',
+        'to',
+        'so',
+        'no',
+        'me',
+        'do',
+        'an',
+        'ha',
+        'ma',
+        'she',
+        'man',
+        'men',
+        'he',
+        'la',
+        # Words, but not very common (or hasn't been a problem yet):
+        #'hang',
+        #'ran',
+        #'tan',
+        #'dui',  # DUI
+    ]
     TITLES = [
+        ('警官', 'post'),
+        ('医生', 'post'),
         ('经理', 'post'),
         ('院长', 'post'),
         ('总', 'post'),
@@ -311,7 +338,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                             py_groups = [g for g, i in py_groups]
                             if len(py_groups) == 0:
                                 continue
-                            if len(set(py_groups) & set(DISALLOW_PY)) == len(py_groups):
+                            if len(set(py_groups) & set(DISALLOW_SINGLE_PY)) == len(py_groups):
                                 # All syllables are disallowed, so skip
                                 continue
 
