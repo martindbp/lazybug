@@ -17,18 +17,28 @@ const store = new Vuex.Store({
         knowledge: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
-        peekStates: Vue.ref({'py': [], 'hz': [], 'tr': [], 'translation': false}),
+        peekStates: Vue.ref({
+            py: [],
+            hz: [],
+            tr: [],
+            rows: {
+                py: false,
+                tr: false,
+                hz: false,
+                translation: false,
+            }
+        }),
         showOptions: false,
         showDictionary: false,
         options: Vue.ref({
             autoPause: true,
             characterSet: 'sm',
             blurCaptions: true,
-            show: {
-                hz: null,
-                py: null,
-                tr: null,
-                fullTr: false,
+            pin: {
+                hz: false,
+                py: false,
+                tr: false,
+                translation: false,
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
             knownLevels: {
@@ -65,11 +75,13 @@ const store = new Vuex.Store({
             state.captionOffset = offset;
         },
         setPeekState(state, val) {
-            if (val.i === undefined || val.i === null) {
+            if ([undefined, null].includes(val.i)) {
                 if (val.type === 'translation') {
                     state.peekStates[val.type] = true;
+                    state.peekStates.rows[val.type] = true;
                 }
                 else {
+                    state.peekStates.rows[val.type] = true;
                     // Set peek state for all words
                     for (let i = 0; i < state.peekStates[val.type].length; i++) {
                         state.peekStates[val.type][i] = true;
@@ -78,6 +90,25 @@ const store = new Vuex.Store({
             }
             else {
                 state.peekStates[val.type][val.i] = true;
+            }
+        },
+        resetPeekStates(state, val) {
+            state.peekStates = {
+                py: [],
+                hz: [],
+                tr: [],
+                translation: false,
+                rows: {
+                    hz: false,
+                    tr: false,
+                    py: false,
+                    translation: false,
+                },
+            };
+            for (let i = 0; i < val; i++) {
+                for (const type of ['py', 'hz', 'tr']) {
+                    state.peekStates[type].push(false);
+                }
             }
         },
         setPeekStates(state, val) {

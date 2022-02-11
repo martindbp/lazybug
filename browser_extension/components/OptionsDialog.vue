@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="show" dark ref="optionmodal">
-        <q-card class="q-px-sm q-pb-md" style="min-height: 750px">
+        <q-card class="q-px-sm q-pb-md" style="min-height: 400px">
             <q-tabs
               v-model="tab"
               dense
@@ -37,60 +37,6 @@
                     </q-item>
                 </q-tab-panel>
                 <q-tab-panel name="subtitle" style="width: 400px">
-                    <q-item-label header>Show pinyin</q-item-label>
-                    <q-btn-toggle
-                        push
-                        glossy
-                        v-model="showPy"
-                        toggle-color="primary"
-                        :options="[
-                            {label: 'Auto', value: null},
-                            {label: 'Hide All', value: false},
-                            {label: 'Show All', value: true}
-                        ]"
-                    />
-
-                    <q-item-label header>Show hanzi</q-item-label>
-                    <q-btn-toggle
-                        push
-                        glossy
-                        v-model="showHz"
-                        toggle-color="primary"
-                        :options="[
-                            {label: 'Auto', value: null},
-                            {label: 'Hide All', value: false},
-                            {label: 'Show All', value: true}
-                        ]"
-                    />
-
-                    <q-item-label header>Show word translation</q-item-label>
-                    <q-btn-toggle
-                        push
-                        glossy
-                        v-model="showTr"
-                        toggle-color="primary"
-                        :options="[
-                            {label: 'Auto', value: null},
-                            {label: 'Hide All', value: false},
-                            {label: 'Show All', value: true}
-                        ]"
-                    />
-
-                    <q-item-label header>Show full sentence translation</q-item-label>
-                    <q-btn-toggle
-                        push
-                        glossy
-                        v-model="showFullTr"
-                        toggle-color="primary"
-                        :options="[
-                            {label: 'Hide', value: false},
-                            {label: 'Show', value: true}
-                        ]"
-                    />
-
-                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
-
-                    Other
                     <q-item-label header>Chinese characters</q-item-label>
                     <q-btn-toggle
                         push
@@ -113,6 +59,7 @@
                             {label: 'Machine', value: 1}
                         ]"
                     />
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
                     </div>
@@ -171,22 +118,6 @@ export default {
         choosingShortcut: null,
     }},
     computed: {
-        showHz: {
-            get: function() { return this.$store.state.options.show.hz; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'hz', value: val}); },
-        },
-        showPy: {
-            get: function() { return this.$store.state.options.show.py; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'py', value: val}); },
-        },
-        showTr: {
-            get: function() { return this.$store.state.options.show.tr; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'tr', value: val}); },
-        },
-        showFullTr: {
-            get: function() { return this.$store.state.options.show.fullTr; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'fullTr', value: val}); },
-        },
         show: {
             get: function() { return this.$store.state.showOptions; },
             set: function(val) { this.$store.commit('setShowOptions', val); },

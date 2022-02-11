@@ -2,8 +2,9 @@
     <div :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
         <table class="contenttable">
             <tr class="toprow">
-                <td title="Peek pinyin row" :class="getClasses('py', null)" @click="peekAll('py')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
+                <td title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
+                    <span v-if="isPeek('py')" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="!isPeek('py')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">PY</span>
                 </td>
                 <td
@@ -20,8 +21,9 @@
                 </td>
             </tr>
             <tr class="centerrow">
-                <td title="Peek hanzi row" :class="getClasses('hz', null)" @click="peekAll('hz')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
+                <td title="Peek hanzi row" :class="getClasses('hz', null)" @click="clickPeekRow('hz')">
+                    <span v-if="isPeek('hz')" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="!isPeek('hz')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">HZ</span>
                 </td>
                 <td
@@ -44,8 +46,9 @@
                 </td>
             </tr>
             <tr class="bottomrow">
-                <td title="Peek word translation row" :class="getClasses('tr', null)" @click="peekAll('tr')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
+                <td title="Peek word translations" :class="getClasses('tr', null)" @click="clickPeekRow('tr')">
+                    <span v-if="isPeek('tr')" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="!isPeek('tr')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">TR</span>
                 </td>
                 <td
@@ -68,19 +71,26 @@
                 </td>
             </tr>
         </table>
-        <div
-            @click="click('translation')"
-            :class="{
-                captioncard: true,
-                peeking: peekStates['translation'],
-                fulltranslation: true,
-                placeholder: !finalShowStates['translation'],
-                showborder: data !== null,
-            }"
-        >
-            <span v-if="finalShowStates['translation']"> {{ translation }}</span>
-            <span v-if="!finalShowStates['translation']" v-html="eyecon"></span>
-        </div>
+        <table class="contenttable">
+            <td title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
+                <span v-if="isPeek('translation')" class="iconcard peek" v-html="eyecon"></span>
+                <span v-if="!isPeek('translation')" class="iconcard peek" v-html="pinIcon"></span>
+                <span class="cardcontent">EN</span>
+            </td>
+            <td
+                @click="click('translation')"
+                :class="{
+                    captioncard: true,
+                    peeking: peekStates['translation'],
+                    fulltranslation: true,
+                    placeholder: !finalShowStates['translation'],
+                    showborder: data !== null,
+                }"
+            >
+                <span :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
+                <span style="position: absolute; left: 50%" v-if="!finalShowStates['translation']" v-html="eyecon"></span>
+            </td>
+        </table>
     </div>
 </template>
 <script>
@@ -97,6 +107,8 @@ export default {
     },
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
+        pinIcon: getIconSvg("pin", 18),
+        unpinIcon: getIconSvg("unpin", 18),
         bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
         closeIcon: getIconSvg("undo", 18),
@@ -113,10 +125,10 @@ export default {
         },
         peekStates: function() {
             const states = this.$store.state.peekStates;
-            states['translation'] = (states['translation'] || this.$store.state.options.show['fullTr']) && !this.showStates['translation'];
+            states['translation'] = states['translation'] && !this.showStates['translation'];
             for (var i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = (states[type][i] || this.$store.state.options.show[type]) && !this.showStates[type][i];
+                    states[type][i] = states[type][i] && !this.showStates[type][i];
                 }
             }
             return states;
@@ -215,25 +227,27 @@ export default {
             handler: function(newData, oldData) {
                 if (newData !== oldData) {
                     if (newData !== null && newData.dummy === true) return;
+
                     this.applyKnownLvls();
                     this.applyKnownPinyinCompounds();
                     this.applyKnownCompoundWordsNotInDict();
-
-                    const allFalse = [];
-                    for (let i = 0; i < this.wordData.hz.length; i++) {
-                        allFalse.push(false);
+                    this.$store.commit('resetPeekStates', this.wordData.hz.length);
+                    for (const type of ['hz', 'tr', 'py', 'translation']) {
+                        if (this.$store.state.options.pin[type] === true) {
+                            this.$store.commit('setPeekState', {'type': type});
+                        }
                     }
-                    this.$store.commit('setPeekStates', {
-                        'py': allFalse.slice(),
-                        'hz': allFalse.slice(),
-                        'tr': allFalse.slice(),
-                        'translation': false
-                    });
                 }
             },
         },
     },
     methods: {
+        isPeek: function(type) {
+            return (
+                !this.$store.state.peekStates.rows[type] &&
+                !this.$store.state.options.pin[type]
+            );
+        },
         getClasses: function(type, i) {
             const cl = {
                 captioncard: true,
@@ -242,7 +256,8 @@ export default {
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
                 learning: i !== null && this.learningStates[type][i],
                 known: i !== null && this.knownStates[type][i],
-                peekall: i === null,
+                peekrow: i === null,
+                pinned: this.$store.state.options.pin[type],
             };
             return cl;
         },
@@ -302,9 +317,15 @@ export default {
                 }
             }
         },
-        peekAll: function(type) {
-            for (let i = 0; i < this.wordData.hz.length; i++) {
-                this.peek(type, i);
+        clickPeekRow: function(type) {
+            if (this.$store.state.options.pin[type] === true) {
+                this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: false});
+            }
+            else if (this.$store.state.peekStates.rows[type] === true) {
+                this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: true});
+            }
+            else {
+                this.$store.commit('setPeekState', {'type': type});
             }
         },
         applyKnownLvls: function() {
@@ -420,7 +441,7 @@ export default {
 </script>
 
 <style>
-.peekall {
+.peekrow {
     width: 1.5em;
     margin-right: 3em;
 }
@@ -515,7 +536,7 @@ export default {
     color: #32de84;
 }
 
-.peekall .cardcontent {
+.peekrow .cardcontent {
     font-size: 0.5em;
     color: lightgray;
     position: absolute;
@@ -526,7 +547,7 @@ export default {
     margin-top: 0em;
 }
 
-.peekall:hover .cardcontent {
+.peekrow:hover .cardcontent {
     visibility: hidden;
 }
 
@@ -536,6 +557,18 @@ export default {
     height: 20px;
     visibility: hidden;
     z-index: 999;
+}
+
+.pinned.peekrow .iconcard {
+    visibility: visible;
+}
+
+.pinned.peekrow .cardcontent {
+    visibility: hidden;
+}
+
+.pinned.peekrow svg {
+    background-color: #606060;
 }
 
 .iconcard.peek {
