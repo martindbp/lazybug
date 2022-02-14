@@ -94,7 +94,10 @@ test-cases:
 
 ext:
 	mv browser_extension/dist/zimu_quasar.css browser_extension/
-	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist
+	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_captionmanager
+	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
+	mv browser_extension/dist_captionmanager/* browser_extension/dist/
+	mv browser_extension/dist_popuproot/* browser_extension/dist/
 	mv browser_extension/zimu_quasar.css browser_extension/dist/
 
 css:

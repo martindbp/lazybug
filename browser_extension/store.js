@@ -31,6 +31,7 @@ const store = new Vuex.Store({
         showOptions: false,
         showDictionary: false,
         options: Vue.ref({
+            extensionToggle: true,
             autoPause: true,
             characterSet: 'sm',
             blurCaptions: true,

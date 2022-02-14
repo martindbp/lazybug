@@ -1,5 +1,5 @@
 <template>
-    <div v-if="captionId && AVElement">
+    <div v-if="captionId && AVElement && $store.state.options.extensionToggle">
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
@@ -15,7 +15,7 @@
         <CaptionBlur
             id="blurroot"
             ref="blurroot"
-            v-if="$store.state.captionData !== null"
+            v-if="$store.state.captionData !== null && $store.state.options.extensionToggle"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
             v-bind:nextCaption="nextCaption"
@@ -302,6 +302,13 @@ export default {
 
             document.addEventListener('DOMContentLoaded', () => {
                 self.AVElement = document.querySelector(self.AVElementSelector);
+            });
+
+            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                if (message.type === 'extensionToggle') {
+                    self.$store.commit('setOption', {key: 'extensionToggle', value: message.data});
+                }
+                return true;
             });
         },
         fullscreenChangeListener: function() {
