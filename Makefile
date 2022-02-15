@@ -100,6 +100,9 @@ ext:
 	mv browser_extension/dist_popuproot/* browser_extension/dist/
 	mv browser_extension/zimu_quasar.css browser_extension/dist/
 
+release:
+	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
+
 css:
 	sass browser_extension/css/zimu_quasar.sass browser_extension/dist/zimu_quasar.css
 	sed -i -E 's/\.zimu (body|html|:root)/\1/g' browser_extension/dist/zimu_quasar.css

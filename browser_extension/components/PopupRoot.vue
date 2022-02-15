@@ -4,17 +4,21 @@
           v-model="extensionToggle"
           color="green"
         />
-        <q-btn label="Measure caption" @click="measureCaption" />
-        <q-btn label="Print playlist" @click="printPlaylist" />
+        <div v-if="dev">
+            <q-btn label="Measure caption" @click="measureCaption" />
+            <q-btn label="Print playlist" @click="printPlaylist" />
+        </div>
     </div>
 </template>
 
 <script>
+const ZIMUDEVMODE = true;
 export default {
     props: {
     },
     data: function() { return {
         extensionToggle: window.localStorage.getItem('extensionToggle') === 'true',
+        dev: ZIMUDEVMODE,
     }},
     mounted: function() {
         const self = this;
