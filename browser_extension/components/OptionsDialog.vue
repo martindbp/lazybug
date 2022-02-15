@@ -1,6 +1,6 @@
 <template>
     <q-dialog v-model="show" dark ref="optionmodal">
-        <q-card class="q-px-sm q-pb-md" style="min-height: 400px">
+        <q-card class="q-px-sm q-pb-md" style="min-height: 500px">
             <q-tabs
               v-model="tab"
               dense
@@ -66,6 +66,20 @@
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="blurCaptions" label="Blur Captions" />
                     </div>
+                    <!--
+                    <div class="q-gutter-sm">
+                        <q-item-label header>Timing Offset</q-item-label>
+                        <q-slider
+                            v-model="timingOffset"
+                            label
+                            label-always
+                            selection-color="transparent"
+                            :min="-3.0"
+                            :max="3.0"
+                            :step="0.05"
+                        />
+                    </div>
+                    -->
                 </q-tab-panel>
                 <q-tab-panel name="keyboard" style="width: 400px">
                     <div class="q-gutter-sm">
@@ -121,6 +135,10 @@ export default {
         show: {
             get: function() { return this.$store.state.showOptions; },
             set: function(val) { this.$store.commit('setShowOptions', val); },
+        },
+        timingOffset: {
+            get: function() { return this.$store.state.timingOffset; },
+            set: function(val) { this.$store.commit('setTimingOffset', val); },
         },
         hanziKnownLevel: {
             get: function() { return this.$store.state.options.knownLevels.hz; },

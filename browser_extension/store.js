@@ -30,6 +30,7 @@ const store = new Vuex.Store({
         }),
         showOptions: false,
         showDictionary: false,
+        timingOffset: 0,
         options: Vue.ref({
             extensionToggle: true,
             autoPause: true,
@@ -53,6 +54,9 @@ const store = new Vuex.Store({
         captionData: null,
     },
     mutations: {
+        setTimingOffset(state, val) {
+            state.timingOffset = val;
+        },
         setCaptionData(state, val) {
             state.captionData = val;
         },
