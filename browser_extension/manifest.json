@@ -8,7 +8,8 @@
     ],
     "host_permissions": [
         "http://cdn.zimu.ai/*",
-        "https://cdn.zimu.ai/*"
+        "https://cdn.zimu.ai/*",
+        "http://localhost/*"
     ],
     "background": {
         "service_worker": "background.js"
@@ -53,6 +54,15 @@
                 "dist/CaptionManager.umd.js",
                 "main.js",
                 "mixins.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://www.deepl.com/translator*"
+            ],
+            "run_at": "document_end",
+            "js": [
+                "dist/deepl_main.js"
             ]
         }
     ],

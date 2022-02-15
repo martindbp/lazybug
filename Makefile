@@ -99,6 +99,7 @@ ext:
 	mv browser_extension/dist_captionmanager/* browser_extension/dist/
 	mv browser_extension/dist_popuproot/* browser_extension/dist/
 	mv browser_extension/zimu_quasar.css browser_extension/dist/
+	cp browser_extension/deepl_main.js browser_extension/dist/
 
 release:
 	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
