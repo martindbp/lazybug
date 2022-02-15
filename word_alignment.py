@@ -17,12 +17,13 @@ from sentence_embedding_translations import get_embedding_word_translations
 
 
 @task(serializer=json)
-def add_segmentation_and_alignment(caption_data, alignment_translations):
+def add_segmentation_and_alignment(caption_data, alignment_translations, show_names_list):
     hanzis = [' '.join(line[0]) for line in caption_data['lines']]
     translations = [line[7] for line in caption_data['lines']]
     alignment_line_translations = [transl for (transl, *_) in alignment_translations]
     translation_words = [words for (_, words, _) in alignment_translations]
     indices = [indices for (_, _, indices) in alignment_translations]
+    show_names_dict = {name: transl for name, transl in show_names_list}
 
     datas = []
     empty_translations = []
@@ -46,7 +47,10 @@ def add_segmentation_and_alignment(caption_data, alignment_translations):
                 if word_hz not in ENGLISH_MWS:
                     seg_type = 'skip'
             elif seg_type == 'person':
-                transl = re.sub('[1-5]', '', py).capitalize()
+                if word_hz in show_names_dict:
+                    transl = show_names_dict[word_hz]
+                else:
+                    transl = re.sub('[1-5]', '', py).capitalize()
                 py = py.capitalize()
             elif seg_type == 'skip':
                 transl = ''

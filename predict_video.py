@@ -1197,11 +1197,19 @@ def process_translations(show_name=None, *, remove_unmatched_captions: bool=True
     return out
 
 
+def _get_show_names_list(show_name):
+    with open(f'data/remote/private/shows/{show_name}.json') as f:
+        show_data = json.load(f)
+
+    return show_data.get('names_list', [])
+
+
 def process_segmentation_alignment(show_name=None, video_id=None):
     os.makedirs('data/remote/private/caption_data/alignment_translations', exist_ok=True)
     os.makedirs('data/remote/public/subtitles/', exist_ok=True)
 
     videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/captions_all_translations/', file_type=None)
+    show_names_list = _get_show_names_list(show_name)
     pinyin_freq_db = Future.from_file('data/remote/private/pinyin_freqs.json')
     global_known_names = extract_names()
     out = []
@@ -1212,9 +1220,9 @@ def process_segmentation_alignment(show_name=None, video_id=None):
             json_captions_all_translations = Future.from_file(file_path)
         except FileNotFoundError:
             continue
-        alignment_translations = get_alignment_translations(json_captions_all_translations, global_known_names)
+        alignment_translations = get_alignment_translations(json_captions_all_translations, global_known_names, show_names_list)
         alignment_translations >> f'data/remote/private/caption_data/alignment_translations/{vid}.json'
-        json_captions_final = add_segmentation_and_alignment(json_captions_all_translations, alignment_translations)
+        json_captions_final = add_segmentation_and_alignment(json_captions_all_translations, alignment_translations, show_names_list)
         json_captions_final >> f'data/remote/public/subtitles/{vid}-{json_captions_final.hash}.json'
         with open(f'data/remote/public/subtitles/{vid}.hash', 'w') as f:
             f.write(json_captions_final.hash)
