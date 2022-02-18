@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import math
 import shutil
 import random
@@ -11,6 +12,7 @@ from tempfile import NamedTemporaryFile, mkstemp
 import cv2
 import numpy as np
 from hanziconv import HanziConv
+from pymatting import blend
 
 from merkl import pipeline, task, batch, FileRef, DirRef, combine_file_refs
 
@@ -19,6 +21,44 @@ from merkl import pipeline, task, batch, FileRef, DirRef, combine_file_refs
 def generate_text_image(text, text_width, text_color, font, font_size, line_width, line_color, bold, italic):
     raise NotImplementedError
     return 'image', 'mask', 'text_widths'
+
+
+def _make_width(img, width):
+    left = max(math.floor((img.shape[1] - width) / 2), 0)
+    w = min(img.shape[1] - left, width)
+    shape = (img.shape[0], width, *img.shape[2:])
+    out = np.zeros(shape, img.dtype)
+    out[:, :w] = img[:, left:(left+w)]
+    return out
+
+
+@task
+def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur=False):
+    cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
+    prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
+    background = cv2.imread(background_filename).astype('float') / 255
+
+    foreground = cutout[..., :3].astype('float') / 255
+    alpha = cutout[..., -1].astype('float') / 255
+    alpha = cv2.blur(alpha, (3, 3))
+    composite = (255 * blend(foreground, background, alpha)).astype('uint8')
+    composite = _make_width(composite, out_width)
+    if blur:
+        composite = cv2.blur(composite, (3, 3))
+    composite_filename = FileRef(ext='jpg')
+    cv2.imwrite(composite_filename, composite)
+
+    #cv2.imshow('foreground', cutout[..., :3])
+    #cv2.imshow('background', background)
+    cv2.imshow('composite', composite)
+    #cv2.imshow('alpha', alpha)
+    cv2.waitKey(1)
+
+    mask = 255*(prob > 255//2).astype('uint8')
+    mask = _make_width(mask, out_width)
+    mask_filename = FileRef(ext='png')
+    cv2.imwrite(mask_filename, mask)
+    return composite_filename, mask_filename
 
 
 @batch(generate_text_image)
@@ -191,6 +231,59 @@ def combine(arg):
 def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int = 42):
     random.seed(seed)
 
+    print('Generating composites')
+    CAPTION_DATA_DIR = 'data/remote/private/caption_data'
+    composite_images = []
+    composite_masks = []
+    for show_name in os.listdir(f'{CAPTION_DATA_DIR}/cutouts'):
+        with open(f'data/remote/private/shows/{show_name}.json', 'r') as f:
+            show_json = json.load(f)
+
+        files = []
+        for season in show_json['seasons']:
+            for video in season['episodes']:
+                filename = f'{CAPTION_DATA_DIR}/raw_captions/{video["id"]}-hanzi.json'
+                if os.path.exists(filename):
+                    files.append(filename)
+
+        empty_line_hashes = []
+        for filename in files:
+            with open(filename, 'r') as f:
+                data = json.load(f)
+            for line in data['lines']:
+                if line[0] == '':
+                    empty_line_hashes.append(line[-1])
+
+        show_dir = f'{CAPTION_DATA_DIR}/cutouts/{show_name}'
+        for cutout in os.listdir(show_dir):
+            cutout_hash = cutout.split('.')[0]
+            cutout_filename = f'{show_dir}/{cutout}'
+
+            for i in range(10):
+                i = int(random.random() * len(empty_line_hashes))
+                hash = empty_line_hashes[i]
+                background_filename = FileRef(f'{CAPTION_DATA_DIR}/images/{hash}.jpg')
+                if not os.path.exists(background_filename):
+                    print('Background', background_filename, 'does not exist')
+                    continue
+
+                prob_filename = FileRef(f'{CAPTION_DATA_DIR}/segmentation_probs/{cutout_hash}.png')
+                composite, mask = generate_cutout_composite(
+                    cutout_filename,
+                    prob_filename,
+                    background_filename,
+                    out_width,
+                    blur=random.random() < 0.2,
+                    scale=1.0
+                )
+                composite_images.append(composite)
+                composite_masks.append(mask)
+
+    # Make sure the total number of images out is `num`
+    num -= len(composite_images)
+
+    random.seed(seed)  # seed again so changes above do not affect the generation below
+
     print('reading weibo dataset')
     fonts = [path.split('.')[0] for path in os.listdir('data/remote/private/fonts/')]
 
@@ -227,11 +320,11 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
         if random.random() < 0.05:
             r = random.random()
             if r < 0.33:
-                down_upscale_after_render = 1.5
+                down_upscale_after_render = 1.25
             elif r < 0.66:
-                down_upscale_after_render = 2
+                down_upscale_after_render = 1.5
             else:
-                down_upscale_after_render = 2.5
+                down_upscale_after_render = 1.8
 
         bg_x_offset_percent = random.random()
         bg_y_offset_percent = random.random()
@@ -270,6 +363,10 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
         render_image_paths.append(img)
         render_mask_paths.append(mask)
         render_text_positions.append(text_positions)
+
+
+    render_image_paths += composite_images
+    render_mask_paths += composite_masks
 
     render_images_dir = combine_file_refs(render_image_paths)
     render_masks_dir = combine_file_refs(render_mask_paths)
