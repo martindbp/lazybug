@@ -507,8 +507,9 @@ def replace_or_add_line(
             for op in ops:
                 if op.type == OpType.SUBSTITUTE:
                     # Update the char_probs and prob_distribution
-                    prob_distribution = last_line.prob_distributions[op.from_idx] * new_line.prob_distributions[op.to_idx]
-                    prob_distribution /= prob_distribution.sum()
+                    #prob_distribution = last_line.prob_distributions[op.from_idx] * new_line.prob_distributions[op.to_idx]
+                    #prob_distribution /= prob_distribution.sum()
+                    prob_distribution = (last_line.prob_distributions[op.from_idx] + new_line.prob_distributions[op.to_idx]) / 2
                     char_prob = prob_distribution.max()
                     new_char = alphabet[np.argmax(prob_distribution)]
                     if new_char is not None:
