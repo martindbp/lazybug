@@ -99,19 +99,20 @@ export default {
             yMax += this.videoCaptionTopPx;
             for (var i = 0; i < this.$el.children.length; i++) {
                 const blurDiv = this.$el.children[i];
-                const padding = Math.ceil((videoRect.width / DEFAULT_WIDTH) * i * this.blurPadding); // increase the padding for each div
+                const padding = Math.ceil(1.0 * i * this.blurPadding); // increase the padding for each div
                 const xMinDiv = xMin - padding;
                 const yMinDiv = yMin - padding;
                 const xMaxDiv = xMax + padding;
                 const yMaxDiv = yMax + padding;
                 let divWidth = xMaxDiv - xMinDiv;
                 let divHeight = yMaxDiv - yMinDiv;
-                let parentOffset = videoRect.left - videoParentRect.left;
-                blurDiv.style.top = (videoRect.height * yMinDiv / this.videoFrameSize[0]) + 'px';
-                blurDiv.style.left = parentOffset + (videoRect.width * xMinDiv / this.videoFrameSize[1]) + 'px';
+                let parentOffsetX = videoRect.left - videoParentRect.left;
+                let parentOffsetY = videoRect.top - videoParentRect.top;
+                blurDiv.style.top = parentOffsetY + (videoRect.height * yMinDiv / this.videoFrameSize[0]) + 'px';
+                blurDiv.style.left = parentOffsetX + (videoRect.width * xMinDiv / this.videoFrameSize[1]) + 'px';
                 blurDiv.style.height = (videoRect.height * divHeight / this.videoFrameSize[0]) + 'px';
                 blurDiv.style.width = (videoRect.width * divWidth / this.videoFrameSize[1]) + 'px';
-                const blurPixels = Math.ceil((videoRect.width / DEFAULT_WIDTH) * (this.numBlurLayers - i));
+                const blurPixels = Math.pow(2, this.numBlurLayers - i - 1);
                 blurDiv.style.backdropFilter = `blur(${blurPixels}px)`;
             }
         },
