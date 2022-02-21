@@ -17,7 +17,7 @@ dataset:
 test:
 	python -m unittest discover -s helpers/ -p 'test_*.py'
 
-zip-extension:
+zip-ext:
 	zip -r data/remote/public/browser_extension.zip browser_extension/
 
 pre-public-sync:

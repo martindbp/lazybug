@@ -66,14 +66,5 @@
             ]
         }
     ],
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "CaptionManager.vue",
-                "dist/CaptionManager.umd.js.map"
-            ],
-            "matches": []
-        }
-    ],
     "manifest_version": 3
 }
