@@ -177,9 +177,8 @@ def get_machine_translations(caption_data):
 
 
 @task(serializer=json, deps=[transformer_segmentation, get_idioms])
-def get_alignment_translations(caption_data, global_known_names=[], show_names_list=[]):
+def get_alignment_translations(caption_data, global_known_names=[], fixed_translations={}):
     lines = caption_data['lines']
-    show_names_dict = {name: transl for name, transl in show_names_list}
 
     all_lines = [' '.join(line[0]) for line in lines]
     all_translations = [line[7] for line in lines]
@@ -188,7 +187,7 @@ def get_alignment_translations(caption_data, global_known_names=[], show_names_l
     with Eval():
         all_segments = segment_sentences(all_lines, join_compound_words=True)
         all_pys = segmentations_to_pinyin(all_segments)
-        all_segments, all_pys, confirmed_names = join_names_present_in_translations(all_segments, all_pys, all_translations, global_known_names, show_names_list)
+        all_segments, all_pys, confirmed_names = join_names_present_in_translations(all_segments, all_pys, all_translations, global_known_names, fixed_translations)
 
     print('num segments:', len(all_segments))
     print('num pys:', len(all_pys))
@@ -224,8 +223,13 @@ def get_alignment_translations(caption_data, global_known_names=[], show_names_l
                 seg_type = 'mw'  # measure word
             elif match_fixed_translation(hz, py) is not None:
                 seg_type = 'skip'
-            elif hz in confirmed_people_hz or hz in ner_people or hz in show_names_dict:
-                seg_type = 'person'
+            elif hz in confirmed_people_hz or hz in ner_people:
+                seg_type = 'name'
+            elif hz in fixed_translations:
+                if fixed_translations[hz][0].isupper():
+                    seg_type = 'name'
+                else:
+                    seg_type = 'fixed_translation'
             else:
                 include = True
 

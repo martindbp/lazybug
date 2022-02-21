@@ -20,10 +20,13 @@ test:
 zip-extension:
 	zip -r data/remote/public/browser_extension.zip browser_extension/
 
-sync-up-public:
+pre-public-sync:
 	make show-list
 	make cedict
 	make public-cedict
+	make names-list
+
+sync-up-public:
 	touch synced.txt
 	b2 sync --noProgress data/remote/public b2://zimu-public | tee synced.txt
 	make purge-cloudflare-public
@@ -58,6 +61,9 @@ cedict:
 public-cedict:
 	merkl -v run predict_video.make_public_cedict_db
 
+names-list:
+	merkl -v run predict_video.make_names_list
+
 download-yt:
 	mkdir -p $(out)/$(show)
 	cat data/remote/private/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\"/\1/g" | xargs -I {} yt-dlp -o "../videos/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs -- {}
@@ -67,7 +73,7 @@ process-video-captions:
 	merkl -v run predict_video.process_video_captions ${show} ${videos}
 
 process-translations:
-	merkl -v run predict_video.process_translations ${show}
+	merkl -v run predict_video.process_translations ${show} --force-redo
 
 process-segmentation-alignments:
 	merkl -v run predict_video.process_segmentation_alignment ${show} ${video}

@@ -174,11 +174,9 @@ def segmentations_to_pinyin(segmentations):
 
 
 @task
-def join_names_present_in_translations(segmentations, pinyins, translations, global_known_names=[], show_names_list=[]):
+def join_names_present_in_translations(segmentations, pinyins, translations, global_known_names=[], fixed_translations={}):
     global_known_name_hzs = [hz for hz, py in global_known_names]
     global_known_name_hzs_set = set(global_known_name_hzs)
-
-    show_names_dict = {name: transl for name, transl in show_names_list}
 
     # These chars have simple translations that may show up spuriously in the target translation
     DISALLOW_HZ = '了啦吧呢啊吗呗嘛呀'
@@ -379,7 +377,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                         elif full_joined_hz in global_known_name_hzs_set:
                             joined_py = global_known_names[global_known_name_hzs.index(full_joined_hz)][1]
                             transl_matches[transl_idx].append((full_joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, i, None, None))
-                        elif full_joined_hz in show_names_dict:
+                        elif full_joined_hz in fixed_translations:
                             joined_py = ''.join(component_pys)
                             transl_matches[transl_idx].append((full_joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, i, None, None))
 
@@ -433,6 +431,8 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                     confirmed = True
 
                 print(f'Joining name (confirmed={confirmed}): {joined_hz} {joined_py} {transls}, {" ".join(ws[-1] for ws in ws_sentence)}, {window_size} {i} {j}')
+            else:
+                print(f'Joining unconfirmed name: {joined_hz} {joined_py} {" ".join(ws[-1] for ws in ws_sentence)}, {window_size} {i} {j}')
 
             new_ws_sentence += ws_sentence[last_idx:component_idx_start] + [(joined_idx_start, joined_idx_end, joined_hz)]
             new_pos_sentence += psos_sentence[last_idx:component_idx_start] + ['']

@@ -389,7 +389,7 @@ def get_options(hzs, base_translations, pys, deepl_translations=None, skip_words
 
 
 @task(ignore_args=['print_iterations'], deps=[CEDICT, clean_cedict_translation])
-def get_embedding_word_translations(hzs, pys, alignment_indices, base_translations, skip_words, deepl_translations=None, print_iterations=False):
+def get_embedding_word_translations(hzs, pys, alignment_indices, base_translations, skip_words, prevent_split, deepl_translations=None, print_iterations=False):
     orig_pys = list(pys)
     global model
     if model is None:
@@ -459,6 +459,7 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                 # Add all possible option combinations for the split words (if exists)
                 hz = hzs[current_segmentation_idx]
                 py = pys[current_segmentation_idx]
+                no_split = prevent_split[current_segmentation_idx]
                 first_hz, second_hz = None, None
                 both_have_translations = False
                 for split_idx in range(1, len(hz)):
@@ -472,6 +473,7 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                         first_hz not in NEVER_SPLIT and
                         second_hz not in NEVER_SPLIT and
                         hz not in NEVER_SPLIT and
+                        not prevent_split and
                         first_hz != second_hz  # don't want to split e.g 妈妈 爸爸
                     ):
                         both_have_translations = True

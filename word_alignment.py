@@ -17,13 +17,12 @@ from sentence_embedding_translations import get_embedding_word_translations
 
 
 @task(serializer=json)
-def add_segmentation_and_alignment(caption_data, alignment_translations, show_names_list):
+def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_translations):
     hanzis = [' '.join(line[0]) for line in caption_data['lines']]
     translations = [line[7] for line in caption_data['lines']]
     alignment_line_translations = [transl for (transl, *_) in alignment_translations]
     translation_words = [words for (_, words, _) in alignment_translations]
     indices = [indices for (_, _, indices) in alignment_translations]
-    show_names_dict = {name: transl for name, transl in show_names_list}
 
     datas = []
     empty_translations = []
@@ -39,19 +38,25 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, show_na
         pys = []
         indices = []
         skip = []
+        prevent_splits = []
         for i, ((from_idx, to_idx, word_hz), pos, py, include, seg_type) in enumerate(word_indices):
             word_hz = word_hz.strip()
             transl = ''
+            prevent_split = False
             if seg_type == 'mw':  # measure word
                 transl = '[MW]'
                 if word_hz not in ENGLISH_MWS:
                     seg_type = 'skip'
-            elif seg_type == 'person':
-                if word_hz in show_names_dict:
-                    transl = show_names_dict[word_hz]
+            elif seg_type == 'name':
+                if word_hz in fixed_translations:
+                    transl = fixed_translations[word_hz]
                 else:
                     transl = re.sub('[1-5]', '', py).capitalize()
                 py = py.capitalize()
+                prevent_split = True
+            elif seg_type == 'fixed_translation':
+                transl = fixed_translations[word_hz]
+                prevent_split = True
             elif seg_type == 'skip':
                 transl = ''
             elif include:
@@ -65,6 +70,7 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, show_na
             pys.append(py)
             indices.append((from_idx, to_idx))
             skip.append(seg_type == 'skip')
+            prevent_splits.append(prevent_split)
 
         with Eval():
             (
@@ -80,6 +86,7 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, show_na
                 indices,
                 sentence_translations + [alignment_line_transl],
                 skip,
+                prevent_splits,
                 deepl_transls,
                 print_iterations=True,
             )
