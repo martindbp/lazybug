@@ -78,6 +78,9 @@ show-list:
 segmentation-model:
 	merkl -v run train_predict.train_pipeline
 
+finetune-segmentation-model:
+	merkl -v run train_predict.finetune_pipeline
+
 diff:
 	NEXT_FILE=$$(ls -t data/remote/public/subtitles/${id}*.json | head -n 2 | head -1); \
 	PREV_FILE=$$(ls -t data/remote/public/subtitles/${id}*.json | head -n 2 | tail -1); \

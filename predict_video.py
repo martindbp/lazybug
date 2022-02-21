@@ -22,7 +22,7 @@ from easyocr import Reader
 
 from merkl import task, pipeline, HashMode, FileRef, Future
 from wrapped_json import json
-from train_predict import predict_img_pipeline
+from train_predict import predict_img_pipeline, _get_latest_net
 from process_translations import get_alignment_translations, get_machine_translations
 from word_alignment import add_segmentation_and_alignment
 from caption_translation_alignment import align_translations_and_captions, make_caption_lines_lists
@@ -389,8 +389,10 @@ def find_next_diff(line, buffer_frames, threshold=10):
     return None
 
 
-def predict_line(ocr, frame, frame_t, font_height):
-    mask, probs = predict_img_pipeline(frame)
+net = _get_latest_net()
+
+def predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx=None):
+    mask, probs = predict_img_pipeline(frame, net)
     mask.cache = None
     probs.cache = None
     mask = mask.eval()

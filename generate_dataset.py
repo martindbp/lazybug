@@ -32,19 +32,42 @@ def _make_width(img, width):
     return out
 
 
+def _increase_brightness(img, value=30):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
+
 @task
-def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur=False):
+def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur=False, brighten=False, sample_background_from_cutout=False):
     cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
     prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
-    background = cv2.imread(background_filename).astype('float') / 255
 
     foreground = cutout[..., :3].astype('float') / 255
     alpha = cutout[..., -1].astype('float') / 255
     alpha = cv2.blur(alpha, (3, 3))
+    background = cv2.imread(background_filename)
+    if brighten:
+        background = _increase_brightness(background, 200)
+
+    background = background.astype('float') / 255
+
+    if sample_background_from_cutout:
+        indices_y, indices_x = np.where(alpha > 0.7)
+        random_idx = int(random.random() * len(indices_y))
+        random_idx_color = foreground[indices_y[random_idx], indices_x[random_idx], :]
+        background[..., :] = random_idx_color
+
     composite = (255 * blend(foreground, background, alpha)).astype('uint8')
     composite = _make_width(composite, out_width)
     if blur:
-        composite = cv2.blur(composite, (3, 3))
+        composite = cv2.blur(composite, (5, 5))
     composite_filename = FileRef(ext='jpg')
     cv2.imwrite(composite_filename, composite)
 
@@ -228,31 +251,20 @@ def combine(arg):
 
 
 @pipeline
-def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int = 42):
-    random.seed(seed)
+def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int = 42, fill_with_synthetic=True):
+    random.seed(seed+1)
 
     print('Generating composites')
     CAPTION_DATA_DIR = 'data/remote/private/caption_data'
     composite_images = []
     composite_masks = []
+    composite_text_positions = []
     for show_name in os.listdir(f'{CAPTION_DATA_DIR}/cutouts'):
-        with open(f'data/remote/private/shows/{show_name}.json', 'r') as f:
-            show_json = json.load(f)
+        if show_name.endswith('.json'):
+            continue
 
-        files = []
-        for season in show_json['seasons']:
-            for video in season['episodes']:
-                filename = f'{CAPTION_DATA_DIR}/raw_captions/{video["id"]}-hanzi.json'
-                if os.path.exists(filename):
-                    files.append(filename)
-
-        empty_line_hashes = []
-        for filename in files:
-            with open(filename, 'r') as f:
-                data = json.load(f)
-            for line in data['lines']:
-                if line[0] == '':
-                    empty_line_hashes.append(line[-1])
+        with open(f'{CAPTION_DATA_DIR}/cutouts/{show_name}.json', 'r') as f:
+            empty_line_hashes = json.load(f)
 
         show_dir = f'{CAPTION_DATA_DIR}/cutouts/{show_name}'
         for cutout in os.listdir(show_dir):
@@ -260,8 +272,8 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             cutout_filename = f'{show_dir}/{cutout}'
 
             for i in range(10):
-                i = int(random.random() * len(empty_line_hashes))
-                hash = empty_line_hashes[i]
+                j = int(random.random() * len(empty_line_hashes))
+                hash = empty_line_hashes[j]
                 background_filename = FileRef(f'{CAPTION_DATA_DIR}/images/{hash}.jpg')
                 if not os.path.exists(background_filename):
                     print('Background', background_filename, 'does not exist')
@@ -273,101 +285,106 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                     prob_filename,
                     background_filename,
                     out_width,
-                    blur=random.random() < 0.2,
-                    scale=1.0
+                    blur=random.random() < 0.3,
+                    scale=1.0,
+                    sample_background_from_cutout=(i <= 3),
+                    brighten=(4 <= i <= 7),
                 )
                 composite_images.append(composite)
                 composite_masks.append(mask)
+                composite_text_positions.append(None)
 
     # Make sure the total number of images out is `num`
     num -= len(composite_images)
 
-    random.seed(seed)  # seed again so changes above do not affect the generation below
+    if fill_with_synthetic:
+        random.seed(seed)  # seed again so changes above do not affect the generation below
 
-    print('reading weibo dataset')
-    fonts = [path.split('.')[0] for path in os.listdir('data/remote/private/fonts/')]
+        print('reading weibo dataset')
+        fonts = [path.split('.')[0] for path in os.listdir('data/remote/private/fonts/')]
 
-    print('generating text image parameters')
-    text_image_parameters = []
-    for text in corpus[:num]:
-        text = HanziConv.toTraditional(text) if random.random() < 0.5 else text
-        font = random.choice(fonts)
-        color = random_hsv_str()
-        font_size = 58 + floor(random.random() * 5)
-        text_width = max(floor(out_width * random.random()), 2*font_size + 1)
-        bold = random.random() < 0.5
-        italic = False
-        line_width = floor(random.random() * 6)
-        line_color = 'black'
-        text_image_parameters.append((text, text_width, color, font, font_size, line_width, line_color, bold, italic))
+        print('generating text image parameters')
+        text_image_parameters = []
+        for text in corpus[:num]:
+            text = HanziConv.toTraditional(text) if random.random() < 0.5 else text
+            font = random.choice(fonts)
+            color = random_hsv_str()
+            font_size = 58 + floor(random.random() * 5)
+            text_width = max(floor(out_width * random.random()), 2*font_size + 1)
+            bold = random.random() < 0.5
+            italic = False
+            line_width = floor(random.random() * 6)
+            line_color = 'black'
+            text_image_parameters.append((text, text_width, color, font, font_size, line_width, line_color, bold, italic))
 
-    print('calling generate_text_images')
-    text_image_paths = generate_text_images(text_image_parameters)
-    print('done')
+        print('calling generate_text_images')
+        text_image_paths = generate_text_images(text_image_parameters)
+        print('done')
 
-    background_image_paths = [FileRef(path) for path in glob('data/remote/private/backgrounds/*')]
+        background_image_paths = [FileRef(path) for path in glob('data/remote/private/backgrounds/*')]
 
-    random.seed(seed)  # reset seed, so randomizing here is not affected by previous randomization
-    render_image_paths = []
-    render_mask_paths = []
-    render_text_positions = []
-    for (text_image_path, text_mask_path, text_widths), params in zip(text_image_paths, text_image_parameters):
-        text = params[0]
-        background_image_path = random.choice(background_image_paths)
-        blur_background = random.random() < 0.3
-        blur_after_render = random.random() < 0.1
-        down_upscale_after_render = 1
-        if random.random() < 0.05:
-            r = random.random()
-            if r < 0.33:
-                down_upscale_after_render = 1.25
-            elif r < 0.66:
-                down_upscale_after_render = 1.5
-            else:
-                down_upscale_after_render = 1.8
+        random.seed(seed)  # reset seed, so randomizing here is not affected by previous randomization
+        render_image_paths = []
+        render_mask_paths = []
+        render_text_positions = []
+        for (text_image_path, text_mask_path, text_widths), params in zip(text_image_paths, text_image_parameters):
+            text = params[0]
+            background_image_path = random.choice(background_image_paths)
+            blur_background = random.random() < 0.3
+            blur_after_render = random.random() < 0.1
+            down_upscale_after_render = 1
+            if random.random() < 0.05:
+                r = random.random()
+                if r < 0.33:
+                    down_upscale_after_render = 1.25
+                elif r < 0.66:
+                    down_upscale_after_render = 1.5
+                else:
+                    down_upscale_after_render = 1.8
 
-        bg_x_offset_percent = random.random()
-        bg_y_offset_percent = random.random()
-        text_x_offset_percent = random.random()
-        jpeg_quality = 30 if random.random() < 0.1 else 100
-        bg_color_hsv = (
-            floor(random.random() * 360),
-            floor(random.random() * 100),
-            floor(random.random() * 50),
-        )
-        if random.random() < 0.4:
-            bg_color_hsv = (0, 0, 0)  # black
+            bg_x_offset_percent = random.random()
+            bg_y_offset_percent = random.random()
+            text_x_offset_percent = random.random()
+            jpeg_quality = 30 if random.random() < 0.1 else 100
+            bg_color_hsv = (
+                floor(random.random() * 360),
+                floor(random.random() * 100),
+                floor(random.random() * 50),
+            )
+            if random.random() < 0.4:
+                bg_color_hsv = (0, 0, 0)  # black
 
-        bg_alpha = 0.0
-        if random.random() < 0.05:
-            bg_alpha = 1.0 if random.random() < 0.5 else random.random()
+            bg_alpha = 0.0
+            if random.random() < 0.05:
+                bg_alpha = 1.0 if random.random() < 0.5 else random.random()
 
-        img, mask, text_positions = render_final_image_and_mask(
-            text,
-            text_image_path,
-            text_mask_path,
-            text_widths,
-            background_image_path,
-            bg_color_hsv,
-            bg_alpha,
-            blur_background,
-            blur_after_render,
-            down_upscale_after_render,
-            bg_x_offset_percent,
-            bg_y_offset_percent,
-            text_x_offset_percent,
-            jpeg_quality,
-            out_width,
-            out_height,
-        )
-        render_image_paths.append(img)
-        render_mask_paths.append(mask)
-        render_text_positions.append(text_positions)
+            img, mask, text_positions = render_final_image_and_mask(
+                text,
+                text_image_path,
+                text_mask_path,
+                text_widths,
+                background_image_path,
+                bg_color_hsv,
+                bg_alpha,
+                blur_background,
+                blur_after_render,
+                down_upscale_after_render,
+                bg_x_offset_percent,
+                bg_y_offset_percent,
+                text_x_offset_percent,
+                jpeg_quality,
+                out_width,
+                out_height,
+            )
+            render_image_paths.append(img)
+            render_mask_paths.append(mask)
+            render_text_positions.append(text_positions)
 
 
-    render_image_paths += composite_images
-    render_mask_paths += composite_masks
+        composite_images += render_image_paths
+        composite_masks += render_mask_paths
+        composite_text_positions += render_text_positions
 
-    render_images_dir = combine_file_refs(render_image_paths)
-    render_masks_dir = combine_file_refs(render_mask_paths)
-    return render_images_dir, render_masks_dir, combine(render_text_positions)
+    render_images_dir = combine_file_refs(composite_images)
+    render_masks_dir = combine_file_refs(composite_masks)
+    return render_images_dir, render_masks_dir, combine(composite_text_positions)
