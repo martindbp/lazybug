@@ -48,7 +48,11 @@ export default {
                 return;
             }
 
-            if (self.$store.state.showOptions || ! self.$store.state.options.keyboardShortcutsToggle) {
+            if (
+                self.$store.state.showOptions ||
+                ! self.$store.state.options.keyboardShortcutsToggle ||
+                ! self.$store.state.captionData
+            ) {
                 return;
             }
 
