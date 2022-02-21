@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         knowledge: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
+        isMovingCaption: false,
         peekStates: Vue.ref({
             py: [],
             hz: [],
@@ -54,6 +55,9 @@ const store = new Vuex.Store({
         captionData: null,
     },
     mutations: {
+        setIsMovingCaption(state, val) {
+            state.isMovingCaption = val;
+        },
         setTimingOffset(state, val) {
             state.timingOffset = val;
         },

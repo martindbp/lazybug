@@ -110,6 +110,7 @@ export default {
             this.dragging = true;
             this.dragStart = [event.clientX, event.clientY];
             this.origCaptionOffset = this.captionOffset;
+            this.$store.commit('setIsMovingCaption', true);
             window.addEventListener("mouseup", this.moveMouseUp);
             window.addEventListener("mousemove", this.mouseMove);
         },
@@ -120,6 +121,7 @@ export default {
             this.dragging = false;
             this.dragStart = [null, null];
             this.origCaptionOffset = [null, null];
+            this.$store.commit('setIsMovingCaption', false);
             window.removeEventListener("mouseup", this.moveMouseUp);
             window.removeEventListener("mousemove", this.mouseMove);
         },

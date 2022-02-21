@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" class="zimucaptiondiv">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{zimucaptiondiv: true, moving: $store.state.isMovingCaption}">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -59,3 +59,14 @@ export default {
     },
 };
 </script>
+
+<style>
+/*
+.zimucaptiondiv.moving {
+    outline: 2px white solid;
+}
+.zimucaptiondiv.moving .captionmenu {
+    outline: 2px white solid;
+}
+*/
+</style>
