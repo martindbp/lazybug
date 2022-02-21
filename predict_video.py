@@ -6,6 +6,7 @@ import glob
 import hashlib
 import pickle
 from dataclasses import dataclass, field
+from collections import defaultdict
 
 import cv2
 import numpy as np
@@ -58,6 +59,7 @@ class CaptionLine:
     bounding_rect: tuple = field(repr=False, default=())
     mean_dist: float = field(repr=False, default=0)
     data_hash: str = field(repr=False, default='')
+    conditional_caption_idx: int = field(repr=False, default=None)
 
     def zero_out_numpy(self):
         # NOTE: we don't zero out char_probs because it's relatively small and we need to save it to json
@@ -440,6 +442,7 @@ def predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx=None)
         frame, mask > 0, probs,
         char_probs, prob_distributions,
         bounding_rect,
+        conditional_caption_idx=conditional_caption_idx
     )
 
 
@@ -483,6 +486,7 @@ def replace_or_add_line(
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
+    conditional_caption_idx=None,
 ):
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     replaced = False
@@ -549,6 +553,7 @@ def replace_or_add_line(
                 new_line.img, new_line.mask, new_line.probs,
                 new_char_probs, new_prob_distributions,
                 new_line.bounding_rect,
+                new_line.conditional_caption_idx
             )
             caption_lines[-1] = new_line
             print('Replacing', new_line)
@@ -599,13 +604,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10):
+def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, conditional_caption_idx=None):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr, frame, frame_t, font_height)
+        line = predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx)
 
     if line.text == '':
         if last_line is None:
@@ -622,9 +627,9 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, li
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr, diff_frame, diff_t, font_height)
+        diff_line = predict_line(ocr, diff_frame, diff_t, font_height, conditional_caption_idx)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(ocr, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
@@ -635,10 +640,10 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, li
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr, last_line, frames_left, font_height, threshold=threshold) + [line]
+        return extract_lines_from_framebuffer(ocr, last_line, frames_left, font_height, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
 
 
-@task
+@task(deps=[])
 def predict_video_captions(
     video_path: str,
     caption_top: float,
@@ -651,6 +656,7 @@ def predict_video_captions(
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
+    conditional_captions=None,
 ):
     global ocrs
     SUBSAMPLE_FRAME_RATE = 10
@@ -681,8 +687,22 @@ def predict_video_captions(
     dominant_caption_color = None
     return_frame_size = None
     last_processed_frame = None
+    curr_conditional_caption_idx = 0
     try:
         for i, (frame_time, crop, frame_size, frame) in enumerate(caption_images):
+            if conditional_captions is not None:
+                if curr_conditional_caption_idx is None:
+                    continue
+
+                cond_start = conditional_captions['lines'][curr_conditional_caption_idx][1]
+                cond_end = conditional_captions['lines'][curr_conditional_caption_idx][2]
+                if frame_time < cond_start - 0.5:
+                    continue
+                if frame_time > cond_end + 0.5:
+                    curr_conditional_caption_idx += 1
+                    if curr_conditional_caption_idx >= len(conditional_captions['lines']):
+                        curr_conditional_caption_idx = None
+
             if return_frame_size is None:
                 return_frame_size = frame_size
 
@@ -701,7 +721,7 @@ def predict_video_captions(
 
             print('diff')
 
-            frame_buffer_lines = extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height)
+            frame_buffer_lines = extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, conditional_caption_idx=curr_conditional_caption_idx)
             for line in frame_buffer_lines:
                 if line.text != '':
                     dominant_caption_color = np.median(line.img[line.mask], axis=0)
@@ -750,6 +770,21 @@ def predict_video_captions(
     # Need to save the last caption (the rest are saved in `replace_or_add_line` before zeroing out)
     if caption_lines[-1].text != '' and do_save_caption_data:
         save_caption_data(caption_lines[-1], alphabet)
+
+    if conditional_captions is not None:
+        # We update the original conditional captions and return those
+        breakpoint()
+        for line in caption_lines:
+            cond_line = conditional_captions['lines'][line.conditional_caption_idx]
+            # Prepend the text
+            cond_line[0] = line.text + cond_line[0]
+            # Take the bounding rect union
+            cond_rect = cond_line[3]
+            cond_rect[0] = min(cond_rect[0], line.bounding_rect[0])
+            cond_rect[1] = max(cond_rect[1], line.bounding_rect[1])
+            cond_rect[2] = min(cond_rect[2], line.bounding_rect[2])
+            cond_rect[3] = max(cond_rect[3], line.bounding_rect[3])
+        return conditional_captions, return_frame_size
 
     return caption_lines, return_frame_size
 
@@ -1134,7 +1169,9 @@ def process_video_captions(
             out.append(meta_captions)
             continue
 
-        for param in params:
+        last_caption_of_type = defaultdict(lambda: None)
+        for i, param in enumerate(params):
+            param_id = param.get('id', None) or param['type']
             captions, frame_size = predict_video_captions(
                 video_path,
                 param['caption_top'],
