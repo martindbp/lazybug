@@ -45,7 +45,7 @@ def _increase_brightness(img, value=30):
     return img
 
 @task
-def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur=False, brighten=False, sample_background_from_cutout=False):
+def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur_iterations=0, brighten=False, sample_background_from_cutout=False):
     cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
     prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
 
@@ -66,8 +66,9 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
 
     composite = (255 * blend(foreground, background, alpha)).astype('uint8')
     composite = _make_width(composite, out_width)
-    if blur:
-        composite = cv2.blur(composite, (5, 5))
+    if blur_iterations > 0:
+        for _ in range(blur_iterations):
+            composite = cv2.blur(composite, (3, 3))
     composite_filename = FileRef(ext='jpg')
     cv2.imwrite(composite_filename, composite)
 
@@ -285,10 +286,10 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                     prob_filename,
                     background_filename,
                     out_width,
-                    blur=random.random() < 0.3,
+                    blur_iterations=round(1+random.random()*1) if random.random() < 0.4 else 0,
                     scale=1.0,
-                    sample_background_from_cutout=(i <= 3),
-                    brighten=(4 <= i <= 7),
+                    sample_background_from_cutout=(i <= 4),
+                    brighten=(i <= 7),
                 )
                 composite_images.append(composite)
                 composite_masks.append(mask)
