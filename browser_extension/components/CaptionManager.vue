@@ -41,7 +41,7 @@ export default {
     components: {CaptionContainer, CaptionBlur},
     data: function() {
         return {
-            AVElementSelector: '#primary video',
+            AVElementSelector: '#primary video, #player-theater-container video',
             url: window.location.href,
             localVideoHash: null,
             currTime: -1000.5,
