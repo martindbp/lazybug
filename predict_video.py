@@ -487,6 +487,12 @@ def replace_or_add_line(
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     replaced = False
 
+    if new_line.text != '':
+        too_many_low_prob_chars = (new_line.char_probs < HIGH_PROB_CHAR).sum() / len(new_line.text) > 0.7 and len(new_line.text) > 1
+        if (caption_type == 'hanzi' and len(filter_text_hanzi(new_line.text)) == 0) or too_many_low_prob_chars:
+            print('Too many low prob characters:', new_line, ', removing')
+            return last_line
+
     if last_line is not None and last_line.text != '' and new_line.text != '':
         def _subst_cost(s1, s2, i, j):
             if i >= len(last_line.prob_distributions) or j >= len(new_line.prob_distributions):
@@ -552,7 +558,6 @@ def replace_or_add_line(
 
         new_line.mean_dist = mean_dist
 
-    already_zeroed_out_and_saved = False
     if not replaced:
         # Now that we have definitely moved on to a new line, we apply the BERT prior to the previous one,
         if len(caption_lines) > 0:
@@ -563,13 +568,6 @@ def replace_or_add_line(
                 #apply_english_corrections(last_line)
             #elif caption_type == 'pinyin':
                 #raise NotImplemented
-
-            if last_line.text != '':
-                too_many_low_prob_chars = (last_line.char_probs < HIGH_PROB_CHAR).sum() / len(last_line.text) > 0.7
-                if (caption_type == 'hanzi' and len(filter_text_hanzi(last_line.text)) == 0) or too_many_low_prob_chars:
-                    print('Too many low prob characters:', last_line, ', removing')
-                    caption_lines.pop(-1)
-                    already_zeroed_out_and_saved = True
 
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     if last_line is not None:
@@ -585,7 +583,7 @@ def replace_or_add_line(
             print(f'Updated last_line.t1 {last_line}')
 
     if not replaced:
-        if len(caption_lines) > 0 and not already_zeroed_out_and_saved:
+        if len(caption_lines) > 0:
             # Need to save the caption data before zeroing out
             if do_save_caption_data:
                 print(f'Saving {len(caption_lines)}')
