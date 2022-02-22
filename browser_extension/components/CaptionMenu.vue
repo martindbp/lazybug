@@ -13,8 +13,8 @@
             <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
             <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
             <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
+            <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" style="margin-right: 10px"/>
             <SvgButton title="Options" @click="showOptions" name="options" />
-            <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" />
             <OptionsDialog />
             <DictionaryDialog v-bind:caption="data" />
         </div>
