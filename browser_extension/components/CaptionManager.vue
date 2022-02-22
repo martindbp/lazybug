@@ -344,8 +344,8 @@ export default {
                     ! self.seekedFromMenu &&
                     ! isDummy
                 ) {
-                    self.AVElement.pause();
                     self.automaticallyPausedThisCaption = true;
+                    self.AVElement.pause();
                 }
                 else {
                     self.currTime = newTime;
