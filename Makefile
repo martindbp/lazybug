@@ -55,6 +55,9 @@ purge-cloudflare-public: check-cloudflare-env
      --data '{"files":["https://cdn.zimu.ai/file/zimu-public/{}"]}'
 	echo "Synced" && cat synced.txt && rm synced.txt
 
+pinyin-classifiers:
+	merkl -v run predict_video.make_pinyin_db_classifiers
+
 cedict:
 	merkl -v run predict_video.make_cedict_db
 
