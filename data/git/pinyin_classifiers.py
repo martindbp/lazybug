@@ -4,44 +4,65 @@ POS_WINDOW_SIZE = 2
 
 def 得(prev_psos, pos, next_psos, prev_words, next_words):
     if pos.startswith('DE'):
-        if prev_psos[-1].startswith('Nh'):
-            return 'dei3'
-        else:
-            if prev_psos[0].startswith('Nv'):
+        if prev_psos[-1].startswith('VD'):
+            if prev_psos[0].startswith('C'):
                 return 'dei3'
             else:
-                if prev_psos[-1].startswith('VD'):
-                    return 'de5'
+                return 'de5'
+        else:
+            if next_psos[1].startswith('Cba'):
+                if prev_psos[0].startswith('Cbb'):
+                    return 'dei3'
                 else:
                     return 'de5'
+            else:
+                if prev_psos[0].startswith('Ncd'):
+                    if next_psos[0].startswith('Dfa'):
+                        return 'de5'
+                    else:
+                        return 'de5'
+                else:
+                    if next_psos[1].startswith('DE'):
+                        return 'de5'
+                    else:
+                        return 'de5'
     else:
         if pos.startswith('D'):
             if next_psos[1].startswith('VH'):
                 return 'de5'
             else:
-                if next_psos[0].startswith('VF'):
-                    return 'de2'
-                else:
-                    return 'dei3'
-        else:
-            if next_psos[0].startswith('Neu'):
-                return 'dei3'
-            else:
-                if prev_psos[-1].startswith('V'):
+                if prev_psos[-1].startswith('DE'):
                     return 'de5'
                 else:
-                    return 'de2'
+                    if next_psos[0].startswith('VF'):
+                        return 'de2'
+                    else:
+                        return 'dei3'
+        else:
+            if prev_psos[-1].startswith('DE'):
+                if prev_psos[0].startswith('N'):
+                    return 'dei3'
+                else:
+                    return 'de5'
+            else:
+                if next_psos[0].startswith('Neu'):
+                    return 'dei3'
+                else:
+                    if prev_psos[-1].startswith('V'):
+                        return 'de5'
+                    else:
+                        return 'de2'
 
 
 def 好(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('N'):
-        return 'hao4'
+    if prev_psos[0].startswith('VJ'):
+        return 'hao3'
     else:
         return 'hao3'
 
 
 def 难(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('VH'):
+    if pos.startswith('V'):
         return 'nan2'
     else:
         return 'nan4'
@@ -51,22 +72,19 @@ def 长(prev_psos, pos, next_psos, prev_words, next_words):
     if prev_psos[-1].startswith('Dfa'):
         return 'chang2'
     else:
-        if next_psos[0].startswith('Q'):
-            return 'chang2'
-        else:
-            if next_psos[0].startswith('F'):
-                if next_psos[1].startswith('I'):
-                    return 'zhang3'
-                else:
-                    return 'chang2'
+        if prev_psos[-1].startswith('VH'):
+            if next_psos[0].startswith('I'):
+                return 'zhang3'
             else:
-                if prev_psos[-1].startswith('Nf'):
+                return 'chang2'
+        else:
+            if next_psos[0].startswith('Q'):
+                return 'chang2'
+            else:
+                if prev_psos[0].startswith('Nep'):
                     return 'chang2'
                 else:
-                    if prev_psos[-1].startswith('V'):
-                        return 'chang2'
-                    else:
-                        return 'zhang3'
+                    return 'zhang3'
 
 
 def 干(prev_psos, pos, next_psos, prev_words, next_words):
@@ -81,67 +99,52 @@ def 干(prev_psos, pos, next_psos, prev_words, next_words):
 
 def 没(prev_psos, pos, next_psos, prev_words, next_words):
     if pos.startswith('VC'):
-        return 'mo4'
+        return 'mei2'
     else:
         return 'mei2'
 
 
 def 还(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('V'):
+    if pos.startswith('VD'):
         return 'huan2'
     else:
         return 'hai2'
 
 
 def 过(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('Di'):
-        return 'guo5'
-    else:
+    if pos.startswith('V'):
         return 'guo4'
+    else:
+        return 'guo5'
 
 
 def 为(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('P'):
-        return 'wei4'
-    else:
+    if pos.startswith('V'):
         return 'wei2'
+    else:
+        return 'wei4'
 
 
 def 啊(prev_psos, pos, next_psos, prev_words, next_words):
-    if prev_psos[-1].startswith('^'):
+    if prev_psos[0].startswith('_'):
         if next_psos[1].startswith('Q'):
             return 'a4'
         else:
             if next_psos[1].startswith('Dk'):
                 return 'a4'
             else:
-                if next_psos[1].startswith('Neu'):
-                    return 'a3'
-                else:
-                    return 'a3'
+                return 'a3'
     else:
         if pos.startswith('T'):
             if next_psos[1].startswith('Neqa'):
-                if prev_psos[-1].startswith('Nh'):
-                    return 'a5'
-                else:
-                    return 'a1'
+                return 'a1'
             else:
-                if next_psos[1].startswith('Q'):
-                    return 'a5'
-                else:
-                    return 'a5'
+                return 'a5'
         else:
-            if next_psos[1].startswith('Q'):
-                if prev_psos[0].startswith('^'):
-                    return 'a3'
-                else:
-                    return 'a4'
+            if prev_psos[0].startswith('Q'):
+                return 'a4'
             else:
-                if prev_psos[-1].startswith('FW'):
-                    return 'a1'
-                else:
-                    return 'a1'
+                return 'a1'
 
 
 def 把(prev_psos, pos, next_psos, prev_words, next_words):
@@ -152,7 +155,7 @@ def 把(prev_psos, pos, next_psos, prev_words, next_words):
 
 
 def 打(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('N'):
+    if pos.startswith('Nf'):
         return 'da2'
     else:
         return 'da3'
@@ -174,34 +177,22 @@ def 发(prev_psos, pos, next_psos, prev_words, next_words):
 
 def 和(prev_psos, pos, next_psos, prev_words, next_words):
     if next_psos[1].startswith('$'):
-        if pos.startswith('C'):
+        if pos.startswith('P'):
+            return 'huo4'
+        else:
+            return 'he2'
+    else:
+        if prev_psos[0].startswith('^'):
             return 'he2'
         else:
-            return 'huo4'
-    else:
-        if next_psos[1].startswith('Nc'):
-            if prev_psos[0].startswith('Na'):
-                return 'huo4'
-            else:
-                return 'he2'
-        else:
-            if prev_psos[0].startswith('^'):
-                return 'he2'
-            else:
-                return 'he2'
+            return 'he2'
 
 
 def 看(prev_psos, pos, next_psos, prev_words, next_words):
-    if next_psos[1].startswith('Dfb'):
-        if next_psos[0].startswith('V'):
-            return 'kan4'
-        else:
-            return 'kan1'
+    if prev_psos[-1].startswith('DE'):
+        return 'kan1'
     else:
-        if prev_psos[-1].startswith('DE'):
-            return 'kan1'
-        else:
-            return 'kan4'
+        return 'kan4'
 
 
 def 着(prev_psos, pos, next_psos, prev_words, next_words):
@@ -211,26 +202,18 @@ def 着(prev_psos, pos, next_psos, prev_words, next_words):
         return 'zhe5'
 
 
+def 种(prev_psos, pos, next_psos, prev_words, next_words):
+    if pos.startswith('VC'):
+        return 'zhong4'
+    else:
+        return 'zhong3'
+
+
 def 地(prev_psos, pos, next_psos, prev_words, next_words):
     if pos.startswith('N'):
-        if prev_psos[0].startswith('Dfa'):
-            return 'de5'
-        else:
-            return 'di4'
+        return 'di4'
     else:
-        if prev_psos[-1].startswith('Nes'):
-            return 'di4'
-        else:
-            if prev_psos[-1].startswith('Neqa'):
-                if next_psos[0].startswith('P'):
-                    return 'de5'
-                else:
-                    return 'di4'
-            else:
-                if next_psos[1].startswith('Ncd'):
-                    return 'de5'
-                else:
-                    return 'de5'
+        return 'de5'
 
 
 def 吧(prev_psos, pos, next_psos, prev_words, next_words):
@@ -256,9 +239,18 @@ def 中(prev_psos, pos, next_psos, prev_words, next_words):
 
 def 哇(prev_psos, pos, next_psos, prev_words, next_words):
     if next_psos[1].startswith('Na'):
-        return 'wa5'
+        if pos.startswith('Q'):
+            return 'wa1'
+        else:
+            return 'wa5'
     else:
-        return 'wa1'
+        if next_psos[1].startswith('Q'):
+            return 'wa5'
+        else:
+            if next_psos[1].startswith('Neu'):
+                return 'wa5'
+            else:
+                return 'wa1'
 
 
 def 哪(prev_psos, pos, next_psos, prev_words, next_words):
@@ -276,7 +268,7 @@ def 更(prev_psos, pos, next_psos, prev_words, next_words):
 
 
 def 倒(prev_psos, pos, next_psos, prev_words, next_words):
-    if next_psos[1].startswith('S'):
+    if next_psos[1].startswith('SHI'):
         return 'dao3'
     else:
         if next_psos[1].startswith('Dfa'):
@@ -289,10 +281,28 @@ def 倒(prev_psos, pos, next_psos, prev_words, next_words):
 
 
 def 哦(prev_psos, pos, next_psos, prev_words, next_words):
-    if next_psos[1].startswith('D'):
-        return 'o4'
+    if next_psos[1].startswith('Dk'):
+        if pos.startswith('I'):
+            return 'o4'
+        else:
+            return 'o4'
     else:
-        return 'o5'
+        if prev_psos[-1].startswith('V'):
+            if next_psos[1].startswith('Nh'):
+                return 'e2'
+            else:
+                return 'o5'
+        else:
+            if next_psos[1].startswith('N'):
+                if next_psos[1].startswith('Nep'):
+                    return 'e2'
+                else:
+                    return 'o4'
+            else:
+                if next_psos[1].startswith('VH'):
+                    return 'e2'
+                else:
+                    return 'o5'
 
 
 def 相(prev_psos, pos, next_psos, prev_words, next_words):
@@ -320,20 +330,11 @@ def 当(prev_psos, pos, next_psos, prev_words, next_words):
     if prev_psos[-1].startswith('V'):
         return 'dang1'
     else:
-        if prev_psos[0].startswith('Q'):
-            return 'dang1'
-        else:
-            if prev_psos[-1].startswith('Nf'):
-                return 'dang1'
-            else:
-                if next_psos[0].startswith('Na'):
-                    return 'dang4'
-                else:
-                    return 'dang1'
+        return 'dang1'
 
 
 def 蒙(prev_psos, pos, next_psos, prev_words, next_words):
-    if next_psos[1].startswith('N'):
+    if pos.startswith('P'):
         return 'meng2'
     else:
         return 'meng1'
@@ -347,10 +348,10 @@ def 句(prev_psos, pos, next_psos, prev_words, next_words):
 
 
 def 背(prev_psos, pos, next_psos, prev_words, next_words):
-    if pos.startswith('VC'):
-        return 'bei4'
-    else:
+    if prev_psos[-1].startswith('VG'):
         return 'bei1'
+    else:
+        return 'bei4'
 
 
 def 抢(prev_psos, pos, next_psos, prev_words, next_words):
@@ -479,13 +480,6 @@ def 量(prev_psos, pos, next_psos, prev_words, next_words):
         return 'liang2'
 
 
-def 哄(prev_psos, pos, next_psos, prev_words, next_words):
-    if prev_psos[0].startswith('N'):
-        return 'hong3'
-    else:
-        return 'hong1'
-
-
 def 钻(prev_psos, pos, next_psos, prev_words, next_words):
     if pos.startswith('VC'):
         return 'zuan1'
@@ -569,6 +563,12 @@ single_readings = {
 	"爱": "ai4",
 	"先": "xian1",
 	"变": "bian4",
+	"身": "shen1",
+	"烫": "tang4",
+	"卷": "juan3",
+	"摸": "mo1",
+	"来": "lai2",
+	"刨": "bao4",
 	"呜": "wu1",
 	"别": "bie2",
 	"哭": "ku1",
@@ -600,7 +600,6 @@ single_readings = {
 	"大": "da4",
 	"想": "xiang3",
 	"住": "zhu4",
-	"来": "lai2",
 	"下": "xia4",
 	"八": "ba1",
 	"套": "tao4",
@@ -620,7 +619,6 @@ single_readings = {
 	"唯": "wei2",
 	"流": "liu2",
 	"让": "rang4",
-	"种": "zhong3",
 	"必": "bi4",
 	"而": "er2",
 	"克": "ke4",
@@ -914,7 +912,6 @@ single_readings = {
 	"笔": "bi3",
 	"花": "hua1",
 	"批": "pi1",
-	"身": "shen1",
 	"吵": "chao3",
 	"联": "lian2",
 	"七": "qi1",
@@ -986,7 +983,6 @@ single_readings = {
 	"九": "jiu3",
 	"您": "nin2",
 	"汤": "tang1",
-	"烫": "tang4",
 	"锤": "chui2",
 	"雇": "gu4",
 	"步": "bu4",
@@ -1395,7 +1391,6 @@ single_readings = {
 	"繁": "fan2",
 	"简": "jian3",
 	"版": "ban3",
-	"摸": "mo1",
 	"邮": "you2",
 	"取": "qu3",
 	"习": "xi2",
@@ -1468,6 +1463,7 @@ single_readings = {
 	"庙": "miao4",
 	"绿": "lv4",
 	"奶": "nai3",
+	"哄": "hong3",
 	"串": "chuan4",
 	"拎": "lin1",
 	"玉": "yu4",
@@ -1544,7 +1540,6 @@ single_readings = {
 	"汗": "han4",
 	"奔": "ben4",
 	"狂": "kuang2",
-	"卷": "juan3",
 	"恕": "shu4",
 	"矛": "mao2",
 	"盾": "dun4",
@@ -1561,6 +1556,7 @@ single_readings = {
 	"享": "xiang3",
 	"师": "shi1",
 	"焉": "yan1",
+	"文": "wen2",
 	"须": "xu1",
 	"渐": "jian4",
 	"寸": "cun4",
