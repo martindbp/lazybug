@@ -416,6 +416,7 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
 
         return combined_pys
 
+
     translation_options, current_option_indices, current_nailed_down_options, current_order = get_options(
         hzs, base_translations, pys, deepl_translations, skip_words
     )
@@ -473,7 +474,7 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                         first_hz not in NEVER_SPLIT and
                         second_hz not in NEVER_SPLIT and
                         hz not in NEVER_SPLIT and
-                        not prevent_split and
+                        not no_split and
                         first_hz != second_hz  # don't want to split e.g 妈妈 爸爸
                     ):
                         both_have_translations = True
@@ -500,12 +501,14 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                     new_nailed_down_options = list(current_nailed_down_options)
                     new_order = list(current_order)
                     new_hzs = list(hzs)
+                    new_prevent_split = list(prevent_split)
 
                     new_hzs[current_segmentation_idx:current_segmentation_idx+1] = [first_hz, second_hz]
                     new_translation_options[current_segmentation_idx:current_segmentation_idx+1] = [
                         first_options,
                         second_options,
                     ]
+                    new_prevent_split[current_segmentation_idx:current_segmentation_idx+1] = [False, False]
                     new_option_indices[current_segmentation_idx:current_segmentation_idx+1] = [-1, -1]
                     new_nailed_down_options[current_segmentation_idx:current_segmentation_idx+1] = [False, False]
 
@@ -612,6 +615,7 @@ def get_embedding_word_translations(hzs, pys, alignment_indices, base_translatio
                             (alignment_range[0] + len(first_hz), alignment_range[1]),
                         ]
                         hzs = new_hzs
+                        prevent_split = new_prevent_split
                         print('SPLIT:', first_hz, second_hz, combined_translations[max_idx], max_similarity/best_similarity)
 
                     iterations_since_last_change = 0
