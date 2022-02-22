@@ -643,7 +643,7 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, li
         return extract_lines_from_framebuffer(ocr, last_line, frames_left, font_height, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
 
 
-@task(deps=[])
+@task(deps=[net])
 def predict_video_captions(
     video_path: str,
     caption_top: float,
