@@ -8,7 +8,7 @@ from pymatting import cutout, blend
 
 import argparse
 
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(description='Mine good segmentations')
 parser.add_argument('show_name', type=str)
 parser.add_argument('--dilate-foreground', type=int, default=2)
 parser.add_argument('--dilate-move-foreground', type=str, default='')
