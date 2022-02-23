@@ -107,13 +107,17 @@ test-cases:
 	make process-segmentation-alignments show=doutinghao
 	make process-segmentation-alignments show=huanlesong
 
-ext:
-	mv browser_extension/dist/zimu_quasar.css browser_extension/
+ext-caption:
 	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_captionmanager
-	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
 	mv browser_extension/dist_captionmanager/* browser_extension/dist/
+
+ext-popup:
+	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
 	mv browser_extension/dist_popuproot/* browser_extension/dist/
-	mv browser_extension/zimu_quasar.css browser_extension/dist/
+
+ext:
+	make ext-caption
+	make ext-popup
 	cp browser_extension/deepl_main.js browser_extension/dist/
 
 release:
