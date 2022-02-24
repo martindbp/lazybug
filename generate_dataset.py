@@ -45,7 +45,7 @@ def _increase_brightness(img, value=30):
     return img
 
 @task
-def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur_iterations=0, brighten=False, sample_background_from_cutout=False):
+def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur_kernel_size=0, brighten=False, sample_background_from_cutout=False):
     cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
     prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
 
@@ -66,9 +66,8 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
 
     composite = (255 * blend(foreground, background, alpha)).astype('uint8')
     composite = _make_width(composite, out_width)
-    if blur_iterations > 0:
-        for _ in range(blur_iterations):
-            composite = cv2.blur(composite, (3, 3))
+    if blur_kernel_size > 0:
+        composite = cv2.blur(composite, (blur_kernel_size, blur_kernel_size))
     composite_filename = FileRef(ext='jpg')
     cv2.imwrite(composite_filename, composite)
 
@@ -272,7 +271,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             cutout_hash = cutout.split('.')[0]
             cutout_filename = f'{show_dir}/{cutout}'
 
-            for i in range(10):
+            for i in range(15):
                 j = int(random.random() * len(empty_line_hashes))
                 hash = empty_line_hashes[j]
                 background_filename = FileRef(f'{CAPTION_DATA_DIR}/images/{hash}.jpg')
@@ -281,15 +280,19 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                     continue
 
                 prob_filename = FileRef(f'{CAPTION_DATA_DIR}/segmentation_probs/{cutout_hash}.png')
+                blur_kernel_size = 0
+                if random.random() < 0.5:
+                    blur_kernel_size = 3 if random.random() < 0.5 else 5
+
                 composite, mask = generate_cutout_composite(
                     cutout_filename,
                     prob_filename,
                     background_filename,
                     out_width,
-                    blur_iterations=round(1+random.random()*1) if random.random() < 0.4 else 0,
+                    blur_kernel_size=blur_kernel_size,
                     scale=1.0,
-                    sample_background_from_cutout=(i <= 4),
-                    brighten=(i <= 7),
+                    sample_background_from_cutout=(5 <= i <= 9),
+                    brighten=(i <= 4),
                 )
                 composite_images.append(composite)
                 composite_masks.append(mask)
