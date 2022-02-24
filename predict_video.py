@@ -86,31 +86,42 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def _max_len_prediction(result):
-    if len(result) == 0:
+def _join_predictions(results):
+    if len(results) == 0:
         return None, '', 0, np.array([]), np.array([])
     else:
-        return max(result, key=lambda x: len(x[1]))  # length of text
+        results = sorted(results, key=lambda x: x[0][0][0]) # sort by x value of upper-left corner
+        ul = [min(x for ((x, _), *_), *_ in results), min(y for ((_, y), *_), *_ in results)]
+        ur = [max(x for (_, (x, _), *_), *_ in results), min(y for (_, (_, y), *_), *_ in results)]
+        dr = [max(x for (_, _, (x, _), _), *_ in results), max(y for (_, _, (_, y), _), *_ in results)]
+        dl = [min(x for (*_, (x, _)), *_ in results), max(y for (*_, (_, y)), *_ in results)]
+        rect = [ul, ur, dr, dl]
+        text = ''.join((x[1] for x in results))
+        mean_confidence_score = np.array([x[2] for x in results]).mean()
+
+        indices = np.concatenate([x[3].numpy() for x in results])
+        probs = np.concatenate([x[4]for x in results], axis=0)
+        return [rect, text, mean_confidence_score, indices, probs]
 
 
 def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=False):
     margin = 0.1
     text_threshold = 0.7
     min_size = 20
-    result = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-    result = _max_len_prediction(result)
+    results = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+    result = _join_predictions(results)
     if result[0] == None:
         # Wider margin, lower thresholds seems to be needed for single chars
         margin = 0.5
         text_threshold = 0.3
         min_size = 10
-        result = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _max_len_prediction(result)
+        results = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+        result = _join_predictions(results)
 
     box, text, confidence, prob_indices, prob_distributions = result
     if confidence < 0.6 and len(img) > 0:
-        result = ocr.readtext(img, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _max_len_prediction(result)
+        results = ocr.readtext(img, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+        result = _join_predictions(results)
         img_confidence = result[2]
         img_text = result[1]
         print(f"{img_confidence = } {confidence = } {img_text = } {text = }")
