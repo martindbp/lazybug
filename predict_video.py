@@ -334,7 +334,7 @@ def get_video_caption_area(
             curr_time = last_time + last_delta / 2
 
         last_time = curr_time
-        yield curr_time, crop, frame.shape[:2], frame
+        yield curr_time, crop, frame
 
         if end_time_s is not None and curr_time >= end_time_s:
             break
@@ -449,13 +449,14 @@ def predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx=None)
     cv2.imshow('frame', frame_copy)
     cv2.imshow('probs', (255*probs).astype('uint8'))
     cv2.waitKey(1)
-    return CaptionLine(
+    caption_line = CaptionLine(
         text, frame_t, frame_t, logprob,
         frame, mask > 0, probs,
         char_probs, prob_distributions,
         bounding_rect,
         conditional_caption_idx=conditional_caption_idx
     )
+    return caption_line
 
 
 def save_caption_data(caption_line, alphabet):
@@ -693,14 +694,47 @@ def predict_video_captions(
     ocr = ocrs[','.join(sorted(lang))]
     alphabet = ocr.converter.character
 
+    # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
+    bounding_rects = []
+    frame_size = None
+    for i, (frame_time, crop, frame) in enumerate(caption_images):
+        if i % SUBSAMPLE_FRAME_RATE != 0:
+            continue
+
+        if frame_size is None:
+            frame_size = frame.shape[:2]
+
+        line = predict_line(ocr, crop, frame_time, font_height)
+        if line.text != '' and line.bounding_rect is not None:
+            bounding_rects.append(line.bounding_rect)
+
+        if len(bounding_rects) > 10:
+            break
+
+    caption_top_px = int(caption_top * frame.shape[0])
+    caption_bottom_px = int(caption_bottom * frame.shape[0])
+    crop_scale = (caption_bottom_px - caption_top_px) / font_height
+    mean_crop_caption_top = np.array([min_y for (_, _, min_y, _) in bounding_rects]).mean()
+    mean_crop_caption_bottom = np.array([max_y for (_, _, _, max_y) in bounding_rects]).mean()
+    expected_crop_caption_top = (out_height - font_height) / 2
+    expected_crop_caption_bottom = out_height - expected_crop_caption_top
+
+    top_diff_px = (mean_crop_caption_top - expected_crop_caption_top) * crop_scale
+    bottom_diff_px = (mean_crop_caption_bottom - expected_crop_caption_bottom) * crop_scale
+    caption_top += top_diff_px / frame_size[0]
+    caption_bottom += bottom_diff_px / frame_size[0]
+
+    caption_images = get_video_caption_area(
+        video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
+    )
+
     frame_buffer = []
     caption_lines = []
     dominant_caption_color = None
-    return_frame_size = None
     last_processed_frame = None
     curr_conditional_caption_idx = 0
     try:
-        for i, (frame_time, crop, frame_size, frame) in enumerate(caption_images):
+        for i, (frame_time, crop, frame) in enumerate(caption_images):
             if conditional_captions is not None:
                 if curr_conditional_caption_idx is None:
                     continue
@@ -713,9 +747,6 @@ def predict_video_captions(
                     curr_conditional_caption_idx += 1
                     if curr_conditional_caption_idx >= len(conditional_captions['lines']):
                         curr_conditional_caption_idx = None
-
-            if return_frame_size is None:
-                return_frame_size = frame_size
 
             frame_buffer.append((frame_time, crop))
 
@@ -737,8 +768,8 @@ def predict_video_captions(
                 if line.text != '':
                     dominant_caption_color = np.median(line.img[line.mask], axis=0)
 
-                caption_top_px = int(caption_top * return_frame_size[0])
-                caption_bottom_px = int(caption_bottom * return_frame_size[0])
+                caption_top_px = int(caption_top * frame_size[0])
+                caption_bottom_px = int(caption_bottom * frame_size[0])
 
                 if line.bounding_rect:
                     # Transform bounding rect from local coordinates (in the scaled cropped image fed to OCR), to global
@@ -788,7 +819,7 @@ def predict_video_captions(
     if caption_lines[-1].text != '' and do_save_caption_data:
         save_caption_data(caption_lines[-1], alphabet)
 
-    return caption_lines, return_frame_size
+    return caption_lines, frame_size
 
 
 @task
