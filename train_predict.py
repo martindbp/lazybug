@@ -68,7 +68,7 @@ def train_unet(images_dir, masks_dir, epochs=8, lr=0.001, batch_size=4, net=None
 def train_pipeline():
     seed = 42
     corpus = get_corpus(seed=seed)
-    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 30000, 1024, 80, seed=seed)
+    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 35000, 1024, 80, seed=seed)
 
     net = train_unet(images_dir, masks_dir)
     net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
@@ -81,7 +81,7 @@ def train_pipeline():
 def finetune_pipeline():
     seed = 42
     corpus = get_corpus(seed=seed)
-    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 30000, 1024, 80, seed=seed, fill_with_synthetic=False)
+    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 35000, 1024, 80, seed=seed, fill_with_synthetic=True)
 
     net = _get_latest_net()
     net = train_unet(images_dir, masks_dir, epochs=4, lr=0.0005, net=net)
