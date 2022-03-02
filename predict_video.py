@@ -90,6 +90,7 @@ def _join_predictions(results):
     if len(results) == 0:
         return None, '', 0, np.array([]), np.array([])
     else:
+        results = [x for x in results if len(x[1]) > 0]  # only non-empty predictions
         results = sorted(results, key=lambda x: x[0][0][0]) # sort by x value of upper-left corner
         ul = [min(x for ((x, _), *_), *_ in results), min(y for ((_, y), *_), *_ in results)]
         ur = [max(x for (_, (x, _), *_), *_ in results), min(y for (_, (_, y), *_), *_ in results)]
@@ -100,7 +101,7 @@ def _join_predictions(results):
         mean_confidence_score = np.array([x[2] for x in results]).mean()
 
         indices = np.concatenate([x[3].numpy() for x in results])
-        probs = np.concatenate([x[4]for x in results], axis=0)
+        probs = np.concatenate([x[4] for x in results], axis=0)
         return [rect, text, mean_confidence_score, indices, probs]
 
 
@@ -497,7 +498,6 @@ def replace_or_add_line(
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
-    conditional_caption_idx=None,
 ):
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     replaced = False
@@ -564,7 +564,7 @@ def replace_or_add_line(
                 new_line.img, new_line.mask, new_line.probs,
                 new_char_probs, new_prob_distributions,
                 new_line.bounding_rect,
-                new_line.conditional_caption_idx
+                conditional_caption_idx=new_line.conditional_caption_idx
             )
             caption_lines[-1] = new_line
             print('Replacing', new_line)
@@ -741,11 +741,17 @@ def predict_video_captions(
                 caption_bottom_px = int(caption_bottom * return_frame_size[0])
 
                 if line.bounding_rect:
+                    # Transform bounding rect from local coordinates (in the scaled cropped image fed to OCR), to global
                     padding = (out_height - font_height) // 2
                     scale_factor = font_height / (caption_bottom_px - caption_top_px)
                     min_x, max_x, min_y, max_y = line.bounding_rect
                     min_y -= padding
                     max_y -= padding
+
+                    # Add caption top to get global coordinates
+                    min_y += caption_top_px
+                    max_y += caption_top_px
+
                     line.bounding_rect = (
                         int(min_x / scale_factor), int(max_x / scale_factor), int(min_y / scale_factor), int(max_y / scale_factor)
                     )
@@ -782,35 +788,39 @@ def predict_video_captions(
     if caption_lines[-1].text != '' and do_save_caption_data:
         save_caption_data(caption_lines[-1], alphabet)
 
-    if conditional_captions is not None:
-        # We update the original conditional captions and return those
-        breakpoint()
-        for line in caption_lines:
-            cond_line = conditional_captions['lines'][line.conditional_caption_idx]
-            # Prepend the text
-            cond_line[0] = line.text + cond_line[0]
-            # Take the bounding rect union
-            cond_rect = cond_line[3]
-            cond_rect[0] = min(cond_rect[0], line.bounding_rect[0])
-            cond_rect[1] = max(cond_rect[1], line.bounding_rect[1])
-            cond_rect[2] = min(cond_rect[2], line.bounding_rect[2])
-            cond_rect[3] = max(cond_rect[3], line.bounding_rect[3])
-        return conditional_captions, return_frame_size
-
     return caption_lines, return_frame_size
+
+
+@task
+def update_conditional_captions(caption_lines, conditional_captions):
+    # We update the original conditional captions and return those instead
+    for line in caption_lines:
+        if line.text == '':
+            continue
+
+        cond_line = conditional_captions['lines'][line.conditional_caption_idx]
+        # Prepend the text
+        cond_line[0] = line.text + cond_line[0]
+        # Take the bounding rect union
+        cond_rect = list(cond_line[3])
+        cond_rect[0] = min(cond_rect[0], line.bounding_rect[0])  # min x
+        cond_rect[1] = max(cond_rect[1], line.bounding_rect[1])  # max x
+        cond_rect[2] = min(cond_rect[2], line.bounding_rect[2])  # min y
+        cond_rect[3] = max(cond_rect[3], line.bounding_rect[3])  # max y
+        cond_line[3] = cond_rect
+    return conditional_captions
 
 
 @task(ignore_args=['args', 'kwargs'])
 def get_video_captions(caption_id, args=[], kwargs={}):
     print(caption_id)
-    caption_top = args[1]
     # This task only caches the predicted results given the site name and video id, instead of the parameters used
     captions, frame_size = predict_video_captions(*args, **kwargs)
     return captions.eval(), frame_size.eval()
 
 
 @task(serializer=json, outs=1)
-def caption_lines_to_json(lines, frame_size, caption_top, video_length):
+def caption_lines_to_json(lines, frame_size, params, video_length, conditional_params=None):
     json_lines = []
 
     for line in lines:
@@ -825,6 +835,10 @@ def caption_lines_to_json(lines, frame_size, caption_top, video_length):
             line.data_hash
         ])
         print(line.text)
+
+    caption_top = params['caption_top']
+    if conditional_params is not None:
+        caption_top = min(caption_top, conditional_params['caption_top'])
 
     return {
         'video_length': video_length,
@@ -1182,9 +1196,16 @@ def process_video_captions(
             out.append(meta_captions)
             continue
 
-        last_caption_of_type = defaultdict(lambda: None)
+        prev_captions = defaultdict(lambda: None)
+        prev_params = defaultdict(lambda: None)
         for i, param in enumerate(params):
             param_id = param.get('id', None) or param['type']
+            depends_on = param.get('depends_on', None)
+            conditional_captions, conditional_params = None, None
+            if depends_on is not None:
+                conditional_captions = prev_captions[depends_on]
+                conditional_params = prev_params[depends_on]
+
             captions, frame_size = predict_video_captions(
                 video_path,
                 param['caption_top'],
@@ -1193,19 +1214,25 @@ def process_video_captions(
                 param.get('end_time', None),
                 replace_levenshtein_threshold=1.0,
                 caption_type=param['type'],
-                conditional_captions=last_caption_of_type[param_id],
+                conditional_captions=conditional_captions
             )
-            json_captions = caption_lines_to_json(captions, frame_size, param['caption_top'], video_length)
-            json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param["type"]}.json'
+            json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
+            json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param_id}.json'
+
+            if depends_on is not None:
+                json_captions = update_conditional_captions(captions, conditional_captions)
+                json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param["type"]}.json'
+
             meta_captions = add_metadata(json_captions, video_id)
             trimmed_captions = trim_bad_captions(meta_captions)
-            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-{param["type"]}.json'
+            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-{param_id}.json'
 
-            last_caption_of_type[param_id] = trimmed_captions
+            prev_captions[param_id] = trimmed_captions
+            prev_params[param_id] = param
             if force_redo:
+                json_captions.clear_cache()
                 trimmed_captions.clear_cache(delete_output_files=True)
                 meta_captions.clear_cache(delete_output_files=True)
-                json_captions.clear_cache(delete_output_files=True)
                 captions.clear_cache(delete_output_files=True)
 
             out.append(trimmed_captions)
@@ -1260,6 +1287,7 @@ def process_translations(show_name=None, *, remove_unmatched_captions: bool=True
         json_captions_all_translations = add_machine_translations(json_captions_human_translations, machine_translations)
         json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{video_id}.json'
         if force_redo:
+            trimmed_captions.clear_cache()
             json_captions_human_translations.clear_cache(delete_output_files=True)
             machine_translations.clear_cache(delete_output_files=True)
             json_captions_all_translations.clear_cache(delete_output_files=True)
@@ -1275,7 +1303,7 @@ def _get_show_fixed_translations(show_name):
     return show_data.get('fixed_translations', {})
 
 
-def process_segmentation_alignment(show_name=None, video_id=None):
+def process_segmentation_alignment(show_name=None, video_id=None, *, force_redo=False):
     os.makedirs('data/remote/private/caption_data/alignment_translations', exist_ok=True)
     os.makedirs('data/remote/public/subtitles/', exist_ok=True)
 
@@ -1296,6 +1324,10 @@ def process_segmentation_alignment(show_name=None, video_id=None):
         alignment_translations >> f'data/remote/private/caption_data/alignment_translations/{vid}.json'
         json_captions_final = add_segmentation_and_alignment(json_captions_all_translations, alignment_translations, show_fixed_translations)
         json_captions_final >> f'data/remote/public/subtitles/{vid}-{json_captions_final.hash}.json'
+        if force_redo:
+            alignment_translations.clear_cache(delete_output_files=True)
+            json_captions_final.clear_cache(delete_output_files=True)
+
         with open(f'data/remote/public/subtitles/{vid}.hash', 'w') as f:
             f.write(json_captions_final.hash)
         out.append(json_captions_final)
