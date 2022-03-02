@@ -713,7 +713,7 @@ def predict_video_captions(
             frame_size = frame.shape[:2]
 
         line = predict_line(ocr, crop, frame_time, font_height)
-        if line.text != '' and line.bounding_rect is not None:
+        if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
             bounding_rects.append(line.bounding_rect)
 
         if len(bounding_rects) > 10:
