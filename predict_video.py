@@ -7,11 +7,14 @@ import hashlib
 import pickle
 from dataclasses import dataclass, field
 from collections import defaultdict
+from functools import partial
 
 import cv2
 import numpy as np
 
 import mxnet as mx
+from cnocr import CnOcr
+from cnocr.fit.ctc_metrics import CtcMetrics
 import torch
 from torch.nn import functional as F
 import webvtt
@@ -38,7 +41,7 @@ from breakdown import get_cedict_breakdown_characters, get_captions_breakdown_ch
 
 DEBUG = False
 
-ocrs = None
+easy_ocrs = None
 tokenizer = None
 model = None
 
@@ -108,6 +111,75 @@ def _join_predictions(results):
         return [rect, text, mean_confidence_score, indices, probs]
 
 
+cnocr = None
+def ocr_for_single_lines_probs_CnOCR(img, *args):
+    global cnocr
+    img_list = [img]
+
+    if len(img_list) == 0:
+        return []
+
+    img_list = [cnocr._preprocess_img_array(img) for img in img_list]
+
+    batch_size = len(img_list)
+    img_list, img_widths = cnocr._pad_arrays(img_list)
+
+    prob = cnocr._predict(mx.nd.array(img_list))
+    # [seq_len, batch_size, num_classes]
+    prob = np.reshape(prob, (-1, batch_size, prob.shape[1]))
+
+    if cnocr._cand_alph_idx is not None:
+        prob = prob * cnocr._gen_mask(prob.shape)
+
+    max_width = max(img_widths)
+    res = []
+    probs = []
+    prob_distributions = []
+    for i in range(batch_size):
+        line_prob = prob[:, i, :]
+        class_ids = np.argmax(line_prob, axis=-1)
+        chars, start_end_indices = gen_line_pred_chars(cnocr, line_prob, img_widths[i], max_width)
+        batch_probs = []
+        batch_prob_distributions = []
+        for char, (start, end) in zip(chars, start_end_indices):
+            idx_probs = line_prob[start:end].mean(axis=0)
+
+            # Smooth out OCR distribution a bit, because it tends to be over confident
+            idx_probs = np.sqrt(idx_probs)
+            idx_probs = idx_probs / idx_probs.sum()
+
+            batch_prob_distributions.append(idx_probs)
+            batch_probs.append(idx_probs[cnocr._alphabet.index(char)])
+
+        probs.append(batch_probs)
+        prob_distributions.append(batch_prob_distributions)
+        res.append(chars)
+
+    return ''.join(res[0]), np.array(probs)[0], prob_distributions[0]
+
+
+def gen_line_pred_chars(ocr, line_prob, img_width, max_img_width):
+    """
+    Get the predicted characters.
+    :param line_prob: with shape of [seq_length, num_classes]
+    :param img_width:
+    :param max_img_width:
+    :return:
+    """
+    class_ids = np.argmax(line_prob, axis=-1)
+
+    if img_width < max_img_width:
+        comp_ratio = ocr._hp.seq_len_cmpr_ratio
+        end_idx = img_width // comp_ratio
+        if end_idx < len(class_ids):
+            class_ids[end_idx:] = 0
+    prediction, start_end_idx = CtcMetrics.ctc_label(class_ids.tolist())
+    alphabet = ocr._alphabet
+    res = [alphabet[p] if alphabet[p] != '<space>' else ' ' for p in prediction]
+
+    return res, start_end_idx
+
+
 def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=False):
     margin = 0.1
     text_threshold = 0.7
@@ -154,7 +226,7 @@ def srt_timestamp(t):
     return f'{hours:02}:{minutes:02}:{seconds:.3f}'.replace('.', ',')
 
 
-def predict_chars(ocr, mask, probs, img, window_buffer=10):
+def predict_chars(ocr_fn, mask, probs, img, window_buffer=10):
     if mask.sum() == 0:
         return '', None, None
     ys, xs = np.where(mask > 0)
@@ -170,7 +242,7 @@ def predict_chars(ocr, mask, probs, img, window_buffer=10):
     img_crop_larger = np.zeros((img_crop.shape[0]+2*window_buffer, img_crop.shape[1]+2*window_buffer, 3), 'uint8')
     img_crop_larger[window_buffer:-window_buffer, window_buffer:-window_buffer, :] = img_crop
 
-    res, line_prob, prob_distributions = ocr_for_single_lines_probs(ocr, probs_larger, img_crop_larger)
+    res, line_prob, prob_distributions = ocr_fn(probs_larger, img_crop_larger)
     return res, line_prob, prob_distributions
 
 
@@ -408,13 +480,13 @@ def find_next_diff(line, buffer_frames, threshold=10):
 
 net = _get_latest_net()
 
-def predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx=None):
+def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=None):
     mask, probs = predict_img_pipeline(frame, net)
     mask.cache = None
     probs.cache = None
     mask = mask.eval()
     probs = probs.eval()
-    text, char_probs, prob_distributions = predict_chars(ocr, mask, probs, frame)
+    text, char_probs, prob_distributions = predict_chars(ocr_fn, mask, probs, frame)
 
     logprob = None
     if char_probs is not None:
@@ -624,13 +696,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, conditional_caption_idx=None):
+def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, conditional_caption_idx=None):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr, frame, frame_t, font_height, conditional_caption_idx)
+        line = predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx)
 
     if line.text == '':
         if last_line is None:
@@ -647,9 +719,9 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, li
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr, diff_frame, diff_t, font_height, conditional_caption_idx)
+        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height, conditional_caption_idx)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
@@ -660,7 +732,7 @@ def extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, li
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr, last_line, frames_left, font_height, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
+        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
 
 
 @task(deps=[net])
@@ -676,9 +748,10 @@ def predict_video_captions(
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
+    ocr_engine='cnocr',
     conditional_captions=None,
 ):
-    global ocrs
+    global easy_ocrs, cnocr
     SUBSAMPLE_FRAME_RATE = 10
 
     caption_images = get_video_caption_area(
@@ -693,14 +766,21 @@ def predict_video_captions(
     elif caption_type == 'pinyin':
         raise NotImplemented()
 
-    if ocrs is None:
-        ocrs = {
-            'en': Reader(['en']),
-            'ch_sim,en': Reader(['ch_sim', 'en']),
-        }
+    if ocr_engine == 'easyocr':
+        if easy_ocrs is None:
+            easy_ocrs = {
+                'en': Reader(['en']),
+                'ch_sim,en': Reader(['ch_sim', 'en']),
+            }
 
-    ocr = ocrs[','.join(sorted(lang))]
-    alphabet = ocr.converter.character
+        ocr = easy_ocrs[','.join(sorted(lang))]
+        ocr_fn = partial(ocr_for_single_lines_probs, ocr)
+        alphabet = ocr.converter.character
+    else:
+        if cnocr is None:
+            cnocr = CnOcr()
+        ocr_fn = ocr_for_single_lines_probs_CnOCR
+        alphabet = cnocr._alphabet
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     bounding_rects = []
@@ -712,7 +792,7 @@ def predict_video_captions(
         if frame_size is None:
             frame_size = frame.shape[:2]
 
-        line = predict_line(ocr, crop, frame_time, font_height)
+        line = predict_line(ocr_fn, crop, frame_time, font_height)
         if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
             bounding_rects.append(line.bounding_rect)
 
@@ -771,7 +851,7 @@ def predict_video_captions(
 
             print('diff')
 
-            frame_buffer_lines = extract_lines_from_framebuffer(ocr, last_line, frame_buffer, font_height, conditional_caption_idx=curr_conditional_caption_idx)
+            frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, conditional_caption_idx=curr_conditional_caption_idx)
             for line in frame_buffer_lines:
                 if line.text != '':
                     dominant_caption_color = np.median(line.img[line.mask], axis=0)
@@ -1253,6 +1333,7 @@ def process_video_captions(
                 param.get('end_time', None),
                 replace_levenshtein_threshold=1.0,
                 caption_type=param['type'],
+                ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
                 conditional_captions=conditional_captions
             )
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
