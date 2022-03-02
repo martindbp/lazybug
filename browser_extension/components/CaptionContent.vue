@@ -19,6 +19,7 @@
                     >
                         {{ finalShowStates.py[i] ? py : '-' }}
                     </span>
+                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.py[i]"
                         type="py"
@@ -46,10 +47,10 @@
                     <span
                         class="cardcontent"
                         :style="{opacity: finalShowStates.hz[i] ? 1 : 0}"
-                        :title="wordStats[i]"
                     >
                         {{ sm2tr(hz) }}
                     </span>
+                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.hz[i]"
                         type="hz"
@@ -81,6 +82,7 @@
                     >
                         {{ tr !== null && finalShowStates.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
+                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.tr[i]"
                         type="tr"
@@ -148,7 +150,7 @@ export default {
             const stats = [];
             for (var i = 0; i < this.wordData.hz.length; i++) {
                 const key = `${this.wordData.hz[i]}-${this.wordData.py[i]}`;
-                stats.push(this.finalShowStates.hz[i] ? this.videoWordStats[key] : null);
+                stats.push(this.videoWordStats[key]);
             }
             return stats;
         },
@@ -692,5 +694,18 @@ export default {
 
 .fulltranslation.placeholder:hover {
     color: white;
+}
+
+.captioncardhidden .q-badge {
+    display: none !important;
+}
+
+.captioncard:not(:hover) .q-badge {
+    display: none !important;
+}
+
+.captioncard .q-badge {
+    margin-top: -5px;
+    margin-right: -5px;
 }
 </style>
