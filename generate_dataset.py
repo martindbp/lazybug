@@ -49,6 +49,29 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
     cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
     prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
 
+    if scale != 1.0:
+        orig_width = cutout.shape[1]
+        orig_height = cutout.shape[0]
+        new_width = math.floor(orig_width*scale)
+        new_height = math.floor(orig_height*scale)
+        cutout = cv2.resize(cutout, (new_width, new_height))
+        prob = cv2.resize(prob, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
+
+        if scale > 1.0:
+            offset_x = (new_width - orig_width) // 2
+            offset_y = (new_height - orig_height) // 2
+            cutout = cutout[offset_y:(offset_y+orig_height), offset_x:(offset_x+orig_width), :]
+            prob = prob[offset_y:(offset_y+orig_height), offset_x:(offset_x+orig_width)]
+        else:
+            offset_x = (orig_width - new_width) // 2
+            offset_y = (orig_height - new_height) // 2
+            cutout_new = np.zeros((orig_height, orig_width, 4), 'uint8')
+            prob_new = np.zeros((orig_height, orig_width), 'uint8')
+            cutout_new[offset_y:(offset_y+new_height), offset_x:(offset_x+new_width), :] = cutout
+            prob_new[offset_y:(offset_y+new_height), offset_x:(offset_x+new_width)] = prob
+            cutout = cutout_new
+            prob = prob_new
+
     foreground = cutout[..., :3].astype('float') / 255
     alpha = cutout[..., -1].astype('float') / 255
     alpha = cv2.blur(alpha, (3, 3))
@@ -74,6 +97,7 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
     #cv2.imshow('foreground', cutout[..., :3])
     #cv2.imshow('background', background)
     cv2.imshow('composite', composite)
+    cv2.imshow('composite prob', prob)
     #cv2.imshow('alpha', alpha)
     cv2.waitKey(1)
 
@@ -284,13 +308,17 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                 if random.random() < 0.5:
                     blur_kernel_size = 3 if random.random() < 0.5 else 5
 
+                scale = 1.0
+                if random.random() < 0.5:
+                    scale = 0.98 if random.random() < 0.5 else 1.02
+
                 composite, mask = generate_cutout_composite(
                     cutout_filename,
                     prob_filename,
                     background_filename,
                     out_width,
                     blur_kernel_size=blur_kernel_size,
-                    scale=1.0,
+                    scale=scale,
                     sample_background_from_cutout=(5 <= i <= 9),
                     brighten=(i <= 4),
                 )
