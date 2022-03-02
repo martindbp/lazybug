@@ -20,8 +20,8 @@
                 </div>
             </q-card-section>
             <q-card-section align="left" style="padding: 25px; max-height: 400px; height: 400px" class="scroll">
-                <q-separator color="orange" v-if="showEntries.length > 0"/>
-                <div v-for="entry in showEntries">
+                <q-separator color="orange" v-if="dictEntries.length > 0"/>
+                <div v-for="entry in dictEntries">
                     <div class="text-h4">{{ entry.hz }}</div>
                     <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
                         <span v-for="(py, i) in item.pysDiacriticals" :style="{ color: COLORS[parseInt(item.pys[i].slice(-1))] }">
@@ -29,7 +29,7 @@
                         </span>: {{ item.translations.join(' ‧ ') }}</div>
                     <q-separator color="orange" />
                 </div>
-                <div class="text-h5" v-if="showEntries.length === 0 && text !== ''">
+                <div class="text-h5" v-if="dictEntries.length === 0 && text !== ''">
                     Click on a word to see the dictionary pinyin and translations
                 </div>
             </q-card-section>
@@ -48,8 +48,6 @@ export default {
     components: { },
     data: function() { return {
         mouseoverChar: null,
-        showEntries: [],
-        showRange: [-1, -1],
         COLORS: [
             null,
             '#DC143C', // red
@@ -72,15 +70,19 @@ export default {
         },
         show: {
             get: function() { return this.$store.state.showDictionary; },
-            set: function(val) { this.$store.commit('setShowDictionary', val); },
+            set: function(val) { this.$store.commit('setShowDictionary', {val: val}); },
+        },
+        showRange: {
+            get: function() { return this.$store.state.showDictionaryRange; },
+            set: function(val) { this.$store.commit('setShowDictionary', {range: val}); },
         },
         dictEntries: function() {
-            if (this.$store.state.DICT === null || this.highlightRange[0] < 0) return [];
+            if (this.$store.state.DICT === null || this.showRange[0] < 0) return [];
 
             const entries = []
-            for (var i = this.highlightRange[0]+1; i <= this.highlightRange[1]; i++) {
-                const text = this.text.substring(this.highlightRange[0], i)
-                const textSm = this.texts.sm.substring(this.highlightRange[0], i)
+            for (var i = this.showRange[0]+1; i <= this.showRange[1]; i++) {
+                const text = this.text.substring(this.showRange[0], i)
+                const textSm = this.texts.sm.substring(this.showRange[0], i)
                 if (this.$store.state.DICT[textSm] !== undefined) {
                     entries.push({hz: text, items: dictItemsToDict(this.$store.state.DICT[textSm])});
                 }
@@ -102,9 +104,12 @@ export default {
     },
     watch: {
         caption: function(newVal, oldVal) {
-            this.showEntries = [];
+            this.show = false
             this.showRange = [-1, -1];
             this.mouseoverChar = null;
+        },
+        showRange: function(newVal, oldVal) {
+            this.mouseoverChar = newVal[0];
         },
     },
     methods: {
@@ -115,7 +120,6 @@ export default {
         },
         clickChar: function(event) {
             this.showRange = this.highlightRange;
-            this.showEntries = this.dictEntries;
         },
     },
 }

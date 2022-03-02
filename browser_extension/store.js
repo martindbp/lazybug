@@ -31,6 +31,7 @@ const store = new Vuex.Store({
         }),
         showOptions: false,
         showDictionary: false,
+        showDictionaryRange: [-1, -1],
         timingOffset: 0,
         options: Vue.ref({
             extensionToggle: true,
@@ -68,7 +69,8 @@ const store = new Vuex.Store({
             state.showOptions = val;
         },
         setShowDictionary(state, val) {
-            state.showDictionary = val;
+            if (! [null, undefined].includes(val.val)) state.showDictionary = val.val;
+            if (val.range) state.showDictionaryRange = val.range;
         },
         setKnowledge(state, knowledge) {
             state.knowledge = knowledge;

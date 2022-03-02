@@ -77,6 +77,16 @@ app.mixin({
 
             return wordStats;
         },
+        purePeekStates: function() {
+            const states = this.$store.state.peekStates;
+            states['translation'] = states['translation'] && !this.showStates['translation'];
+            for (var i = 0; i < this.wordData.hz.length; i++) {
+                for (var type of ['hz', 'py', 'tr']) {
+                    states[type][i] = states[type][i] && !this.showStates[type][i];
+                }
+            }
+            return states;
+        },
     },
 });
 

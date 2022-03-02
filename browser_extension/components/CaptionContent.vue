@@ -1,6 +1,6 @@
 <template>
-    <div :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
-        <table class="contenttable">
+    <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
+        <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
                 <td title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
                     <span v-if="isPeek('py')" class="iconcard peek" v-html="eyecon"></span>
@@ -9,15 +9,26 @@
                 </td>
                 <td
                     :class="getClasses('py', i)"
-                    @click="click('py', i)"
+                    @click.stop.prevent="click('py', i)"
                     v-for="(py, i) in wordData.py"
                     :key="i"
                 >
-                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.py[i] && knownStates.py[i]"></span>
-                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.py[i]"></span>
-                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.py[i]"></span>
-                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.py[i] && learningStates.py[i]"></span>
-                    <span class="cardcontent" :style="{opacity: finalShowStates.py[i] ? 1 : 0}">{{ finalShowStates.py[i] ? py : '-' }}</span>
+                    <span
+                        class="cardcontent"
+                        :style="{opacity: finalShowStates.py[i] ? 1 : 0}"
+                    >
+                        {{ finalShowStates.py[i] ? py : '-' }}
+                    </span>
+                    <ContentContextMenu
+                        v-if="showContextMenu.py[i]"
+                        type="py"
+                        :idx="i"
+                        :know="showStates.py[i]"
+                        :learn="showStates.py[i] || (purePeekStates.py[i] && knownStates.py[i])"
+                        :reset="purePeekStates.py[i] && (learningStates.py[i] || knownStates.py[i])"
+                        :dict="true"
+                        :click="clickContextMenu"
+                    />
                 </td>
             </tr>
             <tr class="centerrow">
@@ -28,14 +39,10 @@
                 </td>
                 <td
                     :class="getClasses('hz', i)"
-                    @click="click('hz', i)"
+                    @click.stop.prevent="click('hz', i)"
                     v-for="(hz, i) in wordData.hz"
                     :key="i"
                 >
-                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.hz[i] && knownStates.hz[i]"></span>
-                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.hz[i]"></span>
-                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.hz[i]"></span>
-                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.hz[i] && learningStates.hz[i]"></span>
                     <span
                         class="cardcontent"
                         :style="{opacity: finalShowStates.hz[i] ? 1 : 0}"
@@ -43,6 +50,16 @@
                     >
                         {{ sm2tr(hz) }}
                     </span>
+                    <ContentContextMenu
+                        v-if="showContextMenu.hz[i]"
+                        type="hz"
+                        :idx="i"
+                        :know="showStates.hz[i]"
+                        :learn="showStates.hz[i] || (purePeekStates.hz[i] && knownStates.hz[i])"
+                        :reset="purePeekStates.hz[i] && (learningStates.hz[i] || knownStates.hz[i])"
+                        :dict="true"
+                        :click="clickContextMenu"
+                    />
                 </td>
             </tr>
             <tr class="bottomrow">
@@ -53,14 +70,10 @@
                 </td>
                 <td
                     :class="getClasses('tr', i)"
-                    @click="click('tr', i)"
+                    @click.stop.prevent="click('tr', i)"
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
                 >
-                    <span class="iconcard learn" title="Learn" v-html="bookIcon" v-if="peekStates.tr[i] && knownStates.tr[i]"></span>
-                    <span class="iconcard know" title="Know this" v-html="checkIcon" v-if="showStates.tr[i]"></span>
-                    <span class="iconcard peek" v-html="eyecon" v-if="! finalShowStates.tr[i]"></span>
-                    <span class="iconcard remove" title="Reset" v-html="closeIcon" v-if="peekStates.tr[i] && learningStates.tr[i]"></span>
                     <span
                         class="cardcontent"
                         :title="finalShowStates.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
@@ -68,37 +81,53 @@
                     >
                         {{ tr !== null && finalShowStates.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
+                    <ContentContextMenu
+                        v-if="showContextMenu.tr[i]"
+                        type="tr"
+                        :idx="i"
+                        :know="showStates.tr[i]"
+                        :learn="showStates.tr[i] || (purePeekStates.tr[i] && knownStates.tr[i])"
+                        :reset="purePeekStates.tr[i] && (learningStates.tr[i] || knownStates.tr[i])"
+                        :dict="true"
+                        :click="clickContextMenu"
+                    />
                 </td>
             </tr>
         </table>
-        <table class="contenttable">
-            <td title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
-                <span v-if="isPeek('translation')" class="iconcard peek" v-html="eyecon"></span>
-                <span v-if="!isPeek('translation')" class="iconcard peek" v-html="pinIcon"></span>
-                <span class="cardcontent">EN</span>
-            </td>
-            <td
-                @click="click('translation')"
-                :class="{
-                    captioncard: true,
-                    peeking: peekStates['translation'],
-                    fulltranslation: true,
-                    placeholder: !finalShowStates['translation'],
-                    showborder: data !== null,
-                }"
-            >
-                <span :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
-                <span style="position: absolute; left: 50%" v-if="!finalShowStates['translation']" v-html="eyecon"></span>
-            </td>
+        <br/>
+        <table class="contenttable" style="margin-top: -15px">
+            <tr>
+                <td title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
+                    <span v-if="isPeek('translation')" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="!isPeek('translation')" class="iconcard peek" v-html="pinIcon"></span>
+                    <span class="cardcontent">EN</span>
+                </td>
+                <td
+                    ref="fulltranslation"
+                    @click.stop.prevent="click('translation')"
+                    :class="{
+                        captioncard: true,
+                        peeking: purePeekStates['translation'],
+                        fulltranslation: true,
+                        placeholder: !finalShowStates['translation'],
+                        showborder: data !== null,
+                    }"
+                >
+                    <span :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
+                    <span style="position: absolute; left: 50%" v-if="!finalShowStates['translation']" v-html="eyecon"></span>
+                </td>
+            </tr>
         </table>
     </div>
 </template>
 <script>
 import SvgButton from './SvgButton.vue'
+import ContentContextMenu from './ContentContextMenu.vue'
 
 export default {
     components: {
         SvgButton,
+        ContentContextMenu,
     },
     props: {
         data: { default: null },
@@ -111,8 +140,8 @@ export default {
         unpinIcon: getIconSvg("unpin", 18),
         bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
-        closeIcon: getIconSvg("undo", 18),
         undoIcon: getIconSvg("undo", 18),
+        showContextMenu: {hz: [], tr: [], py: [], translation: false},
     }},
     computed: {
         wordStats: function() {
@@ -122,16 +151,6 @@ export default {
                 stats.push(this.finalShowStates.hz[i] ? this.videoWordStats[key] : null);
             }
             return stats;
-        },
-        peekStates: function() {
-            const states = this.$store.state.peekStates;
-            states['translation'] = states['translation'] && !this.showStates['translation'];
-            for (var i = 0; i < this.wordData.hz.length; i++) {
-                for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = states[type][i] && !this.showStates[type][i];
-                }
-            }
-            return states;
         },
         truncateTrLengths: function() {
             let outLengths = [];
@@ -206,10 +225,10 @@ export default {
         },
         finalShowStates: function() {
             // Show states that include the peek states
-            const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.showStates['translation'] || this.peekStates['translation']};
+            const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.showStates['translation'] || this.purePeekStates['translation']};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = this.showStates[type][i] || this.peekStates[type][i];
+                    states[type][i] = this.showStates[type][i] || this.purePeekStates[type][i];
                 }
             }
             return states;
@@ -220,6 +239,23 @@ export default {
         learningStates: function() {
             return this.getStates(KnowledgeLearning);
         },
+    },
+    updated: function() {
+        // New text may have changed the size of the caption, so need to update width of full translation table
+        const self = this;
+        this.$nextTick(function () {
+            if (! [null, undefined].includes(self.$refs.captioncontent)) {
+                const topLeftWidth = self.$refs.wordcontent.children[0].children[0].clientWidth;
+                const totalRowWidth = self.$refs.wordcontent.clientWidth;
+                self.$refs.fulltranslation.style.minWidth = (totalRowWidth - topLeftWidth) + 'px';
+            }
+        });
+    },
+    mounted: function() {
+        const self = this;
+        document.addEventListener('click', function(event) {
+            self.resetShowContextMenu(self.wordData);
+        });
     },
     watch: {
         data: {
@@ -240,8 +276,25 @@ export default {
                 }
             },
         },
+        wordData: function(newData, oldData) {
+            this.resetShowContextMenu(newData);
+        }
     },
     methods: {
+        resetShowContextMenu: function(newData) {
+            const show = {
+                translation: false,
+                hz: [],
+                tr: [],
+                py: []
+            }
+            for (let i = 0; i < newData.hz.length; i++) {
+                show.hz.push(false);
+                show.tr.push(false);
+                show.py.push(false);
+            }
+            this.showContextMenu = show;
+        },
         isPeek: function(type) {
             return (
                 !this.$store.state.peekStates.rows[type] &&
@@ -251,7 +304,7 @@ export default {
         getClasses: function(type, i) {
             const cl = {
                 captioncard: true,
-                peeking: i !== null && this.peekStates[type][i],
+                peeking: i !== null && this.purePeekStates[type][i],
                 captioncardhidden: i !== null && ! this.finalShowStates[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
                 learning: i !== null && this.learningStates[type][i],
@@ -280,6 +333,28 @@ export default {
                 this.wordData.translation
             );
         },
+        clickContextMenu(action, type, i) {
+            const d = this.$store.state.DICT;
+            const k = this.$store.state.knowledge;
+
+            const pys = this.wordData.pys[i];
+            const hz = this.wordData.hz[i];
+            const tr = this.wordData.tr[i];
+
+            let setState = null;
+            if (action === 'know') setState = KnowledgeKnown;
+            else if (action === 'learn') setState = KnowledgeLearning;
+            else if (action === 'remove') setState = KnowledgeUnknown;
+
+            if (setState !== null) {
+                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, setState, true);
+            }
+            else if (action === 'dict') {
+                let [startIdx, endIdx, ...rest] = this.data.alignments[i];
+                this.$store.commit('setShowDictionary', {val: true, range: [startIdx, endIdx]});
+            }
+            this.resetShowContextMenu(this.wordData);
+        },
         click: function(type, i = null) {
             if (type === 'translation' && this.showStates[type] === false) {
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
@@ -288,31 +363,18 @@ export default {
 
             if (this.wordData.pys[i] === null) return;
 
-            const d = this.$store.state.DICT;
-            const k = this.$store.state.knowledge;
-
-            const pys = this.wordData.pys[i];
-            const hz = this.wordData.hz[i];
-            const tr = this.wordData.tr[i];
-            if (this.showStates[type][i] === false) {
-                if (! this.peekStates[type][i]) {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
-                }
-                else if (this.knownStates[type][i]) {
-                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeLearning, true);
-                }
-                else if (this.learningStates[type][i]) {
-                    applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeUnknown, true);
-                }
+            if (this.showStates[type][i] === false && ! this.purePeekStates[type][i]) {
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
             else {
-                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
+                const lastVal = this.showContextMenu[type][i];
+                this.resetShowContextMenu(this.wordData);
+                this.showContextMenu[type][i] = ! lastVal;
             }
         },
         peek: function(type, i) {
             if (this.showStates[type][i] === false) {
-                if (! this.peekStates[type][i]) {
+                if (! this.purePeekStates[type][i]) {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
                 }
             }
@@ -447,6 +509,7 @@ export default {
 }
 
 .captioncontent {
+    width: 100%;
     display: inline-block;
     padding-left: 0.25em !important;
     padding-right: 2em !important;
@@ -465,6 +528,7 @@ export default {
 }
 
 .contenttable {
+    display: inline-block;
     text-align: center;
     table-layout: fixed;
     border-spacing: 0.3em;
@@ -490,12 +554,9 @@ export default {
 
 .captioncard {
     position: relative;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* IE10+/Edge */
-    user-select: none; /* Standard */
+    user-select: none;
     white-space: nowrap;
-    border: 1px solid black;
+    border: 1px solid transparent;
     border-radius: 5px;
 }
 
@@ -503,19 +564,15 @@ export default {
     cursor: pointer;
 }
 
-.captioncard:not(.peeking):not(.nonhanzi):hover {
+.captioncard:not(.nonhanzi):hover {
     background-color: gray;
 }
 
-.captioncard.peeking:not(.nonhanzi):hover {
-    background-color: gray;
-}
-
-.captioncard:not(.peeking):not(.nonhanzi):active {
+.captioncard:not(.nonhanzi):active {
     background-color: lightgray;
 }
 
-.captioncard.peeking {
+.captioncard.peeking:not(.fulltranslation) {
     padding-left: 2px;
     padding-right: 2px;
 }

@@ -108,7 +108,7 @@ export default {
         },
         showDictionary: function(event) {
             if (this.data && ! this.data.dummy) {
-                this.$store.commit('setShowDictionary', true);
+                this.$store.commit('setShowDictionary', {val: true});
             }
         },
         moveMouseDown: function(event) {
@@ -184,7 +184,7 @@ export default {
 
 <style>
 .captionmenu {
-    background: black;
+    background: rgba(0, 0, 0, 0.85);
     position: absolute;
     top: -30px;
     display: inline-block;

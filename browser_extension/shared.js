@@ -190,24 +190,25 @@ const KnowledgeUnknown = 0;
 const KnowledgeKnown = 1;
 const KnowledgeLearning = 2;
 
-function setKnowledge(dict, key, val) {
+function setKnowledge(dict, key, newState) {
     let currCounts = dict[key];
     if (currCounts === undefined) {
         currCounts = [0, 0];
     }
 
-    if (val === KnowledgeUnknown) {
-        // If we're setting as unknown, must have been "learning before"
-        currCounts[KnowledgeLearning-1] -= 1;
+    let prevState = KnowledgeUnknown;
+    if (currCounts[KnowledgeLearning-1] > 0) {
+        prevState = KnowledgeLearning;
     }
-    else if (val === KnowledgeKnown) {
-        currCounts[KnowledgeKnown-1] += 1;
+    else if (currCounts[KnowledgeKnown-1] > 0) {
+        prevState = KnowledgeKnown;
     }
-    else if (val === KnowledgeLearning) {
-        // If we're setting "learning", must have been "known" before
-        currCounts[KnowledgeKnown-1] -= 1;
-        currCounts[KnowledgeLearning-1] += 1;
+
+    if (prevState > 0) {
+        currCounts[prevState-1] -= 1;
     }
+
+    currCounts[newState-1] += 1;
 
     dict[key] = currCounts;
     return currCounts;

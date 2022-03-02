@@ -22,7 +22,6 @@
             v-bind:currTime="currTime"
             v-bind:AVElement="AVElement"
             v-bind:videoFrameSize="videoFrameSize"
-            v-bind:videoCaptionTopPx="videoCaptionTopPx"
         />
     </div>
 </template>
@@ -395,10 +394,6 @@ export default {
             if (this.$store.state.captionData === null) return null;
             return this.$store.state.captionData['frame_size'];
         },
-        videoCaptionTopPx: function() {
-            if (this.$store.state.captionData === null || this.videoFrameSize === undefined) return null;
-            return Math.round(this.$store.state.captionData['caption_top'] * this.videoFrameSize[0]);
-        },
         currentCaptionIdx: function() {
             const captionData = this.$store.state.captionData;
             if (captionData === null) return null;
@@ -449,12 +444,11 @@ export default {
 
 .zimucaptiondiv {
     color: white;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.85);
     text-align: left;
     font-family: 'Heiti SC';
     font-size: 18px;
     padding: 0px;
     min-width: 7em;
-    opacity: 0.85;
 }
 </style>

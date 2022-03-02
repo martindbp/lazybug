@@ -37,7 +37,6 @@ export default {
         currTime: { default: null },
         AVElement: { default: null },
         videoFrameSize: { default: null },
-        videoCaptionTopPx: { default: null },
         numBlurLayers: { default: 4 },
         blurPadding: { default: 5 },
         blurSidePadding: { default: 20 },
@@ -95,8 +94,6 @@ export default {
             const blurSidePadding = Math.ceil((videoRect.width / DEFAULT_WIDTH) * this.blurSidePadding);
             xMin -= blurSidePadding;
             xMax += blurSidePadding;
-            yMin += this.videoCaptionTopPx;
-            yMax += this.videoCaptionTopPx;
             for (var i = 0; i < this.$el.children.length; i++) {
                 const blurDiv = this.$el.children[i];
                 const padding = Math.ceil(1.0 * i * this.blurPadding); // increase the padding for each div
