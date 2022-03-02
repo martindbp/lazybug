@@ -91,6 +91,9 @@ def _join_predictions(results):
         return None, '', 0, np.array([]), np.array([])
     else:
         results = [x for x in results if len(x[1]) > 0]  # only non-empty predictions
+        if len(results) == 0:
+            return None, '', 0, np.array([]), np.array([])
+
         results = sorted(results, key=lambda x: x[0][0][0]) # sort by x value of upper-left corner
         ul = [min(x for ((x, _), *_), *_ in results), min(y for ((_, y), *_), *_ in results)]
         ur = [max(x for (_, (x, _), *_), *_ in results), min(y for (_, (_, y), *_), *_ in results)]
@@ -515,6 +518,11 @@ def replace_or_add_line(
                 # This happened when ocr output "[blank]". Keep this just in case
                 print('WARNING: out of bounds')
                 return 1.0
+
+            if last_line.text[i] == ' ':
+                # We have a very low penalty for substituting a space, since there are often spurious spaces in the OCR
+                return 0.01
+
             return jeffrey_div(new_line.prob_distributions[j], last_line.prob_distributions[i])
 
         dist, ops = weighted_levenshtein(last_line.text, new_line.text, _subst_cost, return_ops=True)
