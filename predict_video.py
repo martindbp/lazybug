@@ -753,10 +753,7 @@ def predict_video_captions(
 ):
     global easy_ocrs, cnocr
     SUBSAMPLE_FRAME_RATE = 10
-
-    caption_images = get_video_caption_area(
-        video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
-    )
+    print('Processing video', video_path)
 
     lang = None
     if caption_type == 'hanzi':
@@ -783,34 +780,39 @@ def predict_video_captions(
         alphabet = cnocr._alphabet
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
-    bounding_rects = []
     frame_size = None
-    for i, (frame_time, crop, frame) in enumerate(caption_images):
-        if i % SUBSAMPLE_FRAME_RATE != 0:
-            continue
+    for _ in range(2):
+        bounding_rects = []
+        caption_images = get_video_caption_area(
+            video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
+        )
 
-        if frame_size is None:
-            frame_size = frame.shape[:2]
+        for i, (frame_time, crop, frame) in enumerate(caption_images):
+            if i % SUBSAMPLE_FRAME_RATE != 0:
+                continue
 
-        line = predict_line(ocr_fn, crop, frame_time, font_height)
-        if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
-            bounding_rects.append(line.bounding_rect)
+            if frame_size is None:
+                frame_size = frame.shape[:2]
 
-        if len(bounding_rects) > 10:
-            break
+            line = predict_line(ocr_fn, crop, frame_time, font_height)
+            if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
+                bounding_rects.append(line.bounding_rect)
 
-    caption_top_px = int(caption_top * frame.shape[0])
-    caption_bottom_px = int(caption_bottom * frame.shape[0])
-    crop_scale = (caption_bottom_px - caption_top_px) / font_height
-    mean_crop_caption_top = np.array([min_y for (_, _, min_y, _) in bounding_rects]).mean()
-    mean_crop_caption_bottom = np.array([max_y for (_, _, _, max_y) in bounding_rects]).mean()
-    expected_crop_caption_top = (out_height - font_height) / 2
-    expected_crop_caption_bottom = out_height - expected_crop_caption_top
+            if len(bounding_rects) > 10:
+                break
 
-    top_diff_px = (mean_crop_caption_top - expected_crop_caption_top) * crop_scale
-    bottom_diff_px = (mean_crop_caption_bottom - expected_crop_caption_bottom) * crop_scale
-    caption_top += top_diff_px / frame_size[0]
-    caption_bottom += bottom_diff_px / frame_size[0]
+        caption_top_px = int(caption_top * frame.shape[0])
+        caption_bottom_px = int(caption_bottom * frame.shape[0])
+        crop_scale = (caption_bottom_px - caption_top_px) / font_height
+        mean_crop_caption_top = np.array([min_y for (_, _, min_y, _) in bounding_rects]).mean()
+        mean_crop_caption_bottom = np.array([max_y for (_, _, _, max_y) in bounding_rects]).mean()
+        expected_crop_caption_top = (out_height - font_height) / 2
+        expected_crop_caption_bottom = out_height - expected_crop_caption_top
+
+        top_diff_px = (mean_crop_caption_top - expected_crop_caption_top) * crop_scale
+        bottom_diff_px = (mean_crop_caption_bottom - expected_crop_caption_bottom) * crop_scale
+        caption_top += top_diff_px / frame_size[0]
+        caption_bottom += bottom_diff_px / frame_size[0]
 
     caption_images = get_video_caption_area(
         video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
