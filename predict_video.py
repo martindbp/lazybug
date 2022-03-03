@@ -912,7 +912,7 @@ def predict_video_captions(
     return caption_lines, frame_size
 
 
-@task
+@task(serializer=json)
 def update_conditional_captions(caption_lines, conditional_captions):
     # We update the original conditional captions and return those instead
     for line in caption_lines:
@@ -1301,19 +1301,23 @@ def process_video_captions(
     videos_path: str,
     *,
     force_redo: bool = False,
+    video_id: str = None,
 ):
     os.makedirs('data/remote/private/caption_data/raw_captions', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/meta_trimmed_captions', exist_ok=True)
     videos = get_video_paths(show_name=show_name, videos_path=videos_path)
 
     out = []
-    for (video_id, video_path, params) in videos:
+    for (vid, video_path, params) in videos:
+        if video_id is not None and video_id != vid:
+            continue
+
         video_length, _, frame_size = get_video_length_size(video_path)
-        captions_vtt_path = f'data/remote/private/caption_data/translations/{video_id}.zh.vtt'
+        captions_vtt_path = f'data/remote/private/caption_data/translations/{vid}.zh.vtt'
         if os.path.exists(captions_vtt_path):
             json_captions = convert_vtt_to_caption_format(captions_vtt_path, params, video_length, frame_size)
-            meta_captions = add_metadata(json_captions, video_id)
-            meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-hanzi.json'
+            meta_captions = add_metadata(json_captions, vid)
+            meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-hanzi.json'
             out.append(meta_captions)
             continue
 
@@ -1339,15 +1343,15 @@ def process_video_captions(
                 conditional_captions=conditional_captions
             )
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
-            json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param_id}.json'
+            json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
 
             if depends_on is not None:
-                json_captions = update_conditional_captions(captions, conditional_captions)
-                json_captions >> f'data/remote/private/caption_data/raw_captions/{video_id}-{param["type"]}.json'
+                json_captions_joined = update_conditional_captions(captions, conditional_captions)
+                json_captions_joined >> f'data/remote/private/caption_data/raw_captions/{vid}-{param["type"]}.json'
 
-            meta_captions = add_metadata(json_captions, video_id)
+            meta_captions = add_metadata(json_captions, vid)
             trimmed_captions = trim_bad_captions(meta_captions)
-            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{video_id}-{param_id}.json'
+            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-{param_id}.json'
 
             prev_captions[param_id] = trimmed_captions
             prev_params[param_id] = param
