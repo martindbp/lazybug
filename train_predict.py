@@ -1,5 +1,7 @@
 import io
 import random
+from functools import partial
+
 import cv2
 from merkl import task, FileRef, pipeline, Future
 import generate_dataset
@@ -64,6 +66,11 @@ def train_unet(images_dir, masks_dir, epochs=8, lr=0.001, batch_size=4, net=None
     )
 
 
+def write_hash_file(filename, hash):
+    with open(filename, 'w') as f:
+        f.write(hash)
+
+
 @pipeline(cache_in_memory=True)
 def train_pipeline():
     seed = 42
@@ -72,8 +79,7 @@ def train_pipeline():
 
     net = train_unet(images_dir, masks_dir)
     net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
-    with open('data/remote/private/text_segmentation_model.pth.hash', 'w') as f:
-        f.write(net.hash)
+    net.on_completed = partial(write_hash_file, filename='data/remote/private/text_segmentation_model.pth.hash', hash=net.hash)
 
     return net
 
@@ -86,8 +92,7 @@ def finetune_pipeline():
     net = _get_latest_net()
     net = train_unet(images_dir, masks_dir, epochs=4, lr=0.0005, net=net)
     net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
-    with open('data/remote/private/text_segmentation_model.pth.hash', 'w') as f:
-        f.write(net.hash)
+    net.on_completed = partial(write_hash_file, filename='data/remote/private/text_segmentation_model.pth.hash', hash=net.hash)
 
     return net
 
