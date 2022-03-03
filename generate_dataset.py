@@ -76,6 +76,9 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
     alpha = cutout[..., -1].astype('float') / 255
     alpha = cv2.blur(alpha, (3, 3))
     background = cv2.imread(background_filename)
+    # Background could be wider or narrower
+    background = _make_width(background, foreground.shape[1])
+
     if brighten:
         background = _increase_brightness(background, 200)
 
@@ -94,15 +97,11 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
     composite_filename = FileRef(ext='jpg')
     cv2.imwrite(composite_filename, composite)
 
-    #cv2.imshow('foreground', cutout[..., :3])
-    #cv2.imshow('background', background)
-    cv2.imshow('composite', composite)
-    cv2.imshow('composite prob', prob)
-    #cv2.imshow('alpha', alpha)
-    cv2.waitKey(1)
-
     mask = 255*(prob > 255//2).astype('uint8')
     mask = _make_width(mask, out_width)
+    cv2.imshow('composite mask', mask)
+    cv2.imshow('composite', composite)
+    cv2.waitKey(1)
     mask_filename = FileRef(ext='png')
     cv2.imwrite(mask_filename, mask)
     return composite_filename, mask_filename
