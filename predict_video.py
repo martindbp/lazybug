@@ -539,6 +539,9 @@ def save_caption_data(caption_line, alphabet):
     h.update(bytes(caption_line.text, 'utf-8'))
     h.update(bytes(str(caption_line.t0), 'utf-8'))
     h.update(bytes(str(caption_line.t1), 'utf-8'))
+    for x in caption_line.bounding_rect:
+        h.update(bytes(str(x), 'utf-8'))
+
     data_hash = h.hexdigest()
     caption_line.data_hash = data_hash
 
