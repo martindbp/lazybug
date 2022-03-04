@@ -11,6 +11,8 @@ for filename in files:
     if filename.endswith('merkl'):
         continue
 
+    print('Processing', filename)
+
     with open(filename, 'r') as f:
         data = json.loads(f.read())
 
@@ -24,13 +26,13 @@ for filename in files:
         for rect in rects:
             if rect is None or rect[0] is None:
                 continue
-            print('Prev rect', rect)
+            #print('Prev rect', rect)
 
             rect[2] += y_offset
             rect[3] += y_offset
             rect[2] = round(rect[2])
             rect[3] = round(rect[3])
-            print('After rect', rect)
+            #print('After rect', rect)
 
-    #with open(filename, 'w') as f:
-        #json.dump(data, f)
+    with open(filename, 'w') as f:
+        json.dump(data, f)
