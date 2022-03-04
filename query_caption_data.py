@@ -29,8 +29,8 @@ for filename in glob.glob('data/remote/public/subtitles/*.json'):
             if output_training_data:
                 print(' '.join(line[0]))
                 pys = []
-                for (_, _, hz, py, tr) in words:
-                    pys.append(normalize_pinyin(py))
+                for (_, _, hz, word_pys, tr) in words:
+                    pys.append(''.join(py[1] for py in word_pys))
 
                 print(''.join(pys))
             else:
@@ -38,5 +38,5 @@ for filename in glob.glob('data/remote/public/subtitles/*.json'):
                 for (_, _, hz, py, tr) in words:
                     print('\t', hz, py, tr)
 
-    if not output_training_data:
-        print('')
+    #if not output_training_data:
+        #print('')
