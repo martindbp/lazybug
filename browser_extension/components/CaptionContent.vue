@@ -109,14 +109,23 @@
                     @click.stop.prevent="click('translation')"
                     :class="{
                         captioncard: true,
-                        peeking: purePeekStates['translation'],
+                        peeking: purePeekStates.translation,
+                        learning: learningStates.translation,
                         fulltranslation: true,
-                        placeholder: !finalShowStates['translation'],
+                        placeholder: !finalShowStates.translation,
                         showborder: data !== null,
                     }"
                 >
-                    <span :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
+                    <span class="cardcontent" :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
                     <span style="position: absolute; left: 50%" v-if="!finalShowStates['translation']" v-html="eyecon"></span>
+                    <ContentContextMenu
+                        v-if="showContextMenu.translation"
+                        type="translation"
+                        :learn="! learningStates.translation"
+                        :reset="learningStates.translation"
+                        :dict="false"
+                        :click="clickContextMenu"
+                    />
                 </td>
             </tr>
         </table>
@@ -317,7 +326,8 @@ export default {
             return cl;
         },
         getStates: function(compareTo) {
-            const states = {'py': [], 'hz': [], 'tr': []};
+            const translationState = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey('translation'))
+            const states = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
                     const state = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i));
@@ -326,12 +336,12 @@ export default {
             }
             return states;
         },
-        knowledgeKey: function(type, i) {
+        knowledgeKey: function(type, i = null) {
             return getKnowledgeKey(
                 type,
-                this.wordData.hz[i],
-                this.wordData.pys[i],
-                this.wordData.tr[i],
+                i === null ? null : this.wordData.hz[i],
+                i === null ? null : this.wordData.pys[i],
+                i === null ? null : this.wordData.tr[i],
                 this.wordData.translation
             );
         },
@@ -339,9 +349,9 @@ export default {
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
 
-            const pys = this.wordData.pys[i];
-            const hz = this.wordData.hz[i];
-            const tr = this.wordData.tr[i];
+            const pys = i === null ? null : this.wordData.pys[i];
+            const hz = i === null ? null : this.wordData.hz[i];
+            const tr = i === null ? null : this.wordData.tr[i];
 
             let setState = null;
             if (action === 'know') setState = KnowledgeKnown;
@@ -359,7 +369,14 @@ export default {
         },
         click: function(type, i = null) {
             if (type === 'translation' && this.showStates[type] === false) {
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
+                if (this.finalShowStates[type] === true) {
+                    const lastVal = this.showContextMenu[type];
+                    this.resetShowContextMenu(this.wordData);
+                    this.showContextMenu[type] = ! lastVal;
+                }
+                else {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                }
                 return;
             }
 
