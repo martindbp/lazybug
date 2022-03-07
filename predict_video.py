@@ -534,8 +534,9 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
     return caption_line
 
 
-def save_caption_data(caption_line, alphabet):
+def save_caption_data(video_id, caption_line, alphabet):
     h = hashlib.md5()
+    h.update(bytes(video_id, 'utf-8'))
     h.update(bytes(caption_line.text, 'utf-8'))
     h.update(bytes(str(caption_line.t0), 'utf-8'))
     h.update(bytes(str(caption_line.t1), 'utf-8'))
@@ -570,6 +571,7 @@ def save_caption_data(caption_line, alphabet):
 
 
 def replace_or_add_line(
+    video_id,
     new_line,
     caption_lines,
     alphabet,
@@ -687,7 +689,7 @@ def replace_or_add_line(
             # Need to save the caption data before zeroing out
             if do_save_caption_data:
                 print(f'Saving {len(caption_lines)}')
-                save_caption_data(caption_lines[-1], alphabet)
+                save_caption_data(video_id, caption_lines[-1], alphabet)
 
             if zero_out_numpy:
                 print(f'Zeroing out {len(caption_lines)}')
@@ -741,6 +743,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
 @task(deps=[net])
 def predict_video_captions(
     video_path: str,
+    video_id: str,
     caption_top: float,
     caption_bottom: float,
     start_time_s: float=0,
@@ -889,6 +892,7 @@ def predict_video_captions(
                 #if (line.t0 == 0 or line.t1 == 0) and line.text != '':
                     #breakpoint()
                 line = replace_or_add_line(
+                    video_id,
                     line,
                     caption_lines,
                     alphabet,
@@ -910,7 +914,7 @@ def predict_video_captions(
 
     # Need to save the last caption (the rest are saved in `replace_or_add_line` before zeroing out)
     if caption_lines[-1].text != '' and do_save_caption_data:
-        save_caption_data(caption_lines[-1], alphabet)
+        save_caption_data(video_id, caption_lines[-1], alphabet)
 
     return caption_lines, frame_size
 
@@ -933,14 +937,6 @@ def update_conditional_captions(caption_lines, conditional_captions):
         cond_rect[3] = max(cond_rect[3], line.bounding_rect[3])  # max y
         cond_line[3] = cond_rect
     return conditional_captions
-
-
-@task(ignore_args=['args', 'kwargs'])
-def get_video_captions(caption_id, args=[], kwargs={}):
-    print(caption_id)
-    # This task only caches the predicted results given the site name and video id, instead of the parameters used
-    captions, frame_size = predict_video_captions(*args, **kwargs)
-    return captions.eval(), frame_size.eval()
 
 
 @task(serializer=json, outs=1)
@@ -1037,42 +1033,6 @@ def compare_video_captions_to_truth(captions, true_srt):
             total_chars += len(caption[0])
 
     return errors, total_chars
-
-
-@pipeline
-def compare_pipeline(
-    true_srt: str,
-    video_path: str,
-    caption_top: float,
-    caption_bottom: float,
-    start_time_s: float=0,
-    end_time_s: float=None,
-    replace_levenshtein_threshold=1.0,
-):
-    captions, _ = predict_video_captions(
-        video_path, caption_top, caption_bottom, start_time_s, end_time_s,
-        replace_levenshtein_threshold=replace_levenshtein_threshold
-    )
-    return compare_video_captions_to_truth(captions, true_srt)
-
-
-@pipeline
-def to_srt_pipeline(
-    out_path: str,
-    video_path: str,
-    caption_top: float,
-    caption_bottom: float,
-    start_time_s: float=0,
-    end_time_s: float=None,
-    replace_levenshtein_threshold=1.0,
-):
-    captions, _ = predict_video_captions(
-        video_path, caption_top, caption_bottom, start_time_s, end_time_s,
-        replace_levenshtein_threshold=replace_levenshtein_threshold
-    )
-    srt_data = caption_lines_to_srt(captions)
-    srt_data > out_path
-    return srt_data
 
 
 def timestamp_to_seconds(timestamp):
@@ -1336,6 +1296,7 @@ def process_video_captions(
 
             captions, frame_size = predict_video_captions(
                 video_path,
+                video_id,
                 param['caption_top'],
                 param['caption_bottom'],
                 param.get('start_time', None),
