@@ -72,14 +72,16 @@ selected_indices = set()
 
 if args.show != '':
     empty_hashes = []
-    with open(f'{CAPTION_DATA_DIR}/cutouts/{args.show}.json', 'r') as f:
-        print('Read current background hashes file')
-        empty_hashes = json.load(f)
+    show_file = f'{CAPTION_DATA_DIR}/cutouts/{args.show}.json'
+    if os.path.exists(show_file):
+        with open(show_file, 'r') as f:
+            print('Read current background hashes file')
+            empty_hashes = json.load(f)
 
     for line in lines:
         if line[0] == '' and os.path.exists(f'{CAPTION_DATA_DIR}/images/{line[-1]}.jpg'):
             empty_hashes.append(line[-1])
-    with open(f'{CAPTION_DATA_DIR}/cutouts/{args.show}.json', 'w') as f:
+    with open(show_file, 'w') as f:
         print('Writing background hashes file')
         json.dump(list(set(empty_hashes)), f)
 
@@ -120,6 +122,10 @@ def draw_frame():
 
         if img_buffer is None:
             img_buffer = np.zeros((height, 3*line_width, 3), 'uint8')
+        else:
+            if 3*line_width != img_buffer.shape[1]:
+                print('Skipping line', i, 'because image width is different')
+                continue
 
         color = 0
         if i in selected_indices:
@@ -135,6 +141,7 @@ def draw_frame():
 
     if img_buffer is not None:
         cv2.imshow('img', img_buffer)
+
 
 def handle_click(event,x,y,flags,param):
     #print(event)
