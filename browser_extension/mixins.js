@@ -1,4 +1,4 @@
-app.mixin({
+const mixin = {
     methods: {
         sm2tr(text) {
             if (this.$store.state.DICT === null) return null;
@@ -27,6 +27,12 @@ app.mixin({
             }
 
             return trText;
+        },
+        appendSessionLog(data) {
+            appendSessionLog(this.$store.state.captionId, this.$store.state.sessionTime, data);
+        },
+        createSession() {
+            createSession(this.$store.state.captionId, this.$store.state.sessionTime);
         },
     },
     computed: {
@@ -88,5 +94,5 @@ app.mixin({
             return states;
         },
     },
-});
+};
 

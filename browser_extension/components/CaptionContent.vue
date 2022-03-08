@@ -136,6 +136,7 @@ import SvgButton from './SvgButton.vue'
 import ContentContextMenu from './ContentContextMenu.vue'
 
 export default {
+    mixins: [mixin],
     components: {
         SvgButton,
         ContentContextMenu,
@@ -360,6 +361,7 @@ export default {
 
             if (setState !== null) {
                 applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, setState, true);
+                this.appendSessionLog([getEvent(action, type), i]);
             }
             else if (action === 'dict') {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
@@ -376,6 +378,7 @@ export default {
                 }
                 else {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
+                    this.appendSessionLog([getEvent('peek', 'translation')]);
                 }
                 return;
             }
@@ -384,6 +387,7 @@ export default {
 
             if (this.showStates[type][i] === false && ! this.purePeekStates[type][i]) {
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
+                this.appendSessionLog([getEvent('peek', 'tr'), i]);
             }
             else {
                 const lastVal = this.showContextMenu[type][i];
@@ -391,22 +395,18 @@ export default {
                 this.showContextMenu[type][i] = ! lastVal;
             }
         },
-        peek: function(type, i) {
-            if (this.showStates[type][i] === false) {
-                if (! this.purePeekStates[type][i]) {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
-                }
-            }
-        },
         clickPeekRow: function(type) {
             if (this.$store.state.options.pin[type] === true) {
                 this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: false});
+                this.appendSessionLog([getEvent('pin_row', type), false]);
             }
             else if (this.$store.state.peekStates.rows[type] === true) {
                 this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: true});
+                this.appendSessionLog([getEvent('pin_row', type), true]);
             }
             else {
                 this.$store.commit('setPeekState', {'type': type});
+                this.appendSessionLog([getEvent('peek_row', type)]);
             }
         },
         applyKnownLvls: function() {
@@ -427,6 +427,7 @@ export default {
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as known');
                         applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
+                        this.appendSessionLog([getEvent('know_auto', type), i]);
                     }
                 }
             }
@@ -462,10 +463,12 @@ export default {
                 if (hasLearning) {
                     console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as learning');
                     applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeLearning, true);
+                    this.appendSessionLog([getEvent('learn_auto', 'py'), i]);
                 }
                 else if (! hasUnknown) {
                     console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as known');
                     applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeKnown, true);
+                    this.appendSessionLog([getEvent('know_auto', 'py'), i]);
                 }
             }
         },
@@ -513,6 +516,7 @@ export default {
                     if (knowAll[type]) {
                         console.log('applyKnownCompoundWordsNotInDict', type, hz, pys);
                         applyKnowledge(d, k, type, hz, pys, null, null, KnowledgeKnown, true);
+                        this.appendSessionLog([getEvent('know_auto', type), i]);
                     }
                 }
             }

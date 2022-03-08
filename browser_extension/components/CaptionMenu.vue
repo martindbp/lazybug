@@ -27,6 +27,7 @@ import OptionsDialog from './OptionsDialog.vue'
 import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
+    mixins: [mixin],
     props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'AVElement'],
     components: {
         SvgButton,
@@ -154,6 +155,7 @@ export default {
             this.AVElement.currentTime = goToCaption.t0 + 1e-3;
             this.AVElement.play();
             this.$emit('seeked');
+            this.appendSessionLog([eventsMap['EVENT_REPLAY_CAPTION']]);
         },
         playPause: function(event) {
             if (this.paused) this.AVElement.play();
@@ -174,6 +176,7 @@ export default {
                 states['tr'][i] = true;
             }
             this.$store.commit('setPeekStates', states);
+            this.appendSessionLog([eventsMap['EVENT_PEEK_ALL']]);
         },
     },
     computed: {

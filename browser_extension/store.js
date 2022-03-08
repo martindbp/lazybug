@@ -12,6 +12,9 @@ const DEFAULT_SHORTCUTS = {
 
 const store = new Vuex.Store({
     state: {
+        captionId: null,
+        sessionTime: null,
+        captionData: null,
         DICT: null,
         HSK_WORDS: null,
         knowledge: Vue.ref({}),
@@ -53,7 +56,6 @@ const store = new Vuex.Store({
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
         }),
-        captionData: null,
     },
     mutations: {
         setIsMovingCaption(state, val) {
@@ -61,6 +63,18 @@ const store = new Vuex.Store({
         },
         setTimingOffset(state, val) {
             state.timingOffset = val;
+        },
+        setCaptionId(state, val) {
+            state.captionId = val;
+            state.sessionTime = Date.now();
+            if ([null, undefined].includes(val)) return;
+            createSession(state.captionId, state.sessionTime);
+            // Append the initial pinned peek values
+            for (const type of ['py', 'hz', 'tr', 'translation']) {
+                if (state.options.pin[type] === true) {
+                    appendSessionLog(state.captionId, state.sessionTime, [getEvent('pin_row', type), true]);
+                }
+            }
         },
         setCaptionData(state, val) {
             state.captionData = val;
@@ -70,7 +84,16 @@ const store = new Vuex.Store({
         },
         setShowDictionary(state, val) {
             if (! [null, undefined].includes(val.val)) state.showDictionary = val.val;
-            if (val.range) state.showDictionaryRange = val.range;
+            if (val.range) {
+                state.showDictionaryRange = val.range;
+                if (val.range[0] >= 0) {
+                    appendSessionLog(
+                        state.captionId,
+                        state.sessionTime,
+                        [eventsMap['EVENT_SHOW_DICTIONARY_RANGE'], val.range[0], val.range[1]]
+                    );
+                }
+            }
         },
         setKnowledge(state, knowledge) {
             state.knowledge = knowledge;

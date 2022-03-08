@@ -44,6 +44,7 @@
 
 
 export default {
+    mixins: [mixin],
     props: ['caption'],
     components: { },
     data: function() { return {

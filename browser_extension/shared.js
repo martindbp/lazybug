@@ -1,3 +1,46 @@
+const events = [
+    'EVENT_SHOW_CAPTION_IDX',
+    'EVENT_REPLAY_CAPTION',
+    'EVENT_SHOW_DICTIONARY_RANGE',
+    'EVENT_PEEK_ALL',
+    'EVENT_PEEK_ROW_PY',
+    'EVENT_PEEK_ROW_HZ',
+    'EVENT_PEEK_ROW_TR',
+    'EVENT_PEEK_TRANSLATION',
+    'EVENT_PIN_ROW_PY',
+    'EVENT_PIN_ROW_HZ',
+    'EVENT_PIN_ROW_TR',
+    'EVENT_PIN_ROW_TRANSLATION',
+    'EVENT_PEEK_PY',
+    'EVENT_PEEK_HZ',
+    'EVENT_PEEK_TR',
+    'EVENT_KNOW_PY',
+    'EVENT_KNOW_HZ',
+    'EVENT_KNOW_TR',
+    'EVENT_KNOW_AUTO_PY',
+    'EVENT_KNOW_AUTO_HZ',
+    'EVENT_KNOW_AUTO_TR',
+    'EVENT_LEARN_PY',
+    'EVENT_LEARN_HZ',
+    'EVENT_LEARN_TR',
+    'EVENT_LEARN_AUTO_PY',
+    'EVENT_LEARN_AUTO_HZ',
+    'EVENT_LEARN_AUTO_TR',
+    'EVENT_REMOVE_PY',
+    'EVENT_REMOVE_HZ',
+    'EVENT_REMOVE_TR',
+];
+
+const eventsMap = {};
+
+for (let i = 0; i < events.length; i++) {
+    eventsMap[events[i]] = i;
+}
+
+function getEvent(eventName, contentType) {
+    return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
+}
+
 const CAPTION_FADEOUT_TIME = 5;
 function fetchVersionedResource(filename, callback) {
     chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
@@ -39,6 +82,29 @@ function setIndexedDbData(storageName, keys, values, callback) {
 
 function clearIndexedDb() {
     chrome.runtime.sendMessage({type: 'clearIndexedDb'}, function onResponse(message) {
+        return true;
+    });
+}
+
+function createSession(captionId, sessionTime) {
+    console.log('Create session', captionId, sessionTime);
+    chrome.runtime.sendMessage({
+        type: 'createSession',
+        captionId: captionId,
+        sessionTime: sessionTime
+    }, function onResponse(message) {
+        return true;
+    });
+}
+
+function appendSessionLog(captionId, sessionTime, data) {
+    console.log('Append log', captionId, sessionTime, data);
+    chrome.runtime.sendMessage({
+        type: 'appendSessionLog',
+        captionId: captionId,
+        sessionTime: sessionTime,
+        data: data,
+    }, function onResponse(message) {
         return true;
     });
 }

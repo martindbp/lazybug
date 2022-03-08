@@ -37,6 +37,7 @@ const CAPTION_END_BUFFER_TIME = 1;
 let lastCaptionIdxGlobal = 0;
 
 export default {
+    mixins: [mixin],
     components: {CaptionContainer, CaptionBlur},
     data: function() {
         return {
@@ -151,6 +152,7 @@ export default {
         captionId: {
             immediate: true,
             handler: function() {
+                this.$store.commit('setCaptionId', this.captionId);
                 this.fetchCaptionMaybe();
             }
         },
@@ -197,6 +199,8 @@ export default {
                 this.currCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx], captionData);
                 this.minHeight = null;  // when the caption changes we reset any min height set
                 this.automaticallyPausedThisCaption = false;
+                const dt = Date.now() - this.$store.state.sessionTime;
+                this.appendSessionLog([eventsMap['EVENT_SHOW_CAPTION_IDX'], this.currentCaptionIdx, dt]);
             }
 
             if (captionData === null || this.currentCaptionIdx === null) {

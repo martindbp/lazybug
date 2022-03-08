@@ -13,7 +13,7 @@ function initIndexedDb() {
         network: 'id',
         knowledge: 'id',
         other: 'id',
-        interactionLog: 'date',
+        log: '[captionId+sessionTime]',
     });
 }
 
@@ -38,10 +38,11 @@ function getStorageData(keys, store) {
         return store.toArray().then();
     }
     console.log('Get storage', keys);
-    return store.bulkGet(keys).then(function(data) {
-        if (data) return data.map((item) => item ? item.value : null);
-        return null;
-    });
+    return store.bulkGet(keys)
+        .then(function(data) {
+            if (data) return data.map((item) => item ? item.value : null);
+            return null;
+        });
 }
 
 function updateStorageData(keys, values, store) {
@@ -124,7 +125,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
                 });
         } else {
             return getStorageData([storageFileKey], db.network)
-                .then((data) => data[0]);
+                   .then((data) => data[0]);
         }
     })
     .then(function(data) {
@@ -159,11 +160,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     else if (message.type === 'getIndexedDbData') {
         const storage = db[message.storage];
         getStorageData(message.keys, storage)
-            .then(function(data) {
-                console.log(message.keys, 'got', data);
-                sendResponse({data: data});
-            })
-            .catch((error) => sendResponse('error'));
+        .then(function(data) {
+            console.log(message.keys, 'got', data);
+            sendResponse({data: data});
+        })
+        .catch((error) => sendResponse('error'));
     }
     else if (message.type === 'setIndexedDbData') {
         const storage = db[message.storage];
@@ -176,26 +177,40 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             values = keys.map((key) => message.values[key]);
         }
         addStorageData(keys, values, storage)
+        .then(function() {
+            sendResponse();
+        })
+        .catch(function(error) {
+            console.log("Adding didn't work, trying updating instead");
+            // Adding didn't work, try updating
+            return updateStorageData(keys, values, storage)
             .then(function() {
                 sendResponse();
             })
             .catch(function(error) {
-                console.log("Adding didn't work, trying updating instead");
-                // Adding didn't work, try updating
-                return updateStorageData(keys, values, storage)
-                    .then(function() {
-                        sendResponse();
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                        sendResponse('error');
-                    });
+                console.log(error);
+                sendResponse('error');
             });
+        });
+    }
+    else if (message.type === 'createSession') {
+        db.log.add({captionId: message.captionId, sessionTime: message.sessionTime, events: []});
+    }
+    else if (message.type === 'appendSessionLog') {
+        db.log.where({captionId: message.captionId, sessionTime: message.sessionTime}).modify(
+            x => x.events.push(message.data)
+        )
+        .then(function() {
+            sendResponse();
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
     }
     else if (message.type === 'poll') {
         console.log('Polling');
-        fetch('http://localhost:8000')
-        .then(function(response) {
+        fetch('http://localhost:8000').then(function(response) {
             if (!response.ok) {
                 console.log('No server running');
                 sendResponse(null);
@@ -214,7 +229,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     else if (message.type === 'translation') {
         fetch('http://localhost:8000', { method: 'POST', body: message.data })
     }
-
 
     return true;
 });
