@@ -534,14 +534,15 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
     return caption_line
 
 
-def save_caption_data(video_id, caption_line, alphabet):
+def save_caption_data(video_id, caption_top, caption_bottom, caption_line, alphabet):
     h = hashlib.md5()
     h.update(bytes(video_id, 'utf-8'))
     h.update(bytes(caption_line.text, 'utf-8'))
     h.update(bytes(str(caption_line.t0), 'utf-8'))
     h.update(bytes(str(caption_line.t1), 'utf-8'))
-    for x in caption_line.bounding_rect:
-        h.update(bytes(str(x), 'utf-8'))
+    if caption_line.bounding_rect is not None:
+        for x in caption_line.bounding_rect:
+            h.update(bytes(str(x), 'utf-8'))
 
     data_hash = h.hexdigest()
     caption_line.data_hash = data_hash
@@ -555,6 +556,7 @@ def save_caption_data(video_id, caption_line, alphabet):
     prob_distributions_path = f'data/remote/private/caption_data/char_probability_distributions/{data_hash}.pickle'
     if caption_line.img is not None and len(caption_line.img) > 0:
         cv2.imwrite(img_path, caption_line.img, [cv2.IMWRITE_JPEG_QUALITY, 90])
+
 
     if caption_line.text != '':
         cv2.imwrite(caption_probs_path, (caption_line.probs * 255).astype('uint8'))
@@ -572,6 +574,8 @@ def save_caption_data(video_id, caption_line, alphabet):
 
 def replace_or_add_line(
     video_id,
+    caption_top,
+    caption_bottom,
     new_line,
     caption_lines,
     alphabet,
@@ -689,7 +693,7 @@ def replace_or_add_line(
             # Need to save the caption data before zeroing out
             if do_save_caption_data:
                 print(f'Saving {len(caption_lines)}')
-                save_caption_data(video_id, caption_lines[-1], alphabet)
+                save_caption_data(video_id, caption_top, caption_bottom, caption_lines[-1], alphabet)
 
             if zero_out_numpy:
                 print(f'Zeroing out {len(caption_lines)}')
@@ -893,6 +897,8 @@ def predict_video_captions(
                     #breakpoint()
                 line = replace_or_add_line(
                     video_id,
+                    caption_top,
+                    caption_bottom,
                     line,
                     caption_lines,
                     alphabet,
@@ -914,7 +920,7 @@ def predict_video_captions(
 
     # Need to save the last caption (the rest are saved in `replace_or_add_line` before zeroing out)
     if caption_lines[-1].text != '' and do_save_caption_data:
-        save_caption_data(video_id, caption_lines[-1], alphabet)
+        save_caption_data(video_id, caption_top, caption_bottom, caption_lines[-1], alphabet)
 
     return caption_lines, frame_size
 
@@ -1296,7 +1302,7 @@ def process_video_captions(
 
             captions, frame_size = predict_video_captions(
                 video_path,
-                video_id,
+                vid,
                 param['caption_top'],
                 param['caption_bottom'],
                 param.get('start_time', None),
