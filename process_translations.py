@@ -107,6 +107,8 @@ def _get_translations(all_lines, automated=True):
         # the DeepL automation browser extension, sends the text to be
         # translated, then waits for the POST reply with the translation
         text = '\n'.join(all_lines)
+        if text.strip() == '':
+            return [''] * len(all_lines)
         print('Waiting to get translation from extension: ')
         print(text)
         print('Open URL: https://www.deepl.com/translator#zh/en/')
