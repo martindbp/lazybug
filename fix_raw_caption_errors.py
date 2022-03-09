@@ -124,7 +124,7 @@ def draw_frame():
             img_buffer = np.zeros((height, 3*line_width, 3), 'uint8')
         else:
             if 3*line_width != img_buffer.shape[1]:
-                print('Skipping line', i, 'because image width is different')
+                print('Skipping line', i, hash, 'because image width is different')
                 continue
 
         color = 0
