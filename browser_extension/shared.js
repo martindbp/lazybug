@@ -33,9 +33,11 @@ const events = [
 ];
 
 const eventsMap = {};
+const reverseEventsMap = {};
 
 for (let i = 0; i < events.length; i++) {
     eventsMap[events[i]] = i;
+    reverseEventsMap[i] = events[i];
 }
 
 function getEvent(eventName, contentType) {
@@ -108,6 +110,15 @@ function appendSessionLog(state, data) {
         sessionTime: state.sessionTime,
         data: data,
     }, function onResponse(message) {
+        return true;
+    });
+}
+
+function getLog(callback) {
+    return chrome.runtime.sendMessage({
+        type: 'getLog',
+    }, function onResponse(message) {
+        callback(message.data);
         return true;
     });
 }

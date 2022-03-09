@@ -5,6 +5,7 @@
           color="green"
         />
         <div v-if="dev">
+            <q-btn label="Dashboard" @click="dashboard" />
             <q-btn label="Measure caption" @click="measureCaption" />
             <q-btn label="Print playlist" @click="printPlaylist" />
         </div>
@@ -30,6 +31,11 @@ export default {
         });
     },
     methods: {
+        dashboard: function() {
+            chrome.tabs.create({
+              url: "dashboard.html",
+            });
+        },
         updateBadge: function() {
             if (this.extensionToggle) {
                 chrome.action.setBadgeText({text:''});

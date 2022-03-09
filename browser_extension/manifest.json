@@ -4,6 +4,7 @@
     "description": "",
     "permissions": [
         "storage",
+        "tabs",
         "unlimitedStorage"
     ],
     "host_permissions": [

@@ -235,6 +235,16 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             return null;
         });
     }
+    else if (message.type === 'getLog') {
+        db.log.toArray()
+        .then(function(data) {
+            sendResponse({data: data});
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
+    }
     else if (message.type === 'translation') {
         fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse(null));
     }

@@ -232,6 +232,8 @@ export default {
                 if (message === 'error') {
                     return false;
                 }
+                if (self.$store.state.captionHash === message.hash) return true;
+
                 self.$store.state.captionHash = message.hash;
                 self.$store.state.captionData = message.data;
                 self.createSession();
