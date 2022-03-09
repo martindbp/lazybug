@@ -10,11 +10,17 @@ const DEFAULT_SHORTCUTS = {
     peekTr: 'KeyN',
 }
 
+
+function syncOptions(state) {
+    setIndexedDbData('other', ['options'], [state.options], function() {});
+}
+
 const store = new Vuex.Store({
     state: {
         captionId: null,
         sessionTime: null,
         captionData: null,
+        captionHash: null, // use this for event log
         DICT: null,
         HSK_WORDS: null,
         knowledge: Vue.ref({}),
@@ -68,13 +74,6 @@ const store = new Vuex.Store({
             state.captionId = val;
             state.sessionTime = Date.now();
             if ([null, undefined].includes(val)) return;
-            createSession(state.captionId, state.sessionTime);
-            // Append the initial pinned peek values
-            for (const type of ['py', 'hz', 'tr', 'translation']) {
-                if (state.options.pin[type] === true) {
-                    appendSessionLog(state.captionId, state.sessionTime, [getEvent('pin_row', type), true]);
-                }
-            }
         },
         setCaptionData(state, val) {
             state.captionData = val;
@@ -88,8 +87,7 @@ const store = new Vuex.Store({
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
                     appendSessionLog(
-                        state.captionId,
-                        state.sessionTime,
+                        state,
                         [eventsMap['EVENT_SHOW_DICTIONARY_RANGE'], val.range[0], val.range[1]]
                     );
                 }
@@ -148,17 +146,22 @@ const store = new Vuex.Store({
         setPeekStates(state, val) {
             state.peekStates = val;
         },
+        setBlur(state, val) {
+            state.options.blurCaptions = val;
+            syncOptions(state);
+            appendSessionLog(state, [eventsMap['EVENT_BLUR'], val]);
+        },
         setOptions(state, options) {
             state.options = options;
-            setIndexedDbData('other', ['options'], [state.options], function() {});
+            syncOptions(state);
         },
         setOption(state, option) {
             state.options[option.key] = option.value;
-            setIndexedDbData('other', ['options'], [state.options], function() {});
+            syncOptions(state);
         },
         setDeepOption(state, option) {
             state.options[option.key][option.key2] = option.value;
-            setIndexedDbData('other', ['options'], [state.options], function() {});
+            syncOptions(state);
         },
         setDict(state, dict) {
             state.DICT = dict;

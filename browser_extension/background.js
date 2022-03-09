@@ -13,7 +13,7 @@ function initIndexedDb() {
         network: 'id',
         knowledge: 'id',
         other: 'id',
-        log: '[captionId+sessionTime]',
+        log: '[captionId+captionHash+sessionTime]',
     });
 }
 
@@ -92,9 +92,10 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     const getStorageHashPromise = getStorageData([storageHashKey], db.network)
         .then((data) => data[0]);
 
+    let fetchHash = null;
     Promise.all([fetchHashPromise, getStorageHashPromise])
     .then(function(values) {
-        const fetchHash = values[0].trim();
+        fetchHash = values[0].trim();
         const storageHash = values[1];
         console.log('Got hashes', fetchHash, storageHash);
         if (fetchHash !== storageHash) {
@@ -129,7 +130,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
         }
     })
     .then(function(data) {
-        callback(data);
+        callback(data, fetchHash);
     }).catch((error) => {
         failCallback(error);
     });
@@ -141,16 +142,17 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         sendResponse();
     }
     else if (message.type === 'fetchVersionedResource') {
-        fetchVersionedResource('zimu-public', message.filename, function (data) {
-            sendResponse({data: data});
+        fetchVersionedResource('zimu-public', message.filename, function (data, hash) {
+            sendResponse({data: data, hash: hash});
         }, function(error) {
             console.log('ERROR');
             console.log(error);
+            sendResponse('error');
         });
     }
     else if (message.type === 'getCaptions') {
-        fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data) {
-            sendResponse({data: data});
+        fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
+            sendResponse({data: data, hash: hash});
             chrome.runtime.sendMessage({type: 'requestSucceeded'});
         }, function(response) {
             chrome.runtime.sendMessage({type: 'requestFailed'});
@@ -194,10 +196,17 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'createSession') {
-        db.log.add({captionId: message.captionId, sessionTime: message.sessionTime, events: []});
+        db.log.add({captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime, events: []})
+        .then(function() {
+            sendResponse(null);
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
     }
     else if (message.type === 'appendSessionLog') {
-        db.log.where({captionId: message.captionId, sessionTime: message.sessionTime}).modify(
+        db.log.where({captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime}).modify(
             x => x.events.push(message.data)
         )
         .then(function() {
@@ -227,7 +236,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'translation') {
-        fetch('http://localhost:8000', { method: 'POST', body: message.data })
+        fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse(null));
     }
 
     return true;

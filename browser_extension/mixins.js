@@ -29,10 +29,10 @@ const mixin = {
             return trText;
         },
         appendSessionLog(data) {
-            appendSessionLog(this.$store.state.captionId, this.$store.state.sessionTime, data);
+            appendSessionLog(this.$store.state, data);
         },
         createSession() {
-            createSession(this.$store.state.captionId, this.$store.state.sessionTime);
+            createSession(this.$store.state);
         },
     },
     computed: {

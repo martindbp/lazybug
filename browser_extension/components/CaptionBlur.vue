@@ -45,7 +45,7 @@ export default {
     computed: {
         toggleOn: {
             get: function() { return this.$store.state.options.blurCaptions; },
-            set: function(val) { this.$store.commit('setOption', {key: 'blurCaptions', value: val}); },
+            set: function(val) { this.$store.commit('setBlur', val); },
         },
         currRect: function() {
             let rects = this.currCaption !== null ? this.currCaption.boundingRects : [];

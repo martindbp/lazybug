@@ -29,6 +29,7 @@ const events = [
     'EVENT_REMOVE_PY',
     'EVENT_REMOVE_HZ',
     'EVENT_REMOVE_TR',
+    'EVENT_BLUR',
 ];
 
 const eventsMap = {};
@@ -86,23 +87,25 @@ function clearIndexedDb() {
     });
 }
 
-function createSession(captionId, sessionTime) {
-    console.log('Create session', captionId, sessionTime);
+function createSession(state) {
+    console.log('Create session', state.captionId, state.captionHash, state.sessionTime);
     chrome.runtime.sendMessage({
         type: 'createSession',
-        captionId: captionId,
-        sessionTime: sessionTime
+        captionId: state.captionId,
+        captionHash: state.captionHash,
+        sessionTime: state.sessionTime
     }, function onResponse(message) {
         return true;
     });
 }
 
-function appendSessionLog(captionId, sessionTime, data) {
-    console.log('Append log', captionId, sessionTime, data);
+function appendSessionLog(state, data) {
+    console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data);
     chrome.runtime.sendMessage({
         type: 'appendSessionLog',
-        captionId: captionId,
-        sessionTime: sessionTime,
+        captionId: state.captionId,
+        captionHash: state.captionHash,
+        sessionTime: state.sessionTime,
         data: data,
     }, function onResponse(message) {
         return true;

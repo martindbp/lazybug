@@ -84,7 +84,7 @@ export default {
         this.AVElement = document.querySelector(this.AVElementSelector);
         this.setObserversAndHandlers();
         const self = this;
-        fetchVersionedResource('show_list.json', function (data) { self.showList = data; });
+        fetchVersionedResource('show_list.json', function (data, hash) { self.showList = data; });
     },
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);
@@ -232,7 +232,16 @@ export default {
                 if (message === 'error') {
                     return false;
                 }
+                self.$store.state.captionHash = message.hash;
                 self.$store.state.captionData = message.data;
+                self.createSession();
+                // Append the initial pinned peek values
+                for (const type of ['py', 'hz', 'tr', 'translation']) {
+                    if (self.$store.state.options.pin[type] === true) {
+                        self.appendSessionLog([getEvent('pin_row', type), true]);
+                    }
+                }
+                self.appendSessionLog([eventsMap['EVENT_BLUR'], self.$store.state.options.blurCaptions]);
                 return true;
             });
         },

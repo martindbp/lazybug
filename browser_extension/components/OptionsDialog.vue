@@ -166,7 +166,7 @@ export default {
         },
         blurCaptions: {
             get: function() { return this.$store.state.options.blurCaptions; },
-            set: function(val) { this.$store.commit('setOption', {key: 'blurCaptions', value: val}); },
+            set: function(val) { this.$store.commit('setBlur', val); },
         },
         keyboardShortcutsToggle: {
             get: function() { return this.$store.state.options.keyboardShortcutsToggle; },
