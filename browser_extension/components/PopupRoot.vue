@@ -6,6 +6,7 @@
         />
         <div v-if="dev">
             <q-btn label="Dashboard" @click="dashboard" />
+            <q-btn label="SRS" @click="srs" />
             <q-btn label="Measure caption" @click="measureCaption" />
             <q-btn label="Print playlist" @click="printPlaylist" />
         </div>
@@ -34,6 +35,11 @@ export default {
         dashboard: function() {
             chrome.tabs.create({
               url: "dashboard.html",
+            });
+        },
+        srs: function() {
+            chrome.tabs.create({
+              url: "srs.html",
             });
         },
         updateBadge: function() {

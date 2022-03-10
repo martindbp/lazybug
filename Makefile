@@ -119,10 +119,15 @@ ext-dashboard:
 	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_dashboardroot
 	mv browser_extension/dist_dashboardroot/* browser_extension/dist/
 
+ext-srs:
+	vue-cli-service build browser_extension/components/SRSRoot.vue --target lib --dest browser_extension/dist_srsroot
+	mv browser_extension/dist_srsroot/* browser_extension/dist/
+
 ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
+	make ext-srs
 	cp browser_extension/deepl_main.js browser_extension/dist/
 
 release:

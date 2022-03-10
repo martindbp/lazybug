@@ -14,6 +14,7 @@ function initIndexedDb() {
         knowledge: 'id',
         other: 'id',
         log: '[captionId+captionHash+sessionTime]',
+        srs: 'id',
     });
 }
 
