@@ -928,20 +928,34 @@ def predict_video_captions(
 @task(serializer=json)
 def update_conditional_captions(caption_lines, conditional_captions):
     # We update the original conditional captions and return those instead
-    for line in caption_lines:
-        if line.text == '':
+    next_conditional_idx = 0
+    for line in caption_lines['lines']:
+        if line[0] == '':
             continue
 
-        cond_line = conditional_captions['lines'][line.conditional_caption_idx]
-        # Prepend the text
-        cond_line[0] = line.text + cond_line[0]
-        # Take the bounding rect union
-        cond_rect = list(cond_line[3])
-        cond_rect[0] = min(cond_rect[0], line.bounding_rect[0])  # min x
-        cond_rect[1] = max(cond_rect[1], line.bounding_rect[1])  # max x
-        cond_rect[2] = min(cond_rect[2], line.bounding_rect[2])  # min y
-        cond_rect[3] = max(cond_rect[3], line.bounding_rect[3])  # max y
-        cond_line[3] = cond_rect
+        t0, t1 = line[1], line[2]
+
+        for i in range(next_conditional_idx, len(conditional_captions['lines'])):
+            cond_line = conditional_captions['lines'][i]
+            cond_t0, cond_t1 = cond_line[1], cond_line[2]
+            intersection_start = max(cond_t0, t0)
+            intersection_end = min(cond_t1, t1)
+            if intersection_end < intersection_start or (intersection_end - intersection_start) / (cond_t1 - cond_t0) < 0.5:
+                continue
+
+            # Prepend the text
+            cond_line[0] = line[0] + ' ' + cond_line[0]
+            # Take the bounding rect union
+            cond_rect = list(cond_line[3])
+            cond_rect[0] = min(cond_rect[0], line[3][0])  # min x
+            cond_rect[1] = max(cond_rect[1], line[3][1])  # max x
+            cond_rect[2] = min(cond_rect[2], line[3][2])  # min y
+            cond_rect[3] = max(cond_rect[3], line[3][3])  # max y
+            cond_line[3] = cond_rect
+
+            next_conditional_idx = i + 1
+            break
+
     return conditional_captions
 
 
@@ -1316,17 +1330,20 @@ def process_video_captions(
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
 
             if depends_on is not None:
-                json_captions_joined = update_conditional_captions(captions, conditional_captions)
+                json_captions_joined = update_conditional_captions(json_captions, conditional_captions)
                 json_captions_joined >> f'data/remote/private/caption_data/raw_captions/{vid}-{param["type"]}.json'
+            else:
+                json_captions_joined = json_captions
 
-            meta_captions = add_metadata(json_captions, vid)
+            meta_captions = add_metadata(json_captions_joined, vid)
             trimmed_captions = trim_bad_captions(meta_captions)
-            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-{param_id}.json'
+            trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-{param["type"]}.json'
 
             prev_captions[param_id] = trimmed_captions
             prev_params[param_id] = param
             if force_redo:
                 json_captions.clear_cache()
+                json_captions_joined.clear_cache()
                 trimmed_captions.clear_cache(delete_output_files=True)
                 meta_captions.clear_cache(delete_output_files=True)
                 captions.clear_cache(delete_output_files=True)
@@ -1383,7 +1400,7 @@ def process_translations(show_name=None, *, remove_unmatched_captions: bool=True
         json_captions_all_translations = add_machine_translations(json_captions_human_translations, machine_translations)
         json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{video_id}.json'
         if force_redo:
-            trimmed_captions.clear_cache()
+            #trimmed_captions.clear_cache()
             json_captions_human_translations.clear_cache(delete_output_files=True)
             machine_translations.clear_cache(delete_output_files=True)
             json_captions_all_translations.clear_cache(delete_output_files=True)
