@@ -1371,33 +1371,41 @@ def make_names_list():
     return names
 
 
-def process_translations(show_name=None, *, remove_unmatched_captions: bool=True, force_redo: bool=False):
+def process_translations(
+    show_name=None,
+    *,
+    remove_unmatched_captions: bool=True,
+    force_redo: bool=False,
+    video_id: str=None
+):
     os.makedirs('data/remote/private/caption_data/captions_human_translations', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/machine_translations', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/captions_all_translations', exist_ok=True)
 
     videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/meta_trimmed_captions/')
     out = []
-    for video_id, file_path, params in videos:
+    for vid, file_path, params in videos:
+        if video_id is not None and vid != video_id:
+            continue
         try:
             trimmed_captions = Future.from_file(file_path)
         except FileNotFoundError:
             continue
-        human_translations_path = f'data/remote/private/caption_data/translations/{video_id}.en.vtt'
+        human_translations_path = f'data/remote/private/caption_data/translations/{vid}.en.vtt'
         human_translations = None
         if os.path.exists(human_translations_path):
             human_translations = convert_vtt_to_caption_format(human_translations_path)
         else:
-            english_path = f'data/remote/private/caption_data/raw_captions/{video_id}-english.json'
+            english_path = f'data/remote/private/caption_data/raw_captions/{vid}-english.json'
             if os.path.exists(english_path):
                 human_translations = Future.from_file(english_path)
 
         json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, human_translations, remove_unmatched_captions)
-        json_captions_human_translations >> f'data/remote/private/caption_data/captions_human_translations/{video_id}.json'
+        json_captions_human_translations >> f'data/remote/private/caption_data/captions_human_translations/{vid}.json'
         machine_translations = get_machine_translations(json_captions_human_translations)
-        machine_translations >> f'data/remote/private/caption_data/machine_translations/{video_id}.json'
+        machine_translations >> f'data/remote/private/caption_data/machine_translations/{vid}.json'
         json_captions_all_translations = add_machine_translations(json_captions_human_translations, machine_translations)
-        json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{video_id}.json'
+        json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{vid}.json'
         if force_redo:
             #trimmed_captions.clear_cache()
             json_captions_human_translations.clear_cache(delete_output_files=True)
@@ -1415,7 +1423,7 @@ def _get_show_fixed_translations(show_name):
     return show_data.get('fixed_translations', {})
 
 
-def process_segmentation_alignment(show_name=None, video_id=None, *, force_redo=False):
+def process_segmentation_alignment(show_name=None, *, force_redo=False, video_id:str=None):
     os.makedirs('data/remote/private/caption_data/alignment_translations', exist_ok=True)
     os.makedirs('data/remote/public/subtitles/', exist_ok=True)
 
