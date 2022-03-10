@@ -879,12 +879,11 @@ def predict_video_captions(
                     min_y -= padding
                     max_y -= padding
 
-                    # Add caption top to get global coordinates
-                    min_y += caption_top_px
-                    max_y += caption_top_px
-
                     line.bounding_rect = (
-                        int(min_x / scale_factor), int(max_x / scale_factor), int(min_y / scale_factor), int(max_y / scale_factor)
+                        int(min_x / scale_factor),
+                        int(max_x / scale_factor),
+                        int(min_y / scale_factor) + caption_top_px, # Add caption top to get global coordinates
+                        int(max_y / scale_factor) + caption_top_px
                     )
 
                     #frame_copy = frame.copy()
