@@ -791,36 +791,52 @@ def predict_video_captions(
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     frame_size = None
-    for _ in range(2):
-        bounding_rects = []
-        caption_images = get_video_caption_area(
-            video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
-        )
+    for j in range(2):
+        best_top_bottom = None
+        best_logprob_sum = -float('inf')
+        best_offset = 0
+        offsets = [0] if j >= 1 else range(-2, 3)
+        for y_offset in offsets:
+            y_offset /= 200
+            caption_images = get_video_caption_area(
+                video_path, caption_top+y_offset, caption_bottom+y_offset, start_time_s, end_time_s, out_height, font_height
+            )
+            num_added = 0
+            sum_log_prob = 0
+            bounding_rects = []
+            for i, (frame_time, crop, frame) in enumerate(caption_images):
+                if i % 60 != 0:
+                    continue
 
-        for i, (frame_time, crop, frame) in enumerate(caption_images):
-            if i % SUBSAMPLE_FRAME_RATE != 0:
-                continue
+                if frame_size is None:
+                    frame_size = frame.shape[:2]
 
-            if frame_size is None:
-                frame_size = frame.shape[:2]
+                line = predict_line(ocr_fn, crop, frame_time, font_height)
+                print(line.text)
+                if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
+                    sum_log_prob += line.logprob
+                    bounding_rects.append(line.bounding_rect)
 
-            line = predict_line(ocr_fn, crop, frame_time, font_height)
-            if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
-                bounding_rects.append(line.bounding_rect)
+                if len(bounding_rects) > 10 or frame_time - start_time_s > 120:
+                    break
 
-            if len(bounding_rects) > 10:
-                break
+            if sum_log_prob > best_logprob_sum and len(bounding_rects) > 0:
+                best_logprob_sum = sum_log_prob
+                best_offset = y_offset
+                mean_crop_caption_top = np.array([min_y for (_, _, min_y, _) in bounding_rects]).mean()
+                mean_crop_caption_bottom = np.array([max_y for (_, _, _, max_y) in bounding_rects]).mean()
+                best_top_bottom = [mean_crop_caption_top, mean_crop_caption_bottom]
 
         caption_top_px = int(caption_top * frame.shape[0])
         caption_bottom_px = int(caption_bottom * frame.shape[0])
         crop_scale = (caption_bottom_px - caption_top_px) / font_height
-        mean_crop_caption_top = np.array([min_y for (_, _, min_y, _) in bounding_rects]).mean()
-        mean_crop_caption_bottom = np.array([max_y for (_, _, _, max_y) in bounding_rects]).mean()
         expected_crop_caption_top = (out_height - font_height) / 2
         expected_crop_caption_bottom = out_height - expected_crop_caption_top
 
-        top_diff_px = (mean_crop_caption_top - expected_crop_caption_top) * crop_scale
-        bottom_diff_px = (mean_crop_caption_bottom - expected_crop_caption_bottom) * crop_scale
+        caption_top += best_offset
+        caption_bottom += best_offset
+        top_diff_px = (best_top_bottom[0] - expected_crop_caption_top) * crop_scale
+        bottom_diff_px = (best_top_bottom[1] - expected_crop_caption_bottom) * crop_scale
         caption_top += top_diff_px / frame_size[0]
         caption_bottom += bottom_diff_px / frame_size[0]
 
