@@ -582,9 +582,13 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
         # The transformer segmentation often makes the mistake to join 了 with the next word, e.g 了别 and 了明.
         # In this case (if the compound is not in cedict), split them into two. The second part could be merged with something
         # that comes later
+        # Another special case is 你好: this should only be matched exactly against translation, so if we get one we split it
         for i, (hz, pos) in enumerate(zip(new_ws_sentence, new_pos_sentence)):
             if len(hz) > 1 and hz[0] == '了' and hz not in CEDICT.v:
                 new_ws_sentence = new_ws_sentence[:i] + ['了', hz[1:]] + new_ws_sentence[i+1:]
+                new_pos_sentence = new_pos_sentence[:i] + ['unknown', 'unknown'] + new_pos_sentence[i+1:]
+            elif hz == '你好':
+                new_ws_sentence = new_ws_sentence[:i] + ['你', '好'] + new_ws_sentence[i+1:]
                 new_pos_sentence = new_pos_sentence[:i] + ['unknown', 'unknown'] + new_pos_sentence[i+1:]
 
         found_match = True
