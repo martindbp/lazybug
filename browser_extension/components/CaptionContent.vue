@@ -24,9 +24,10 @@
                         v-if="showContextMenu.py[i]"
                         type="py"
                         :idx="i"
-                        :know="showStates.py[i]"
+                        :hide="showStates.py[i]"
+                        :pin="purePeekStates.py[i] && knownStates.py[i]"
                         :learn="showStates.py[i] || (purePeekStates.py[i] && knownStates.py[i])"
-                        :reset="purePeekStates.py[i] && (learningStates.py[i] || knownStates.py[i])"
+                        :unlearn="purePeekStates.py[i] && learningStates.py[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -55,9 +56,10 @@
                         v-if="showContextMenu.hz[i]"
                         type="hz"
                         :idx="i"
-                        :know="showStates.hz[i]"
+                        :hide="showStates.hz[i]"
+                        :pin="purePeekStates.hz[i] && knownStates.hz[i]"
                         :learn="showStates.hz[i] || (purePeekStates.hz[i] && knownStates.hz[i])"
-                        :reset="purePeekStates.hz[i] && (learningStates.hz[i] || knownStates.hz[i])"
+                        :unlearn="purePeekStates.hz[i] && learningStates.hz[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -87,9 +89,10 @@
                         v-if="showContextMenu.tr[i]"
                         type="tr"
                         :idx="i"
-                        :know="showStates.tr[i]"
+                        :hide="showStates.tr[i]"
+                        :pin="purePeekStates.tr[i] && knownStates.tr[i]"
                         :learn="showStates.tr[i] || (purePeekStates.tr[i] && knownStates.tr[i])"
-                        :reset="purePeekStates.tr[i] && (learningStates.tr[i] || knownStates.tr[i])"
+                        :unlearn="purePeekStates.tr[i] && learningStates.tr[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -122,7 +125,9 @@
                         v-if="showContextMenu.translation"
                         type="translation"
                         :learn="! learningStates.translation"
-                        :reset="learningStates.translation"
+                        :unlearn="learningStates.translation"
+                        :pin="false"
+                        :hide="false"
                         :dict="false"
                         :click="clickContextMenu"
                     />
@@ -228,7 +233,7 @@ export default {
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
                     const isUnknown = [KnowledgeUnknown, undefined].includes(
-                        getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i))
+                        getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i), KnowledgeKnown)
                     );
                     states[type].push(isUnknown);
                 }
@@ -277,7 +282,7 @@ export default {
                     if (newData !== null && newData.dummy === true) return;
 
                     this.applyKnownLvls();
-                    this.applyKnownPinyinCompounds();
+                    this.applyKnownPinyinComponents();
                     this.applyKnownCompoundWordsNotInDict();
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     for (const type of ['hz', 'tr', 'py', 'translation']) {
@@ -327,11 +332,11 @@ export default {
             return cl;
         },
         getStates: function(compareTo) {
-            const translationState = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey('translation'))
+            const translationState = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey('translation'), compareTo)
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    const state = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i));
+                    const state = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i), compareTo);
                     states[type].push(state === compareTo);
                 }
             }
@@ -355,12 +360,26 @@ export default {
             const tr = i === null ? null : this.wordData.tr[i];
 
             let setState = null;
-            if (action === 'know') setState = KnowledgeKnown;
-            else if (action === 'learn') setState = KnowledgeLearning;
-            else if (action === 'remove') setState = KnowledgeUnknown;
+            let stateType = null;
+            if (action === 'hide') {
+                stateType = KnowledgeKnown;
+                setState = KnowledgeKnown;
+            }
+            else if (action === 'learn') {
+                stateType = KnowledgeLearning;
+                setState = KnowledgeLearning;
+            }
+            else if (action === 'pin') {
+                stateType = KnowledgeKnown;
+                setState = KnowledgeUnknown;
+            }
+            else if (action === 'unlearn') {
+                stateType = KnowledgeLearning;
+                setState = KnowledgeUnknown;
+            }
 
             if (setState !== null) {
-                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, setState, true);
+                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true);
                 this.appendSessionLog([getEvent(action, type), i]);
             }
             else if (action === 'dict') {
@@ -422,57 +441,48 @@ export default {
                 for (var type of ['hz', 'py', 'tr']) {
                     const key = this.knowledgeKey(type, i);
                     if (
-                        [KnowledgeUnknown, undefined].includes(getKnowledgeState(k, key)) &&
-                        getKnowledgeState(this.lvlKnowledge, key) == KnowledgeKnown
+                        [KnowledgeUnknown, undefined].includes(getKnowledgeState(k, key, KnowledgeKnown)) &&
+                        getKnowledgeState(this.lvlKnowledge, key, KnowledgeKnown) == KnowledgeKnown
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as known');
-                        applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, true);
-                        this.appendSessionLog([getEvent('know_auto', type), i]);
+                        applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, KnowledgeKnown, false, true);
+                        this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
             }
         },
-        applyKnownPinyinCompounds: function() {
-            // For pinyins, if all the pinyins of all the characters of a word are known, we mark the whole pinyin as known
-            // More specifically, the compound knowledge level is the minimum of the constituent parts
+        applyKnownPinyinComponents: function() {
+            // If user knows ni3hao3, he should know ni3 and hao3 separately, but not other way around.
+
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
             if (d === null || k === null) return;
 
             for (let i = 0; i < this.wordData.hz.length; i++) {
-                let hasUnknown = false;
-                let hasLearning = false;
-                const hzChars = this.wordData.hz[i];
+                const hz = this.wordData.hz[i];
                 const pys = this.wordData.pys[i];
-                if (pys === null) continue;
-                if ([KnowledgeKnown, KnowledgeLearning].includes(getKnowledgeState(k, this.knowledgeKey('py', i)))) {
-                    continue;
-                }
-
                 const tr = this.wordData.tr[i];
-                for (let j = 0; j < pys.length; j++) {
-                    const py = pys[j];
-                    const hz = hzChars[j];
-                    const key = getKnowledgeKey('py', hz, [py], null);
-                    const knowledgeState = getKnowledgeState(k, key);
-                    const lvlKnowledgeState = getKnowledgeState(this.lvlKnowledge, key);
-                    hasUnknown = hasUnknown || ([KnowledgeUnknown, undefined].includes(knowledgeState) && [KnowledgeUnknown, undefined].includes(lvlKnowledgeState));
-                    hasLearning = hasLearning || (knowledgeState == KnowledgeLearning || lvlKnowledgeState == KnowledgeLearning);
-                }
+                if (d[hz] !== undefined || pys === null || isName(tr)) continue;
 
-                if (hasLearning) {
-                    console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as learning');
-                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeLearning, true);
-                    this.appendSessionLog([getEvent('learn_auto', 'py'), i]);
-                }
-                else if (! hasUnknown) {
-                    console.log('COMPOUNDS: Marking pinyin', hzChars, pys, 'as known');
-                    applyKnowledge(d, k, 'py', hzChars, pys, tr, this.wordData.translation, KnowledgeKnown, true);
-                    this.appendSessionLog([getEvent('know_auto', 'py'), i]);
+                let words = [];
+                for (let w = 5; w >= 1; w--) {
+                    for (let startIdx = 0; startIdx < hz.length-w+1; startIdx++) {
+                        const endIdx = startIdx + w;
+                        const hzSub = hz.substring(startIdx, endIdx);
+                        const pysSub = pys.slice(startIdx, endIdx);
+                        if (hzSub === hz) continue;
+                        if (d[hzSub] === undefined) continue;
+
+                        console.log('applyKnownPinyinComponents: ', 'py', hzSub, pysSub);
+                        applyKnowledge(d, k, 'py', hzSub, pysSub, null, this.wordData.translation, KnowledgeKnown, KnowledgeKnown, false, true);
+                    }
                 }
             }
         },
         applyKnownCompoundWordsNotInDict: function() {
+            // If word is not in dict, but we know all the sub-words, then we say we know the compound (for hz and tr)
+            // The reasoning is, if it's not in the dictionary, it's more likely to be a compound of regular words that
+            // have a similar meaning to the parts. If it had a very different meaning, then it should be in the dictionary.
             const d = this.$store.state.DICT;
             const k = this.$store.state.knowledge;
             if (d === null || k === null) return;
@@ -504,19 +514,22 @@ export default {
                 for (const [wordHz, wordPys] of words) {
                     for (const type of ['hz', 'tr']) {
                         const key = getKnowledgeKey(type, wordHz, wordPys, null, null);
-                        knowAll[type] = knowAll[type] && (getKnowledgeState(this.lvlKnowledge, key) === KnowledgeKnown || getKnowledgeState(this.$store.state.knowledge, key) === KnowledgeKnown);
+                        knowAll[type] = knowAll[type] && (
+                            getKnowledgeState(this.lvlKnowledge, key, KnowledgeKnown) === KnowledgeKnown ||
+                            getKnowledgeState(this.$store.state.knowledge, key, KnowledgeKnown) === KnowledgeKnown
+                        );
                     }
                 }
 
                 for (const type of ['hz', 'tr']) {
-                    if ([KnowledgeKnown, KnowledgeLearning].includes(getKnowledgeState(k, this.knowledgeKey(type, i)))) {
+                    if (getKnowledgeState(k, this.knowledgeKey(type, i), KnowledgeKnown) === KnowledgeKnown) {
                         continue;
                     }
 
                     if (knowAll[type]) {
                         console.log('applyKnownCompoundWordsNotInDict', type, hz, pys);
-                        applyKnowledge(d, k, type, hz, pys, null, null, KnowledgeKnown, true);
-                        this.appendSessionLog([getEvent('know_auto', type), i]);
+                        applyKnowledge(d, k, type, hz, pys, null, null, KnowledgeKnown, KnowledgeKnown, false, true);
+                        this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
             }

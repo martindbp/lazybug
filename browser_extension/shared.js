@@ -14,21 +14,24 @@ const events = [
     'EVENT_PEEK_PY',
     'EVENT_PEEK_HZ',
     'EVENT_PEEK_TR',
-    'EVENT_KNOW_PY',
-    'EVENT_KNOW_HZ',
-    'EVENT_KNOW_TR',
-    'EVENT_KNOW_AUTO_PY',
-    'EVENT_KNOW_AUTO_HZ',
-    'EVENT_KNOW_AUTO_TR',
+    'EVENT_HIDE_PY',
+    'EVENT_HIDE_HZ',
+    'EVENT_HIDE_TR',
+    'EVENT_HIDE_AUTO_PY',
+    'EVENT_HIDE_AUTO_HZ',
+    'EVENT_HIDE_AUTO_TR',
     'EVENT_LEARN_PY',
     'EVENT_LEARN_HZ',
     'EVENT_LEARN_TR',
     'EVENT_LEARN_AUTO_PY',
     'EVENT_LEARN_AUTO_HZ',
     'EVENT_LEARN_AUTO_TR',
-    'EVENT_REMOVE_PY',
-    'EVENT_REMOVE_HZ',
-    'EVENT_REMOVE_TR',
+    'EVENT_PIN_PY',
+    'EVENT_PIN_HZ',
+    'EVENT_PIN_TR',
+    'EVENT_UNLEARN_PY',
+    'EVENT_UNLEARN_HZ',
+    'EVENT_UNLEARN_TR',
     'EVENT_BLUR',
 ];
 
@@ -204,12 +207,12 @@ function getKnowledgeKey(type, hz, pys, tr, translation) {
     return key;
 }
 
-function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, knowledgeVal, syncIndexedDb = false) {
+function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, stateType, knowledgeVal, explicit, syncIndexedDb = false) {
     const keys = [];
     const vals = [];
     let key = getKnowledgeKey(type, hz, pys, tr, translation);
     keys.push(key);
-    vals.push(setKnowledge(knowledge, key, knowledgeVal));
+    vals.push(setKnowledge(knowledge, key, stateType, knowledgeVal, explicit));
 
     if (['hz', 'py', 'tr'].includes(type)) {
         // Add all the individual char/pys
@@ -224,7 +227,9 @@ function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, knowled
                 vals.push(setKnowledge(
                     knowledge,
                     key,
-                    knowledgeVal
+                    stateType,
+                    knowledgeVal,
+                    explicit
                 ));
             }
         }
@@ -239,35 +244,41 @@ const KnowledgeUnknown = 0;
 const KnowledgeKnown = 1;
 const KnowledgeLearning = 2;
 
-function setKnowledge(dict, key, newState) {
-    let currCounts = dict[key];
-    if (currCounts === undefined) {
-        currCounts = [0, 0];
+function setKnowledge(dict, key, stateType, newState, explicit) {
+    let currData = dict[key];
+    if (currData === undefined) {
+        currData = [0, 0, false]; // Known/Learn/Explicit vs implicit
     }
 
-    let prevState = KnowledgeUnknown;
-    if (currCounts[KnowledgeLearning-1] > 0) {
-        prevState = KnowledgeLearning;
+    const currExplicit = currData[2];
+    if (currExplicit && ! explicit) {
+        // Implicit knowledge has no effect on current explicit knowledge
+        return currData;
     }
-    else if (currCounts[KnowledgeKnown-1] > 0) {
-        prevState = KnowledgeKnown;
+    else if (explicit) {
+        // If explicit, we just set it to 0 or 1, no need to count
+        currData[stateType-1] = newState === KnowledgeUnknown ? 0 : 1;
+        currData[2] = true; // set explicit
+    }
+    else if (! currExplicit && ! explicit) {
+        // Update the implicit count
+        let prevState = currData[stateType-1] ? stateType : KnowledgeUnknown;
+
+        if (prevState > 0) {
+            currData[prevState-1] -= 1;
+        }
+
+        currData[newState-1] += 1;
     }
 
-    if (prevState > 0) {
-        currCounts[prevState-1] -= 1;
-    }
-
-    currCounts[newState-1] += 1;
-
-    dict[key] = currCounts;
-    return currCounts;
+    dict[key] = currData;
+    return currData;
 }
 
-function getKnowledgeState(dict, key) {
+function getKnowledgeState(dict, key, stateType) {
     const knowledgeState = dict[key];
     if (knowledgeState  === undefined) return undefined;
-    if (knowledgeState[0] > 0) return KnowledgeKnown;
-    if (knowledgeState[1] > 0) return KnowledgeLearning;
+    if (knowledgeState[stateType-1] > 0) return stateType;
     return KnowledgeUnknown;
 }
 
@@ -293,6 +304,7 @@ const ICON_SVG = {
     'pin': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 100 100"><path d="M85.4 45L54.9 14.6c-2.8-2.9-3.5-1.1-3.5.3v14L28.7 45.7H15c-3.9 0-.8 4.2-1.4 3.5l17.2 17.1-14.4 14.5c-.8.8-.8 2.1 0 2.9.8.8 2.1.8 2.9 0l14.4-14.4 17.1 17.2c-.5-.5 3.6 2.2 3.6-1.4V71.3l16.8-22.7h12.7c2.1-.1 4.9-.1 1.5-3.6zm-65.5 4.6h8.9l21.7 21.7v8.9L19.9 49.6zm32.5 17.7L32.7 47.6 52.8 33l14.4 14.6-14.8 19.7zm17.8-22.7L55.4 29.8v-8.9l23.7 23.7h-8.9z" fill="currentColor" stroke-width="4" stroke="white" /><path fill="currentColor" stroke-width="4" stroke="white" d="M804-1070V614H-980v-1684H804m8-8H-988V622H812v-1700z"/></svg>',
     'unpin': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 100 100"><path d="M85.4 45L54.9 14.6c-2.8-2.9-3.5-1.1-3.5.3v14L28.7 45.7H15c-3.9 0-.8 4.2-1.4 3.5l17.2 17.1-14.4 14.5c-.8.8-.8 2.1 0 2.9.8.8 2.1.8 2.9 0l14.4-14.4 17.1 17.2c-.5-.5 3.6 2.2 3.6-1.4V71.3l16.8-22.7h12.7c2.1-.1 4.9-.1 1.5-3.6zm-65.5 4.6h8.9l21.7 21.7v8.9L19.9 49.6zm32.5 17.7L32.7 47.6 52.8 33l14.4 14.6-14.8 19.7zm17.8-22.7L55.4 29.8v-8.9l23.7 23.7h-8.9z" fill="currentColor" stroke-width="4" stroke="white" /><path fill="currentColor" stroke-width="4" stroke="white" d="M804-1070V614H-980v-1684H804m8-8H-988V622H812v-1700z"/><line x1="10" y1="10" x2="90" y2="90" style="stroke-width: 4; stroke: white;" /></svg>',
     'pen': '<svg viewBox="0 0 24 24" width="${width}" height="${height}" fill="none" xmlns="http://www.w3.org/2000/svg" ><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2635 2.29289C20.873 1.90237 20.2398 1.90237 19.8493 2.29289L18.9769 3.16525C17.8618 2.63254 16.4857 2.82801 15.5621 3.75165L4.95549 14.3582L10.6123 20.0151L21.2189 9.4085C22.1426 8.48486 22.338 7.1088 21.8053 5.99367L22.6777 5.12132C23.0682 4.7308 23.0682 4.09763 22.6777 3.70711L21.2635 2.29289ZM16.9955 10.8035L10.6123 17.1867L7.78392 14.3582L14.1671 7.9751L16.9955 10.8035ZM18.8138 8.98525L19.8047 7.99429C20.1953 7.60376 20.1953 6.9706 19.8047 6.58007L18.3905 5.16586C18 4.77534 17.3668 4.77534 16.9763 5.16586L15.9853 6.15683L18.8138 8.98525Z" fill="currentColor" /> <path d="M2 22.9502L4.12171 15.1717L9.77817 20.8289L2 22.9502Z" fill="currentColor" /></svg>',
+    'hide': '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="${width}" height="${height}" viewBox="0 0 572.098 572.098" style="enable-background:new 0 0 572.098 572.098;" xml:space="preserve"> <g> <path d="M99.187,398.999l44.333-44.332c-24.89-15.037-47.503-33.984-66.763-56.379c29.187-33.941,66.053-60.018,106.947-76.426 c-6.279,14.002-9.853,29.486-9.853,45.827c0,16.597,3.696,32.3,10.165,46.476l35.802-35.797 c-5.698-5.594-9.248-13.36-9.248-21.977c0-17.02,13.801-30.82,30.82-30.82c8.611,0,16.383,3.55,21.971,9.248l32.534-32.534 l36.635-36.628l18.366-18.373c-21.206-4.186-42.896-6.469-64.848-6.469c-107.663,0-209.732,52.155-273.038,139.518L0,298.288 l13.011,17.957C36.83,349.116,66.151,376.999,99.187,398.999z"/> <path d="M459.208,188.998l-44.854,44.854c30.539,16.071,58.115,37.846,80.986,64.437 c-52.167,60.662-128.826,96.273-209.292,96.273c-10.3,0-20.533-0.6-30.661-1.744l-52.375,52.375 c26.903,6.887,54.762,10.57,83.036,10.57c107.663,0,209.738-52.154,273.038-139.523l13.011-17.957l-13.011-17.956 C532.023,242.995,497.844,212.15,459.208,188.998z"/> <path d="M286.049,379.888c61.965,0,112.198-50.234,112.198-112.199c0-5.588-0.545-11.035-1.335-16.402L269.647,378.56 C275.015,379.349,280.461,379.888,286.049,379.888z"/> <path d="M248.815,373.431L391.79,230.455l4.994-4.994l45.796-45.796l86.764-86.77c13.543-13.543,13.543-35.502,0-49.046 c-6.77-6.769-15.649-10.159-24.523-10.159s-17.754,3.384-24.522,10.159l-108.33,108.336l-22.772,22.772l-29.248,29.248 l-48.14,48.14l-34.456,34.456l-44.027,44.027l-33.115,33.115l-45.056,45.055l-70.208,70.203 c-13.543,13.543-13.543,35.502,0,49.045c6.769,6.77,15.649,10.16,24.523,10.16s17.754-3.385,24.523-10.16l88.899-88.898 l50.086-50.086L248.815,373.431z"/> </g></svg>',
 }
 
 function getIconSvg(name, size) {

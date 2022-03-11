@@ -1,20 +1,22 @@
 <template>
     <span class="contextmenu">
-        <span v-if="know" class="contexticon know" title="Know this" v-html="checkIcon" @click.stop.prevent="clickButton('know')"></span>
-        <span v-if="learn" class="contexticon learn" title="Learn this" v-html="plusIcon" @click.stop.prevent="clickButton('learn')"></span>
-        <span v-if="reset" class="contexticon remove" title="Reset to unknown" v-html="undoIcon" @click.stop.prevent="clickButton('remove')"></span>
+        <span v-if="hide" class="contexticon hide" title="Hide" v-html="hideIcon" @click.stop.prevent="clickButton('hide')"></span>
+        <span v-if="pin" class="contexticon pin" title="Pin" v-html="pinIcon" @click.stop.prevent="clickButton('pin')"></span>
+        <span v-if="learn" class="contexticon learn" title="Learn" v-html="plusIcon" @click.stop.prevent="clickButton('learn')"></span>
+        <span v-if="unlearn" class="contexticon unlearn" title="Unlearn" v-html="undoIcon" @click.stop.prevent="clickButton('unlearn')"></span>
         <span v-if="dict" class="contexticon dictionary" title="Look up in dictionary" v-html="dictionaryIcon" @click.stop.prevent="clickButton('dict')"></span>
     </span>
 </template>
 
 <script>
 export default {
-    props: ['type', 'idx', 'know', 'learn', 'reset', 'dict', 'click'],
+    props: ['type', 'idx', 'hide', 'learn', 'pin', 'dict', 'click'],
     data: function () { return {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),
-        checkIcon: getIconSvg("check", 18),
+        hideIcon: getIconSvg("hide", 18),
         undoIcon: getIconSvg("undo", 18),
+        pinIcon: getIconSvg("pin", 18),
     }},
     methods: {
         clickButton: function(action) {
@@ -50,12 +52,16 @@ export default {
     background: darkorange;
 }
 
-.contexticon.know svg {
+.contexticon.hide svg {
     background: limegreen;
 }
 
-.contexticon.remove svg {
-    background: red;
+.contexticon.pin svg {
+    background: lightgray;
+}
+
+.contexticon.unlearn svg {
+    background: darkorange;
 }
 
 .contexticon.dictionary svg {
