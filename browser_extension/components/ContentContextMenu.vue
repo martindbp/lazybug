@@ -53,11 +53,11 @@ export default {
 }
 
 .contexticon.hide svg {
-    background: limegreen;
+    background: gray;
 }
 
 .contexticon.pin svg {
-    background: lightgray;
+    background: gray;
 }
 
 .contexticon.unlearn svg {
