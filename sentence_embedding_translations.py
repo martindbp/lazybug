@@ -6,7 +6,7 @@ import itertools
 import numpy as np
 from iteration_utilities import unique_everseen
 from sentence_transformers import SentenceTransformer
-from han import filter_text_hanzi, CEDICT, clean_cedict_translation, is_name_according_to_cedict
+from han import filter_text_hanzi, CEDICT, get_translation_options_cedict, is_name_according_to_cedict
 from misc import get_punctuation
 from pinyin import extract_normalized_pinyin
 from transformers import AutoTokenizer, AutoModel
@@ -30,21 +30,6 @@ NEVER_SPLIT = [
     #'到',
     '识',
     '子',
-]
-
-SKIP = [
-    '的',
-    '啊', 
-    '吗',
-    '呗',
-    '嘛', 
-    '呀',
-    '了',
-    '啦',
-    '吧',
-    #'呢',
-    '着',
-    '得',
 ]
 
 DISALLOW_MWS = [
@@ -135,70 +120,6 @@ def get_similarity(base_translations, combined_translations, print_iterations=Fa
             print(combined_translations[i], cosine_similarity[i])
 
     return max_similarity, max_idx, cosine_similarity
-
-
-def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True):
-    # Returns list of ([option strings], exact_match_only, py)
-
-    options = []
-    if deepl not in [None, '', '[UNK]']:
-        deepl = re.sub('-', ' ', deepl)
-        options.append((deepl.split(' '), False, py))
-
-    if hz in SKIP: # and add_empty:
-        options.append(([''], False, py))
-        return options
-
-    if hz not in CEDICT.v:
-        if len(options) == 0 and add_empty:
-            options.append(([''], False, py))
-        return options
-
-    entries = CEDICT.v.get(hz)[1]
-    #if hz in ALLOW_EMPTY and add_empty:
-    if add_empty and deepl not in [None, '', '[UNK]']:
-        options.append(([''], False, py))
-
-    for _, entry_py, transl, _, _ in entries:
-        # Only check translations for the correct pinyin (if it's one we trained a classifier for)
-        if (
-            py is not None and
-            entry_py.lower() != py.lower() and
-            (hz in pinyin_classifiers.__dict__ or hz in pinyin_classifiers.single_readings)
-        ):
-            continue
-
-        transls = transl.split('/')
-
-        # By convention, anyting after ! is for exact matching only
-        rest_is_exact_match_only = False
-        for tr in transls:
-            if tr == '!':
-                rest_is_exact_match_only = True
-                options.insert(0, ([''], False, entry_py))
-                continue
-
-            # We include options with and without parenthesised text, e.g. 九 -> "(long) time", we want
-            # both "long", and "long time" options
-            trs = (
-                clean_cedict_translation(tr, hz, entry_py, split_or=split_or, remove_parens=True) +
-                clean_cedict_translation(tr, hz, entry_py, split_or=split_or, remove_parens=False)
-            )
-
-            for tr_split in trs:
-                if ' sb' in tr_split or ' sth' in tr_split or " one's" in tr_split:
-                    # We want to allow the text before and after to be matched separately
-                    split_options = re.split(" sb| sth| one's", tr_split)
-                    split_options = [op.strip() for op in split_options if op != '']
-                    options.append((split_options, rest_is_exact_match_only, entry_py))
-                elif len(tr_split) != 0:
-                    options.append((tr_split.split(' '), rest_is_exact_match_only, entry_py))
-
-    if add_empty and len(options) == 0:
-        options.append(([''], False, py))
-
-    options = list(unique_everseen(options, key=lambda x: ' '.join(x[0])))
-    return options
 
 
 def _nail_down_options(baseline_words, translation_options, current_option_indices, current_nailed_down_options, current_segmentation_idx, clear_options=True):
@@ -388,7 +309,7 @@ def get_options(hzs, base_translations, pys, deepl_translations=None, skip_words
     return translation_options, current_option_indices, current_nailed_down_options, current_order
 
 
-@task(ignore_args=['print_iterations'], deps=[CEDICT, clean_cedict_translation])
+@task(ignore_args=['print_iterations'], deps=[CEDICT, get_translation_options_cedict])
 def get_embedding_word_translations(hzs, pys, alignment_indices, base_translations, skip_words, prevent_split, deepl_translations=None, print_iterations=False):
     orig_pys = list(pys)
     global model

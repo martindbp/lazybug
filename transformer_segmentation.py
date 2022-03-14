@@ -6,7 +6,7 @@ from hanziconv import HanziConv
 from typing import *
 from merkl import task, batch, Eval, Future
 
-from han import filter_text_hanzi, is_name_according_to_cedict, get_difficulty, CEDICT
+from han import filter_text_hanzi, is_name_according_to_cedict, get_difficulty, CEDICT, get_translation_options_cedict
 from word_disambiguation import pad_parts_of_speech, construct_classifier_args
 from pinyin import (
     extract_normalized_pinyin,
@@ -729,6 +729,53 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     print('Components:', best_hz)
 
                 if found_match:
+                    break
+
+        #
+        # Join words accross segmentation boundaries if the joined word is in cedict, but previously segmented words are not (or are shorter)
+        #
+        for i in range(len(new_ws_sentence) - 2 + 1):
+            components = new_ws_sentence[i : i + 2]
+            max_len_in_cedict = 1  # 1 because single chars are always in cedict
+            for hz in components:
+                for from_idx in range(0, len(hz)):
+                    for to_idx in range(from_idx, len(hz) + 1):
+                        sub_hz = hz[from_idx:to_idx]
+                        if sub_hz in CEDICT.v:
+                            max_len_in_cedict = max(max_len_in_cedict, len(sub_hz))
+
+            for offset_start in range(0, len(components[0])):
+                do_break = False
+                for offset_end in range(0, len(components[1])):
+                    if offset_start == 0 and offset_end == 0:
+                        continue
+
+                    pre = components[0][:offset_start]
+                    joined_hz = components[0][offset_start:] + components[1][:len(components[1])-offset_end]
+                    post = components[1][len(components[1])-offset_end:]
+
+                    translation_options = get_translation_options_cedict(joined_hz, py=None, deepl=None, add_empty=False)
+                    if (
+                        len(joined_hz) > max_len_in_cedict and
+                        joined_hz in CEDICT.v and
+                        len(translation_options) > 0 and
+                        joined_hz not in BLACKLIST
+                    ):
+                        new_components = []
+                        if len(pre) > 0:
+                            new_components.append(pre)
+                        new_components.append(joined_hz)
+                        if len(post) > 0:
+                            new_components.append(post)
+
+                        new_ws_sentence = new_ws_sentence[:i] + new_components + new_ws_sentence[i + 2:]
+                        new_pos_sentence = new_pos_sentence[:i] + len(new_components)*['cedict'] + new_pos_sentence[i + 2:]
+                        sentence_compounds.append((joined_hz, joined_hz))
+                        print('Components:', joined_hz)
+                        do_break = True
+                        break
+
+                if do_break:
                     break
 
         if join_compound_words:
