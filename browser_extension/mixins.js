@@ -40,12 +40,12 @@ const mixin = {
             if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
             const d = this.$store.state.DICT;
             const knowledge = {};
-            for (let lvl = 0; lvl < 6; lvl++) {
+            for (let lvl = 1; lvl <= 6; lvl++) {
                 const knowPy = lvl <= this.$store.state.options.knownLevels.py;
                 const knowHz = lvl <= this.$store.state.options.knownLevels.hz;
                 const knowTr = lvl <= this.$store.state.options.knownLevels.tr;
 
-                for (const hz of this.$store.state.HSK_WORDS[lvl]) {
+                for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
                     if (knowHz) applyKnowledge(d, knowledge, 'hz', hz, null, null, null, KnowledgeKnown, KnowledgeKnown, false);
                     const entries = d[hz];
                     if (entries === undefined) continue;
