@@ -9,7 +9,7 @@
         />
         <CaptionContent
             :class="{ showpeekall: showMenu }"
-            v-if="showData !== null"
+            v-if="showData !== null && ! isLoading"
             v-bind:data="showData"
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
