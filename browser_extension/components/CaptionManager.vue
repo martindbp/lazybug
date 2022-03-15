@@ -56,26 +56,7 @@ export default {
             seeked: false,
             showList: null,
             prevCaption: null,
-            currCaption: {
-                dummy: true,
-                texts: [['你好你好你好你好你好']],
-                t0s: [-1000],
-                t1s: [-1001],
-                t0: -1000,
-                t1: -1001,
-                boundingRects: [],
-                charProbs: [],
-                logprob: [],
-                data_hash: null,
-                translations: [['hello hello hello hello hello']],
-                alignments: [
-                    [0, 1, '你', [['nǐ', 'ni3']], 'you'], [1, 2, '好', [['hǎo', 'hao3']], 'good'],
-                    [2, 3, '你', [['nǐ', 'ni3']], 'you'], [3, 4, '好', [['hǎo', 'hao3']], 'good'],
-                    [4, 5, '你', [['nǐ', 'ni3']], 'you'], [5, 6, '好', [['hǎo', 'hao3']], 'good'],
-                    [6, 7, '你', [['nǐ', 'ni3']], 'you'], [7, 8, '好', [['hǎo', 'hao3']], 'good'],
-                    [8, 9, '你', [['nǐ', 'ni3']], 'you'], [9, 10, '好', [['hǎo', 'hao3']], 'good'],
-                ],
-            },
+            currCaption: null,
             nextCaption: null,
         };
     },
@@ -346,7 +327,6 @@ export default {
                         newTime <= self.nextCaption.t1
                     )
                 );
-                const isDummy = self.currCaption !== null && self.currCaption.dummy === true;
 
                 if (
                     self.options.autoPause &&
@@ -354,8 +334,7 @@ export default {
                     ! self.paused &&
                     captionChanged &&
                     ! self.seeked &&
-                    ! self.seekedFromMenu &&
-                    ! isDummy
+                    ! self.seekedFromMenu
                 ) {
                     self.automaticallyPausedThisCaption = true;
                     self.AVElement.pause();

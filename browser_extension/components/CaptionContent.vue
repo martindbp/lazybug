@@ -1,5 +1,5 @@
 <template>
-    <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut, notransition: data !== null && data.dummy === true }">
+    <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
         <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
                 <td title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
@@ -279,8 +279,6 @@ export default {
             immediate: true,
             handler: function(newData, oldData) {
                 if (newData !== oldData) {
-                    if (newData !== null && newData.dummy === true) return;
-
                     this.applyKnownLvls();
                     this.applyKnownPinyinComponents();
                     this.applyKnownCompoundWordsNotInDict();
@@ -557,10 +555,6 @@ export default {
     opacity: 0;
     visibility: hidden;
     transition: visibility 0s 1.5s, opacity 1.5s linear;
-}
-
-.captioncontent.fadeout.notransition {
-    transition: none !important;
 }
 
 .contenttable {
