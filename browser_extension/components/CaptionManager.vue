@@ -222,7 +222,7 @@ export default {
     },
     methods: {
         fetchCaptionMaybe: function() {
-            this.$store.commit('setCaptionData', null);
+            this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
             if (this.captionId === null || [null, undefined].includes(chrome.runtime)) return;
 
             const self = this;
@@ -234,8 +234,7 @@ export default {
                 }
                 if (self.$store.state.captionHash === message.hash) return true;
 
-                self.$store.state.captionHash = message.hash;
-                self.$store.state.captionData = message.data;
+                self.$store.commit('setCaptionDataAndHash', message);
                 self.createSession();
                 // Append the initial pinned peek values
                 for (const type of ['py', 'hz', 'tr', 'translation']) {

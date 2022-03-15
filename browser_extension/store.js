@@ -75,8 +75,9 @@ const store = new Vuex.Store({
             state.sessionTime = Date.now();
             if ([null, undefined].includes(val)) return;
         },
-        setCaptionData(state, val) {
-            state.captionData = val;
+        setCaptionDataAndHash(state, val) {
+            state.captionData = val.data;
+            state.captionHash = val.hash;
         },
         setShowOptions(state, val) {
             state.showOptions = val;
