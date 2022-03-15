@@ -91,6 +91,7 @@
                     <div class="q-gutter-sm" v-for="shortcut in shortcuts">
                         <q-btn
                             style="margin-top: 10px; width: 80%"
+                            size="sm"
                             color="primary"
                             :disable="!keyboardShortcutsToggle || choosingShortcut !== null"
                             :label="choosingShortcut === shortcut[0] ? (shortcut[1] + ': <Press Key> (ESC to clear)') : (shortcut[1] + ': ' + (shortcutValues[shortcut[0]] || 'Unset'))"
