@@ -14,6 +14,15 @@
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
         />
+        <div class="initialcontent" v-if="showData === null && ! isLoading">
+            Video has <i>{{ translationType }}</i> sentence translations
+            <br />
+            <br />
+            <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
+        </div>
+        <div class="loadingcontent" v-if="isLoading">
+            Loading resources...
+        </div>
     </div>
 </template>
 
@@ -22,7 +31,17 @@ import CaptionMenu from './CaptionMenu.vue'
 import CaptionContent from './CaptionContent.vue'
 
 export default {
-    props: ['prevCaption', 'currCaption', 'nextCaption', 'currTime', 'paused', 'AVElement'],
+    props: [
+        'firstCaption',
+        'prevCaption',
+        'currCaption',
+        'nextCaption',
+        'currTime',
+        'paused',
+        'AVElement',
+        'isLoading',
+        'translationType'
+    ],
     components: {CaptionContent, CaptionMenu},
     data: function() { return {
         showMenu: false,
@@ -39,6 +58,11 @@ export default {
         updateFadeout: function() {
             // NOTE: we set fadeOut based on currTime in a watch instead of computed, because a computed makes the component re-render every frame
             this.fadeOut = this.showData !== null && (this.currTime > this.showData.t1 + CAPTION_FADEOUT_TIME || this.currTime < this.showData.t0); // eslint-disable-line
+        },
+        clickFirst: function() {
+            this.AVElement.currentTime = this.firstCaption.t0 + 1e-3;
+            this.AVElement.play();
+            this.$emit('seeked');
         },
     },
     watch: {
@@ -62,12 +86,19 @@ export default {
 </script>
 
 <style>
-/*
-.zimucaptiondiv.moving {
-    outline: 2px white solid;
+.initialcontent {
+    text-align: center;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-left: 50px;
+    padding-right: 50px;
 }
-.zimucaptiondiv.moving .captionmenu {
-    outline: 2px white solid;
+
+.loadingcontent {
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    padding-left: 100px;
+    padding-right: 100px;
 }
-*/
 </style>

@@ -4,6 +4,9 @@
             id="captionroot"
             ref="captionroot"
             :style="{ fontSize: captionFontSize+'px' }"
+            v-bind:isLoading="isLoading"
+            v-bind:translationType="translationType"
+            v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
             v-bind:nextCaption="nextCaption"
@@ -58,6 +61,7 @@ export default {
             prevCaption: null,
             currCaption: null,
             nextCaption: null,
+            translationType: null, // human vs. machine
         };
     },
     mounted: function(){
@@ -364,6 +368,27 @@ export default {
         },
     },
     computed: {
+        firstCaption: function() {
+            const data = this.$store.state.captionData;
+            if (data !== null && data.lines.length > 0) {
+                return captionArrayToDict(data.lines[0]);
+            }
+        },
+        translationType: function() {
+            if (this.firstCaption) {
+                return this.firstCaption.translations.length > 2 ? 'human' : 'machine';
+            }
+        },
+        isLoading: function() {
+            return (
+                this.captionId !== null && (
+                    this.showList === null ||
+                    this.$store.state.captionData === null ||
+                    this.$store.state.DICT === null ||
+                    this.$store.state.HSK_WORDS === null
+                )
+            );
+        },
         options: function() { return this.$store.state.options; },
         captionOffset: function() { return this.$store.state.captionOffset; },
         captionFontScale: function() { return this.$store.state.captionFontScale; },
@@ -439,7 +464,6 @@ export default {
     color: white;
     background-color: rgba(0, 0, 0, 0.85);
     text-align: left;
-    font-family: 'Heiti SC';
     font-size: 18px;
     padding: 0px;
     min-width: 7em;

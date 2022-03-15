@@ -204,6 +204,6 @@ export default {
 }
 
 .captionmenu .svgbutton {
-    top: -4px; /* WHYYYY? */
+    top: -5px; /* WHYYYY? */
 }
 </style>

@@ -543,6 +543,7 @@ export default {
 }
 
 .captioncontent {
+    font-family: 'Heiti SC';
     width: 100%;
     display: inline-block;
     padding-left: 0.25em !important;
