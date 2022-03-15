@@ -23,9 +23,7 @@ const events = [
     'EVENT_LEARN_PY',
     'EVENT_LEARN_HZ',
     'EVENT_LEARN_TR',
-    'EVENT_LEARN_AUTO_PY',
-    'EVENT_LEARN_AUTO_HZ',
-    'EVENT_LEARN_AUTO_TR',
+    'EVENT_LEARN_TRANSLATION',
     'EVENT_PIN_PY',
     'EVENT_PIN_HZ',
     'EVENT_PIN_TR',
@@ -188,7 +186,7 @@ function isName(tr) {
     return /[A-Z]/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
 }
 
-function getKnowledgeKey(type, hz, pys, tr, translation) {
+function getStateKey(type, hz, pys, tr, translation) {
     let key = null;
     if (pys === null && ['py', 'tr'].includes(type)) return null;
     var pysWithoutTones = ['py', 'tr'].includes(type) ? pys.map(py => py.slice(0, -1)) : null;
@@ -207,12 +205,12 @@ function getKnowledgeKey(type, hz, pys, tr, translation) {
     return key;
 }
 
-function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, stateType, knowledgeVal, explicit, syncIndexedDb = false) {
+function applyState(DICT, states, type, hz, pys, tr, translation, stateType, stateVal, explicit, syncIndexedDb = false) {
     const keys = [];
     const vals = [];
-    let key = getKnowledgeKey(type, hz, pys, tr, translation);
+    let key = getStateKey(type, hz, pys, tr, translation);
     keys.push(key);
-    vals.push(setKnowledge(knowledge, key, stateType, knowledgeVal, explicit));
+    vals.push(setState(states, key, stateType, stateVal, explicit));
 
     if (['hz', 'py', 'tr'].includes(type)) {
         // Add all the individual char/pys
@@ -222,13 +220,13 @@ function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, stateTy
                 const pysSub = pys !== null ? pys.slice(startIdx, endIdx) : null;
                 if (DICT[hzSub] === undefined) continue;
 
-                key = getKnowledgeKey(type, hzSub, pysSub, tr, translation);
+                key = getStateKey(type, hzSub, pysSub, tr, translation);
                 keys.push(key);
-                vals.push(setKnowledge(
-                    knowledge,
+                vals.push(setState(
+                    states,
                     key,
                     stateType,
-                    knowledgeVal,
+                    stateVal,
                     explicit
                 ));
             }
@@ -236,33 +234,33 @@ function applyKnowledge(DICT, knowledge, type, hz, pys, tr, translation, stateTy
     }
 
     if (syncIndexedDb) {
-        setIndexedDbData('knowledge', keys, vals, function() {});
+        setIndexedDbData('states', keys, vals, function() {});
     }
 }
 
-const KnowledgeUnknown = 0;
-const KnowledgeKnown = 1;
-const KnowledgeLearning = 2;
+const StateUnknown = 0;
+const StateHidden = 1;
+const StateLearning = 2;
 
-function setKnowledge(dict, key, stateType, newState, explicit) {
+function setState(dict, key, stateType, newState, explicit) {
     let currData = dict[key];
     if (currData === undefined) {
-        currData = [0, 0, false]; // Known/Learn/Explicit vs implicit
+        currData = [0, 0, false]; // Hidden/Learn/Explicit vs implicit
     }
 
     const currExplicit = currData[2];
     if (currExplicit && ! explicit) {
-        // Implicit knowledge has no effect on current explicit knowledge
+        // Implicit state has no effect on current explicit state
         return currData;
     }
     else if (explicit) {
         // If explicit, we just set it to 0 or 1, no need to count
-        currData[stateType-1] = newState === KnowledgeUnknown ? 0 : 1;
+        currData[stateType-1] = newState === StateUnknown ? 0 : 1;
         currData[2] = true; // set explicit
     }
     else if (! currExplicit && ! explicit) {
         // Update the implicit count
-        let prevState = currData[stateType-1] ? stateType : KnowledgeUnknown;
+        let prevState = currData[stateType-1] ? stateType : StateUnknown;
 
         if (prevState > 0) {
             currData[prevState-1] -= 1;
@@ -275,11 +273,11 @@ function setKnowledge(dict, key, stateType, newState, explicit) {
     return currData;
 }
 
-function getKnowledgeState(dict, key, stateType) {
-    const knowledgeState = dict[key];
-    if (knowledgeState  === undefined) return undefined;
-    if (knowledgeState[stateType-1] > 0) return stateType;
-    return KnowledgeUnknown;
+function getState(dict, key, stateType) {
+    const state = dict[key];
+    if (state  === undefined) return undefined;
+    if (state[stateType-1] > 0) return stateType;
+    return StateUnknown;
 }
 
 // SVG icons from css.gg

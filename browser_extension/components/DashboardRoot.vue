@@ -5,7 +5,7 @@
             Caption id: {{ session.captionId }}
             Caption hash: {{ session.captionHash }}
             Events:
-            <div v-for="event in session.events">
+            <div v-for="event in session.events" v-if="reverseEventsMap(event[0]).startsWith('EVENT_LEARN')">
                 {{ reverseEventsMap(event[0]) }}: {{ event.slice(1) }}
             </div>
         </div>

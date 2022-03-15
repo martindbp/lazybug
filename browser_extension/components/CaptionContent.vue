@@ -25,8 +25,8 @@
                         type="py"
                         :idx="i"
                         :hide="showStates.py[i]"
-                        :pin="purePeekStates.py[i] && knownStates.py[i]"
-                        :learn="showStates.py[i] || (purePeekStates.py[i] && knownStates.py[i])"
+                        :pin="purePeekStates.py[i] && hiddenStates.py[i]"
+                        :learn="showStates.py[i] || (purePeekStates.py[i] && hiddenStates.py[i])"
                         :unlearn="purePeekStates.py[i] && learningStates.py[i]"
                         :dict="true"
                         :click="clickContextMenu"
@@ -57,8 +57,8 @@
                         type="hz"
                         :idx="i"
                         :hide="showStates.hz[i]"
-                        :pin="purePeekStates.hz[i] && knownStates.hz[i]"
-                        :learn="showStates.hz[i] || (purePeekStates.hz[i] && knownStates.hz[i])"
+                        :pin="purePeekStates.hz[i] && hiddenStates.hz[i]"
+                        :learn="showStates.hz[i] || (purePeekStates.hz[i] && hiddenStates.hz[i])"
                         :unlearn="purePeekStates.hz[i] && learningStates.hz[i]"
                         :dict="true"
                         :click="clickContextMenu"
@@ -90,8 +90,8 @@
                         type="tr"
                         :idx="i"
                         :hide="showStates.tr[i]"
-                        :pin="purePeekStates.tr[i] && knownStates.tr[i]"
-                        :learn="showStates.tr[i] || (purePeekStates.tr[i] && knownStates.tr[i])"
+                        :pin="purePeekStates.tr[i] && hiddenStates.tr[i]"
+                        :learn="showStates.tr[i] || (purePeekStates.tr[i] && hiddenStates.tr[i])"
                         :unlearn="purePeekStates.tr[i] && learningStates.tr[i]"
                         :dict="true"
                         :click="clickContextMenu"
@@ -113,7 +113,7 @@
                     :class="{
                         captioncard: true,
                         peeking: purePeekStates.translation,
-                        learning: learningStates.translation,
+                        learningstate: learningStates.translation,
                         fulltranslation: true,
                         placeholder: !finalShowStates.translation,
                         showborder: data !== null,
@@ -232,8 +232,8 @@ export default {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': false};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    const isUnknown = [KnowledgeUnknown, undefined].includes(
-                        getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i), KnowledgeKnown)
+                    const isUnknown = [StateUnknown, undefined].includes(
+                        getState(this.$store.state.states, this.stateKey(type, i), StateHidden)
                     );
                     states[type].push(isUnknown);
                 }
@@ -250,11 +250,11 @@ export default {
             }
             return states;
         },
-        knownStates: function() {
-            return this.getStates(KnowledgeKnown);
+        hiddenStates: function() {
+            return this.getStates(StateHidden);
         },
         learningStates: function() {
-            return this.getStates(KnowledgeLearning);
+            return this.getStates(StateLearning);
         },
     },
     updated: function() {
@@ -279,9 +279,9 @@ export default {
             immediate: true,
             handler: function(newData, oldData) {
                 if (newData !== oldData) {
-                    this.applyKnownLvls();
-                    this.applyKnownPinyinComponents();
-                    this.applyKnownCompoundWordsNotInDict();
+                    this.applyLvlStates();
+                    this.applyHiddenPinyinComponents();
+                    this.applyHiddenCompoundWordsNotInDict();
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     for (const type of ['hz', 'tr', 'py', 'translation']) {
                         if (this.$store.state.options.pin[type] === true) {
@@ -322,26 +322,26 @@ export default {
                 peeking: i !== null && this.purePeekStates[type][i],
                 captioncardhidden: i !== null && ! this.finalShowStates[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
-                learning: i !== null && this.learningStates[type][i],
-                known: i !== null && this.knownStates[type][i],
+                learningstate: i !== null && this.learningStates[type][i],
+                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.learningStates[type][i],
                 peekrow: i === null,
                 pinned: this.$store.state.options.pin[type],
             };
             return cl;
         },
         getStates: function(compareTo) {
-            const translationState = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey('translation'), compareTo)
+            const translationState = getState(this.$store.state.states, this.stateKey('translation'), compareTo)
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    const state = getKnowledgeState(this.$store.state.knowledge, this.knowledgeKey(type, i), compareTo);
+                    const state = getState(this.$store.state.states, this.stateKey(type, i), compareTo);
                     states[type].push(state === compareTo);
                 }
             }
             return states;
         },
-        knowledgeKey: function(type, i = null) {
-            return getKnowledgeKey(
+        stateKey: function(type, i = null) {
+            return getStateKey(
                 type,
                 i === null ? null : this.wordData.hz[i],
                 i === null ? null : this.wordData.pys[i],
@@ -351,7 +351,7 @@ export default {
         },
         clickContextMenu(action, type, i) {
             const d = this.$store.state.DICT;
-            const k = this.$store.state.knowledge;
+            const k = this.$store.state.states;
 
             const pys = i === null ? null : this.wordData.pys[i];
             const hz = i === null ? null : this.wordData.hz[i];
@@ -360,24 +360,24 @@ export default {
             let setState = null;
             let stateType = null;
             if (action === 'hide') {
-                stateType = KnowledgeKnown;
-                setState = KnowledgeKnown;
+                stateType = StateHidden;
+                setState = StateHidden;
             }
             else if (action === 'learn') {
-                stateType = KnowledgeLearning;
-                setState = KnowledgeLearning;
+                stateType = StateLearning;
+                setState = StateLearning;
             }
             else if (action === 'pin') {
-                stateType = KnowledgeKnown;
-                setState = KnowledgeUnknown;
+                stateType = StateHidden;
+                setState = StateUnknown;
             }
             else if (action === 'unlearn') {
-                stateType = KnowledgeLearning;
-                setState = KnowledgeUnknown;
+                stateType = StateLearning;
+                setState = StateUnknown;
             }
 
             if (setState !== null) {
-                applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true);
+                applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true);
                 this.appendSessionLog([getEvent(action, type), i]);
             }
             else if (action === 'dict') {
@@ -426,9 +426,9 @@ export default {
                 this.appendSessionLog([getEvent('peek_row', type)]);
             }
         },
-        applyKnownLvls: function() {
+        applyLvlStates: function() {
             const d = this.$store.state.DICT;
-            const k = this.$store.state.knowledge;
+            const k = this.$store.state.states;
             if (d === null || k === null) return;
 
             for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -437,23 +437,23 @@ export default {
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
                 for (var type of ['hz', 'py', 'tr']) {
-                    const key = this.knowledgeKey(type, i);
+                    const key = this.stateKey(type, i);
                     if (
-                        [KnowledgeUnknown, undefined].includes(getKnowledgeState(k, key, KnowledgeKnown)) &&
-                        getKnowledgeState(this.lvlKnowledge, key, KnowledgeKnown) == KnowledgeKnown
+                        [StateUnknown, undefined].includes(getState(k, key, StateHidden)) &&
+                        getState(this.lvlStates, key, StateHidden) == StateHidden
                     ) {
-                        console.log('LVLS: Marking', type, hz, pys, tr, 'as known');
-                        applyKnowledge(d, k, type, hz, pys, tr, this.wordData.translation, KnowledgeKnown, KnowledgeKnown, false, true);
+                        console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
+                        applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, false, true);
                         this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
             }
         },
-        applyKnownPinyinComponents: function() {
-            // If user knows ni3hao3, he should know ni3 and hao3 separately, but not other way around.
+        applyHiddenPinyinComponents: function() {
+            // If user hides ni3hao3, he should hide ni3 and hao3 separately, but not other way around.
 
             const d = this.$store.state.DICT;
-            const k = this.$store.state.knowledge;
+            const k = this.$store.state.states;
             if (d === null || k === null) return;
 
             for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -471,18 +471,18 @@ export default {
                         if (hzSub === hz) continue;
                         if (d[hzSub] === undefined) continue;
 
-                        console.log('applyKnownPinyinComponents: ', 'py', hzSub, pysSub);
-                        applyKnowledge(d, k, 'py', hzSub, pysSub, null, this.wordData.translation, KnowledgeKnown, KnowledgeKnown, false, true);
+                        console.log('applyHiddenPinyinComponents: ', 'py', hzSub, pysSub);
+                        applyState(d, k, 'py', hzSub, pysSub, null, this.wordData.translation, StateHidden, StateHidden, false, true);
                     }
                 }
             }
         },
-        applyKnownCompoundWordsNotInDict: function() {
-            // If word is not in dict, but we know all the sub-words, then we say we know the compound (for hz and tr)
+        applyHiddenCompoundWordsNotInDict: function() {
+            // If word is not in dict, but we hide all the sub-words, then we say we hide the compound (for hz and tr)
             // The reasoning is, if it's not in the dictionary, it's more likely to be a compound of regular words that
             // have a similar meaning to the parts. If it had a very different meaning, then it should be in the dictionary.
             const d = this.$store.state.DICT;
-            const k = this.$store.state.knowledge;
+            const k = this.$store.state.states;
             if (d === null || k === null) return;
 
             for (let i = 0; i < this.wordData.hz.length; i++) {
@@ -508,25 +508,25 @@ export default {
                     }
                 }
 
-                let knowAll = {hz: true, tr: true};
+                let allHidden = {hz: true, tr: true};
                 for (const [wordHz, wordPys] of words) {
                     for (const type of ['hz', 'tr']) {
-                        const key = getKnowledgeKey(type, wordHz, wordPys, null, null);
-                        knowAll[type] = knowAll[type] && (
-                            getKnowledgeState(this.lvlKnowledge, key, KnowledgeKnown) === KnowledgeKnown ||
-                            getKnowledgeState(this.$store.state.knowledge, key, KnowledgeKnown) === KnowledgeKnown
+                        const key = getStateKey(type, wordHz, wordPys, null, null);
+                        allHidden[type] = allHidden[type] && (
+                            getState(this.lvlStates, key, StateHidden) === StateHidden ||
+                            getState(this.$store.state.states, key, StateHidden) === StateHidden
                         );
                     }
                 }
 
                 for (const type of ['hz', 'tr']) {
-                    if (getKnowledgeState(k, this.knowledgeKey(type, i), KnowledgeKnown) === KnowledgeKnown) {
+                    if (getState(k, this.stateKey(type, i), StateHidden) === StateHidden) {
                         continue;
                     }
 
-                    if (knowAll[type]) {
-                        console.log('applyKnownCompoundWordsNotInDict', type, hz, pys);
-                        applyKnowledge(d, k, type, hz, pys, null, null, KnowledgeKnown, KnowledgeKnown, false, true);
+                    if (allHidden[type]) {
+                        console.log('applyHiddenCompoundWordsNotInDict', type, hz, pys);
+                        applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
                         this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
@@ -612,15 +612,15 @@ export default {
     border: 1px dashed white;
 }
 
-.captioncardhidden.learning {
+.captioncardhidden.learningstate {
     border: 1px dashed darkorange;
 }
 
-.captioncard.learning .cardcontent {
+.captioncard.learningstate .cardcontent {
     color: darkorange;
 }
 
-.captioncard.known .cardcontent {
+.captioncard.hiddenstate .cardcontent {
     color: #32de84;
 }
 
@@ -676,13 +676,13 @@ export default {
     background: darkorange;
 }
 
-.iconcard.know {
+.iconcard.hide {
     top: -10px;
     right: -7px;
     width: 20px;
 }
 
-.iconcard.know svg {
+.iconcard.hide svg {
     background: limegreen;
 }
 

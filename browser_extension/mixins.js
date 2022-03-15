@@ -36,29 +36,29 @@ const mixin = {
         },
     },
     computed: {
-        lvlKnowledge: function() {
+        lvlStates: function() {
             if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
             const d = this.$store.state.DICT;
-            const knowledge = {};
+            const states = {};
             for (let lvl = 1; lvl <= 6; lvl++) {
-                const knowPy = lvl <= this.$store.state.options.knownLevels.py;
-                const knowHz = lvl <= this.$store.state.options.knownLevels.hz;
-                const knowTr = lvl <= this.$store.state.options.knownLevels.tr;
+                const hidePy = lvl <= this.$store.state.options.hideLevels.py;
+                const hideHz = lvl <= this.$store.state.options.hideLevels.hz;
+                const hideTr = lvl <= this.$store.state.options.hideLevels.tr;
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
-                    if (knowHz) applyKnowledge(d, knowledge, 'hz', hz, null, null, null, KnowledgeKnown, KnowledgeKnown, false);
+                    if (hideHz) applyState(d, states, 'hz', hz, null, null, null, StateHidden, StateHidden, false);
                     const entries = d[hz];
                     if (entries === undefined) continue;
 
                     for (let entry of entries) {
                         entry = dictArrayToDict(entry);
                         const pys = entry.pys;
-                        if (knowPy) applyKnowledge(d, knowledge, 'py', hz, pys, null, null, KnowledgeKnown, KnowledgeKnown, false);
-                        if (knowTr) applyKnowledge(d, knowledge, 'tr', hz, pys, null, null, KnowledgeKnown, KnowledgeKnown, false);
+                        if (hidePy) applyState(d, states, 'py', hz, pys, null, null, StateHidden, StateHidden, false);
+                        if (hideTr) applyState(d, states, 'tr', hz, pys, null, null, StateHidden, StateHidden, false);
                     }
                 }
             }
-            return knowledge;
+            return states;
         },
         videoWordStats: function() {
             if (this.$store.state.captionData === null) return {};

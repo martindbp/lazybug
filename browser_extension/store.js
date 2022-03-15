@@ -23,7 +23,7 @@ const store = new Vuex.Store({
         captionHash: null, // use this for event log
         DICT: null,
         HSK_WORDS: null,
-        knowledge: Vue.ref({}),
+        states: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
         isMovingCaption: false,
@@ -54,7 +54,7 @@ const store = new Vuex.Store({
                 translation: false,
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
-            knownLevels: {
+            hideLevels: {
                 py: 4,
                 hz: 2,
                 tr: 4,
@@ -94,9 +94,9 @@ const store = new Vuex.Store({
                 }
             }
         },
-        setKnowledge(state, knowledge) {
-            state.knowledge = knowledge;
-            setIndexedDbData('knowledge', null, knowledge, function() {});
+        setStates(state, states) {
+            state.states = states;
+            setIndexedDbData('states', null, states, function() {});
         },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
@@ -175,13 +175,13 @@ const store = new Vuex.Store({
 
 fetchVersionedResource('public_cedict.json', function (data) { store.commit('setDict', data); });
 fetchVersionedResource('hsk_words.json', function (data) { store.commit('setHskWords', data); });
-getIndexedDbData('knowledge', null, function (data) {
+getIndexedDbData('states', null, function (data) {
     if (data) {
         const dict = {};
         for (const item of data) {
             dict[item.id] = item.value;
         }
-        store.commit('setKnowledge', dict);
+        store.commit('setStates', dict);
     }
 });
 getIndexedDbData('other', ['options'], function (data) {

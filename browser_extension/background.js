@@ -11,7 +11,7 @@ function initIndexedDb() {
     db = new Dexie('zimuai');
     db.version(VERSION).stores({
         network: 'id',
-        knowledge: 'id',
+        states: 'id',
         other: 'id',
         log: '[captionId+captionHash+sessionTime]',
         srs: 'id',
