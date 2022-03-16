@@ -172,7 +172,7 @@ export default {
         truncateTrLengths: function() {
             let outLengths = [];
             for (let i = 0; i < this.data.alignments.length; i++) {
-                const trunateLength = Math.max(15, Math.ceil(Math.max(this.wordData.py[i].length, this.wordData.hz[i].length) * 2))  // add 100% to longest
+                const trunateLength = truncateTranslationLength(this.wordData.py[i], this.wordData.hz[i]);
                 outLengths.push(trunateLength);
             }
             return outLengths;
@@ -366,6 +366,8 @@ export default {
             else if (action === 'learn') {
                 stateType = StateLearning;
                 setState = StateLearning;
+                console.log(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
+                updateClipboard(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
             }
             else if (action === 'pin') {
                 stateType = StateHidden;

@@ -280,6 +280,46 @@ function getState(dict, key, stateType) {
     return StateUnknown;
 }
 
+function truncateTranslationLength(py, hz) {
+    // Calculates a max length based on the length of `py` and `hz`
+    return Math.max(15, Math.ceil(Math.max(py.length, hz.length) * 2));  // add 100% to longest
+}
+
+function captionToAnkiCloze(wordData, hiddenStates, type, i) {
+    let html = '<table>';
+    for (const rowType of ['py', 'hz', 'tr']) {
+        let row = '<tr>';
+        for (let j = 0; j < wordData[rowType].length; j++) {
+            let data = wordData[rowType][j];
+
+            if (rowType === type && i == j) {
+                row += '<td>{{c1::' + data + '}}</td>';
+            }
+            else {
+                let td = '<td>';
+                if (rowType !== 'hz' && hiddenStates[rowType][j]) {
+                    td = '<td style="display: none">';
+                }
+                if (rowType === 'tr') {
+                    const truncateLength = truncateTranslationLength(wordData.py[j], wordData.hz[j]);
+                    data = data.slice(0, truncateLength) + '...';
+                }
+                row += td + data + '</td>';
+            }
+        }
+        html += row;
+    }
+    html += '</table>';
+    return html;
+}
+
+function updateClipboard(newClip) {
+  navigator.clipboard.writeText(newClip).then(function() {
+  }, function() {
+    console.log('Clipboard failed');
+  });
+}
+
 // SVG icons from css.gg
 const ICON_SVG = {
     'play-track-next': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none"><path d="M6 17L14 12L6 7V17Z" fill="currentColor"/><path d="M18 7H15V12V17H18V7Z" fill="currentColor"/></svg>',
