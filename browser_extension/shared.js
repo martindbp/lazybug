@@ -286,27 +286,27 @@ function truncateTranslationLength(py, hz) {
 }
 
 function captionToAnkiCloze(wordData, hiddenStates, type, i) {
-    let html = '<table>';
+    let html = '<table>\n';
     for (const rowType of ['py', 'hz', 'tr']) {
-        let row = '<tr>';
+        let row = '\t<tr>\n';
         for (let j = 0; j < wordData[rowType].length; j++) {
             let data = wordData[rowType][j];
 
             if (rowType === type && i == j) {
-                row += '<td>{{c1::' + data + '}}</td>';
+                row += '\t\t<td>{{c1::' + data + '}}</td>\n';
             }
             else {
-                let td = '<td>';
-                if (rowType !== 'hz' && hiddenStates[rowType][j]) {
-                    td = '<td style="display: none">';
-                }
                 if (rowType === 'tr') {
                     const truncateLength = truncateTranslationLength(wordData.py[j], wordData.hz[j]);
-                    data = data.slice(0, truncateLength) + '...';
+                    data = data.slice(0, truncateLength) + (data.length > truncateLength ? '...' : '');
                 }
-                row += td + data + '</td>';
+                if (rowType !== 'hz' && hiddenStates[rowType][j]) {
+                    data = '<span style="display: none">' + data + '</span>';
+                }
+                row += '\t\t<td>' + data + '</td>\n';
             }
         }
+        row += '\t</tr>\n';
         html += row;
     }
     html += '</table>';
