@@ -379,7 +379,7 @@ export default {
             }
 
             if (setState !== null) {
-                applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true);
+                applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
                 this.appendSessionLog([getEvent(action, type), i]);
             }
             else if (action === 'dict') {
