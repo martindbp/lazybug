@@ -480,7 +480,7 @@ export default {
             }
         },
         applyHiddenCompoundWordsNotInDict: function() {
-            // If word is not in dict, but we hide all the sub-words, then we say we hide the compound (for hz and tr)
+            // If word is not in dict, but we hide all the sub-words, then we say we hide the compound
             // The reasoning is, if it's not in the dictionary, it's more likely to be a compound of regular words that
             // have a similar meaning to the parts. If it had a very different meaning, then it should be in the dictionary.
             const d = this.$store.state.DICT;
@@ -510,9 +510,9 @@ export default {
                     }
                 }
 
-                let allHidden = {hz: true, tr: true};
+                let allHidden = {hz: true, tr: true, py: true};
                 for (const [wordHz, wordPys] of words) {
-                    for (const type of ['hz', 'tr']) {
+                    for (const type of ['hz', 'tr', 'py']) {
                         const key = getStateKey(type, wordHz, wordPys, null, null);
                         allHidden[type] = allHidden[type] && (
                             getState(this.lvlStates, key, StateHidden) === StateHidden ||
@@ -521,7 +521,7 @@ export default {
                     }
                 }
 
-                for (const type of ['hz', 'tr']) {
+                for (const type of ['hz', 'tr', 'py']) {
                     if (getState(k, this.stateKey(type, i), StateHidden) === StateHidden) {
                         continue;
                     }
