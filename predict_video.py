@@ -582,6 +582,7 @@ def replace_or_add_line(
     replace_levenshtein_threshold=1.0,
     zero_out_numpy=True,
     do_save_caption_data=True,
+    filter_out_too_many_low_prob_chars=True,
     caption_type='hanzi',
 ):
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
@@ -589,7 +590,7 @@ def replace_or_add_line(
 
     if new_line.text != '':
         too_many_low_prob_chars = (new_line.char_probs < HIGH_PROB_CHAR).sum() / len(new_line.text) > 0.7 and len(new_line.text) > 1
-        if (caption_type == 'hanzi' and len(filter_text_hanzi(new_line.text)) == 0) or too_many_low_prob_chars:
+        if (caption_type == 'hanzi' and len(filter_text_hanzi(new_line.text)) == 0) or (filter_out_too_many_low_prob_chars and too_many_low_prob_chars):
             print('Too many low prob characters:', new_line, ', removing')
             return last_line
 
@@ -755,6 +756,7 @@ def predict_video_captions(
     out_height=80,
     font_height=60,
     replace_levenshtein_threshold=1.0,
+    filter_out_too_many_low_prob_chars=True,
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
@@ -920,6 +922,7 @@ def predict_video_captions(
                     replace_levenshtein_threshold,
                     zero_out_numpy,
                     do_save_caption_data,
+                    filter_out_too_many_low_prob_chars,
                     caption_type,
                 )
                 #if (line.t0 == 0 or line.t1 == 0) and line.text != '':
@@ -1337,6 +1340,7 @@ def process_video_captions(
                 param.get('start_time', None),
                 param.get('end_time', None),
                 replace_levenshtein_threshold=1.0,
+                filter_out_too_many_low_prob_chars=param.get('filter_out_too_many_low_prob_chars', True),
                 caption_type=param['type'],
                 ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
                 conditional_captions=conditional_captions
