@@ -10,7 +10,7 @@
 
 <script>
 export default {
-    props: ['type', 'idx', 'hide', 'learn', 'pin', 'dict', 'click'],
+    props: ['type', 'idx', 'hide', 'learn', 'unlearn', 'pin', 'dict', 'click'],
     data: function () { return {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),

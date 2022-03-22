@@ -31,6 +31,7 @@ const events = [
     'EVENT_UNLEARN_HZ',
     'EVENT_UNLEARN_TR',
     'EVENT_BLUR',
+    'EVENT_HIDDEN_STATES',
 ];
 
 const eventsMap = {};

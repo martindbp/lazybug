@@ -15,19 +15,19 @@
                 >
                     <span
                         class="cardcontent"
-                        :style="{opacity: finalShowStates.py[i] ? 1 : 0}"
+                        :style="{opacity: hiddenAndNotPeeking.py[i] ? 0 : 1}"
                     >
-                        {{ finalShowStates.py[i] ? py : '-' }}
+                        {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
                     <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.py[i]"
                         type="py"
                         :idx="i"
-                        :hide="showStates.py[i]"
+                        :hide="!hiddenStates.py[i]"
                         :pin="purePeekStates.py[i] && hiddenStates.py[i]"
-                        :learn="showStates.py[i] || (purePeekStates.py[i] && hiddenStates.py[i])"
-                        :unlearn="purePeekStates.py[i] && learningStates.py[i]"
+                        :learn="!hiddenAndNotPeeking.py[i] && ! learningStates.py[i]"
+                        :unlearn="learningStates.py[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -47,7 +47,7 @@
                 >
                     <span
                         class="cardcontent"
-                        :style="{opacity: finalShowStates.hz[i] ? 1 : 0}"
+                        :style="{opacity: hiddenAndNotPeeking.hz[i] ? 0 : 1}"
                     >
                         {{ sm2tr(hz) }}
                     </span>
@@ -56,10 +56,10 @@
                         v-if="showContextMenu.hz[i]"
                         type="hz"
                         :idx="i"
-                        :hide="showStates.hz[i]"
+                        :hide="!hiddenStates.hz[i]"
                         :pin="purePeekStates.hz[i] && hiddenStates.hz[i]"
-                        :learn="showStates.hz[i] || (purePeekStates.hz[i] && hiddenStates.hz[i])"
-                        :unlearn="purePeekStates.hz[i] && learningStates.hz[i]"
+                        :learn="!hiddenAndNotPeeking.hz[i] && ! learningStates.hz[i]"
+                        :unlearn="learningStates.hz[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -79,20 +79,20 @@
                 >
                     <span
                         class="cardcontent"
-                        :title="finalShowStates.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
-                        :style="{opacity: finalShowStates.tr[i] ? 1 : 0}"
+                        :title="!hiddenAndNotPeeking.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
+                        :style="{opacity: hiddenAndNotPeeking.tr[i] ? 0 : 1}"
                     >
-                        {{ tr !== null && finalShowStates.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
+                        {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
                     <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.tr[i]"
                         type="tr"
                         :idx="i"
-                        :hide="showStates.tr[i]"
+                        :hide="!hiddenStates.tr[i]"
                         :pin="purePeekStates.tr[i] && hiddenStates.tr[i]"
-                        :learn="showStates.tr[i] || (purePeekStates.tr[i] && hiddenStates.tr[i])"
-                        :unlearn="purePeekStates.tr[i] && learningStates.tr[i]"
+                        :learn="!hiddenAndNotPeeking.tr[i] && ! learningStates.tr[i]"
+                        :unlearn="learningStates.tr[i]"
                         :dict="true"
                         :click="clickContextMenu"
                     />
@@ -115,12 +115,12 @@
                         peeking: purePeekStates.translation,
                         learningstate: learningStates.translation,
                         fulltranslation: true,
-                        placeholder: !finalShowStates.translation,
+                        placeholder: hiddenAndNotPeeking.translation,
                         showborder: data !== null,
                     }"
                 >
-                    <span class="cardcontent" :style="{ opacity: finalShowStates['translation'] ? 1 : 0 }"> {{ translation }}</span>
-                    <span style="position: absolute; left: 50%" v-if="!finalShowStates['translation']" v-html="eyecon"></span>
+                    <span class="cardcontent" :style="{ opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }"> {{ translation }}</span>
+                    <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking['translation']" v-html="eyecon"></span>
                     <ContentContextMenu
                         v-if="showContextMenu.translation"
                         type="translation"
@@ -228,24 +228,11 @@ export default {
             //console.log('wordData', wordData);
             return wordData;
         },
-        showStates: function() {
-            const states = {'py': [], 'hz': [], 'tr': [], 'translation': false};
+        hiddenAndNotPeeking: function() {
+            const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.hiddenStates['translation'] && ! this.purePeekStates['translation']};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    const isUnknown = [StateUnknown, undefined].includes(
-                        getState(this.$store.state.states, this.stateKey(type, i), StateHidden)
-                    );
-                    states[type].push(isUnknown);
-                }
-            }
-            return states;
-        },
-        finalShowStates: function() {
-            // Show states that include the peek states
-            const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.showStates['translation'] || this.purePeekStates['translation']};
-            for (let i = 0; i < this.wordData.hz.length; i++) {
-                for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = this.showStates[type][i] || this.purePeekStates[type][i];
+                    states[type][i] = this.hiddenStates[type][i] && ! this.purePeekStates[type][i];
                 }
             }
             return states;
@@ -288,6 +275,8 @@ export default {
                             this.$store.commit('setPeekState', {'type': type});
                         }
                     }
+                    // Store states as seen by the user after lvl/component/compounds have been applied
+                    this.storeHiddenStates();
                 }
             },
         },
@@ -296,6 +285,9 @@ export default {
         }
     },
     methods: {
+        storeHiddenStates: function() {
+
+        },
         resetShowContextMenu: function(newData) {
             const show = {
                 translation: false,
@@ -320,7 +312,7 @@ export default {
             const cl = {
                 captioncard: true,
                 peeking: i !== null && this.purePeekStates[type][i],
-                captioncardhidden: i !== null && ! this.finalShowStates[type][i],
+                captioncardhidden: i !== null && this.hiddenAndNotPeeking[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
                 learningstate: i !== null && this.learningStates[type][i],
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.learningStates[type][i],
@@ -362,6 +354,8 @@ export default {
             if (action === 'hide') {
                 stateType = StateHidden;
                 setState = StateHidden;
+                // Peek it so that it doesn't become hidden right away
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
             else if (action === 'learn') {
                 stateType = StateLearning;
@@ -389,8 +383,8 @@ export default {
             this.resetShowContextMenu(this.wordData);
         },
         click: function(type, i = null) {
-            if (type === 'translation' && this.showStates[type] === false) {
-                if (this.finalShowStates[type] === true) {
+            if (type === 'translation' && this.hiddenStates[type] === true) {
+                if (this.hiddenAndNotPeeking[type] === false) {
                     const lastVal = this.showContextMenu[type];
                     this.resetShowContextMenu(this.wordData);
                     this.showContextMenu[type] = ! lastVal;
@@ -404,7 +398,7 @@ export default {
 
             if (this.wordData.pys[i] === null) return;
 
-            if (this.showStates[type][i] === false && ! this.purePeekStates[type][i]) {
+            if (this.hiddenStates[type][i] === true && ! this.purePeekStates[type][i]) {
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
                 this.appendSessionLog([getEvent('peek', 'tr'), i]);
             }
@@ -612,18 +606,21 @@ export default {
 
 .centerrow .captioncardhidden {
     border: 1px dashed white;
+    border-radius: 3px;
 }
 
-.captioncardhidden.learningstate {
+.captioncard.learningstate {
     border: 1px dashed darkorange;
+    border-radius: 3px;
 }
 
-.captioncard.learningstate .cardcontent {
-    color: darkorange;
+.captioncard.peeking .cardcontent {
+    /*color: #32de84;*/
+    color: gray;
 }
 
-.captioncard.hiddenstate .cardcontent {
-    color: #32de84;
+.captioncard.peeking:hover .cardcontent {
+    color: lightgray;
 }
 
 .peekrow .cardcontent {

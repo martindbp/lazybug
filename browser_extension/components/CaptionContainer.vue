@@ -14,7 +14,7 @@
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
         />
-        <div class="initialcontent" v-if="showData === null && ! isLoading">
+        <div class="initialcontent" v-if="! isLoading && showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
             Video has <i>{{ translationType }}</i> sentence translations
             <br />
             <br />

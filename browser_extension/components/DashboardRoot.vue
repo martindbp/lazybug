@@ -1,11 +1,15 @@
 <template>
     <div>
+        <div v-for="event in learnEvents">
+            {{ event }}
+        </div>
+
         <div v-for="session in log">
             Session time: {{ session.sessionTime }}
             Caption id: {{ session.captionId }}
             Caption hash: {{ session.captionHash }}
             Events:
-            <div v-for="event in session.events" v-if="reverseEventsMap(event[0]).startsWith('EVENT_LEARN')">
+            <div v-for="event in session.events">
                 {{ reverseEventsMap(event[0]) }}: {{ event.slice(1) }}
             </div>
         </div>
@@ -31,6 +35,22 @@ export default {
         }
     },
     watch: {
+    },
+    computed: {
+        learnEvents: function() {
+            const learnEvents = [];
+            if (this.log === null) return learnEvents;
+
+            for (const session of this.log) {
+                for (const event of session.events) {
+                    if (reverseEventsMap[event[0]].startsWith("EVENT_LEARN")) {
+                        learnEvents.push(event);
+                    }
+                }
+            }
+
+            return learnEvents;
+        },
     },
 };
 </script>
