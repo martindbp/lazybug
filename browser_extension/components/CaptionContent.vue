@@ -374,7 +374,11 @@ export default {
 
             if (setState !== null) {
                 applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
-                this.appendSessionLog([getEvent(action, type), i]);
+                const eventData = [getEvent(action, type), i];
+                if (setState === StateLearning) {
+                    eventData.push(this.getCurrentState());
+                }
+                this.appendSessionLog(eventData);
             }
             else if (action === 'dict') {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
@@ -382,16 +386,29 @@ export default {
             }
             this.resetShowContextMenu(this.wordData);
         },
+        getCurrentState: function() {
+            return {
+                words: this.wordData,
+                hidden: this.hiddenStates,
+            };
+        },
         click: function(type, i = null) {
-            if (type === 'translation' && this.hiddenStates[type] === true) {
-                if (this.hiddenAndNotPeeking[type] === false) {
+            if (type === 'translation') {
+                if (this.hiddenStates[type] === true) {
+                    if (this.hiddenAndNotPeeking[type] === false) {
+                        const lastVal = this.showContextMenu[type];
+                        this.resetShowContextMenu(this.wordData);
+                        this.showContextMenu[type] = ! lastVal;
+                    }
+                    else {
+                        this.$store.commit('setPeekState', {'type': type, 'i': i});
+                        this.appendSessionLog([getEvent('peek', 'translation')]);
+                    }
+                }
+                else {
                     const lastVal = this.showContextMenu[type];
                     this.resetShowContextMenu(this.wordData);
                     this.showContextMenu[type] = ! lastVal;
-                }
-                else {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
-                    this.appendSessionLog([getEvent('peek', 'translation')]);
                 }
                 return;
             }
