@@ -456,7 +456,7 @@ export default {
                         getState(this.lvlStates, key, StateHidden) == StateHidden
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
-                        applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, false, true);
+                        applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
                         this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
