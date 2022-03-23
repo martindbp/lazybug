@@ -274,9 +274,9 @@ function setState(dict, key, stateType, newState, explicit) {
     return currData;
 }
 
-function getState(dict, key, stateType) {
+function getState(dict, key, stateType, defaultValue) {
     const state = dict[key];
-    if (state  === undefined) return undefined;
+    if (state  === undefined) return defaultValue;
     if (state[stateType-1] > 0) return stateType;
     return StateUnknown;
 }

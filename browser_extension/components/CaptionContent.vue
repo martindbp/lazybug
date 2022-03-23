@@ -238,10 +238,10 @@ export default {
             return states;
         },
         hiddenStates: function() {
-            return this.getStates(StateHidden);
+            return this.getStates(StateHidden, StateUnknown, StateHidden);
         },
         learningStates: function() {
-            return this.getStates(StateLearning);
+            return this.getStates(StateLearning, StateUnknown, StateUnknown);
         },
     },
     updated: function() {
@@ -321,12 +321,12 @@ export default {
             };
             return cl;
         },
-        getStates: function(compareTo) {
-            const translationState = getState(this.$store.state.states, this.stateKey('translation'), compareTo)
+        getStates: function(compareTo, defaultValue, defaultValueTranslation) {
+            const translationState = getState(this.$store.state.states, this.stateKey('translation'), compareTo, defaultValueTranslation)
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    const state = getState(this.$store.state.states, this.stateKey(type, i), compareTo);
+                    const state = getState(this.$store.state.states, this.stateKey(type, i), compareTo, defaultValue);
                     states[type].push(state === compareTo);
                 }
             }
