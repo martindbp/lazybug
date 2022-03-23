@@ -371,7 +371,7 @@ export default {
         firstCaption: function() {
             const data = this.$store.state.captionData;
             if (data !== null && data.lines.length > 0) {
-                return captionArrayToDict(data.lines[0]);
+                return captionArrayToDict(data.lines[0], this.$store.state.captionData);
             }
         },
         translationType: function() {
