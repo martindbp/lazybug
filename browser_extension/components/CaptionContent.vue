@@ -741,6 +741,11 @@ export default {
     color: white;
 }
 
+.fulltranslation > .cardcontent {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
 .captioncardhidden .q-badge {
     display: none !important;
 }
