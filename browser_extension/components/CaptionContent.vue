@@ -362,6 +362,10 @@ export default {
                 setState = StateLearning;
                 console.log(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
                 updateClipboard(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
+                this.$q.notify({
+                  type: 'positive',
+                  message: 'Anki cloze card copied to clipboard'
+                })
             }
             else if (action === 'pin') {
                 stateType = StateHidden;
