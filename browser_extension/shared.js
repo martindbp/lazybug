@@ -288,29 +288,65 @@ function truncateTranslationLength(py, hz) {
 
 function captionToAnkiCloze(wordData, hiddenStates, type, i) {
     let html = '<table>\n';
+    let nextClozeIdx = 0;
     for (const rowType of ['py', 'hz', 'tr']) {
         let row = '\t<tr>\n';
         for (let j = 0; j < wordData[rowType].length; j++) {
             let data = wordData[rowType][j];
 
-            if (rowType === type && i == j) {
-                row += '\t\t<td>{{c1::' + data + '}}</td>\n';
+            if (i == j) {
+                if (type === 'py') {
+                    if (rowType === 'py') {
+                        row += '\t\t<td>{{c1::' + data + '}}</td>\n';
+                    }
+                    else {
+                        row += '\t\t<td>' + data + '</td>\n';
+                    }
+                }
+                else if (type === 'hz') {
+                    if (rowType === 'hz') {
+                        row += '\t\t<td>' + data + '</td>\n';
+                    }
+                    else if (rowType === 'py') {
+                        row += '\t\t<td>{{c1::' + data + '}}</td>\n';
+                    }
+                    else if (rowType === 'tr') {
+                        row += '\t\t<td>{{c1::' + data + '}}</td>\n';
+                    }
+                }
+                else if (type === 'tr') {
+                    if (rowType === 'tr') {
+                        row += '\t\t<td>{{c1::' + data + '}}</td>\n';
+                    }
+                    else {
+                        row += '\t\t<td>' + data + '</td>\n';
+                    }
+                }
             }
             else {
+                let title = null;
                 if (rowType === 'tr') {
                     const truncateLength = truncateTranslationLength(wordData.py[j], wordData.hz[j]);
-                    data = data.slice(0, truncateLength) + (data.length > truncateLength ? '...' : '');
+                    const doTruncate = data.length > truncateLength;
+                    title = data;
+                    data = data.slice(0, truncateLength) + (doTruncate ? '...' : '');
                 }
                 if (rowType !== 'hz' && hiddenStates[rowType][j]) {
                     data = '<span style="display: none">' + data + '</span>';
                 }
-                row += '\t\t<td>' + data + '</td>\n';
+                if (title !== null) {
+                    row += `\t\t<td title="${title}">` + data + '</td>\n';
+                }
+                else {
+                    row += '\t\t<td>' + data + '</td>\n';
+                }
             }
         }
         row += '\t</tr>\n';
         html += row;
     }
     html += '</table>';
+    html += `<br><hr><br><div>{{c1::${wordData.translation}}}</div>`;
     return html;
 }
 

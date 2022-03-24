@@ -181,10 +181,13 @@ export default {
             }
             return outLengths;
         },
+        translationIdx: function() {
+            if (this.data == null) return null;
+            return Math.min(this.$store.state.options.displayTranslation, this.data.translations.length-1);
+        },
         translation: function() {
-            if (this.data == null) return '';
-            const useTranslationIdx = Math.min(this.$store.state.options.displayTranslation, this.data.translations.length-1);
-            return this.data.translations[useTranslationIdx];
+            if (this.translationIdx == null) return '';
+            return this.data.translations[this.translationIdx];
         },
         texts: function() {
             const sm = this.data.texts.join(' ');
@@ -364,8 +367,9 @@ export default {
             else if (action === 'learn') {
                 stateType = StateLearning;
                 setState = StateLearning;
-                console.log(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
-                updateClipboard(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i), this.$q, 'Anki cloze card copied to clipboard');
+                const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i);
+                console.log(cloze);
+                updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
             }
             else if (action === 'pin') {
                 stateType = StateHidden;
