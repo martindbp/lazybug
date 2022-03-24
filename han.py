@@ -96,8 +96,8 @@ def load_hsk_unihan_jieba():
             JIEBA_POS_FREQ[hz] = (pos, int(freq))
 
 
-@task(serializer=json, deps=[FileRef('data/git/cedict_ts.u8'), FileRef('data/git/cedict_ignore.txt'), FileRef('data/git/cedict_freq_override.txt')])
-def make_cedict(freqs=None) -> Cedict:
+@task(serializer=json, deps=[FileRef('data/git/cedict_ignore.txt'), FileRef('data/git/cedict_freq_override.txt')])
+def make_cedict(freqs=None, filename=FileRef('data/git/cedict_ts.u8')) -> Cedict:
     load_hsk_unihan_jieba()
     cedict_ignore = set()
     with open('data/git/cedict_ignore.txt') as f:
@@ -121,7 +121,7 @@ def make_cedict(freqs=None) -> Cedict:
         readings_freq_all, readings_freq_single = freqs
 
     cedict = defaultdict(list)
-    with open('data/git/cedict_ts.u8', 'r', encoding="utf-8") as f:
+    with open(filename, 'r', encoding="utf-8") as f:
         total_freqs = 0
         for i, line in enumerate(f):
             tr_sm_py = line[:line.index(']')+1] if ']' in line else None

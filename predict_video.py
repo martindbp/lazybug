@@ -1288,7 +1288,7 @@ def _make_public_cedict(cedict):
 
 
 def make_public_cedict_db():
-    cedict = Future.from_file('data/remote/private/cedict_with_freqs.json')
+    cedict = make_cedict(freqs=None, filename='data/remote/public/cedict_ts.u8')
     public_cedict = _make_public_cedict(cedict)
     public_cedict >> f'data/remote/public/public_cedict-{public_cedict.hash}.json'
     with open(f'data/remote/public/public_cedict.hash', 'w') as f:
