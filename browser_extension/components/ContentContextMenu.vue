@@ -5,18 +5,20 @@
         <span v-if="learn" class="contexticon learn" title="Learn" v-html="plusIcon" @click.stop.prevent="clickButton('learn')"></span>
         <span v-if="unlearn" class="contexticon unlearn" title="Unlearn" v-html="undoIcon" @click.stop.prevent="clickButton('unlearn')"></span>
         <span v-if="dict" class="contexticon dictionary" title="Look up in dictionary" v-html="dictionaryIcon" @click.stop.prevent="clickButton('dict')"></span>
+        <span v-if="copy" class="contexticon copy" title="Copy" v-html="copyIcon" @click.stop.prevent="clickButton('copy')"></span>
     </span>
 </template>
 
 <script>
 export default {
-    props: ['type', 'idx', 'hide', 'learn', 'unlearn', 'pin', 'dict', 'click'],
+    props: ['type', 'idx', 'hide', 'learn', 'unlearn', 'pin', 'dict', 'copy', 'click'],
     data: function () { return {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),
         hideIcon: getIconSvg("hide", 18),
         undoIcon: getIconSvg("undo", 18),
         pinIcon: getIconSvg("pin", 18),
+        copyIcon: getIconSvg("copy", 18),
     }},
     methods: {
         clickButton: function(action) {
@@ -66,6 +68,10 @@ export default {
 
 .contexticon.dictionary svg {
     background: #483D8B;
+}
+
+.contexticon.copy svg {
+    background: gray;
 }
 
 .contexticon > svg {

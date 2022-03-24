@@ -30,6 +30,7 @@
                         :unlearn="learningStates.py[i]"
                         :dict="true"
                         :click="clickContextMenu"
+                        :copy="true"
                     />
                 </td>
             </tr>
@@ -62,6 +63,7 @@
                         :unlearn="learningStates.hz[i]"
                         :dict="true"
                         :click="clickContextMenu"
+                        :copy="true"
                     />
                 </td>
             </tr>
@@ -95,6 +97,7 @@
                         :unlearn="learningStates.tr[i]"
                         :dict="true"
                         :click="clickContextMenu"
+                        :copy="true"
                     />
                 </td>
             </tr>
@@ -130,6 +133,7 @@
                         :hide="false"
                         :dict="false"
                         :click="clickContextMenu"
+                        :copy="true"
                     />
                 </td>
             </tr>
@@ -361,11 +365,7 @@ export default {
                 stateType = StateLearning;
                 setState = StateLearning;
                 console.log(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
-                updateClipboard(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i));
-                this.$q.notify({
-                  type: 'positive',
-                  message: 'Anki cloze card copied to clipboard'
-                })
+                updateClipboard(captionToAnkiCloze(this.wordData, this.hiddenStates, type, i), this.$q, 'Anki cloze card copied to clipboard');
             }
             else if (action === 'pin') {
                 stateType = StateHidden;
@@ -388,6 +388,15 @@ export default {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
                 this.$store.commit('setShowDictionary', {val: true, range: [startIdx, endIdx]});
             }
+            else if (action === 'copy') {
+                if (type === 'translation') {
+                    updateClipboard(this.wordData[type], this.$q, 'Copied to clipboard');
+                }
+                else {
+                    updateClipboard(this.wordData[type][i], this.$q, 'Copied to clipboard');
+                }
+            }
+
             this.resetShowContextMenu(this.wordData);
         },
         getCurrentState: function() {
@@ -549,6 +558,9 @@ export default {
                 }
             }
         },
+        applyHiddenCompoundWordsWhereAllButOneIsSimpleModifier: function() {
+            // Yeah, sorry about this name... For example, 地上, 拿不着, 这样的, 不服气
+        }
     }
 };
 </script>
