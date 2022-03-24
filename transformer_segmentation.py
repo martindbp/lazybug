@@ -669,29 +669,34 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     # * 出点钱
                     # * 出过国
                     for middle_char in MIDDLE_CHARS:
-                        pre = ''.join(components[:2])
-                        post = ''.join(components[1:])
+                        if middle_char not in joined_hz:
+                            continue
+
+                        idx = joined_hz.index(middle_char)
+                        if idx == 0 or idx == len(joined_hz) - 1:
+                            continue
+
+                        pre = joined_hz[:idx]
+                        post = joined_hz[idx+1:]
                         post_post = new_ws_sentence[i+window_size+1] if len(new_ws_sentence) > i + window_size + 1 else None
                         if (
-                            window_size == 3 and
                             joined_hz not in CEDICT.v and
-                            components[1] == middle_char and
                             middle_char != post_post and # needed this for e.g. (好了好）了
                             pre not in CEDICT.v and
                             post not in CEDICT.v and
-                            (components[0] + components[2]) in CEDICT.v
+                            pre + post in CEDICT.v
 
                         ):
-                            check_hz = components[0] + components[2]
+                            check_hz = pre + post
                             break
 
-                    # Special cases for e.g. 对不对
+                    # Special cases for e.g. 对不对, 想不想, 知不知道
                     if (
-                        window_size == 3 and
-                        components[0] == components[2] and
-                        components[1] == '不'
+                        len(joined_hz) in [3, 4] and
+                        joined_hz[0] == joined_hz[2] and
+                        joined_hz[1] == '不'
                     ):
-                        check_hz = components[0]
+                        check_hz = joined_hz[2:]
                         break
 
                     force_join = False
