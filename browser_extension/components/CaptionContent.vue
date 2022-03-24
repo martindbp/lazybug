@@ -647,7 +647,7 @@ export default {
     border-radius: 3px;
 }
 
-.captioncard.peeking .cardcontent {
+.captioncard.peeking:not(.fulltranslation) .cardcontent {
     /*color: #32de84;*/
     color: gray;
 }
