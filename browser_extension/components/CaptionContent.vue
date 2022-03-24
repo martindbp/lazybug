@@ -480,7 +480,7 @@ export default {
             }
         },
         applyHiddenPinyinComponents: function() {
-            // If user hides ni3hao3, he should hide ni3 and hao3 separately, but not other way around.
+            // If user hides ni3hao3, we should hide ni3 and hao3 separately, but not other way around.
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -490,7 +490,11 @@ export default {
                 const hz = this.wordData.hz[i];
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
-                if (d[hz] !== undefined || pys === null || isName(tr)) continue;
+
+                const key = getStateKey('py', hz, pys, null, null);
+                const currState = getState(k, key, StateHidden, StateUnknown);
+
+                if (d[hz] !== undefined || pys === null || isName(tr) || currState !== StateHidden) continue;
 
                 let words = [];
                 for (let w = 5; w >= 1; w--) {
@@ -554,7 +558,13 @@ export default {
                         continue;
                     }
 
-                    if (allHidden[type]) {
+                    if (type === 'py' && !allHidden.tr) {
+                        // Do nothing, we don't want to hide py unless tr is hidden first
+                    }
+                    else if (type === 'hz' && (!allHidden.tr || !allHidden.py)) {
+                        // Do nothing, we don't want to hide hz unless both py and tr are also hidden
+                    }
+                    else if (allHidden[type]) {
                         console.log('applyHiddenCompoundWordsNotInDict', type, hz, pys);
                         applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
                         this.appendSessionLog([getEvent('hide_auto', type), i]);
@@ -563,7 +573,8 @@ export default {
             }
         },
         applyHiddenCompoundWordsWhereAllButOneIsSimpleModifier: function() {
-            // Yeah, sorry about this name... For example, 地上, 拿不着, 这样的, 不服气
+            // For example, 地上, 拿不着, 这样的, 不服气, 知道了
+            // But not 想不到
         }
     }
 };

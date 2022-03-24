@@ -184,7 +184,8 @@ function captionArrayToDict(arr, captionData) {
 
 function isName(tr) {
     // NOTE: we say it's a name if there is _any_ capitalzied character, e.g. "lao Ni"
-    return /[A-Z]/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
+    // Should match "Henry", but not "TV" or "chair"
+    return /^[A-Z][^A-Z]+/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
 }
 
 function getStateKey(type, hz, pys, tr, translation) {
@@ -209,6 +210,7 @@ function getStateKey(type, hz, pys, tr, translation) {
 function applyState(DICT, states, type, hz, pys, tr, translation, stateType, stateVal, explicit, syncIndexedDb = false) {
     const keys = [];
     const vals = [];
+
     let key = getStateKey(type, hz, pys, tr, translation);
     keys.push(key);
     vals.push(setState(states, key, stateType, stateVal, explicit));
@@ -228,7 +230,7 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
                     key,
                     stateType,
                     stateVal,
-                    explicit
+                    false, // not exlicit
                 ));
             }
         }

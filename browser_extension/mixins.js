@@ -46,15 +46,15 @@ const mixin = {
                 const hideTr = lvl <= this.$store.state.options.hideLevels.tr;
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
-                    if (hideHz) applyState(d, states, 'hz', hz, null, null, null, StateHidden, StateHidden, false);
+                    if (hideHz) applyState(d, states, 'hz', hz, null, null, null, StateHidden, StateHidden, true, false);
                     const entries = d[hz];
                     if (entries === undefined) continue;
 
                     for (let entry of entries) {
                         entry = dictArrayToDict(entry);
                         const pys = entry.pys;
-                        if (hidePy) applyState(d, states, 'py', hz, pys, null, null, StateHidden, StateHidden, false);
-                        if (hideTr) applyState(d, states, 'tr', hz, pys, null, null, StateHidden, StateHidden, false);
+                        if (hidePy) applyState(d, states, 'py', hz, pys, null, null, StateHidden, StateHidden, true, false);
+                        if (hideTr) applyState(d, states, 'tr', hz, pys, null, null, StateHidden, StateHidden, true, false);
                     }
                 }
             }
