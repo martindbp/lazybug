@@ -456,8 +456,8 @@ export default {
                 for (var type of ['hz', 'py', 'tr']) {
                     const key = this.stateKey(type, i);
                     if (
-                        [StateUnknown, undefined].includes(getState(k, key, StateHidden)) &&
-                        getState(this.lvlStates, key, StateHidden) == StateHidden
+                        getState(k, key, StateHidden, StateUnknown) == StateUnknown &&
+                        getState(this.lvlStates, key, StateHidden, StateUnknown) == StateHidden
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
                         applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
@@ -530,14 +530,14 @@ export default {
                     for (const type of ['hz', 'tr', 'py']) {
                         const key = getStateKey(type, wordHz, wordPys, null, null);
                         allHidden[type] = allHidden[type] && (
-                            getState(this.lvlStates, key, StateHidden) === StateHidden ||
-                            getState(this.$store.state.states, key, StateHidden) === StateHidden
+                            getState(this.lvlStates, key, StateHidden, StateUnknown) === StateHidden ||
+                            getState(this.$store.state.states, key, StateHidden, StateUnknown) === StateHidden
                         );
                     }
                 }
 
                 for (const type of ['hz', 'tr', 'py']) {
-                    if (getState(k, this.stateKey(type, i), StateHidden) === StateHidden) {
+                    if (getState(k, this.stateKey(type, i), StateHidden, StateUnknown) === StateHidden) {
                         continue;
                     }
 
