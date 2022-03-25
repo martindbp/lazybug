@@ -55,9 +55,9 @@ const store = new Vuex.Store({
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
             hideLevels: {
-                py: 4,
-                hz: 2,
-                tr: 4,
+                py: 0,
+                hz: 0,
+                tr: 0,
             },
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
