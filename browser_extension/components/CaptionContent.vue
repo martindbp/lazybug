@@ -274,8 +274,9 @@ export default {
             handler: function(newData, oldData) {
                 if (newData !== oldData) {
                     this.applyLvlStates();
-                    this.applyHiddenPinyinComponents();
-                    this.applyHiddenCompoundWordsNotInDict();
+                    this.applyPinyinComponents();
+                    this.applyCompoundWordsNotInDict();
+                    this.applySimpleCompounds();
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     for (const type of ['hz', 'tr', 'py', 'translation']) {
                         if (this.$store.state.options.pin[type] === true) {
@@ -456,6 +457,13 @@ export default {
                 this.appendSessionLog([getEvent('peek_row', type)]);
             }
         },
+        isHiddenStoreOrLvlStates: function(type, hz, pys) {
+            const key = getStateKey(type, hz, pys, null, null);
+            return (
+                getState(this.lvlStates, key, StateHidden, StateUnknown) === StateHidden ||
+                getState(this.$store.state.states, key, StateHidden, StateUnknown) === StateHidden
+            );
+        },
         applyLvlStates: function() {
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -479,7 +487,7 @@ export default {
                 }
             }
         },
-        applyHiddenPinyinComponents: function() {
+        applyPinyinComponents: function() {
             // If user hides ni3hao3, we should hide ni3 and hao3 separately, but not other way around.
 
             const d = this.$store.state.DICT;
@@ -505,13 +513,13 @@ export default {
                         if (hzSub === hz) continue;
                         if (d[hzSub] === undefined) continue;
 
-                        console.log('applyHiddenPinyinComponents: ', 'py', hzSub, pysSub);
+                        console.log('applyPinyinComponents: ', 'py', hzSub, pysSub);
                         applyState(d, k, 'py', hzSub, pysSub, null, this.wordData.translation, StateHidden, StateHidden, false, true);
                     }
                 }
             }
         },
-        applyHiddenCompoundWordsNotInDict: function() {
+        applyCompoundWordsNotInDict: function() {
             // If word is not in dict, but we hide all the sub-words, then we say we hide the compound
             // The reasoning is, if it's not in the dictionary, it's more likely to be a compound of regular words that
             // have a similar meaning to the parts. If it had a very different meaning, then it should be in the dictionary.
@@ -542,14 +550,10 @@ export default {
                     }
                 }
 
-                let allHidden = {hz: true, tr: true, py: true};
+                const allHidden = {hz: true, tr: true, py: true};
                 for (const [wordHz, wordPys] of words) {
                     for (const type of ['hz', 'tr', 'py']) {
-                        const key = getStateKey(type, wordHz, wordPys, null, null);
-                        allHidden[type] = allHidden[type] && (
-                            getState(this.lvlStates, key, StateHidden, StateUnknown) === StateHidden ||
-                            getState(this.$store.state.states, key, StateHidden, StateUnknown) === StateHidden
-                        );
+                        allHidden[type] = allHidden[type] && this.isHiddenStoreOrLvlStates(type, wordHz, wordPys);
                     }
                 }
 
@@ -565,16 +569,70 @@ export default {
                         // Do nothing, we don't want to hide hz unless both py and tr are also hidden
                     }
                     else if (allHidden[type]) {
-                        console.log('applyHiddenCompoundWordsNotInDict', type, hz, pys);
+                        console.log('applyCompoundWordsNotInDict', type, hz, pys);
                         applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
                         this.appendSessionLog([getEvent('hide_auto', type), i]);
                     }
                 }
             }
         },
-        applyHiddenCompoundWordsWhereAllButOneIsSimpleModifier: function() {
-            // For example, 地上, 拿不着, 这样的, 不服气, 知道了
-            // But not 想不到
+        applySimpleCompounds: function() {
+            // Where there is a main component, and an additional "simple" character like 了
+            // For example, 地上, 拿不着, 这样的, 不服气, 知道了, But not 想不到
+
+            const simpleChars = [
+                '了', '上', '下', '的', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '着',
+                '得', '地', '过', '哟', '喽', '不', '儿', '来', '去', '里', '个', '点', '到',
+                '子',
+            ];
+
+            const d = this.$store.state.DICT;
+            const k = this.$store.state.states;
+            if (d === null || k === null) return;
+
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const hz = this.wordData.hz[i];
+                if (hz.length < 2) continue;
+
+                const pys = this.wordData.pys[i];
+                const tr = this.wordData.tr[i];
+
+                const allHidden = {hz: false, tr: false, py: false};
+                for (const type of ['hz', 'py', 'tr']) {
+                    if (getState(k, this.stateKey(type, i), StateHidden, StateUnknown) === StateHidden) {
+                        continue;
+                    }
+
+                    for (const indices of [[[0, 1], [1, hz.length]], [[hz.length-1, hz.length], [0, hz.length-1]]]) {
+                        const preIdx = indices[0];
+                        const postIdx = indices[1];
+                        if (simpleChars.includes(hz.substring(preIdx[0], preIdx[1]))) {
+                            const preHz = hz.substring(preIdx[0], preIdx[1]);
+                            const postHz = hz.substring(postIdx[0], postIdx[1]);
+                            const prePys = pys.slice(preIdx[0], preIdx[1]);
+                            const postPys = pys.slice(postIdx[0], postIdx[1]);
+                            allHidden[type] = allHidden[type] || (
+                                this.isHiddenStoreOrLvlStates(type, preHz, prePys) &&
+                                this.isHiddenStoreOrLvlStates(type, postHz, postPys)
+                            );
+                        }
+                    }
+                }
+
+                for (const type of ['hz', 'py', 'tr']) {
+                    if (type === 'py' && !allHidden.tr) {
+                        // Do nothing, we don't want to hide py unless tr is hidden first
+                    }
+                    else if (type === 'hz' && (!allHidden.tr || !allHidden.py)) {
+                        // Do nothing, we don't want to hide hz unless both py and tr are also hidden
+                    }
+                    else if (allHidden[type]) {
+                        console.log('applySimpleCompounds', type, hz, pys);
+                        applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
+                        this.appendSessionLog([getEvent('hide_auto', type), i]);
+                    }
+                }
+            }
         }
     }
 };

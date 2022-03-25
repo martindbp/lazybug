@@ -1,3 +1,16 @@
+function combinations(options, accumulatorArray, currCombination = [], currIdx = 0) {
+    if (currIdx === options.length) {
+        accumulatorArray.push(currCombination);
+        return;
+    }
+
+    for (const item of options[currIdx]) {
+        //let newCombination = [...currCombination];
+        let newCombination = currCombination.concat(item);
+        combinations(options, accumulatorArray, newCombination, currIdx + 1);
+    }
+}
+
 const mixin = {
     methods: {
         sm2tr(text) {
@@ -47,12 +60,27 @@ const mixin = {
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
                     if (hideHz) applyState(d, states, 'hz', hz, null, null, null, StateHidden, StateHidden, true, false);
-                    const entries = d[hz];
-                    if (entries === undefined) continue;
+                    let entries = d[hz];
+                    let entryPys = [];
+                    if (entries === undefined) {
+                        // No entry, so pick all combinations of single char pys
+                        const charPyOptions = [];
+                        for (const c of hz) {
+                            const charEntryPys = [];
+                            for (let entry of d[c]) {
+                                charEntryPys.push(dictArrayToDict(entry).pys)
+                            }
+                            charPyOptions.push(charEntryPys);
+                        }
+                        combinations(charPyOptions, entryPys);
+                    }
+                    else {
+                        for (let entry of entries) {
+                            entryPys.push(dictArrayToDict(entry).pys);
+                        }
+                    }
 
-                    for (let entry of entries) {
-                        entry = dictArrayToDict(entry);
-                        const pys = entry.pys;
+                    for (let pys of entryPys) {
                         if (hidePy) applyState(d, states, 'py', hz, pys, null, null, StateHidden, StateHidden, true, false);
                         if (hideTr) applyState(d, states, 'tr', hz, pys, null, null, StateHidden, StateHidden, true, false);
                     }
