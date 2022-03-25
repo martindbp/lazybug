@@ -22,7 +22,9 @@
             <q-card-section align="left" style="padding: 25px; max-height: 400px; height: 400px" class="scroll">
                 <q-separator color="orange" v-if="dictEntries.length > 0"/>
                 <div v-for="entry in dictEntries">
-                    <div class="text-h4">{{ entry.hz }}</div>
+                    <div>
+                        <span class="text-h4">{{ entry.hz }}</span> <span class="hsklvl" v-if="entry.lvl !== null">(HSK{{entry.lvl}})</span>
+                    </div>
                     <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
                         <span v-for="(py, i) in item.pysDiacriticals" :style="{ color: COLORS[parseInt(item.pys[i].slice(-1))] }">
                             {{ py }}
@@ -55,7 +57,8 @@ export default {
             'orange',
             '#228B22', // green
             '#4169E1', // blue
-            'gray'],
+            'gray'
+        ],
     }},
     computed: {
         text: function() {
@@ -82,10 +85,17 @@ export default {
 
             const entries = []
             for (var i = this.showRange[0]+1; i <= this.showRange[1]; i++) {
-                const text = this.text.substring(this.showRange[0], i)
-                const textSm = this.texts.sm.substring(this.showRange[0], i)
+                const text = this.text.substring(this.showRange[0], i);
+                const textSm = this.texts.sm.substring(this.showRange[0], i);
                 if (this.$store.state.DICT[textSm] !== undefined) {
-                    entries.push({hz: text, items: dictItemsToDict(this.$store.state.DICT[textSm])});
+                    let entryLvl = null;
+                    for (let lvl = 0; lvl < 6; lvl++) {
+                        if (this.$store.state.HSK_WORDS[lvl].includes(text)) {
+                            entryLvl = lvl + 1;
+                            break;
+                        }
+                    }
+                    entries.push({hz: text, items: dictItemsToDict(this.$store.state.DICT[textSm]), lvl: entryLvl});
                 }
             }
 
@@ -156,6 +166,10 @@ export default {
 .selected {
     text-decoration: underline;
     text-decoration-color: orange;
+}
+
+.hsklvl {
+    font-size: 15px;
 }
 
 </style>
