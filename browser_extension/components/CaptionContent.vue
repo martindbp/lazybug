@@ -477,8 +477,14 @@ export default {
                 for (var type of ['hz', 'py', 'tr']) {
                     const key = this.stateKey(type, i);
                     if (
-                        getState(k, key, StateHidden, StateUnknown) == StateUnknown &&
-                        getState(this.lvlStates, key, StateHidden, StateUnknown) == StateHidden
+                        (
+                            getState(k, key, StateHidden, StateUnknown) == StateUnknown &&
+                            getState(this.lvlStates, key, StateHidden, StateUnknown) == StateHidden
+                        ) ||
+                        ( // Any number + MW should be hidden if hide level is > 2
+                            hz.match(/^[一二三四五六七八九十百千万个]+$/) &&
+                            this.$store.state.options.hideLevels[type] > 2
+                        )
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
                         applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
