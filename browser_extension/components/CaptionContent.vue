@@ -368,7 +368,7 @@ export default {
             else if (action === 'learn') {
                 stateType = StateLearning;
                 setState = StateLearning;
-                const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i);
+                const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
                 console.log(cloze);
                 updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
             }

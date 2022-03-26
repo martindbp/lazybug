@@ -18,6 +18,7 @@ function syncOptions(state) {
 const store = new Vuex.Store({
     state: {
         captionId: null,
+        videoId: null,
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log

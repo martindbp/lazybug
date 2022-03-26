@@ -141,6 +141,12 @@ export default {
                 this.fetchCaptionMaybe();
             }
         },
+        videoId: {
+            immediate: true,
+            handler: function() {
+                this.$store.state.videoId = this.videoId;
+            }
+        },
         showList: {
             immediate: true,
             handler: function() {
@@ -392,15 +398,21 @@ export default {
         options: function() { return this.$store.state.options; },
         captionOffset: function() { return this.$store.state.captionOffset; },
         captionFontScale: function() { return this.$store.state.captionFontScale; },
+        videoId: function() {
+            if (this.url !== null) {
+                const id = getYoutubeIdFromURL(this.url); // eslint-disable-line
+                return id;
+            }
+            return null;
+        },
         captionId: function() {
             let captionId = null;
             if (this.localVideoHash !== null) {
                 captionId = 'local-' + this.localVideoHash;
             }
 
-            let videoId = getYoutubeIdFromURL(this.url); // eslint-disable-line
-            if (videoId !== null) {
-                captionId = 'youtube-' + videoId;
+            if (this.videoId !== null) {
+                captionId = 'youtube-' + this.videoId;
             }
             if (this.showList === null || ! this.showList.includes(captionId)) {
                 return null;
