@@ -289,7 +289,7 @@ function truncateTranslationLength(py, hz) {
 }
 
 
-const getYoutubeEmbedCode = (id, t0, t1, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 function captionToAnkiCloze(wordData, hiddenStates, type, i, youtubeId = null, t0 = null, t1 = null) {
     let html = '<table>\n';
     let nextClozeIdx = 0;
@@ -352,8 +352,13 @@ function captionToAnkiCloze(wordData, hiddenStates, type, i, youtubeId = null, t
     html += '</table>';
     html += `<br><hr><br><div>{{c1::${wordData.translation}}}</div>`;
     if (youtubeId !== null) {
-        const embedding = getYoutubeEmbedCode(youtubeId, t0, t1);
-        html += `<br><hr>{{c1::${embedding}}}`;
+        const embedding = getYoutubeEmbedCode(youtubeId, t0, t1, true);
+        html += `<br><hr><button onClick="addEmbedding(event)">Play</button>`;
+        html += '<script>';
+        html += 'function addEmbedding(event) {';
+        html += `event.target.outerHTML = '${embedding}'`;
+        html += '}';
+        html += '</script>';
     }
     return html;
 }
