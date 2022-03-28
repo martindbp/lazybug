@@ -20,16 +20,16 @@ const events = [
     'EVENT_HIDE_AUTO_PY',
     'EVENT_HIDE_AUTO_HZ',
     'EVENT_HIDE_AUTO_TR',
-    'EVENT_LEARN_PY',
-    'EVENT_LEARN_HZ',
-    'EVENT_LEARN_TR',
-    'EVENT_LEARN_TRANSLATION',
+    'EVENT_STAR_PY',
+    'EVENT_STAR_HZ',
+    'EVENT_STAR_TR',
+    'EVENT_STAR_TRANSLATION',
     'EVENT_PIN_PY',
     'EVENT_PIN_HZ',
     'EVENT_PIN_TR',
-    'EVENT_UNLEARN_PY',
-    'EVENT_UNLEARN_HZ',
-    'EVENT_UNLEARN_TR',
+    'EVENT_UNSTAR_PY',
+    'EVENT_UNSTAR_HZ',
+    'EVENT_UNSTAR_TR',
     'EVENT_BLUR',
     'EVENT_HIDDEN_STATES',
 ];
@@ -241,14 +241,14 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
     }
 }
 
-const StateUnknown = 0;
+const StateNone = 0;
 const StateHidden = 1;
-const StateLearning = 2;
+const StateStarred = 2;
 
 function setState(dict, key, stateType, newState, explicit) {
     let currData = dict[key];
     if (currData === undefined) {
-        currData = [0, 0, false]; // Hidden/Learn/Explicit vs implicit
+        currData = [0, 0, false]; // Hidden/Star/Explicit vs implicit
     }
 
     const currExplicit = currData[2];
@@ -258,12 +258,12 @@ function setState(dict, key, stateType, newState, explicit) {
     }
     else if (explicit) {
         // If explicit, we just set it to 0 or 1, no need to count
-        currData[stateType-1] = newState === StateUnknown ? 0 : 1;
+        currData[stateType-1] = newState === StateNone ? 0 : 1;
         currData[2] = true; // set explicit
     }
     else if (! currExplicit && ! explicit) {
         // Update the implicit count
-        let prevState = currData[stateType-1] ? stateType : StateUnknown;
+        let prevState = currData[stateType-1] ? stateType : StateNone;
 
         if (prevState > 0) {
             currData[prevState-1] -= 1;
@@ -280,7 +280,7 @@ function getState(dict, key, stateType, defaultValue) {
     const state = dict[key];
     if (state  === undefined) return defaultValue;
     if (state[stateType-1] > 0) return stateType;
-    return StateUnknown;
+    return StateNone;
 }
 
 function truncateTranslationLength(py, hz) {
@@ -377,6 +377,13 @@ function updateClipboard(newClip, $q = null, message = null) {
     }
 }
 
+
+function openDashboard() {
+    chrome.runtime.sendMessage({type: 'openDashboard'}, function onResponse(message) {
+        return true;
+    });
+}
+
 // SVG icons from css.gg
 const ICON_SVG = {
     'play-track-next': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none"><path d="M6 17L14 12L6 7V17Z" fill="currentColor"/><path d="M18 7H15V12V17H18V7Z" fill="currentColor"/></svg>',
@@ -400,7 +407,9 @@ const ICON_SVG = {
     'unpin': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 100 100"><path d="M85.4 45L54.9 14.6c-2.8-2.9-3.5-1.1-3.5.3v14L28.7 45.7H15c-3.9 0-.8 4.2-1.4 3.5l17.2 17.1-14.4 14.5c-.8.8-.8 2.1 0 2.9.8.8 2.1.8 2.9 0l14.4-14.4 17.1 17.2c-.5-.5 3.6 2.2 3.6-1.4V71.3l16.8-22.7h12.7c2.1-.1 4.9-.1 1.5-3.6zm-65.5 4.6h8.9l21.7 21.7v8.9L19.9 49.6zm32.5 17.7L32.7 47.6 52.8 33l14.4 14.6-14.8 19.7zm17.8-22.7L55.4 29.8v-8.9l23.7 23.7h-8.9z" fill="currentColor" stroke-width="4" stroke="white" /><path fill="currentColor" stroke-width="4" stroke="white" d="M804-1070V614H-980v-1684H804m8-8H-988V622H812v-1700z"/><line x1="10" y1="10" x2="90" y2="90" style="stroke-width: 4; stroke: white;" /></svg>',
     'pen': '<svg viewBox="0 0 24 24" width="${width}" height="${height}" fill="none" xmlns="http://www.w3.org/2000/svg" ><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2635 2.29289C20.873 1.90237 20.2398 1.90237 19.8493 2.29289L18.9769 3.16525C17.8618 2.63254 16.4857 2.82801 15.5621 3.75165L4.95549 14.3582L10.6123 20.0151L21.2189 9.4085C22.1426 8.48486 22.338 7.1088 21.8053 5.99367L22.6777 5.12132C23.0682 4.7308 23.0682 4.09763 22.6777 3.70711L21.2635 2.29289ZM16.9955 10.8035L10.6123 17.1867L7.78392 14.3582L14.1671 7.9751L16.9955 10.8035ZM18.8138 8.98525L19.8047 7.99429C20.1953 7.60376 20.1953 6.9706 19.8047 6.58007L18.3905 5.16586C18 4.77534 17.3668 4.77534 16.9763 5.16586L15.9853 6.15683L18.8138 8.98525Z" fill="currentColor" /> <path d="M2 22.9502L4.12171 15.1717L9.77817 20.8289L2 22.9502Z" fill="currentColor" /></svg>',
     'hide': '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="${width}" height="${height}" viewBox="0 0 572.098 572.098"> <g> <path fill="currentColor" d="M99.187,398.999l44.333-44.332c-24.89-15.037-47.503-33.984-66.763-56.379c29.187-33.941,66.053-60.018,106.947-76.426 c-6.279,14.002-9.853,29.486-9.853,45.827c0,16.597,3.696,32.3,10.165,46.476l35.802-35.797 c-5.698-5.594-9.248-13.36-9.248-21.977c0-17.02,13.801-30.82,30.82-30.82c8.611,0,16.383,3.55,21.971,9.248l32.534-32.534 l36.635-36.628l18.366-18.373c-21.206-4.186-42.896-6.469-64.848-6.469c-107.663,0-209.732,52.155-273.038,139.518L0,298.288 l13.011,17.957C36.83,349.116,66.151,376.999,99.187,398.999z"/> <path fill="currentColor" d="M459.208,188.998l-44.854,44.854c30.539,16.071,58.115,37.846,80.986,64.437 c-52.167,60.662-128.826,96.273-209.292,96.273c-10.3,0-20.533-0.6-30.661-1.744l-52.375,52.375 c26.903,6.887,54.762,10.57,83.036,10.57c107.663,0,209.738-52.154,273.038-139.523l13.011-17.957l-13.011-17.956 C532.023,242.995,497.844,212.15,459.208,188.998z"/> <path fill="currentColor" d="M286.049,379.888c61.965,0,112.198-50.234,112.198-112.199c0-5.588-0.545-11.035-1.335-16.402L269.647,378.56 C275.015,379.349,280.461,379.888,286.049,379.888z"/> <path fill="currentColor" d="M248.815,373.431L391.79,230.455l4.994-4.994l45.796-45.796l86.764-86.77c13.543-13.543,13.543-35.502,0-49.046 c-6.77-6.769-15.649-10.159-24.523-10.159s-17.754,3.384-24.522,10.159l-108.33,108.336l-22.772,22.772l-29.248,29.248 l-48.14,48.14l-34.456,34.456l-44.027,44.027l-33.115,33.115l-45.056,45.055l-70.208,70.203 c-13.543,13.543-13.543,35.502,0,49.045c6.769,6.77,15.649,10.16,24.523,10.16s17.754-3.385,24.523-10.16l88.899-88.898 l50.086-50.086L248.815,373.431z"/> </g></svg>',
-    'copy': '<svg width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" > <path d="M13 7H7V5H13V7Z" fill="currentColor" /> <path d="M13 11H7V9H13V11Z" fill="currentColor" /> <path d="M7 15H13V13H7V15Z" fill="currentColor" /> <path fill-rule="evenodd" clip-rule="evenodd" d="M3 19V1H17V5H21V23H7V19H3ZM15 17V3H5V17H15ZM17 7V19H9V21H19V7H17Z" fill="currentColor" /> </svg>',
+    'copy': '<svg width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" > <path fill-rule="evenodd" clip-rule="evenodd" d="M3 19V1H17V5H21V23H7V19H3ZM15 17V3H5V17H15ZM17 7V19H9V21H19V7H17Z" fill="currentColor" /> </svg>',
+    'star': '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="${width}" height="${height}" viewBox="0 0 314.335 314.336" style="enable-background:new 0 0 314.335 314.336;" xml:space="preserve"> <g> <path stroke="white" fill="currentColor" d="M302.593,117.321h-80.698c-13.583,0-27.994-10.472-32.191-23.398l-24.944-76.744c-4.197-12.925-10.997-12.925-15.198,0 l-24.941,76.744c-4.2,12.926-18.612,23.398-32.195,23.398H11.74c-13.583,0-15.688,6.473-4.699,14.462l65.284,47.426 c10.989,7.986,16.498,24.932,12.298,37.854l-24.941,76.741c-4.2,12.922,1.309,16.922,12.298,8.93l65.291-47.427 c10.988-7.986,28.805-7.986,39.794,0l65.29,47.427c10.988,7.992,16.501,3.98,12.298-8.93l-24.938-76.741 c-4.197-12.923,1.31-29.868,12.298-37.854l65.284-47.426C318.285,123.794,316.176,117.321,302.593,117.321z"/></g></svg>',
+    'hollowstar': '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="${width}" height="${height}" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><g><path stroke="white" fill="currentColor" d="M511.177,197.119c-1.975-6.079-7.23-10.51-13.554-11.429l-156.54-22.758L271.059,21.066 c-2.829-5.731-8.667-9.359-15.059-9.359c-6.391,0-12.23,3.628-15.059,9.359l-70.024,141.866L14.377,185.689 c-6.324,0.919-11.58,5.35-13.554,11.429c-1.976,6.079-0.328,12.753,4.25,17.214L118.338,324.74L91.619,480.664 c-1.08,6.3,1.51,12.665,6.681,16.422c5.17,3.756,12.024,4.252,17.683,1.279l140.016-73.593l140.014,73.593 c5.688,2.99,12.54,2.457,17.683-1.279c5.171-3.756,7.762-10.123,6.681-16.422L393.66,324.741l113.267-110.409 C511.505,209.87,513.153,203.196,511.177,197.119z M363.897,306.851c-3.958,3.857-5.763,9.414-4.83,14.861l22.463,131.097 l-117.718-61.875c-4.89-2.572-10.735-2.573-15.625,0l-117.719,61.875l22.463-131.097c0.934-5.446-0.872-11.004-4.83-14.861 L52.878,214.03l131.607-19.133c5.469-0.795,10.195-4.23,12.643-9.185L256,66.439l58.872,119.274 c2.447,4.955,7.174,8.39,12.643,9.185l131.607,19.133L363.897,306.851z"/></g></svg>',
 }
 
 function getIconSvg(name, size) {

@@ -249,6 +249,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     else if (message.type === 'translation') {
         fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse(null));
     }
+    else if (message.type === 'openDashboard') {
+        chrome.tabs.create({
+          url: "dashboard.html",
+        });
+    }
 
     return true;
 });

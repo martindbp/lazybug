@@ -19,15 +19,16 @@
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
-                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge v-if="starredStates.py[i]" class="starbadge" color="orange" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.py[i]"
                         type="py"
                         :idx="i"
                         :hide="!hiddenStates.py[i]"
                         :pin="purePeekStates.py[i] && hiddenStates.py[i]"
-                        :learn="!hiddenAndNotPeeking.py[i] && ! learningStates.py[i]"
-                        :unlearn="learningStates.py[i]"
+                        :star="!hiddenAndNotPeeking.py[i] && ! starredStates.py[i]"
+                        :unstar="starredStates.py[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -52,15 +53,16 @@
                     >
                         {{ sm2tr(hz) }}
                     </span>
-                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge v-if="starredStates.hz[i]" class="starbadge" color="orange" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.hz[i]"
                         type="hz"
                         :idx="i"
                         :hide="!hiddenStates.hz[i]"
                         :pin="purePeekStates.hz[i] && hiddenStates.hz[i]"
-                        :learn="!hiddenAndNotPeeking.hz[i] && ! learningStates.hz[i]"
-                        :unlearn="learningStates.hz[i]"
+                        :star="!hiddenAndNotPeeking.hz[i] && ! starredStates.hz[i]"
+                        :unstar="starredStates.hz[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -86,15 +88,16 @@
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
-                    <q-badge :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <q-badge v-if="starredStates.tr[i]" class="starbadge" color="orange" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.tr[i]"
                         type="tr"
                         :idx="i"
                         :hide="!hiddenStates.tr[i]"
                         :pin="purePeekStates.tr[i] && hiddenStates.tr[i]"
-                        :learn="!hiddenAndNotPeeking.tr[i] && ! learningStates.tr[i]"
-                        :unlearn="learningStates.tr[i]"
+                        :star="!hiddenAndNotPeeking.tr[i] && ! starredStates.tr[i]"
+                        :unstar="starredStates.tr[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -116,19 +119,22 @@
                     :class="{
                         captioncard: true,
                         peeking: purePeekStates.translation,
-                        learningstate: learningStates.translation,
+                        starred: starredStates.translation,
                         fulltranslation: true,
                         placeholder: hiddenAndNotPeeking.translation,
                         showborder: data !== null,
                     }"
                 >
-                    <span class="cardcontent" :style="{ opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }"> {{ translation }}</span>
+                    <span class="cardcontent" :style="{ position: 'relative', opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }">
+                        {{ translation }}
+                        <q-badge v-if="starredStates.translation" class="starbadge" color="orange" rounded floating v-html="smallStarIcon"></q-badge>
+                    </span>
                     <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking['translation']" v-html="eyecon"></span>
                     <ContentContextMenu
                         v-if="showContextMenu.translation"
                         type="translation"
-                        :learn="! learningStates.translation"
-                        :unlearn="learningStates.translation"
+                        :star="! starredStates.translation"
+                        :unstar="starredStates.translation"
                         :pin="false"
                         :hide="false"
                         :dict="false"
@@ -162,6 +168,7 @@ export default {
         bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
         undoIcon: getIconSvg("undo", 18),
+        smallStarIcon: getIconSvg("star", 10),
         showContextMenu: {hz: [], tr: [], py: [], translation: false},
     }},
     computed: {
@@ -245,10 +252,13 @@ export default {
             return states;
         },
         hiddenStates: function() {
-            return this.getStates(StateHidden, StateUnknown, StateHidden);
+            const states = this.getStates(StateHidden, StateNone, StateHidden);
+            // Translation is always hidden:
+            states.translation = true;
+            return states;
         },
-        learningStates: function() {
-            return this.getStates(StateLearning, StateUnknown, StateUnknown);
+        starredStates: function() {
+            return this.getStates(StateStarred, StateNone, StateNone);
         },
     },
     updated: function() {
@@ -283,8 +293,6 @@ export default {
                             this.$store.commit('setPeekState', {'type': type});
                         }
                     }
-                    // Store states as seen by the user after lvl/component/compounds have been applied
-                    this.storeHiddenStates();
                 }
             },
         },
@@ -293,9 +301,6 @@ export default {
         }
     },
     methods: {
-        storeHiddenStates: function() {
-
-        },
         resetShowContextMenu: function(newData) {
             const show = {
                 translation: false,
@@ -322,8 +327,8 @@ export default {
                 peeking: i !== null && this.purePeekStates[type][i],
                 captioncardhidden: i !== null && this.hiddenAndNotPeeking[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
-                learningstate: i !== null && this.learningStates[type][i],
-                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.learningStates[type][i],
+                starred: i !== null && this.starredStates[type][i],
+                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates[type][i],
                 peekrow: i === null,
                 pinned: this.$store.state.options.pin[type],
             };
@@ -365,26 +370,37 @@ export default {
                 // Peek it so that it doesn't become hidden right away
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
-            else if (action === 'learn') {
-                stateType = StateLearning;
-                setState = StateLearning;
-                const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
-                console.log(cloze);
-                updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
+            else if (action === 'star') {
+                stateType = StateStarred;
+                setState = StateStarred;
+                //const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
+                //console.log(cloze);
+                //updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
+                let content = '';
+                if (type === 'translation') content = this.wordData.translation;
+                else content = this.wordData[type][i];
+
+                this.$q.notify({
+                    type: 'positive',
+                    message: `"${content}" starred`,
+                    actions: [
+                        { label: 'Open in Dashboard', color: 'white', handler: openDashboard }
+                    ]
+                });
             }
             else if (action === 'pin') {
                 stateType = StateHidden;
-                setState = StateUnknown;
+                setState = StateNone;
             }
-            else if (action === 'unlearn') {
-                stateType = StateLearning;
-                setState = StateUnknown;
+            else if (action === 'unstar') {
+                stateType = StateStarred;
+                setState = StateNone;
             }
 
             if (setState !== null) {
                 applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
                 const eventData = [getEvent(action, type), i];
-                if (setState === StateLearning) {
+                if (setState === StateStarred) {
                     eventData.push(this.getCurrentState());
                 }
                 this.appendSessionLog(eventData);
@@ -460,8 +476,8 @@ export default {
         isHiddenStoreOrLvlStates: function(type, hz, pys) {
             const key = getStateKey(type, hz, pys, null, null);
             return (
-                getState(this.lvlStates, key, StateHidden, StateUnknown) === StateHidden ||
-                getState(this.$store.state.states, key, StateHidden, StateUnknown) === StateHidden
+                getState(this.lvlStates, key, StateHidden, StateNone) === StateHidden ||
+                getState(this.$store.state.states, key, StateHidden, StateNone) === StateHidden
             );
         },
         applyLvlStates: function() {
@@ -478,8 +494,8 @@ export default {
                     const key = this.stateKey(type, i);
                     if (
                         (
-                            getState(k, key, StateHidden, StateUnknown) == StateUnknown &&
-                            getState(this.lvlStates, key, StateHidden, StateUnknown) == StateHidden
+                            getState(k, key, StateHidden, StateNone) == StateNone &&
+                            getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden
                         ) ||
                         ( // Any number + MW should be hidden if hide level is > 2
                             hz.match(/^[一二三四五六七八九十百千万个]+$/) &&
@@ -506,7 +522,7 @@ export default {
                 const tr = this.wordData.tr[i];
 
                 const key = getStateKey('py', hz, pys, null, null);
-                const currState = getState(k, key, StateHidden, StateUnknown);
+                const currState = getState(k, key, StateHidden, StateNone);
 
                 if (d[hz] !== undefined || pys === null || isName(tr) || currState !== StateHidden) continue;
 
@@ -564,7 +580,7 @@ export default {
                 }
 
                 for (const type of ['hz', 'tr', 'py']) {
-                    if (getState(k, this.stateKey(type, i), StateHidden, StateUnknown) === StateHidden) {
+                    if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateHidden) {
                         continue;
                     }
 
@@ -605,7 +621,7 @@ export default {
 
                 const allHidden = {hz: false, tr: false, py: false};
                 for (const type of ['hz', 'py', 'tr']) {
-                    if (getState(k, this.stateKey(type, i), StateHidden, StateUnknown) === StateHidden) {
+                    if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateHidden) {
                         continue;
                     }
 
@@ -699,6 +715,13 @@ export default {
     border-radius: 5px;
 }
 
+/*
+.captioncard.captioncardhidden.starred {
+    border: 1px dashed darkorange;
+    border-radius: 3px;
+}
+*/
+
 .captioncard:not(.nonhanzi) {
     cursor: pointer;
 }
@@ -718,11 +741,6 @@ export default {
 
 .centerrow .captioncardhidden {
     border: 1px dashed white;
-    border-radius: 3px;
-}
-
-.captioncard.learningstate {
-    border: 1px dashed darkorange;
     border-radius: 3px;
 }
 
@@ -777,36 +795,6 @@ export default {
     margin-top: -10px;
 }
 
-.iconcard.learn {
-    top: -10px;
-    right: -7px;
-    width: 20px;
-}
-
-.iconcard.learn svg {
-    background: darkorange;
-}
-
-.iconcard.hide {
-    top: -10px;
-    right: -7px;
-    width: 20px;
-}
-
-.iconcard.hide svg {
-    background: limegreen;
-}
-
-.iconcard.remove {
-    top: -10px;
-    right: -7px;
-    width: 20px;
-}
-
-.iconcard.remove svg {
-    background: lightgray;
-}
-
 .iconcard > svg {
     border-radius: 3px;
     padding: 2px;
@@ -841,11 +829,19 @@ export default {
     padding-right: 0.3em;
 }
 
-.captioncardhidden .q-badge {
+.captioncardhidden .statsbadge {
     display: none !important;
 }
 
-.captioncard:not(:hover) .q-badge {
+.captioncard:not(:hover) .statsbadge {
+    display: none !important;
+}
+
+.captioncard:hover:not(.fulltranslation):not(.captioncardhidden) .starbadge {
+    display: none !important;
+}
+
+.captioncardhidden .starbadge {
     display: none !important;
 }
 
@@ -853,4 +849,5 @@ export default {
     margin-top: -5px;
     margin-right: -5px;
 }
+
 </style>
