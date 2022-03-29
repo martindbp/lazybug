@@ -421,9 +421,14 @@ export default {
             this.resetShowContextMenu(this.wordData);
         },
         getCurrentState: function() {
+            // We add dt so that we can uniquely identify this event state
+            const dt = Date.now() - this.$store.state.sessionTime;
             return {
+                t0: this.data.t0,
+                t1: this.data.t1,
                 words: this.wordData,
                 hidden: this.hiddenStates,
+                dt: dt,
             };
         },
         click: function(type, i = null) {

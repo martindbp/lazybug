@@ -10,7 +10,34 @@
             :selected-rows-label="getSelectedString"
             selection="multiple"
             v-model:selected="selected"
-        />
+        >
+          <template v-slot:body-cell-video="props">
+            <q-td :props="props">
+              <q-btn outline color="primary" :label="props.value" :to="youtubeLink(props.value)" />
+            </q-td>
+          </template>
+          <template v-slot:body="props">
+              <q-tr :props="props">
+                  <q-td>
+                      <q-checkbox v-model="props.selected" color="primary" />
+                  </q-td>
+                  <q-td
+                     v-for="col in props.cols"
+                     :key="col.name"
+                     :props="props"
+                     @click="props.expand = !props.expand"
+                     style="cursor: pointer"
+                     >
+                       {{ col.value }}
+                  </q-td>
+              </q-tr>
+              <q-tr v-show="props.expand" :props="props">
+                  <q-td colspan="100%">
+                      <div v-html="rowYoutubeEmbedCode(props.row.idx)" />
+                  </q-td>
+              </q-tr>
+          </template>
+        </q-table>
         <div class="q-mt-md">
             <q-btn label="Export to Anki" @click="exportToAnki"/>
         </div>
@@ -18,6 +45,8 @@
 </template>
 
 <script>
+// TODO: fix this duplication
+const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
 export default {
     props: {
@@ -45,17 +74,28 @@ export default {
             return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''} selected of ${this.rows.length}`
         },
         exportToAnki: function() {
+            for (const s of this.selected) {
                 //const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
                 //console.log(cloze);
                 //updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
+            }
+        },
+        youtubeLink: function(captionId) {
+            return `https://www.youtube.com/watch?v=${id}`;
+        },
+        rowYoutubeEmbedCode: function(rowIdx) {
+            const [type, eventData, sessionTime, captionId] = this.starEvents[rowIdx];
+            const [_, idx, data] = eventData;
+            const t0 = data.t0;
+            const t1 = data.t1;
+            const [site, id] = captionId.split('-');
+            return getYoutubeEmbedCode(id, t0, t1);
         },
     },
-    watch: {
-    },
     computed: {
-        rows: function() {
-            const rows = [];
-            if (this.log === null) return rows;
+        starEvents: function() {
+            const events = [];
+            if (this.log === null) return events;
 
             for (const session of this.log) {
                 for (const event of session.events) {
@@ -76,23 +116,40 @@ export default {
                         }
                         const idx = event[1];
                         const wordData = event[2].words;
-                        let content = null;
-                        if (type === 'translation') {
-                            content = wordData.translation;
-                        }
-                        else {
-                            const other = [];
-                            const main = wordData[type][idx];
-                            for (const t of ['py', 'hz', 'tr']) {
-                                if (t !== type) {
-                                    other.push(wordData[t][idx]);
-                                }
-                            }
-                            content = `${main} (${other.join('/')})`;
-                        }
-                        rows.push({time: session.sessionTime, video: session.captionId, content: content});
+                        events.push([type, event, session.sessionTime, session.captionId]);
                     }
                 }
+            }
+
+            return events;
+        },
+        rows: function() {
+            const rows = [];
+            if (this.log === null) return rows;
+
+            for (let i = 0; i < this.starEvents.length; i++) {
+                const [type, eventData, sessionTime, captionId] = this.starEvents[i];
+                const [_, idx, data] = eventData;
+                const wordData = data.words;
+                const t0 = data.t0;
+                const t1 = data.t1;
+                const dt = data.dt;
+
+                let content = null;
+                if (type === 'translation') {
+                    content = wordData.translation;
+                }
+                else {
+                    const other = [];
+                    const main = wordData[type][idx];
+                    for (const t of ['py', 'hz', 'tr']) {
+                        if (t !== type) {
+                            other.push(wordData[t][idx]);
+                        }
+                    }
+                    content = `${main} (${other.join('/')})`;
+                }
+                rows.push({id: `${sessionTime}-${dt}-${captionId}-${content}`, idx: i, time: sessionTime, video: captionId, content: content});
             }
 
             return rows;
