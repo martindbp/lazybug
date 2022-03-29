@@ -762,6 +762,7 @@ def predict_video_captions(
     caption_type='hanzi',
     ocr_engine='cnocr',
     conditional_captions=None,
+    refine_bounding_rect=True,
 ):
     global easy_ocrs, cnocr
     SUBSAMPLE_FRAME_RATE = 10
@@ -793,7 +794,8 @@ def predict_video_captions(
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     frame_size = None
-    for j in range(2):
+    iters = 2 if refine_bounding_rect else 0
+    for j in range(iters):
         best_top_bottom = None
         best_logprob_sum = -float('inf')
         best_offset = 0
@@ -853,6 +855,9 @@ def predict_video_captions(
     curr_conditional_caption_idx = 0
     try:
         for i, (frame_time, crop, frame) in enumerate(caption_images):
+            if frame_size is None:
+                frame_size = frame.shape[:2]
+
             if conditional_captions is not None:
                 if curr_conditional_caption_idx is None:
                     continue
@@ -1343,7 +1348,8 @@ def process_video_captions(
                 filter_out_too_many_low_prob_chars=param.get('filter_out_too_many_low_prob_chars', True),
                 caption_type=param['type'],
                 ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
-                conditional_captions=conditional_captions
+                conditional_captions=conditional_captions,
+                refine_bounding_rect=param.get('refine_bounding_rect', True)
             )
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
