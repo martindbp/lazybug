@@ -373,9 +373,6 @@ export default {
             else if (action === 'star') {
                 stateType = StateStarred;
                 setState = StateStarred;
-                //const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
-                //console.log(cloze);
-                //updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
                 let content = '';
                 if (type === 'translation') content = this.wordData.translation;
                 else content = this.wordData[type][i];

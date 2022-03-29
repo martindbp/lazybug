@@ -11,11 +11,6 @@
             selection="multiple"
             v-model:selected="selected"
         >
-          <template v-slot:body-cell-video="props">
-            <q-td :props="props">
-              <q-btn outline color="primary" :label="props.value" :to="youtubeLink(props.value)" />
-            </q-td>
-          </template>
           <template v-slot:body="props">
               <q-tr :props="props">
                   <q-td>
@@ -38,19 +33,15 @@
               </q-tr>
           </template>
         </q-table>
-        <div class="q-mt-md">
+        <div class="q-mt-md" v-if="selected.length > 0">
             <q-btn label="Export to Anki" @click="exportToAnki"/>
         </div>
     </div>
 </template>
 
 <script>
-// TODO: fix this duplication
-const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
 export default {
-    props: {
-    },
     data: function() { return {
         log: null,
         columns: [
@@ -74,14 +65,18 @@ export default {
             return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''} selected of ${this.rows.length}`
         },
         exportToAnki: function() {
-            for (const s of this.selected) {
-                //const cloze = captionToAnkiCloze(this.wordData, this.hiddenStates, type, i, this.$store.state.videoId, this.data.t0, this.data.t1);
-                //console.log(cloze);
-                //updateClipboard(cloze, this.$q, 'Anki cloze card copied to clipboard');
+            let csv = '';
+            for (const item of this.selected) {
+                const [type, eventData, sessionTime, captionId] = this.starEvents[item.idx];
+                const [_, idx, data] = eventData;
+                const t0 = data.t0;
+                const t1 = data.t1;
+
+                const cloze = captionToAnkiCloze(data.words, data.hidden, type, idx, captionId, t0, t1, true);
+                csv += cloze + '\n'
             }
-        },
-        youtubeLink: function(captionId) {
-            return `https://www.youtube.com/watch?v=${id}`;
+            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            download(filename, csv);
         },
         rowYoutubeEmbedCode: function(rowIdx) {
             const [type, eventData, sessionTime, captionId] = this.starEvents[rowIdx];
