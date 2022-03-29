@@ -698,6 +698,11 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     ):
                         check_hz = joined_hz[2:]
 
+                    # Special case for X者, i.e an occupation or similar
+                    if window_size == 2 and components[1] == '者':
+                        force_join = True
+                        check_hz = None
+
                     force_join = False
                     if window_size in [2, 3] and ''.join(components[1:]) in ['不了', '不起', '不上', '不下', '不着', '不清']:
                         force_join = True
