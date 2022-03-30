@@ -1,23 +1,21 @@
 <template>
     <div class="captionmenu">
-        <div>
-            <SvgButton
-                name="move"
-                title="Move"
-                @mousedown.stop.prevent="moveMouseDown"
-            />
-            <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
-            <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
-            <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
-            <SvgButton title="Replay this line" @click="replay" name="replay" />
-            <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
-            <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
-            <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
-            <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" style="margin-right: 10px"/>
-            <SvgButton title="Options" @click="showOptions" name="options" />
-            <OptionsDialog />
-            <DictionaryDialog v-bind:caption="data" />
-        </div>
+        <SvgButton
+            name="move"
+            title="Move"
+            @mousedown.stop.prevent="moveMouseDown"
+        />
+        <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
+        <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
+        <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
+        <SvgButton title="Replay this line" @click="replay" name="replay" />
+        <SvgButton @click="playPause" :name="paused ? 'play-button' : 'play-pause'" />
+        <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
+        <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
+        <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" style="margin-right: 10px"/>
+        <SvgButton title="Options" @click="showOptions" name="options" />
+        <OptionsDialog />
+        <DictionaryDialog v-bind:caption="data" />
     </div>
 </template>
 
@@ -197,6 +195,7 @@ export default {
     opacity: 0;
     transition: opacity 150ms ease-in;
     height: 30px;
+    white-space: nowrap;
 }
 
 .captionmenu.show {
