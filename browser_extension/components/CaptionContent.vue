@@ -604,11 +604,9 @@ export default {
             // Where there is a main component, and an additional "simple" character like 了
             // For example, 地上, 拿不着, 这样的, 不服气, 知道了, But not 想不到
 
-            const simpleChars = [
-                '了', '上', '下', '的', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '着',
-                '得', '地', '过', '哟', '喽', '不', '儿', '来', '去', '里', '个', '点', '到',
-                '子',
-            ];
+            const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽',];
+            const simpleCharsPre = ['不',];
+            const simpleCharsPost = ['地', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '来', '去',];
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -630,7 +628,11 @@ export default {
                     for (const indices of [[[0, 1], [1, hz.length]], [[hz.length-1, hz.length], [0, hz.length-1]]]) {
                         const preIdx = indices[0];
                         const postIdx = indices[1];
-                        if (simpleChars.includes(hz.substring(preIdx[0], preIdx[1]))) {
+                        let checkChars = [...simpleCharsPrePost];
+                        if (preIdx[0] === 0) checkChars = checkChars.concat(simpleCharsPre);
+                        else checkChars = checkChars.concat(simpleCharsPost);
+
+                        if (checkChars.includes(hz.substring(preIdx[0], preIdx[1]))) {
                             const preHz = hz.substring(preIdx[0], preIdx[1]);
                             const postHz = hz.substring(postIdx[0], postIdx[1]);
                             const prePys = pys.slice(preIdx[0], preIdx[1]);
