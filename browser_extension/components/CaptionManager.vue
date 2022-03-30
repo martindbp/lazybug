@@ -318,6 +318,8 @@ export default {
 
             chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 if (message.type === 'extensionToggle') {
+                    // Reset captionOffset so we have a way get out of the situation where it's outside the window
+                    self.$store.state.captionOffset = [0, 0];
                     self.$store.commit('setOption', {key: 'extensionToggle', value: message.data});
                 }
                 return true;
