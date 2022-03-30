@@ -4,8 +4,8 @@
           v-model="extensionToggle"
           color="green"
         />
+        <q-btn label="Dashboard" @click="dashboard" />
         <div v-if="dev">
-            <q-btn label="Dashboard" @click="dashboard" />
             <q-btn label="SRS" @click="srs" />
             <q-btn label="Measure caption" @click="measureCaption" />
             <q-btn label="Print playlist" @click="printPlaylist" />
