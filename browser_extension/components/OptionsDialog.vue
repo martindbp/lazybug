@@ -134,7 +134,12 @@
                     <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
                 </q-tab-panel>
                 <q-tab-panel name="other" style="width: 400px">
-                    <q-btn color="secondary" label="Clear data" @click="clearData"/>
+                    <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
+                    <br>
+                    <br>
+                    <q-btn color="deep-orange" label="Clear personal data" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
+                    <br>
+                    (Will permanently delete personal data)
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -161,6 +166,8 @@ export default {
             ["peekTr", "Peek Word Translation Row"],
         ],
         choosingShortcut: null,
+        clickedClearCache: false,
+        clickedClearPersonalData: false,
     }},
     computed: {
         show: {
@@ -227,8 +234,13 @@ export default {
         resetShortcuts: function() {
             this.$store.commit('setOption', {key: 'keyboardShortcuts', value: DEFAULT_SHORTCUTS});
         },
-        clearData: function() {
-            clearIndexedDb();
+        clearCache: function() {
+            clearCache();
+            this.clickedClearCache = true;
+        },
+        clearPersonalData: function() {
+            clearPersonalData();
+            this.clickedClearPersonalData = true;
         }
     },
 }

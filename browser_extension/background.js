@@ -25,6 +25,17 @@ function clearIndexedDb() {
     initIndexedDb();
 }
 
+function clearCache() {
+    db.network.delete()
+}
+
+function clearPersonalData() {
+    db.states.delete()
+    db.other.delete()
+    db.log.delete()
+    db.srs.delete()
+}
+
 function showBadgeStatus() {
     chrome.action.setBadgeBackgroundColor({color:[0, 150, 0, 255]});
     chrome.action.setBadgeText({text:'✓'});
@@ -138,8 +149,12 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message.type === 'clearIndexedDb') {
-        clearIndexedDb();
+    if (message.type === 'clearCache') {
+        clearCache();
+        sendResponse();
+    }
+    else if (message.type === 'clearPersonalData') {
+        clearPersonalData();
         sendResponse();
     }
     else if (message.type === 'fetchVersionedResource') {

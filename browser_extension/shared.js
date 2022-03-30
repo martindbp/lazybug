@@ -85,8 +85,14 @@ function setIndexedDbData(storageName, keys, values, callback) {
     });
 }
 
-function clearIndexedDb() {
-    chrome.runtime.sendMessage({type: 'clearIndexedDb'}, function onResponse(message) {
+function clearCache() {
+    chrome.runtime.sendMessage({type: 'clearCache'}, function onResponse(message) {
+        return true;
+    });
+}
+
+function clearPersonalData() {
+    chrome.runtime.sendMessage({type: 'clearPersonalData'}, function onResponse(message) {
         return true;
     });
 }
