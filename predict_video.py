@@ -1433,7 +1433,7 @@ def process_translations(
         json_captions_all_translations = add_machine_translations(json_captions_human_translations, machine_translations)
         json_captions_all_translations >> f'data/remote/private/caption_data/captions_all_translations/{vid}.json'
         if force_redo:
-            #trimmed_captions.clear_cache()
+            trimmed_captions.clear_cache()
             json_captions_human_translations.clear_cache(delete_output_files=True)
             machine_translations.clear_cache(delete_output_files=True)
             json_captions_all_translations.clear_cache(delete_output_files=True)
