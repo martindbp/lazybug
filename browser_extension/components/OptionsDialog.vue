@@ -18,21 +18,51 @@
                     <q-item-label header>Hanzi</q-item-label>
                     <q-item dense>
                         <q-item-section>
-                            <q-slider color="teal" v-model="hanziHideLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                            <q-slider
+                                color="teal"
+                                v-model="hanziHideLevel"
+                                :min="0"
+                                :max="7"
+                                :step="1"
+                                :label-value="hanziHideLevel < 7 ? hanziHideLevel : 'all'"
+                                label
+                                snap
+                                markers
+                            />
                         </q-item-section>
                     </q-item>
 
                     <q-item-label header>Pinyin</q-item-label>
                     <q-item dense>
                         <q-item-section>
-                            <q-slider color="teal" v-model="pinyinHideLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                            <q-slider
+                                color="teal"
+                                v-model="pinyinHideLevel"
+                                :min="0"
+                                :max="7"
+                                :step="1"
+                                :label-value="pinyinHideLevel < 7 ? pinyinHideLevel : 'all'"
+                                label
+                                snap
+                                markers
+                            />
                         </q-item-section>
                     </q-item>
 
                     <q-item-label header>Word translation</q-item-label>
                     <q-item dense>
                         <q-item-section>
-                            <q-slider color="teal" v-model="translationHideLevel" :min="0" :max="6" :step="1" label snap markers></q-slider>
+                            <q-slider
+                                color="teal"
+                                v-model="translationHideLevel"
+                                :min="0"
+                                :max="7"
+                                :step="1"
+                                :label-value="translationHideLevel < 7 ? translationHideLevel : 'all'"
+                                label
+                                snap
+                                markers
+                            />
                         </q-item-section>
                     </q-item>
                 </q-tab-panel>

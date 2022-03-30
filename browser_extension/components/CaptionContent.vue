@@ -495,13 +495,14 @@ export default {
                 for (var type of ['hz', 'py', 'tr']) {
                     const key = this.stateKey(type, i);
                     if (
+                        getState(k, key, StateHidden, StateNone) == StateNone &&
                         (
-                            getState(k, key, StateHidden, StateNone) == StateNone &&
-                            getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden
-                        ) ||
-                        ( // Any number + MW should be hidden if hide level is > 2
-                            hz.match(/^[一二三四五六七八九十百千万个]+$/) &&
-                            this.$store.state.options.hideLevels[type] > 2
+                            getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden ||
+                            this.$store.state.options.hideLevels[type] === 7 || // all
+                            ( // Any number + MW should be hidden if hide level is > 2
+                                hz.match(/^[一二三四五六七八九十百千万个]+$/) &&
+                                this.$store.state.options.hideLevels[type] > 2
+                            )
                         )
                     ) {
                         console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
