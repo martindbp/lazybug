@@ -187,7 +187,8 @@ export default {
 
 <style>
 .captionmenu {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.75);
+    transition: background-color 300ms linear;
     position: absolute;
     top: -30px;
     display: inline-block;

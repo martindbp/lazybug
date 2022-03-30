@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{zimucaptiondiv: true, moving: $store.state.isMovingCaption}">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{zimucaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused}">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -101,4 +101,20 @@ export default {
     padding-left: 100px;
     padding-right: 100px;
 }
+
+.zimucaptiondiv {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.75);
+    text-align: left;
+    font-size: 18px;
+    padding: 0px;
+    min-width: 7em;
+}
+
+.zimucaptiondiv.paused,
+.paused .captionmenu{
+    background-color: rgba(0, 0, 0, 1.0);
+    transition: background-color 300ms linear;
+}
+
 </style>

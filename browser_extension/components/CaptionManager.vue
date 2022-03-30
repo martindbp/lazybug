@@ -467,17 +467,10 @@ export default {
 </script>
 
 <style>
+
 #captionroot {
     position:absolute;
     z-index: 9998;
 }
 
-.zimucaptiondiv {
-    color: white;
-    background-color: rgba(0, 0, 0, 0.85);
-    text-align: left;
-    font-size: 18px;
-    padding: 0px;
-    min-width: 7em;
-}
 </style>
