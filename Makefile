@@ -139,6 +139,6 @@ css:
 	sed -i -E 's/rem;/em;/g' browser_extension/dist/zimu_quasar.css
 
 hsk-words:
-	HSK_WORDS_HASH=$$(md5sum data/remote/public/hsk_words.json | cut -d " " -f1) ; \
+	HSK_WORDS_HASH=$$(md5sum data/git/hsk_words.json | cut -d " " -f1) ; \
 	echo $$HSK_WORDS_HASH > data/remote/public/hsk_words.hash ; \
-	cp data/remote/public/hsk_words.json "data/remote/public/hsk_words-$$HSK_WORDS_HASH.json"
+	cp data/git/hsk_words.json "data/remote/public/hsk_words-$$HSK_WORDS_HASH.json"
