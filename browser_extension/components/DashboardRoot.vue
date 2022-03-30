@@ -10,6 +10,7 @@
             :selected-rows-label="getSelectedString"
             selection="multiple"
             v-model:selected="selected"
+            :pagination="pagination"
         >
           <template v-slot:body="props">
               <q-tr :props="props">
@@ -21,7 +22,7 @@
                      :key="col.name"
                      :props="props"
                      @click="props.expand = !props.expand"
-                     style="cursor: pointer"
+                     :style="{ cursor: 'pointer', background: col.name === 'time' && timestampToYYYMMDD(col.value) === timestampToYYYMMDD(Date.now()) ? 'lightgreen' : 'none'}"
                      >
                        {{ col.value }}
                   </q-td>
@@ -45,11 +46,14 @@ export default {
     data: function() { return {
         log: null,
         columns: [
-            {name: 'time', field: 'time', label: 'Date', format: val => (new Date(val)).toISOString().split('T')[0],},
+            {name: 'time', field: 'time', label: 'Date', format: val => this.timestampToYYYMMDD(val),},
             {name: 'video', field: 'video', label: 'Video'},
             {name: 'content', field: 'content', label: 'Content'}
         ],
         selected: [],
+        pagination: {
+            rowsPerPage: 50
+        },
     }},
     mounted: function() {
         const self = this;
@@ -85,6 +89,9 @@ export default {
             const t1 = data.t1;
             const [site, id] = captionId.split('-');
             return getYoutubeEmbedCode(id, t0, t1);
+        },
+        timestampToYYYMMDD: function(val) {
+            return (new Date(val)).toISOString().split('T')[0];
         },
     },
     computed: {
