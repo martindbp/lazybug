@@ -1,5 +1,5 @@
 <template>
-    <div v-if="captionId && AVElement && $store.state.options.extensionToggle">
+    <div v-if="captionId && AVElement && !isLikelyAnAd && $store.state.options.extensionToggle">
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
@@ -49,6 +49,7 @@ export default {
             localVideoHash: null,
             currTime: -1000.5,
             AVElement: null,
+            videoDuration: null, // keep track of changes to it (could be ads)
             resizeObserver: null,
             mutationObserver: null,
             paused: null,
@@ -67,6 +68,9 @@ export default {
     mounted: function(){
         this.setUpdateInterval();
         this.AVElement = document.querySelector(this.AVElementSelector);
+        if (this.AVElement) {
+            this.videoDuration = this.AVElement.duration;
+        }
         this.setObserversAndHandlers();
         const self = this;
         fetchVersionedResource('show_list.json', function (data, hash) { self.showList = data; });
@@ -225,6 +229,7 @@ export default {
                 }
                 if (self.$store.state.captionHash === message.hash) return true;
 
+                console.log(message);
                 self.$store.commit('setCaptionDataAndHash', message);
                 self.createSession();
                 // Append the initial pinned peek values
@@ -282,8 +287,8 @@ export default {
 
                 // If a video element has been added, we update the reference
                 if (self.AVElement == null) {
-                    for(let mutation of mutations) {
-                        for(let node of mutation.addedNodes) {
+                    for (let mutation of mutations) {
+                        for (let node of mutation.addedNodes) {
                             if (node.nodeType !== 1) continue;
                             if (node.matches(self.AVElementSelector)) {
                                 self.AVElement = node;
@@ -294,12 +299,15 @@ export default {
                                 break;
                             }
                         }
-                        for(let node of mutation.removedNodes) {
+                        for (let node of mutation.removedNodes) {
                             if (node == self.AVElement) {
                                 break;
                             }
                         }
                     }
+                }
+                else {
+                    self.videoDuration = self.AVElement.duration; // in case video changed (ad)
                 }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});
@@ -374,6 +382,14 @@ export default {
         },
     },
     computed: {
+        isLikelyAnAd: function() {
+            if (this.videoDuration === NaN || this.$store.state.captionData === null) return false;
+
+            const captionDuration = this.$store.state.captionData.video_length;
+            const isAd = Math.abs(this.videoDuration - captionDuration) > 0.1;
+            console.log('Is ad:', isAd);
+            return isAd;
+        },
         firstCaption: function() {
             const data = this.$store.state.captionData;
             if (data !== null && data.lines.length > 0) {
