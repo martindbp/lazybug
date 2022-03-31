@@ -2,7 +2,7 @@
     <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
         <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
-                <td title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
+                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
                     <span v-if="isPeek('py')" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="!isPeek('py')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">PY</span>
@@ -36,7 +36,7 @@
                 </td>
             </tr>
             <tr class="centerrow">
-                <td title="Peek hanzi row" :class="getClasses('hz', null)" @click="clickPeekRow('hz')">
+                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null)" @click="clickPeekRow('hz')">
                     <span v-if="isPeek('hz')" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="!isPeek('hz')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">HZ</span>
@@ -70,7 +70,7 @@
                 </td>
             </tr>
             <tr class="bottomrow">
-                <td title="Peek word translations" :class="getClasses('tr', null)" @click="clickPeekRow('tr')">
+                <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null)" @click="clickPeekRow('tr')">
                     <span v-if="isPeek('tr')" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="!isPeek('tr')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">TR</span>
@@ -106,9 +106,9 @@
             </tr>
         </table>
         <br/>
-        <table class="contenttable" style="margin-top: -15px">
+        <table class="contenttable" style="margin-top: -15px" v-if="data !== null">
             <tr>
-                <td title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
+                <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
                     <span v-if="isPeek('translation')" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="!isPeek('translation')" class="iconcard peek" v-html="pinIcon"></span>
                     <span class="cardcontent">EN</span>
@@ -266,9 +266,12 @@ export default {
         const self = this;
         this.$nextTick(function () {
             if (! [null, undefined].includes(self.$refs.captioncontent)) {
-                const topLeftWidth = self.$refs.wordcontent.children[0].children[0].clientWidth;
-                const totalRowWidth = self.$refs.wordcontent.clientWidth;
-                self.$refs.fulltranslation.style.minWidth = (totalRowWidth - topLeftWidth) + 'px';
+                const peekCells = self.$refs.wordcontent.children[0].children;
+                if (peekCells.length > 0) {
+                    const topLeftWidth = peekCells[0].clientWidth;
+                    const totalRowWidth = self.$refs.wordcontent.clientWidth;
+                    self.$refs.fulltranslation.style.minWidth = (totalRowWidth - topLeftWidth) + 'px';
+                }
             }
         });
     },

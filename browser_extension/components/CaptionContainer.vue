@@ -7,22 +7,28 @@
             v-bind:data="showData"
             v-on:seeked="$emit('seeked')"
         />
-        <CaptionContent
-            :class="{ showpeekall: showMenu }"
-            v-if="showData !== null && ! isLoading"
-            v-bind:data="showData"
-            v-bind:fadeOut="fadeOut"
-            v-bind:currTime="currTime"
-        />
-        <div class="initialcontent" v-if="! isLoading && showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
+        <div class="loadingcontent" v-if="isLoading">
+            Loading resources...
+        </div>
+        <div class="initialcontent" v-else-if="showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
             Video has <i>{{ translationType }}</i> sentence translations
             <br />
             <br />
             <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
         </div>
-        <div class="loadingcontent" v-if="isLoading">
-            Loading resources...
+        <div class="initialcontent" v-else-if="showData === null">
+            Video has <i>{{ translationType }}</i> sentence translations
+            <br />
+            <br />
+            <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
         </div>
+        <CaptionContent
+            :class="{ showpeekall: showMenu }"
+            v-else
+            v-bind:data="showData"
+            v-bind:fadeOut="fadeOut"
+            v-bind:currTime="currTime"
+        />
     </div>
 </template>
 
@@ -61,6 +67,11 @@ export default {
         },
         clickFirst: function() {
             this.AVElement.currentTime = this.firstCaption.t0 + 1e-3;
+            this.AVElement.play();
+            this.$emit('seeked');
+        },
+        clickNext: function() {
+            this.AVElement.currentTime = this.nextCaption.t0 + 1e-3;
             this.AVElement.play();
             this.$emit('seeked');
         },
