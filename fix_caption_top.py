@@ -20,6 +20,7 @@ for filename in files:
         continue
 
     y_offset = data['caption_top'] * data['frame_size'][0]
+    is_already_absolute = False
     for line in data['lines']:
         rects = line[3] if isinstance(line[3][0], list) else [line[3]]
 
@@ -28,11 +29,17 @@ for filename in files:
                 continue
             #print('Prev rect', rect)
 
+            if rect[2] > 50:
+                #print('Rect is already relative to 0,0')
+                is_already_absolute = True
+                break
+
             rect[2] += y_offset
             rect[3] += y_offset
             rect[2] = round(rect[2])
             rect[3] = round(rect[3])
             #print('After rect', rect)
 
-    with open(filename, 'w') as f:
-        json.dump(data, f)
+    if not is_already_absolute:
+        with open(filename, 'w') as f:
+            json.dump(data, f)
