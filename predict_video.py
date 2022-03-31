@@ -1171,8 +1171,9 @@ def trim_bad_captions(caption_data):
 
 
 @task(serializer=json)
-def add_metadata(caption_data, caption_id):
+def add_metadata(caption_data, caption_id, show_name):
     caption_data['caption_id'] = caption_id
+    caption_data['show_name'] = show_name
     caption_data['version'] = 1
     return caption_data
 
@@ -1183,7 +1184,7 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
     show_data = None
     video_ids = None
     if show_name is not None:
-        with open(f'data/remote/private/shows/{show_name}.json') as f:
+        with open(f'data/remote/public/shows/{show_name}.json') as f:
             show_data = json.load(f)
             video_ids = []
             for season in show_data['seasons']:
@@ -1322,7 +1323,7 @@ def process_video_captions(
         captions_vtt_path = f'data/remote/private/caption_data/translations/{vid}.zh.vtt'
         if os.path.exists(captions_vtt_path):
             json_captions = convert_vtt_to_caption_format(captions_vtt_path, params, video_length, frame_size)
-            meta_captions = add_metadata(json_captions, vid)
+            meta_captions = add_metadata(json_captions, vid, show_name)
             meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-hanzi.json'
             out.append(meta_captions)
             continue
@@ -1443,7 +1444,7 @@ def process_translations(
 
 
 def _get_show_fixed_translations(show_name):
-    with open(f'data/remote/private/shows/{show_name}.json') as f:
+    with open(f'data/remote/public/shows/{show_name}.json') as f:
         show_data = json.load(f)
 
     return show_data.get('fixed_translations', {})
