@@ -1178,6 +1178,23 @@ def add_metadata(caption_data, caption_id, show_name):
     return caption_data
 
 
+def _merge_params(params):
+    params = [p for p in params if p is not None]
+
+    merged_params = []
+    if len(params) == 0:
+        return merged_params
+
+    for _ in params[0]:
+        merged_params.append({})
+
+    for p in params:
+        for i, param in enumerate(p):
+            merged_params[i].update(param)
+
+    return merged_params
+
+
 def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_type='hanzi'):
     videos = []
 
@@ -1230,10 +1247,10 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                 if 'id' not in episode:
                     continue
 
-                episode_ocr_params = (
-                    episode.get('ocr_params', None) or
-                    season.get('ocr_params', None) or
-                    show_data.get('ocr_params', None)
+                episode_ocr_params = _merge_params(
+                    show_data.get('ocr_params', None),
+                    season.get('ocr_params', None),
+                    episode.get('ocr_params', None),
                 )
                 ocr_params.append(episode_ocr_params)
 
