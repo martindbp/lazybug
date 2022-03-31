@@ -762,7 +762,7 @@ def predict_video_captions(
     caption_type='hanzi',
     ocr_engine='cnocr',
     conditional_captions=None,
-    refine_bounding_rect=True,
+    refine_bounding_rect=False,
 ):
     global easy_ocrs, cnocr
     SUBSAMPLE_FRAME_RATE = 10
@@ -1247,11 +1247,11 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                 if 'id' not in episode:
                     continue
 
-                episode_ocr_params = _merge_params(
+                episode_ocr_params = _merge_params([
                     show_data.get('ocr_params', None),
                     season.get('ocr_params', None),
                     episode.get('ocr_params', None),
-                )
+                ])
                 ocr_params.append(episode_ocr_params)
 
         out = []
@@ -1367,7 +1367,7 @@ def process_video_captions(
                 caption_type=param['type'],
                 ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
                 conditional_captions=conditional_captions,
-                refine_bounding_rect=param.get('refine_bounding_rect', True)
+                refine_bounding_rect=param.get('refine_bounding_rect', False)
             )
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
@@ -1378,7 +1378,7 @@ def process_video_captions(
             else:
                 json_captions_joined = json_captions
 
-            meta_captions = add_metadata(json_captions_joined, vid)
+            meta_captions = add_metadata(json_captions_joined, vid, show_name)
             trimmed_captions = trim_bad_captions(meta_captions)
             trimmed_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-{param["type"]}.json'
 
