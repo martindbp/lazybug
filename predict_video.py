@@ -1108,9 +1108,30 @@ def convert_vtt_to_caption_format(translations_path, params=None, video_length=N
 
 
 @task(serializer=json)
-def add_human_translations_merge_lines(caption_data, human_translations=None, remove_unmatched_captions=True):
+def add_human_translations_merge_lines(caption_data, ocr_params, human_translations=None, remove_unmatched_captions=True):
     caption_lines = caption_data['lines']
     make_caption_lines_lists(caption_lines)
+
+    english_params = None
+    hanzi_params = None
+    for params in ocr_params:
+        if params['type'] == 'hanzi':
+            hanzi_params = params
+        elif params['type'] == 'english':
+            english_params = params
+
+    english_offset = english_params.get('offset_time', 0.0)
+    hanzi_offset = hanzi_params.get('offset_time', 0.0)
+    captions_offsets = [(caption_data, hanzi_offset)]
+    if human_translations is not None:
+        captions_offsets.append((human_translations, english_offset))
+
+    for captions, offset in captions_offsets
+        for line in captions['lines']:
+            for i in range(1, 3):
+                for j in range(2):
+                    line[i][j] += offset
+                    line[i][j] += offset
 
     if human_translations is not None:
         align_translations_and_captions(
@@ -1347,7 +1368,10 @@ def process_video_captions(
 
         prev_captions = defaultdict(lambda: None)
         prev_params = defaultdict(lambda: None)
-        for i, param in enumerate(params):
+        for param in params:
+            if 'caption_top' not in param:
+                # It's params for downloaded captions, not OCR
+                continue
             param_id = param.get('id', None) or param['type']
             depends_on = param.get('depends_on', None)
             conditional_captions, conditional_params = None, None
@@ -1444,7 +1468,7 @@ def process_translations(
             if os.path.exists(english_path):
                 human_translations = Future.from_file(english_path)
 
-        json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, human_translations, remove_unmatched_captions)
+        json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, human_translations, params, remove_unmatched_captions)
         json_captions_human_translations >> f'data/remote/private/caption_data/captions_human_translations/{vid}.json'
         machine_translations = get_machine_translations(json_captions_human_translations)
         machine_translations >> f'data/remote/private/caption_data/machine_translations/{vid}.json'
