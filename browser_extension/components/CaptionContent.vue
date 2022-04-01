@@ -18,9 +18,9 @@
                         :style="{opacity: hiddenAndNotPeeking.py[i] ? 0 : 1}"
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
+                        <q-badge v-if="starredStates.py[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
-                    <q-badge v-if="starredStates.py[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.py[i]"
                         type="py"
@@ -52,9 +52,9 @@
                         :style="{opacity: hiddenAndNotPeeking.hz[i] ? 0 : 1}"
                     >
                         {{ sm2tr(hz) }}
+                        <q-badge v-if="starredStates.hz[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
-                    <q-badge v-if="starredStates.hz[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.hz[i]"
                         type="hz"
@@ -87,9 +87,9 @@
                         :style="{opacity: hiddenAndNotPeeking.tr[i] ? 0 : 1}"
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
+                        <q-badge v-if="starredStates.tr[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
-                    <q-badge v-if="starredStates.tr[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.tr[i]"
                         type="tr"
@@ -125,7 +125,7 @@
                         showborder: data !== null,
                     }"
                 >
-                    <span class="cardcontent" :style="{ position: 'relative', opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }">
+                    <span class="cardcontent" :style="{ opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }">
                         {{ translation }}
                         <q-badge v-if="starredStates.translation" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
@@ -754,6 +754,10 @@ export default {
     border-radius: 3px;
 }
 
+.cardcontent {
+    position: relative;
+}
+
 .captioncard.peeking:not(.fulltranslation) .cardcontent {
     /*color: #32de84;*/
     color: gray;
@@ -855,9 +859,14 @@ export default {
     display: none !important;
 }
 
-.captioncard .q-badge {
+.captioncard .statsbadge {
     margin-top: -5px;
     margin-right: -5px;
+}
+
+.captioncard .starbadge {
+    margin-top: -5px;
+    margin-right: -10px;
 }
 
 </style>
