@@ -21,19 +21,19 @@ function initIndexedDb() {
 initIndexedDb();
 
 function clearIndexedDb() {
-    db.delete()
+    db.delete();
     initIndexedDb();
 }
 
 function clearCache() {
-    db.network.delete()
+    db.network.clear();
 }
 
 function clearPersonalData() {
-    db.states.delete()
-    db.other.delete()
-    db.log.delete()
-    db.srs.delete()
+    db.states.clear();
+    db.other.clear();
+    db.log.clear();
+    db.srs.clear();
 }
 
 function showBadgeStatus() {
