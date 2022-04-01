@@ -6,7 +6,7 @@ const events = [
     'EVENT_PEEK_ROW_PY',
     'EVENT_PEEK_ROW_HZ',
     'EVENT_PEEK_ROW_TR',
-    'EVENT_PEEK_TRANSLATION',
+    'EVENT_PEEK_ROW_TRANSLATION',
     'EVENT_PIN_ROW_PY',
     'EVENT_PIN_ROW_HZ',
     'EVENT_PIN_ROW_TR',
@@ -14,6 +14,7 @@ const events = [
     'EVENT_PEEK_PY',
     'EVENT_PEEK_HZ',
     'EVENT_PEEK_TR',
+    'EVENT_PEEK_TRANSLATION',
     'EVENT_HIDE_PY',
     'EVENT_HIDE_HZ',
     'EVENT_HIDE_TR',
@@ -30,8 +31,8 @@ const events = [
     'EVENT_UNSTAR_PY',
     'EVENT_UNSTAR_HZ',
     'EVENT_UNSTAR_TR',
+    'EVENT_UNSTAR_TRANSLATION',
     'EVENT_BLUR',
-    'EVENT_HIDDEN_STATES',
 ];
 
 const eventsMap = {};
