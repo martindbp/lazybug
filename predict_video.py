@@ -89,7 +89,7 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def _join_predictions(results):
+def _join_predictions(results, alphabet):
     if len(results) == 0:
         return None, '', 0, np.array([]), np.array([])
     else:
@@ -103,11 +103,23 @@ def _join_predictions(results):
         dr = [max(x for (_, _, (x, _), _), *_ in results), max(y for (_, _, (_, y), _), *_ in results)]
         dl = [min(x for (*_, (x, _)), *_ in results), max(y for (*_, (_, y)), *_ in results)]
         rect = [ul, ur, dr, dl]
-        text = ''.join((x[1] for x in results))
-        mean_confidence_score = np.array([x[2] for x in results]).mean()
 
-        indices = np.concatenate([x[3].numpy() for x in results])
-        probs = np.concatenate([x[4] for x in results], axis=0)
+        results_with_spaces = []
+        for res in results:
+            if len(results_with_spaces) > 0:
+                indices = np.array([alphabet.index(' ')])
+                probs = np.zeros((1, res[4].shape[1]), float)
+                probs[0, indices[0]] = 1.0
+                results_with_spaces.append((None, ' ', 1.0, indices, probs))
+
+            res = (*res[:3], res[3].numpy(), *res[4:])
+            results_with_spaces.append(res)
+
+        text = ''.join((x[1] for x in results_with_spaces))
+        mean_confidence_score = np.array([x[2] for x in results_with_spaces]).mean()
+
+        indices = np.concatenate([x[3] for x in results_with_spaces])
+        probs = np.concatenate([x[4] for x in results_with_spaces], axis=0)
         return [rect, text, mean_confidence_score, indices, probs]
 
 
@@ -180,24 +192,25 @@ def gen_line_pred_chars(ocr, line_prob, img_width, max_img_width):
     return res, start_end_idx
 
 
-def ocr_for_single_lines_probs(ocr, segmentation, img, smooth_distributions=False):
+def ocr_for_single_lines_probs(ocr, alphabet, segmentation, img, smooth_distributions=False):
     margin = 0.1
     text_threshold = 0.7
     min_size = 20
-    results = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-    result = _join_predictions(results)
+
+    results = ocr.readtext(segmentation)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+    result = _join_predictions(results, alphabet)
     if result[0] == None:
         # Wider margin, lower thresholds seems to be needed for single chars
         margin = 0.5
         text_threshold = 0.3
         min_size = 10
-        results = ocr.readtext(segmentation, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _join_predictions(results)
+        results = ocr.readtext(segmentation)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+        result = _join_predictions(results, alphabet)
 
     box, text, confidence, prob_indices, prob_distributions = result
     if confidence < 0.6 and len(img) > 0:
-        results = ocr.readtext(img, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _join_predictions(results)
+        results = ocr.readtext(img)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
+        result = _join_predictions(results, alphabet)
         img_confidence = result[2]
         img_text = result[1]
         print(f"{img_confidence = } {confidence = } {img_text = } {text = }")
@@ -597,7 +610,8 @@ def replace_or_add_line(
     if last_line is not None and last_line.text != '' and new_line.text != '':
         def _subst_cost(s1, s2, i, j):
             if i >= len(last_line.prob_distributions) or j >= len(new_line.prob_distributions):
-                # This happened when ocr output "[blank]". Keep this just in case
+                # This happened when ocr output "[blank]". Keep this just in case. 
+                # Edit: should be fixed now
                 print('WARNING: out of bounds')
                 return 1.0
 
@@ -626,7 +640,7 @@ def replace_or_add_line(
                     prob_distribution = (last_line.prob_distributions[op.from_idx] + new_line.prob_distributions[op.to_idx]) / 2
                     char_prob = prob_distribution.max()
                     new_char = alphabet[np.argmax(prob_distribution)]
-                    if new_char is not None:
+                    if new_char is not None and new_char != '[blank]':
                         new_text += new_char
                         new_char_probs.append(char_prob)
                         new_prob_distributions.append(prob_distribution)
@@ -784,8 +798,8 @@ def predict_video_captions(
             }
 
         ocr = easy_ocrs[','.join(sorted(lang))]
-        ocr_fn = partial(ocr_for_single_lines_probs, ocr)
         alphabet = ocr.converter.character
+        ocr_fn = partial(ocr_for_single_lines_probs, ocr, alphabet)
     else:
         if cnocr is None:
             cnocr = CnOcr()
