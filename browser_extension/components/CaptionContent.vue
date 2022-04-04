@@ -168,7 +168,7 @@ export default {
         bookIcon: getIconSvg("study", 18),
         checkIcon: getIconSvg("check", 18),
         undoIcon: getIconSvg("undo", 18),
-        smallStarIcon: getIconSvg("star", 10),
+        smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         showContextMenu: {hz: [], tr: [], py: [], translation: false},
     }},
     computed: {
