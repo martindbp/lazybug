@@ -307,7 +307,7 @@ function captionToAnkiCloze(wordData, hiddenStates, type, i, captionId = null, t
 
             if (i == j) {
                 if (type === 'py') {
-                    if (rowType === 'py') {
+                    if (rowType === 'py' || rowType === 'hz') {
                         row += '\t\t<td>{{c1::' + data + '}}</td>\n';
                     }
                     else {
@@ -335,6 +335,9 @@ function captionToAnkiCloze(wordData, hiddenStates, type, i, captionId = null, t
                 }
             }
             else {
+                let visibilityStr = 'style="visibility: hidden"';
+                if (type === 'py') visibilityStr = '';
+
                 let title = null;
                 if (rowType === 'tr') {
                     const truncateLength = truncateTranslationLength(wordData.py[j], wordData.hz[j]);
@@ -346,10 +349,10 @@ function captionToAnkiCloze(wordData, hiddenStates, type, i, captionId = null, t
                     data = '<span style="display: none">' + data + '</span>';
                 }
                 if (title !== null) {
-                    row += `\t\t<td title="${title}">` + data + '</td>\n';
+                    row += `\t\t<td ${visibilityStr} title="${title}">` + data + '</td>\n';
                 }
                 else {
-                    row += '\t\t<td>' + data + '</td>\n';
+                    row += `\t\t<td ${visibilityStr} >` + data + '</td>\n';
                 }
             }
         }
@@ -357,6 +360,9 @@ function captionToAnkiCloze(wordData, hiddenStates, type, i, captionId = null, t
         html += row;
     }
     html += '</table>';
+    if (type !== 'py') {
+        html += `<br><button onClick="document.querySelectorAll('td').forEach((el) => el.style.visibility = 'visible')">Show context</button>`;
+    }
     html += `<br><hr><br><div>{{c1::${wordData.translation}}}</div>`;
     if (captionId !== null) {
         const [site, id] = captionId.split('-');
