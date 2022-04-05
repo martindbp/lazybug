@@ -1136,16 +1136,8 @@ def add_human_translations_merge_lines(caption_data, ocr_params, human_translati
 
     english_offset = english_params.get('offset_time', 0.0)
     hanzi_offset = hanzi_params.get('offset_time', 0.0)
-    captions_offsets = [(caption_data, hanzi_offset)]
-    if human_translations is not None:
-        captions_offsets.append((human_translations, english_offset))
-
-    for captions, offset in captions_offsets
-        for line in captions['lines']:
-            for i in range(1, 3):
-                for j in range(2):
-                    line[i][j] += offset
-                    line[i][j] += offset
+    caption_data['timing_offset'] = hanzi_offset
+    human_translations['timing_offset'] = english_offset
 
     if human_translations is not None:
         align_translations_and_captions(
