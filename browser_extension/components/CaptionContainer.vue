@@ -120,6 +120,7 @@ export default {
     font-size: 18px;
     padding: 0px;
     min-width: 7em;
+    filter: drop-shadow(rgb(25, 25, 25) 3px 3px 5px);
 }
 
 .zimucaptiondiv.paused,
