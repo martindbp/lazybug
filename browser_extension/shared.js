@@ -157,7 +157,7 @@ function dictItemsToDict(items) {
 }
 
 function captionArrayToDict(arr, captionData) {
-    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments] = arr;
+    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments, lineTimingOffset] = arr;
 
     if (boundingRects.length === 1 && boundingRects[0] === null) {
         // The video has soft captions
@@ -174,12 +174,18 @@ function captionArrayToDict(arr, captionData) {
         }
     }
 
+    let timingOffset = captionData.timing_offset || 0;
+    if (lineTimingOffset !== undefined) {
+        timingOffset = lineTimingOffset;
+    }
+
     return {
         texts: texts,
         t0s: t0s,
         t1s: t1s,
         t0: t0s[0],
         t1: t1s[t1s.length-1],
+        timingOffset: timingOffset,
         boundingRects: boundingRects,
         charProbs: charProbs,
         logprob: logprob,

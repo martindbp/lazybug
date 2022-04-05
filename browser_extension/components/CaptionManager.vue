@@ -382,6 +382,50 @@ export default {
             // Actually, scaling is not working well, let's just keep it constant
             this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale);
         },
+        getCurrentCaptionIdx: function(withTimingOffset) {
+            const captionData = this.$store.state.captionData;
+            if (captionData === null) return null;
+
+            const lines = captionData.lines
+            const lastSeenCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], captionData);
+            const lastSeenCaptionT0 = lastSeenCaption.t0 + (withTimingOffset ? lastSeenCaption.timingOffset : 0);
+            if (this.currTime < lastSeenCaptionT0) {
+                // Start over search from the beginning
+                lastCaptionIdxGlobal = 0;
+            }
+
+            for (var i = lastCaptionIdxGlobal; i < lines.length; i++) {
+                let caption = captionArrayToDict(lines[i], captionData);
+                let captionT0 = caption.t0 + (withTimingOffset ? caption.timingOffset : 0)
+                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], captionData) : null;
+                if (this.currTime >= captionT0 && this.currTime <= caption.t1) {
+                    lastCaptionIdxGlobal = i;
+                    return i;
+                }
+                else if (prevCaption && this.currTime > prevCaption.t1 && this.currTime < captionT0) {
+                    // In between two lines
+                    lastCaptionIdxGlobal = i-1;
+
+                    // If we're still close to the prevCaption, we keep it
+                    if (this.currTime < Math.min(prevCaption.t1 + CAPTION_END_BUFFER_TIME, captionT0)) {
+                        return i-1;
+                    }
+                    return [i-1, i];
+                }
+            }
+
+            const firstCaption = captionArrayToDict(lines[0], captionData)
+            const lastCaption = captionArrayToDict(lines[lines.length - 1], captionData)
+            const firstCaptionT0 = firstCaption.t0 + (withTimingOffset ? firstCaption.timingOffset : 0);
+            const lastCaptionT1 = lastCaption.t1 + (withTimingOffset ? lastCaption.timingOffset : 0);
+            if (this.currTime < firstCaptionT0) {
+                return [null, 0];
+            }
+            else if (this.currTime > lastCaptionT1) {
+                return [lines.length-1, null];
+            }
+            return null;
+        },
     },
     computed: {
         isLikelyAnAd: function() {
@@ -443,42 +487,10 @@ export default {
             return this.$store.state.captionData['frame_size'];
         },
         currentCaptionIdx: function() {
-            const captionData = this.$store.state.captionData;
-            if (captionData === null) return null;
-
-            const lines = captionData.lines
-            const lastCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], captionData);
-            if (this.currTime < lastCaption.t0) {
-                // Start over search from the beginning
-                lastCaptionIdxGlobal = 0;
-            }
-
-            for (var i = lastCaptionIdxGlobal; i < lines.length; i++) {
-                let caption = captionArrayToDict(lines[i], captionData);
-                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], captionData) : null;
-                if (this.currTime >= caption.t0 && this.currTime <= caption.t1) {
-                    lastCaptionIdxGlobal = i;
-                    return i;
-                }
-                else if (prevCaption && this.currTime > prevCaption.t1 && this.currTime < caption.t0) {
-                    // In between two lines
-                    lastCaptionIdxGlobal = i-1;
-
-                    // If we're still close to the prevCaption, we keep it
-                    if (this.currTime < Math.min(prevCaption.t1 + CAPTION_END_BUFFER_TIME, caption.t0)) {
-                        return i-1;
-                    }
-                    return [i-1, i];
-                }
-            }
-
-            if (this.currTime < captionArrayToDict(lines[0], captionData).t0) {
-                return [null, 0];
-            }
-            else if (this.currTime > captionArrayToDict(lines[lines.length-1], captionData).t1) {
-                return [lines.length-1, null];
-            }
-            return null;
+            return this.getCurrentCaptionIdx(true); // with offset if any
+        },
+        currentBlurCaptionIdx: function() {
+            return this.getCurrentCaptionIdx(false); // without offsets
         },
     },
 };
