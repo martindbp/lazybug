@@ -1126,8 +1126,8 @@ def add_human_translations_merge_lines(caption_data, ocr_params, human_translati
     caption_lines = caption_data['lines']
     make_caption_lines_lists(caption_lines)
 
-    english_params = None
-    hanzi_params = None
+    english_params = {}
+    hanzi_params = {}
     for params in ocr_params:
         if params['type'] == 'hanzi':
             hanzi_params = params
@@ -1137,9 +1137,9 @@ def add_human_translations_merge_lines(caption_data, ocr_params, human_translati
     english_offset = english_params.get('offset_time', 0.0)
     hanzi_offset = hanzi_params.get('offset_time', 0.0)
     caption_data['timing_offset'] = hanzi_offset
-    human_translations['timing_offset'] = english_offset
 
     if human_translations is not None:
+        human_translations['timing_offset'] = english_offset
         align_translations_and_captions(
             caption_data,
             human_translations,
@@ -1222,7 +1222,7 @@ def _merge_params(params):
     return merged_params
 
 
-def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_type='hanzi'):
+def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_type='hanzi', return_all_ocr_params=False):
     videos = []
 
     show_data = None
@@ -1291,7 +1291,7 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
             ps = []
             if params is not None:
                 for param in params:
-                    if file_path_type is None or ('type' in param and param['type'] == file_path_type):
+                    if return_all_ocr_params or file_path_type is None or ('type' in param and param['type'] == file_path_type):
                         ps.append(param)
 
             out.append((video_id, file_path, ps))
@@ -1364,20 +1364,29 @@ def process_video_captions(
             continue
 
         video_length, _, frame_size = get_video_length_size(video_path)
-        captions_vtt_path = f'data/remote/private/caption_data/translations/{vid}.zh.vtt'
-        if os.path.exists(captions_vtt_path):
-            json_captions = convert_vtt_to_caption_format(captions_vtt_path, params, video_length, frame_size)
-            meta_captions = add_metadata(json_captions, vid, show_name)
-            meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-hanzi.json'
-            out.append(meta_captions)
-            continue
 
         prev_captions = defaultdict(lambda: None)
         prev_params = defaultdict(lambda: None)
         for param in params:
             if 'caption_top' not in param:
-                # It's params for downloaded captions, not OCR
+                # It's params for downloaded vtt captions, not OCR
+
+                vtt_types = None
+                if param['type'] == 'hanzi':
+                    vtt_types = ['zh', 'zh-Hans']
+                elif param['type'] == 'english':
+                    vtt_types = ['en', 'en-US']
+
+                for vtt_type in vtt_types:
+                    path = f'data/remote/private/caption_data/translations/{vid}.{vtt_type}.vtt'
+                    if os.path.exists(path):
+                        json_captions = convert_vtt_to_caption_format(path, params, video_length, frame_size)
+                        meta_captions = add_metadata(json_captions, vid, show_name)
+                        meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-hanzi.json'
+                        out.append(meta_captions)
+                        break
                 continue
+
             param_id = param.get('id', None) or param['type']
             depends_on = param.get('depends_on', None)
             conditional_captions, conditional_params = None, None
@@ -1456,7 +1465,7 @@ def process_translations(
     os.makedirs('data/remote/private/caption_data/machine_translations', exist_ok=True)
     os.makedirs('data/remote/private/caption_data/captions_all_translations', exist_ok=True)
 
-    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/meta_trimmed_captions/')
+    videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/meta_trimmed_captions/', return_all_ocr_params=True)
     out = []
     for vid, file_path, params in videos:
         if video_id is not None and vid != video_id:
@@ -1465,16 +1474,21 @@ def process_translations(
             trimmed_captions = Future.from_file(file_path)
         except FileNotFoundError:
             continue
-        human_translations_path = f'data/remote/private/caption_data/translations/{vid}.en.vtt'
+        human_translations_paths = [
+            f'data/remote/private/caption_data/translations/{vid}.en.vtt',
+            f'data/remote/private/caption_data/translations/{vid}.en-US.vtt'
+        ]
         human_translations = None
-        if os.path.exists(human_translations_path):
-            human_translations = convert_vtt_to_caption_format(human_translations_path)
-        else:
+        for path in human_translations_paths:
+            if os.path.exists(path):
+                human_translations = convert_vtt_to_caption_format(path)
+
+        if human_translations is None:
             english_path = f'data/remote/private/caption_data/raw_captions/{vid}-english.json'
             if os.path.exists(english_path):
                 human_translations = Future.from_file(english_path)
 
-        json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, human_translations, params, remove_unmatched_captions)
+        json_captions_human_translations = add_human_translations_merge_lines(trimmed_captions, params, human_translations, remove_unmatched_captions)
         json_captions_human_translations >> f'data/remote/private/caption_data/captions_human_translations/{vid}.json'
         machine_translations = get_machine_translations(json_captions_human_translations)
         machine_translations >> f'data/remote/private/caption_data/machine_translations/{vid}.json'
