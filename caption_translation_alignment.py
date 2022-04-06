@@ -10,9 +10,45 @@ def make_caption_lines_lists(caption_lines):
             for i in range(0, 7):
                 line[i] = [line[i]]
 
-BAD_OVERLAP_THRESHOLD = 0.5 # seconds
 
-def align_translations_and_captions(caption_data, translations, remove_unmatched_captions=True):
+def get_timing_offset(caption_data, translations):
+    caption_lines = caption_data['lines']
+    translation_lines = translations['lines']
+    caption_offset = caption_data.get('timing_offset', 0)
+    translation_offset = translations.get('timing_offset', 0)
+
+
+    def _subst_cost(translation, caption, i, j):
+        caption_t0, caption_t1 = caption[1][0] + caption_offset, caption[2][-1] + caption_offset
+        translation_t0, translation_t1 = translation[1] + translation_offset, translation[2] + translation_offset
+        return abs((caption_t1 - caption_t0) - (translation_t1 - translation_t0))
+
+    def _insert_cost(caption, i):
+        return 1.0
+
+    dist, ops = weighted_levenshtein(translation_lines, caption_lines, _subst_cost, _insert_cost, return_ops=True)
+
+    #for op in ops:
+        #print(op)
+
+    diffs = []
+    for op in ops:
+        if op.type == OpType.SUBSTITUTE:
+            from_translation = translation_lines[op.from_idx]
+            to_caption = caption_lines[op.to_idx]
+            from_t0 = from_translation[1]
+            to_t0 = to_caption[1][0]
+            diff = from_t0 - to_t0
+            diffs.append(diff)
+            print(from_translation[0], to_caption[0], diff)
+
+    median = list(sorted(diffs))[len(diffs) // 2]
+    return median
+
+
+BAD_OVERLAP_THRESHOLD = 0.5  # seconds
+
+def align_translations_and_captions(caption_data, translations, remove_unmatched_captions=True, use_translation_timings=False):
     """
     NOTE: updates the caption_data by appending the translation at the appropriate caption.
     Also transfers punctuation marks from the human translation to the caption
@@ -22,9 +58,14 @@ def align_translations_and_captions(caption_data, translations, remove_unmatched
     # NOTE: Translations from Youtube may not line up very well with the actual captions, some might not even intersect
     # in time, so do a fuzzy match based on intersections
 
+    timing_offset = 0 #get_timing_offset(caption_data, translations)
+
+    caption_offset = caption_data.get('timing_offset', 0) + timing_offset
+    translation_offset = translations.get('timing_offset', 0)
+
     def _subst_cost(translation, caption, i, j):
-        caption_t0, caption_t1 = caption[1][0], caption[2][-1]
-        translation_t0, translation_t1 = translation[1], translation[2]
+        caption_t0, caption_t1 = caption[1][0] + caption_offset, caption[2][-1] + caption_offset
+        translation_t0, translation_t1 = translation[1] + translation_offset, translation[2] + translation_offset
         intersection_start = max(caption_t0, translation_t0)
         intersection_end = min(caption_t1, translation_t1)
         if intersection_end < intersection_start:
@@ -36,13 +77,13 @@ def align_translations_and_captions(caption_data, translations, remove_unmatched
         return non_intersection
 
     def _insert_cost(caption, i):
-        caption_t0, caption_t1 = caption[1][0], caption[2][-1]
+        caption_t0, caption_t1 = caption[1][0] + caption_offset, caption[2][-1] + caption_offset
         nonlocal translation_lines
         if i >= len(translation_lines):
             return 1.0
         translation = translation_lines[i]
 
-        translation_t0, translation_t1 = translation[1], translation[2]
+        translation_t0, translation_t1 = translation[1] + translation_offset, translation[2] + translation_offset
         intersection_start = max(caption_t0, translation_t0)
         intersection_end = min(caption_t1, translation_t1)
         if intersection_end < intersection_start:
