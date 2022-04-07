@@ -80,6 +80,41 @@ function addStorageData(keys, values, store) {
 
 
 const CDN_URL = "https://cdn.zimu.ai/file/";
+function fetchResource(folder, resourceFilename, callback, failCallback) {
+    console.log(folder, resourceFilename);
+    let [filename, ext] = resourceFilename.split('.');
+    const storageFilename = `${folder}/${filename}.${ext}`;
+
+    getStorageData([storageFilename], db.network)
+    .then(function(data) {
+        if (data[0] === null) {
+            return fetch(CDN_URL + storageFilename, {cache: 'default'})
+                .then(function(response) {
+                    if (!response.ok) {
+                        failCallback(response);
+                        return null;
+                    }
+                    return response;
+                })
+                .then((response) => response.json())
+                .then(function(data) {
+                    console.log('Fetching done for', folder, filename);
+
+                    const keys = [storageFilename];
+                    const values = [data];
+                    return addStorageData(keys, values, db.network)
+                        .then(() => data);
+                });
+        }
+        else {
+            return data[0];
+        }
+    })
+    .then(function(data) {
+        callback(data);
+    });
+}
+
 
 function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
     console.log(folder, resourceFilename);
@@ -160,6 +195,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     else if (message.type === 'fetchVersionedResource') {
         fetchVersionedResource('zimu-public', message.filename, function (data, hash) {
             sendResponse({data: data, hash: hash});
+        }, function(error) {
+            console.log('ERROR');
+            console.log(error);
+            sendResponse('error');
+        });
+    }
+    else if (message.type === 'fetchResource') {
+        fetchResource('zimu-public', message.filename, function (data) {
+            sendResponse({data: data});
         }, function(error) {
             console.log('ERROR');
             console.log(error);

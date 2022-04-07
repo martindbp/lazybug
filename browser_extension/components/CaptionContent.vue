@@ -364,7 +364,7 @@ export default {
             if (setState !== null) {
                 applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
                 const eventData = [getEvent(action, type)];
-                if (i !== null) eventData.push(i);
+                if (i !== null && i !== undefined) eventData.push(i);
 
                 if (setState === StateStarred) {
                     eventData.push(this.getCurrentState());
@@ -389,11 +389,34 @@ export default {
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
             const dt = Date.now() - this.$store.state.sessionTime;
+            const showInfo = this.$store.state.showInfo;
+            let showName = null;
+            let seasonName = null;
+            let episodeName = null;
+            if (showInfo) {
+                showName = showInfo.name;
+                const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, this.$store.state.captionId);
+                if (seasonIdx !== null) {
+                    let seasonName = showInfo.seasons[seasonIdx].name;
+                    if (! seasonName) {
+                        seasonName = showInfo.seasons.length > 1 ? 'Season ' + (seasonIdx + 1) : null;
+                    }
+
+                    let episodeName = showInfo.seasons[seasonIdx].episodes[episodeIdx].name;
+                    if (! episodeName) {
+                        episodeName = showInfo.seasons[seasonIdx].length > 1 ? 'Episode ' + (episodeIdx + 1) : null;
+                    }
+                }
+            }
+
             return {
                 data: this.data,
                 translationIdx: this.translationIdx,
                 hidden: this.hiddenStates,
                 dt: dt,
+                showName: showName,
+                seasonName: seasonName,
+                episodeName: episodeName,
             };
         },
         click: function(type, i = null) {

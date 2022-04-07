@@ -1,3 +1,5 @@
+const CAPTION_FADEOUT_TIME = 5;
+
 const events = [
     'EVENT_SHOW_CAPTION_IDX',
     'EVENT_REPLAY_CAPTION',
@@ -47,13 +49,20 @@ function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
 }
 
-const CAPTION_FADEOUT_TIME = 5;
-function fetchVersionedResource(filename, callback) {
-    chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
-        if (message === 'error') {
+function fetchResource(filename, callback) {
+    chrome.runtime.sendMessage({type: 'fetchResource', filename: filename}, function onResponse(message) {
+        if (['error', null, undefined].includes(message)) {
+            console.log('Failed to fetch ' + filename);
             return false;
         }
-        if (message === undefined || message == null) {
+        callback(message.data);
+        return true;
+    });
+};
+
+function fetchVersionedResource(filename, callback) {
+    chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
+        if (['error', null, undefined].includes(message)) {
             console.log('Failed to fetch ' + filename);
             return false;
         }
@@ -154,6 +163,18 @@ function dictItemsToDict(items) {
         out.push(dictArrayToDict(item));
     }
     return out;
+}
+
+function findVideoInShowInfo(showInfo, captionId) {
+    for (let i = 0; i < showInfo.seasons.length; i++) {
+        for (let j = 0; j < showInfo.seasons[i].episodes.length; j++) {
+            if (showInfo.seasons[i].episodes[j].id === captionId) {
+                return [i, j];
+            }
+        }
+    }
+
+    return [null, null];
 }
 
 function captionArrayToDict(arr, captionData) {

@@ -22,6 +22,7 @@ const store = new Vuex.Store({
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log
+        showInfo: null,
         DICT: null,
         HSK_WORDS: null,
         states: Vue.ref({}),
@@ -79,6 +80,9 @@ const store = new Vuex.Store({
         setCaptionDataAndHash(state, val) {
             state.captionData = val.data;
             state.captionHash = val.hash;
+            if (state.captionData !== null) {
+                fetchResource(`shows/${state.captionData.show_name}.json`, function (data) { state.showInfo = data; });
+            }
         },
         setShowOptions(state, val) {
             state.showOptions = val;

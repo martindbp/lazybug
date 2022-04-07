@@ -14,7 +14,8 @@
           <template v-slot:body="props">
               <q-tr v-if="props.row.isNewSession">
                   <q-td colspan="100%">
-                      <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>: {{ props.row.video }}</div>
+                      <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
+                          {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}</div>
                   </q-td>
               </q-tr>
               <q-tr :props="props">
@@ -26,7 +27,7 @@
                      :key="col.name"
                      :props="props"
                      @click="props.expand = !props.expand"
-                     :style="{ cursor: 'pointer' }"
+                     :style="{ cursor: 'pointer', fontSize: col.name === 'hz' ? '1.2em' : '1em' }"
                      v-html="col.value"
                      >
                   </q-td>
@@ -45,15 +46,26 @@
 </template>
 
 <script>
+const FIELD_TO_LABEL = {
+    hz: 'Hanzi',
+    tr: 'Translation',
+    py: 'Pinyin',
+    translation: 'Full Translation',
+};
+
+
+function wrapInColorSpan(str, color) {
+    return `<span style="background: ${color}">${str}</span>`;
+}
 
 export default {
     data: function() { return {
         log: null,
         columns: [
-            {name: 'hz', field: 'hz', label: 'Hanzi'},
-            {name: 'py', field: 'py', label: 'Pinyin'},
-            {name: 'tr', field: 'tr', label: 'Translation'},
-            {name: 'translation', field: 'translation', label: 'Sentence Translation'},
+            {name: 'hz', field: 'hz', label: FIELD_TO_LABEL.hz},
+            {name: 'py', field: 'py', label: FIELD_TO_LABEL.py},
+            {name: 'tr', field: 'tr', label: FIELD_TO_LABEL.tr},
+            {name: 'translation', field: 'translation', label: FIELD_TO_LABEL.translation},
         ],
         selected: [],
         pagination: {
@@ -78,8 +90,8 @@ export default {
             for (const item of this.selected) {
                 const [type, eventData, sessionTime, captionId] = this.starEvents[item.idx];
                 const [_, idx, data] = eventData;
-                const t0 = data.t0;
-                const t1 = data.t1;
+                const t0 = data.data.t0;
+                const t1 = data.data.t1;
 
                 const cloze = captionToAnkiCloze(data.words, data.hidden, type, idx, captionId, t0, t1, true);
                 csv += cloze + '\n'
@@ -90,8 +102,8 @@ export default {
         rowYoutubeEmbedCode: function(rowIdx) {
             const [type, eventData, sessionTime, captionId] = this.starEvents[rowIdx];
             const [_, idx, data] = eventData;
-            const t0 = data.t0;
-            const t1 = data.t1;
+            const t0 = data.data.t0;
+            const t1 = data.data.t1;
             const [site, id] = captionId.split('-');
             return getYoutubeEmbedCode(id, t0, t1);
         },
@@ -135,29 +147,54 @@ export default {
             if (this.log === null) return rows;
 
             let lastSessionId = null;
-            for (let i = 0; i < this.starEvents.length; i++) {
+            for (let i = this.starEvents.length - 1; i >= 0; i--) {
                 const [type, eventData, sessionTime, captionId] = this.starEvents[i];
-                const [_, idx, data] = eventData;
+                let idx = null;
+                let data = null;
+                if (eventData.length === 3) {
+                    idx = eventData[1];
+                    data = eventData[2];
+                }
+                else {
+                    data = eventData[1];
+                }
                 const wordData = getWordData(data.data, data.translationIdx);
-                const t0 = data.t0;
-                const t1 = data.t1;
                 const dt = data.dt;
 
                 const sessionId = `${sessionTime}-${captionId}`;
 
-                const alignmentIdx = wordData.alignmentIndices[idx];
-                const alignment = data.data.alignments[alignmentIdx];
-                const [startIdx, endIdx, ...rest] = alignment;
-
+                let py = null;
+                let hz = null;
+                let fullHz = null;
+                let tr = null;
+                let translation = wordData.translation;
                 const text = data.data.texts.join(' ');
-                const fullHz = `${text.substring(0, startIdx)}<b>${text.substring(startIdx, endIdx)}</b>${text.substring(endIdx)}`;
+                if (idx !== null) {
+                    const alignmentIdx = wordData.alignmentIndices[idx];
+                    const alignment = data.data.alignments[alignmentIdx];
+                    const [startIdx, endIdx, ...rest] = alignment;
 
-                const py = idx !== null ? wordData.py[idx] : '';
-                const hz = idx !== null ? wordData.hz[idx] : '';
-                const tr = idx !== null ? wordData.tr[idx] : '';
+                    let hzColor = '#00BFFF';
+                    if (type === 'hz') {
+                        hzColor = 'lightgreen';
+                    }
+                    fullHz = `${text.substring(0, startIdx)}<span style="background: ${hzColor}">${text.substring(startIdx, endIdx)}</span>${text.substring(endIdx)}`;
+
+                    py = idx !== null ? wordData.py[idx] : '';
+                    hz = idx !== null ? wordData.hz[idx] : '';
+                    tr = idx !== null ? wordData.tr[idx] : '';
+                    translation = null;
+                }
+                else {
+                    fullHz = text;
+                }
 
                 const id = `${sessionTime}-${dt}-${captionId}-${py}-${hz}-${tr}-${wordData.translation}`;
-                console.log(id);
+
+                if (type === 'py') py = wrapInColorSpan(py, 'lightgreen');
+                else if (type === 'tr') tr = wrapInColorSpan(tr, 'lightgreen');
+                else if (type === 'translation') translation = wrapInColorSpan(translation, 'lightgreen');
+
                 rows.push({
                     id: id,
                     idx: i,
@@ -165,15 +202,16 @@ export default {
                     py: py,
                     hz: fullHz,
                     tr: tr,
-                    translation: wordData.translation,
+                    translation: translation,
                     time: sessionTime,
                     video: captionId,
                     isNewSession: sessionId !== lastSessionId,
+                    data: data,
                 });
                 lastSessionId = sessionId;
             }
 
-            return rows.reverse();
+            return rows;
         },
     },
 };
