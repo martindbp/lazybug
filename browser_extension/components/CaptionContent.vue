@@ -431,6 +431,7 @@ export default {
                 words: this.wordData,
                 hidden: this.hiddenStates,
                 dt: dt,
+                videoTitle: document.querySelector('title').innerText,
             };
         },
         click: function(type, i = null) {
