@@ -204,43 +204,7 @@ export default {
             };
         },
         wordData: function() {
-            const wordData = {hz: [], py: [], tr: [], translation: null, pys: [], pysDiacritical: []};
-            if (this.data === null) {
-                return wordData;
-            }
-
-            wordData.translation = this.translation;
-
-            let nextIdx = 0;
-            for (let i = 0; i < this.data.alignments.length; i++) {
-                let [startIdx, endIdx, _, pyParts, wordTranslation] = this.data.alignments[i];
-                if (startIdx > nextIdx) {
-                    wordData.hz.push(this.texts.sm.substring(nextIdx, startIdx));
-                    wordData.py.push('');
-                    wordData.tr.push('');
-                    wordData.pys.push(null);
-                    wordData.pysDiacritical.push(null);
-                }
-                const hz = this.texts.sm.substring(startIdx, endIdx);
-                wordData.hz.push(hz);
-                const pysDiacritical = pyParts.map((part) => part[0]);
-                const displayPinyin = pysDiacritical.join('');
-                const pys = displayPinyin === '' ? null : pyParts.map((part) => part[1]);
-                wordData.py.push(displayPinyin);
-                wordData.tr.push(wordTranslation);
-                wordData.pysDiacritical.push(pysDiacritical);
-                wordData.pys.push(pys);
-                nextIdx = endIdx;
-            }
-            if (nextIdx < this.texts.sm.length) {
-                wordData.hz.push(this.texts.sm.substring(nextIdx, this.texts.sm.length));
-                wordData.py.push('');
-                wordData.tr.push('');
-                wordData.pys.push(null);
-                wordData.pysDiacritical.push(null);
-            }
-            //console.log('wordData', wordData);
-            return wordData;
+            return getWordData(this.data, this.translationIdx);
         },
         hiddenAndNotPeeking: function() {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.hiddenStates['translation'] && ! this.purePeekStates['translation']};
@@ -426,12 +390,10 @@ export default {
             // We add dt so that we can uniquely identify this event state
             const dt = Date.now() - this.$store.state.sessionTime;
             return {
-                t0: this.data.t0,
-                t1: this.data.t1,
-                words: this.wordData,
+                data: this.data,
+                translationIdx: this.translationIdx,
                 hidden: this.hiddenStates,
                 dt: dt,
-                videoTitle: document.querySelector('title').innerText,
             };
         },
         click: function(type, i = null) {

@@ -301,6 +301,59 @@ function truncateTranslationLength(py, hz) {
     return Math.max(15, Math.ceil(Math.max(py.length, hz.length) * 2));  // add 100% to longest
 }
 
+function getWordData(data, translationIdx) {
+    // Create a bit more convenient data structure for the words
+
+    const wordData = {
+        hz: [],
+        py: [],
+        tr: [],
+        translation: null,
+        pys: [],
+        pysDiacritical: [],
+        alignmentIndices: [],
+    };
+
+    if (data === null) {
+        return wordData;
+    }
+
+    wordData.translation = data.translations[translationIdx];
+
+    let nextIdx = 0;
+    const text = data.texts.join(' ');
+    for (let i = 0; i < data.alignments.length; i++) {
+        const [startIdx, endIdx, _, pyParts, wordTranslation] = data.alignments[i];
+        if (startIdx > nextIdx) {
+            wordData.hz.push(text.substring(nextIdx, startIdx));
+            wordData.py.push('');
+            wordData.tr.push('');
+            wordData.pys.push(null);
+            wordData.pysDiacritical.push(null);
+            wordData.alignmentIndices.push(null);
+        }
+        const hz = text.substring(startIdx, endIdx);
+        wordData.hz.push(hz);
+        const pysDiacritical = pyParts.map((part) => part[0]);
+        const displayPinyin = pysDiacritical.join('');
+        const pys = displayPinyin === '' ? null : pyParts.map((part) => part[1]);
+        wordData.py.push(displayPinyin);
+        wordData.tr.push(wordTranslation);
+        wordData.pysDiacritical.push(pysDiacritical);
+        wordData.pys.push(pys);
+        wordData.alignmentIndices.push(i);
+        nextIdx = endIdx;
+    }
+    if (nextIdx < text.length) {
+        wordData.hz.push(text.substring(nextIdx, text.length));
+        wordData.py.push('');
+        wordData.tr.push('');
+        wordData.pys.push(null);
+        wordData.pysDiacritical.push(null);
+        wordData.alignmentIndices.push(null);
+    }
+    return wordData;
+}
 
 const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 function captionToAnkiCloze(wordData, hiddenStates, type, i, captionId = null, t0 = null, t1 = null, escape = false) {

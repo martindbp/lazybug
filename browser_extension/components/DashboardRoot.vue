@@ -6,13 +6,17 @@
             title="Starred"
             :rows="rows"
             :columns="columns"
-            row-key="content"
             :selected-rows-label="getSelectedString"
             selection="multiple"
             v-model:selected="selected"
             :pagination="pagination"
         >
           <template v-slot:body="props">
+              <q-tr v-if="props.row.isNewSession">
+                  <q-td colspan="100%">
+                      <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>: {{ props.row.video }}</div>
+                  </q-td>
+              </q-tr>
               <q-tr :props="props">
                   <q-td>
                       <q-checkbox v-model="props.selected" color="primary" />
@@ -22,9 +26,9 @@
                      :key="col.name"
                      :props="props"
                      @click="props.expand = !props.expand"
-                     :style="{ cursor: 'pointer', background: col.name === 'time' && timestampToYYYMMDD(col.value) === timestampToYYYMMDD(Date.now()) ? 'lightgreen' : 'none'}"
+                     :style="{ cursor: 'pointer' }"
+                     v-html="col.value"
                      >
-                       {{ col.value }}
                   </q-td>
               </q-tr>
               <q-tr v-show="props.expand" :props="props">
@@ -46,9 +50,10 @@ export default {
     data: function() { return {
         log: null,
         columns: [
-            {name: 'time', field: 'time', label: 'Date', format: val => this.timestampToYYYMMDD(val),},
-            {name: 'video', field: 'video', label: 'Video'},
-            {name: 'content', field: 'content', label: 'Content'}
+            {name: 'hz', field: 'hz', label: 'Hanzi'},
+            {name: 'py', field: 'py', label: 'Pinyin'},
+            {name: 'tr', field: 'tr', label: 'Translation'},
+            {name: 'translation', field: 'translation', label: 'Sentence Translation'},
         ],
         selected: [],
         pagination: {
@@ -129,32 +134,46 @@ export default {
             const rows = [];
             if (this.log === null) return rows;
 
+            let lastSessionId = null;
             for (let i = 0; i < this.starEvents.length; i++) {
                 const [type, eventData, sessionTime, captionId] = this.starEvents[i];
                 const [_, idx, data] = eventData;
-                const wordData = data.words;
+                const wordData = getWordData(data.data, data.translationIdx);
                 const t0 = data.t0;
                 const t1 = data.t1;
                 const dt = data.dt;
 
-                let content = null;
-                if (type === 'translation') {
-                    content = wordData.translation;
-                }
-                else {
-                    const other = [];
-                    const main = wordData[type][idx];
-                    for (const t of ['py', 'hz', 'tr']) {
-                        if (t !== type) {
-                            other.push(wordData[t][idx]);
-                        }
-                    }
-                    content = `${main} (${other.join('/')})`;
-                }
-                rows.push({id: `${sessionTime}-${dt}-${captionId}-${content}`, idx: i, time: sessionTime, video: captionId, content: content});
+                const sessionId = `${sessionTime}-${captionId}`;
+
+                const alignmentIdx = wordData.alignmentIndices[idx];
+                const alignment = data.data.alignments[alignmentIdx];
+                const [startIdx, endIdx, ...rest] = alignment;
+
+                const text = data.data.texts.join(' ');
+                const fullHz = `${text.substring(0, startIdx)}<b>${text.substring(startIdx, endIdx)}</b>${text.substring(endIdx)}`;
+
+                const py = idx !== null ? wordData.py[idx] : '';
+                const hz = idx !== null ? wordData.hz[idx] : '';
+                const tr = idx !== null ? wordData.tr[idx] : '';
+
+                const id = `${sessionTime}-${dt}-${captionId}-${py}-${hz}-${tr}-${wordData.translation}`;
+                console.log(id);
+                rows.push({
+                    id: id,
+                    idx: i,
+                    type: type,
+                    py: py,
+                    hz: fullHz,
+                    tr: tr,
+                    translation: wordData.translation,
+                    time: sessionTime,
+                    video: captionId,
+                    isNewSession: sessionId !== lastSessionId,
+                });
+                lastSessionId = sessionId;
             }
 
-            return rows;
+            return rows.reverse();
         },
     },
 };
