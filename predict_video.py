@@ -20,7 +20,7 @@ from torch.nn import functional as F
 import webvtt
 
 os.environ["TRANSFORMERS_CACHE"] = "./data/local/huggingface-models/"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
+#os.environ["TRANSFORMERS_OFFLINE"] = "1"
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 from easyocr import Reader
 

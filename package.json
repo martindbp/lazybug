@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "canvas": "^2.9.1",
+    "sass": "^1.49.11",
+    "utfstring": "^2.0.2",
+    "vue": "^3.2.31"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "^3.2.31"
+  }
+}

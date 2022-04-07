@@ -1,7 +1,13 @@
 install:
+	sudo apt update
 	sudo apt install -y libcairo2-dev pkg-config python3.9-dev nodejs npm
-	pip install pycairo pangocairocffi
+	pip install -r requirements.txt
 	npm install canvas utfstring
+	sudo npm install -g vue@next @vue/cli-service @vue/compiler-sfc @vue/cli-init sass
+	# For some reason, some module is trying to import "vue/compiler-sfc" instead of "@vue/compiler-sfc"
+	# The hack below works
+	ln -s /usr/local/lib/node_modules/@vue /usr/local/lib/node_modules/vue
+	browser_extension/dist/
 
 clean:
 	rm -rf dataset
@@ -39,6 +45,9 @@ sync-down-public:
 
 sync-down-private:
 	b2 sync b2://zimu-private data/remote/private
+
+sync-down-private-essentials:
+	b2 sync b2://zimu-private data/remote/private --excludeRegex '.*caption_data.*'
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID
