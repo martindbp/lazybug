@@ -355,7 +355,7 @@ def get_alignment_translations(caption_data, global_known_names=[], fixed_transl
                 options = get_translation_options_cedict(hz, py=None, deepl=None, add_empty=False, split_or=False)
                 cleaned_transl = clean_cedict_translation(transl, py=None, split_or=False)
                 if len(cleaned_transl) == 0:
-                    print('Zeroing out', hz, min_option, cleaned_transl)
+                    print('Zeroing out', hz, cleaned_transl)
                     words[i] = '[UNK]'
                 else:
                     cleaned_transl = [c.lower() for c in cleaned_transl[0].split(' ') if c.lower()]
