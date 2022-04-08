@@ -34,14 +34,14 @@ pre-public-sync:
 
 sync-up-public:
 	touch synced.txt
-	b2 sync --noProgress data/remote/public b2://zimu-public | tee synced.txt
+	b2 sync --noProgress data/remote/public b2://zimu-public --skipNewer | tee synced.txt
 	make purge-cloudflare-public
 
 sync-up-private:
-	b2 sync data/remote/private b2://zimu-private
+	b2 sync data/remote/private b2://zimu-private --skipNewer
 
 sync-up-private-essentials:
-	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*'
+	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*' --skipNewer
 
 sync-down-public:
 	b2 sync b2://zimu-public data/remote/public
