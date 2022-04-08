@@ -40,6 +40,9 @@ sync-up-public:
 sync-up-private:
 	b2 sync data/remote/private b2://zimu-private
 
+sync-up-private-essentials:
+	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*'
+
 sync-down-public:
 	b2 sync b2://zimu-public data/remote/public
 
