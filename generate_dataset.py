@@ -167,6 +167,7 @@ def render_final_image_and_mask(
         jpeg_quality,
         out_width,
         out_height,
+        invert,
 ):
     text_img = cv2.imread(text_image_path, cv2.IMREAD_UNCHANGED)
     text_mask = cv2.imread(text_mask_path, cv2.IMREAD_GRAYSCALE)
@@ -240,6 +241,9 @@ def render_final_image_and_mask(
             interpolation=cv2.INTER_LANCZOS4
         )
         rendered = cv2.resize(downscaled, (*orig_shape,))
+
+    if invert:
+        rendered = 255 - rendered
 
     mask = 255*(text_mask > 0.3*255).astype('uint8')
     image_out = FileRef(ext='jpg')
@@ -363,6 +367,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             background_image_path = random.choice(background_image_paths)
             blur_background = random.random() < 0.3
             blur_after_render = random.random() < 0.1
+            invert = random.random() < 0.3
             down_upscale_after_render = 1
             if random.random() < 0.05:
                 r = random.random()
@@ -406,6 +411,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                 jpeg_quality,
                 out_width,
                 out_height,
+                invert,
             )
             render_image_paths.append(img)
             render_mask_paths.append(mask)
