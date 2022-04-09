@@ -14,7 +14,6 @@ function initIndexedDb() {
         states: 'id',
         other: 'id',
         log: '[captionId+captionHash+sessionTime]',
-        srs: 'id',
     });
 }
 
@@ -33,7 +32,6 @@ function clearPersonalData() {
     db.states.clear();
     db.other.clear();
     db.log.clear();
-    db.srs.clear();
 }
 
 function showBadgeStatus() {
