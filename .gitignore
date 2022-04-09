@@ -4,6 +4,7 @@ node_modules
 __pycache__
 .merkl
 browser_extension/dist/*
+browser_extension/dist_*/*
 data/remote
 data/local
 synced.txt

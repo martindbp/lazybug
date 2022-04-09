@@ -121,29 +121,42 @@ test-cases:
 
 ext-caption:
 	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_captionmanager
-	mv browser_extension/dist_captionmanager/* browser_extension/dist/
+	cp browser_extension/dist_captionmanager/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_captionmanager/*.css browser_extension/dist/
 
 ext-popup:
 	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
-	mv browser_extension/dist_popuproot/* browser_extension/dist/
+	cp browser_extension/dist_popuproot/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_popuproot/*.css browser_extension/dist/
+
 
 ext-dashboard:
 	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_dashboardroot
-	mv browser_extension/dist_dashboardroot/* browser_extension/dist/
+	cp browser_extension/dist_dashboardroot/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_dashboardroot/*.css browser_extension/dist/
 
-ext-srs:
-	vue-cli-service build browser_extension/components/SRSRoot.vue --target lib --dest browser_extension/dist_srsroot
-	mv browser_extension/dist_srsroot/* browser_extension/dist/
+ext-clean:
+	rm -r browser_extension/dist
+	mkdir -p browser_extension/dist
+	make css
+	make ext
 
 ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
-	make ext-srs
 	cp browser_extension/deepl_main.js browser_extension/dist/
+	cp browser_extension/*.js browser_extension/dist/
+	cp browser_extension/*.html browser_extension/dist/
+	cp browser_extension/manifest.json browser_extension/dist/
+	cp -r browser_extension/images browser_extension/dist/
+	cp -r browser_extension/css browser_extension/dist/
 
 release:
 	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
+	python make_release_manifest.py browser_extension/manifest.json > browser_extension/dist/manifest.json
+	rm browser_extension/dist/deepl_main.js
+	rm browser_extension/dist/local.html
 
 css:
 	sass browser_extension/css/zimu_quasar.sass browser_extension/dist/zimu_quasar.css

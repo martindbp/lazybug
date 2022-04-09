@@ -3,13 +3,10 @@
     "version": "0.1",
     "description": "",
     "permissions": [
-        "storage",
-        "tabs",
         "unlimitedStorage"
     ],
     "host_permissions": [
-        "http://cdn.zimu.ai/*",
-        "https://cdn.zimu.ai/*",
+        "*://cdn.zimu.ai/*",
         "http://localhost/*"
     ],
     "background": {
@@ -41,9 +38,9 @@
             ],
             "run_at": "document_end",
             "css": [
-                "dist/zimu_quasar.css",
+                "zimu_quasar.css",
                 "css/google.css",
-                "dist/CaptionManager.css"
+                "CaptionManager.css"
              ],
             "js": [
                 "vue.runtime.global.prod.min.js",
@@ -53,7 +50,7 @@
                 "store.js",
                 "devtools.js",
                 "mixins.js",
-                "dist/CaptionManager.umd.js",
+                "CaptionManager.umd.js",
                 "main.js"
             ]
         },
@@ -63,7 +60,7 @@
             ],
             "run_at": "document_end",
             "js": [
-                "dist/deepl_main.js"
+                "deepl_main.js"
             ]
         }
     ],
