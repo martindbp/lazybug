@@ -2,10 +2,10 @@
     <span class="contextmenu">
         <span v-if="hide" class="contexticon hide" title="Hide" v-html="hideIcon" @click.stop.prevent="clickButton('hide')"></span>
         <span v-if="pin" class="contexticon pin" title="Pin" v-html="pinIcon" @click.stop.prevent="clickButton('pin')"></span>
-        <span v-if="star" class="contexticon star" title="Star" v-html="starIcon" @click.stop.prevent="clickButton('star')"></span>
-        <span v-if="unstar" class="contexticon unstar" title="Unstar" v-html="hollowstarIcon" @click.stop.prevent="clickButton('unstar')"></span>
         <span v-if="dict" class="contexticon dictionary" title="Look up in dictionary" v-html="dictionaryIcon" @click.stop.prevent="clickButton('dict')"></span>
         <span v-if="copy" class="contexticon copy" title="Copy" v-html="copyIcon" @click.stop.prevent="clickButton('copy')"></span>
+        <span v-if="star" class="contexticon star" title="Star" v-html="hollowstarIcon" @click.stop.prevent="clickButton('star')"></span>
+        <span v-if="unstar" class="contexticon unstar" title="Unstar" v-html="starIcon" @click.stop.prevent="clickButton('unstar')"></span>
     </span>
 </template>
 
