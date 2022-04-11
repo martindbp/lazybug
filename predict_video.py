@@ -379,6 +379,7 @@ def get_video_caption_area(
     end_time_s: float=None,
     out_height=80,
     font_height=60,
+    height_buffer_px=0,
 ):
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_POS_MSEC, start_time_s*1000)
@@ -415,8 +416,8 @@ def get_video_caption_area(
         right_resized = int(caption_right_px * scale_factor)
 
         padding = (out_height - font_height) // 2
-        crop = resized[top_resized-padding:bottom_resized+padding, left_resized:right_resized]
-        assert crop.shape[0] == out_height
+        crop = resized[top_resized-padding-height_buffer_px:bottom_resized+padding+height_buffer_px, left_resized:right_resized]
+        assert crop.shape[0] == out_height + 2*height_buffer_px
 
         curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
         if curr_time > 0 and last_time > 0:
@@ -499,13 +500,21 @@ def find_next_diff(line, buffer_frames, threshold=10):
 
 net = _get_latest_net()
 
-def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=None):
+def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=None, height_buffer_px=0):
     mask, probs = predict_img_pipeline(frame, net)
     mask.cache = None
     probs.cache = None
     mask = mask.eval()
     probs = probs.eval()
     text, char_probs, prob_distributions = predict_chars(ocr_fn, mask, probs, frame)
+
+    # Remove the height buffer that was added when extracting the frames from the video
+    mask_orig = None
+    if height_buffer_px > 0:
+        frame = frame[height_buffer_px:-height_buffer_px, ...]
+        mask_orig = mask.copy()
+        mask = mask[height_buffer_px:-height_buffer_px, ...]
+        probs = probs[height_buffer_px:-height_buffer_px, ...]
 
     logprob = None
     if char_probs is not None:
@@ -542,6 +551,8 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
 
     cv2.imshow('frame', frame_copy)
     cv2.imshow('probs', (255*probs).astype('uint8'))
+    if mask_orig is not None:
+        cv2.imshow('mask_orig', mask_orig)
     cv2.waitKey(1)
     caption_line = CaptionLine(
         text, frame_t, frame_t, logprob,
@@ -725,13 +736,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10):
+def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, height_buffer_px=0):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr_fn, frame, frame_t, font_height)
+        line = predict_line(ocr_fn, frame, frame_t, font_height, height_buffer_px=height_buffer_px)
 
     if line.text == '':
         if last_line is None:
@@ -748,9 +759,9 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height)
+        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height, height_buffer_px=height_buffer_px)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
@@ -761,7 +772,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold) + [line]
+        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
 
 
 @task(deps=[net])
@@ -776,6 +787,7 @@ def predict_video_captions(
     end_time_s: float=None,
     out_height=80,
     font_height=60,
+    height_buffer_px=0,
     replace_levenshtein_threshold=1.0,
     filter_out_too_many_low_prob_chars=True,
     zero_out_numpy=True,
@@ -824,7 +836,7 @@ def predict_video_captions(
         for y_offset in offsets:
             y_offset /= 200
             caption_images = get_video_caption_area(
-                video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height
+                video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height, height_buffer_px
             )
             num_added = 0
             sum_log_prob = 0
@@ -836,7 +848,7 @@ def predict_video_captions(
                 if frame_size is None:
                     frame_size = frame.shape[:2]
 
-                line = predict_line(ocr_fn, crop, frame_time, font_height)
+                line = predict_line(ocr_fn, crop, frame_time, font_height, height_buffer_px=height_buffer_px)
                 print(line.text)
                 if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
                     sum_log_prob += line.logprob
@@ -866,7 +878,7 @@ def predict_video_captions(
         caption_bottom += bottom_diff_px / frame_size[0]
 
     caption_images = get_video_caption_area(
-        video_path, caption_top, caption_bottom, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height
+        video_path, caption_top, caption_bottom, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height, height_buffer_px
     )
 
     frame_buffer = []
@@ -889,7 +901,7 @@ def predict_video_captions(
                     continue
                 if frame_time > cond_end:
                     frame_t, frame = frame_buffer[len(frame_buffer) // 2]
-                    line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx)
+                    line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
                     frame_buffer_lines = [line]
 
                     curr_conditional_caption_idx += 1
@@ -913,7 +925,7 @@ def predict_video_captions(
                 print('diff')
 
                 last_line = caption_lines[-1] if len(caption_lines) > 0 else None
-                frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height)
+                frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, height_buffer_px=height_buffer_px)
 
             for line in frame_buffer_lines:
                 if line.text != '':
@@ -1427,7 +1439,8 @@ def process_video_captions(
                 caption_type=param['type'],
                 ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
                 conditional_captions=conditional_captions,
-                refine_bounding_rect=param.get('refine_bounding_rect', False)
+                refine_bounding_rect=param.get('refine_bounding_rect', False),
+                height_buffer_px=param.get('height_buffer_px', 0),
             )
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
