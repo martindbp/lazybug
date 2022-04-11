@@ -32,6 +32,15 @@ def _make_width(img, width):
     return out
 
 
+def _make_height(img, height):
+    top = max(math.floor((img.shape[0] - height) / 2), 0)
+    h = min(img.shape[1] - top, height)
+    shape = (height, img.shape[1], *img.shape[2:])
+    out = np.zeros(shape, img.dtype)
+    out[:h, ...] = img[top:(top+h), ...]
+    return out
+
+
 def _increase_brightness(img, value=30):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     h, s, v = cv2.split(hsv)
@@ -191,9 +200,9 @@ def render_final_image_and_mask(
         )
         background = np.tile(background, tiles)
 
-    side = (out_height - text_height) // 2
+    text_padding = (out_height - text_height) // 2
 
-    bg_y_offset = 10 + floor(bg_y_offset_percent * (background.shape[0] - out_height - 20))
+    bg_y_offset = max(0, 10 + floor(bg_y_offset_percent * (background.shape[0] - out_height - 20)))
     bg_x_offset = max(0, floor(bg_x_offset_percent * (background.shape[1] - out_width - 20)))
 
     background_crop = background[bg_y_offset:bg_y_offset+out_height, bg_x_offset:bg_x_offset+out_width, :]
@@ -203,11 +212,11 @@ def render_final_image_and_mask(
     text_mask_crop = text_mask[:, :out_width]
 
     text_mask = np.zeros(background_crop.shape[:2], 'uint8')
-    text_mask[side:side+text_height, text_x_offset:(text_x_offset+text_width)] = text_mask_crop
+    text_mask[text_padding:text_padding+text_height, text_x_offset:(text_x_offset+text_width)] = text_mask_crop
     text_img = np.zeros(background_crop.shape, 'uint8')
-    text_img[side:side+text_height, text_x_offset:(text_x_offset+text_width)] = text_img_crop
+    text_img[text_padding:text_padding+text_height, text_x_offset:(text_x_offset+text_width)] = text_img_crop
     text_alpha = np.zeros(background_crop.shape[:2], 'uint8')
-    text_alpha[side:side+text_height, text_x_offset:(text_x_offset+text_width)] = text_alpha_crop
+    text_alpha[text_padding:text_padding+text_height, text_x_offset:(text_x_offset+text_width)] = text_alpha_crop
 
     if blur_bg:
         # Sometimes, blur the background a lot, because background is often blurry in Chinese dramas
@@ -394,6 +403,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             if random.random() < 0.05:
                 bg_alpha = 1.0 if random.random() < 0.5 else random.random()
 
+            out_height_buffer = floor(random.random() * 30)
             img, mask, text_positions = render_final_image_and_mask(
                 text,
                 text_image_path,
@@ -410,7 +420,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                 text_x_offset_percent,
                 jpeg_quality,
                 out_width,
-                out_height,
+                out_height + 2*out_height_buffer,
                 invert,
             )
             render_image_paths.append(img)
