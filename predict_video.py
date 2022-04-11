@@ -601,6 +601,7 @@ def replace_or_add_line(
     do_save_caption_data=True,
     filter_out_too_many_low_prob_chars=True,
     caption_type='hanzi',
+    force_add=False,
 ):
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     replaced = False
@@ -611,7 +612,7 @@ def replace_or_add_line(
             print('Too many low prob characters:', new_line, ', removing')
             return last_line
 
-    if last_line is not None and last_line.text != '' and new_line.text != '':
+    if last_line is not None and last_line.text != '' and new_line.text != '' and not force_add:
         def _subst_cost(s1, s2, i, j):
             if i >= len(last_line.prob_distributions) or j >= len(new_line.prob_distributions):
                 # This happened when ocr output "[blank]". Keep this just in case. 
@@ -724,13 +725,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, conditional_caption_idx=None):
+def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx)
+        line = predict_line(ocr_fn, frame, frame_t, font_height)
 
     if line.text == '':
         if last_line is None:
@@ -747,9 +748,9 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height, conditional_caption_idx)
+        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
@@ -760,7 +761,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold, conditional_caption_idx=conditional_caption_idx) + [line]
+        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold) + [line]
 
 
 @task(deps=[net])
@@ -884,29 +885,36 @@ def predict_video_captions(
 
                 cond_start = conditional_captions['lines'][curr_conditional_caption_idx][1]
                 cond_end = conditional_captions['lines'][curr_conditional_caption_idx][2]
-                if frame_time < cond_start - 0.5:
+                if frame_time < cond_start:
                     continue
-                if frame_time > cond_end + 0.5:
+                if frame_time > cond_end:
+                    frame_t, frame = frame_buffer[len(frame_buffer) // 2]
+                    line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx)
+                    frame_buffer_lines = [line]
+
                     curr_conditional_caption_idx += 1
                     if curr_conditional_caption_idx >= len(conditional_captions['lines']):
                         curr_conditional_caption_idx = None
+                else:
+                    frame_buffer.append((frame_time, crop))
+                    continue
+            else:
+                frame_buffer.append((frame_time, crop))
 
-            frame_buffer.append((frame_time, crop))
+                if i != 0 and len(frame_buffer) < SUBSAMPLE_FRAME_RATE:
+                    print('buffering')
+                    continue
 
-            if i != 0 and len(frame_buffer) < SUBSAMPLE_FRAME_RATE:
-                print('buffering')
-                continue
+                check_diff_against_frame = last_processed_frame if last_processed_frame is not None else frame_buffer[0][1]
+                if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color) and len(frame_buffer) < 40:
+                    print('no diff')
+                    continue
 
-            last_line = caption_lines[-1] if len(caption_lines) > 0 else None
+                print('diff')
 
-            check_diff_against_frame = last_processed_frame if last_processed_frame is not None else frame_buffer[0][1]
-            if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color) and len(frame_buffer) < 40:
-                print('no diff')
-                continue
+                last_line = caption_lines[-1] if len(caption_lines) > 0 else None
+                frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height)
 
-            print('diff')
-
-            frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, conditional_caption_idx=curr_conditional_caption_idx)
             for line in frame_buffer_lines:
                 if line.text != '':
                     dominant_caption_color = np.median(line.img[line.mask], axis=0)
@@ -948,6 +956,7 @@ def predict_video_captions(
                     do_save_caption_data,
                     filter_out_too_many_low_prob_chars,
                     caption_type,
+                    force_add=conditional_captions is not None,
                 )
                 #if (line.t0 == 0 or line.t1 == 0) and line.text != '':
                     #breakpoint()
@@ -968,25 +977,24 @@ def predict_video_captions(
 
 
 @task(serializer=json)
-def update_conditional_captions(caption_lines, conditional_captions):
+def update_conditional_captions(caption_lines, conditional_captions, action):
+    assert 'type' in action
+    assert 'join' in action
+
     # We update the original conditional captions and return those instead
     next_conditional_idx = 0
     for line in caption_lines['lines']:
         if line[0] == '':
             continue
 
-        t0, t1 = line[1], line[2]
-
         for i in range(next_conditional_idx, len(conditional_captions['lines'])):
             cond_line = conditional_captions['lines'][i]
-            cond_t0, cond_t1 = cond_line[1], cond_line[2]
-            intersection_start = max(cond_t0, t0)
-            intersection_end = min(cond_t1, t1)
-            if intersection_end < intersection_start or (intersection_end - intersection_start) / (cond_t1 - cond_t0) < 0.5:
-                continue
-
             # Prepend the text
-            cond_line[0] = line[0] + ' ' + cond_line[0]
+            if action['type'] == 'prepend':
+                cond_line[0] = line[0] + action['join'] + cond_line[0]
+            elif action['type'] == 'append':
+                cond_line[0] = cond_line[0] + action['join'] + line[0]
+
             # Take the bounding rect union
             cond_rect = list(cond_line[3])
             cond_rect[0] = min(cond_rect[0], line[3][0])  # min x
@@ -1399,6 +1407,7 @@ def process_video_captions(
 
             param_id = param.get('id', None) or param['type']
             depends_on = param.get('depends_on', None)
+            action = param.get('action', None)
             conditional_captions, conditional_params = None, None
             if depends_on is not None:
                 conditional_captions = prev_captions[depends_on]
@@ -1424,7 +1433,7 @@ def process_video_captions(
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
 
             if depends_on is not None:
-                json_captions_joined = update_conditional_captions(json_captions, conditional_captions)
+                json_captions_joined = update_conditional_captions(json_captions, conditional_captions, action)
                 json_captions_joined >> f'data/remote/private/caption_data/raw_captions/{vid}-{param["type"]}.json'
             else:
                 json_captions_joined = json_captions
