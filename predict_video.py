@@ -373,6 +373,8 @@ def get_video_caption_area(
     video_path: str,
     caption_top: float,
     caption_bottom: float,
+    caption_left: float=0.0,
+    caption_right: float=1.0,
     start_time_s: float=0,
     end_time_s: float=None,
     out_height=80,
@@ -401,15 +403,19 @@ def get_video_caption_area(
 
         caption_top_px = int(caption_top * frame.shape[0])
         caption_bottom_px = int(caption_bottom * frame.shape[0])
+        caption_left_px = int(caption_left * frame.shape[1])
+        caption_right_px = int(caption_right * frame.shape[1])
 
         # First scale it to the right resolution
         scale_factor = font_height / (caption_bottom_px - caption_top_px)
         resized = cv2.resize(frame, (int(frame.shape[1] * scale_factor), int(frame.shape[0] * scale_factor)), interpolation=cv2.INTER_LANCZOS4)
         top_resized = int(caption_top_px * scale_factor)
         bottom_resized = int(caption_bottom_px * scale_factor)
+        left_resized = int(caption_left_px * scale_factor)
+        right_resized = int(caption_right_px * scale_factor)
 
         padding = (out_height - font_height) // 2
-        crop = resized[top_resized-padding:bottom_resized+padding, :]
+        crop = resized[top_resized-padding:bottom_resized+padding, left_resized:right_resized]
         assert crop.shape[0] == out_height
 
         curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
@@ -763,6 +769,8 @@ def predict_video_captions(
     video_id: str,
     caption_top: float,
     caption_bottom: float,
+    caption_left: float=0.0,
+    caption_right: float=1.0,
     start_time_s: float=0,
     end_time_s: float=None,
     out_height=80,
@@ -815,7 +823,7 @@ def predict_video_captions(
         for y_offset in offsets:
             y_offset /= 200
             caption_images = get_video_caption_area(
-                video_path, caption_top+y_offset, caption_bottom+y_offset, start_time_s, end_time_s, out_height, font_height
+                video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height
             )
             num_added = 0
             sum_log_prob = 0
@@ -857,7 +865,7 @@ def predict_video_captions(
         caption_bottom += bottom_diff_px / frame_size[0]
 
     caption_images = get_video_caption_area(
-        video_path, caption_top, caption_bottom, start_time_s, end_time_s, out_height, font_height
+        video_path, caption_top, caption_bottom, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height
     )
 
     frame_buffer = []
@@ -905,6 +913,7 @@ def predict_video_captions(
 
                 caption_top_px = int(caption_top * frame_size[0])
                 caption_bottom_px = int(caption_bottom * frame_size[0])
+                caption_left_px = int(caption_left * frame_size[1])
 
                 if line.bounding_rect:
                     # Transform bounding rect from local coordinates (in the scaled cropped image fed to OCR), to global
@@ -915,8 +924,8 @@ def predict_video_captions(
                     max_y -= padding
 
                     line.bounding_rect = (
-                        int(min_x / scale_factor),
-                        int(max_x / scale_factor),
+                        int(min_x / scale_factor) + caption_left_px,
+                        int(max_x / scale_factor) + caption_left_px,
                         int(min_y / scale_factor) + caption_top_px, # Add caption top to get global coordinates
                         int(max_y / scale_factor) + caption_top_px
                     )
@@ -1109,6 +1118,11 @@ def convert_vtt_to_caption_format(translations_path, params=None, video_length=N
     if params is not None:
         data['caption_top'] = params[0]['caption_top']
         data['caption_bottom'] = params[0]['caption_bottom']
+        if 'caption_left' in params[0]:
+            data['caption_left'] = params[0]['caption_left']
+        if 'caption_right' in params[0]:
+            data['caption_right'] = params[0]['caption_right']
+
     if video_length is not None:
         data['video_length'] = video_length;
     if frame_size is not None:
@@ -1395,6 +1409,8 @@ def process_video_captions(
                 vid,
                 param['caption_top'],
                 param['caption_bottom'],
+                param.get('caption_left', 0.0),
+                param.get('caption_right', 1.0),
                 param.get('start_time', None),
                 param.get('end_time', None),
                 replace_levenshtein_threshold=1.0,

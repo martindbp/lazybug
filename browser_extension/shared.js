@@ -184,6 +184,7 @@ function captionArrayToDict(arr, captionData) {
         // The video has soft captions
         if (captionData.caption_top !== undefined && captionData.caption_bottom !== undefined) {
             // But the video also has hard captions that need to be blurred
+            // TODO: use caption_left/right if available
             const xMin = captionData.frame_size[1] * 0.2;
             const xMax = captionData.frame_size[1] * 0.8;
             const yMin = 0;

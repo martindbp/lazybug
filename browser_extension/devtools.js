@@ -15,6 +15,7 @@ chrome.runtime.onMessage.addListener(msgObj => {
 
         let clientX = null;
         let clientY = null;
+        let mouseDownClientX = null;
         let mouseDownClientY = null;
         let measureDiv = null;
         let moveHandler = null;
@@ -28,12 +29,17 @@ chrome.runtime.onMessage.addListener(msgObj => {
             var videoRect = AVElement.getBoundingClientRect();
             var videoTop = Math.round(AVElement.videoHeight * (mouseDownClientY - videoRect.top) / videoRect.height);
             var videoBottom = Math.round(AVElement.videoHeight * (clientY - videoRect.top) / videoRect.height);
+            var videoLeft = Math.round(AVElement.videoWidth * (mouseDownClientX - videoRect.left) / videoRect.width);
+            var videoRight = Math.round(AVElement.videoWidth * (clientX - videoRect.left) / videoRect.width);
             captionBottom = videoBottom / AVElement.videoHeight;
             captionTop = videoTop / AVElement.videoHeight;
+            captionLeft = videoLeft / AVElement.videoWidth;
+            captionRight = videoRight / AVElement.videoWidth;
             measureDiv.remove();
             measureDiv = null;
             window.removeEventListener("mousemove", moveHandler);
             moveHandler = null;
+            mouseDownClientX = null;
             mouseDownClientY = null;
             videoMenu.style.visibility = 'visible';
 
@@ -43,6 +49,8 @@ chrome.runtime.onMessage.addListener(msgObj => {
                         "type": "hanzi",
                         "caption_top": captionTop,
                         "caption_bottom": captionBottom,
+                        "caption_left": captionLeft,
+                        "caption_right": captionRight,
                         "start_time": 0
                     }
                 ]
@@ -56,7 +64,7 @@ chrome.runtime.onMessage.addListener(msgObj => {
             measureDiv.style.cssText = "position:absolute; color: white; border-color: black; border: 2px solid black;";
             document.body.appendChild(measureDiv);
 
-            const mouseDownClientX = clientX;
+            mouseDownClientX = clientX;
             mouseDownClientY = clientY;
             measureDiv.style.left = clientX + "px";
             measureDiv.style.top = clientY + "px";
