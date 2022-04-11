@@ -12,6 +12,7 @@
                     @click.stop.prevent="click('py', i)"
                     v-for="(py, i) in wordData.py"
                     :key="i"
+                    @mouseleave="mouseleave($event, 'py', i)"
                 >
                     <span
                         class="cardcontent"
@@ -46,6 +47,7 @@
                     @click.stop.prevent="click('hz', i)"
                     v-for="(hz, i) in wordData.hz"
                     :key="i"
+                    @mouseleave="mouseleave($event, 'hz', i)"
                 >
                     <span
                         class="cardcontent"
@@ -80,6 +82,7 @@
                     @click.stop.prevent="click('tr', i)"
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
+                    @mouseleave="mouseleave($event, 'tr', i)"
                 >
                     <span
                         class="cardcontent"
@@ -116,6 +119,7 @@
                 <td
                     ref="fulltranslation"
                     @click.stop.prevent="click('translation')"
+                    @mouseleave="mouseleave($event, 'translation')"
                     :class="{
                         captioncard: true,
                         peeking: purePeekStates.translation,
@@ -170,6 +174,8 @@ export default {
         undoIcon: getIconSvg("undo", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         showContextMenu: {hz: [], tr: [], py: [], translation: false},
+        waitingBeforeClosingMenu: false,
+        cancelCloseContextMenu: false,
     }},
     computed: {
         wordStats: function() {
@@ -322,6 +328,9 @@ export default {
             );
         },
         clickContextMenu(action, type, i) {
+            if (this.waitingBeforeClosingMenu) {
+                this.cancelCloseContextMenu = true;
+            }
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
 
@@ -383,8 +392,6 @@ export default {
                     updateClipboard(this.wordData[type][i], this.$q, 'Copied to clipboard');
                 }
             }
-
-            this.resetShowContextMenu(this.wordData);
         },
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
@@ -450,6 +457,28 @@ export default {
                 const lastVal = this.showContextMenu[type][i];
                 this.resetShowContextMenu(this.wordData);
                 this.showContextMenu[type][i] = ! lastVal;
+            }
+        },
+        mouseleave: function(event, type, i = null) {
+            if (
+                type === 'translation' && this.showContextMenu[type] ||
+                this.showContextMenu[type][i]
+            ) {
+                const self = this;
+                event.target.addEventListener('mouseenter', function() {
+                    self.cancelCloseContextMenu = true;
+                }, { once: true });
+
+                this.cancelCloseContextMenu = false;
+                this.waitingBeforeClosingMenu = true;
+                setTimeout(function() {
+                    this.waitingBeforeClosingMenu = false;
+                    if (self.cancelCloseContextMenu) {
+                        self.cancelCloseContextMenu = false;
+                        return;
+                    }
+                    self.resetShowContextMenu(self.wordData);
+                }, 500);
             }
         },
         clickPeekRow: function(type) {
