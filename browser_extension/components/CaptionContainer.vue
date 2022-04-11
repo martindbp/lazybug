@@ -28,6 +28,7 @@
             v-bind:data="showData"
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
+            v-bind:currentCaptionIdx="currentCaptionIdx"
         />
     </div>
 </template>
@@ -38,6 +39,7 @@ import CaptionContent from './CaptionContent.vue'
 
 export default {
     props: [
+        'currentCaptionIdx',
         'firstCaption',
         'prevCaption',
         'currCaption',

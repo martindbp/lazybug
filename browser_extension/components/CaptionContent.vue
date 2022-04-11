@@ -164,6 +164,7 @@ export default {
         data: { default: null },
         currTime: { default: null },
         fadeOut: { default: false },
+        currentCaptionIdx: { default: null },
     },
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
@@ -416,6 +417,10 @@ export default {
                 }
             }
 
+            let captionIdx = this.currentCaptionIdx;
+            if (Array.isArray(captionIdx)) {
+                captionIdx = captionIdx[0];
+            }
             return {
                 data: this.data,
                 translationIdx: this.translationIdx,
@@ -424,6 +429,7 @@ export default {
                 showName: showName,
                 seasonName: seasonName,
                 episodeName: episodeName,
+                captionIdx: captionIdx,
             };
         },
         click: function(type, i = null) {

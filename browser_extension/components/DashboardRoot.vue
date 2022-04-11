@@ -88,19 +88,20 @@ export default {
         exportToAnki: function() {
             let csv = '';
             for (const item of this.selected) {
-                const [type, eventData, sessionTime, captionId] = this.starEvents[item.idx];
+                const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[item.idx];
                 const [_, idx, data] = eventData;
                 const t0 = data.data.t0;
                 const t1 = data.data.t1;
 
-                const cloze = captionToAnkiCloze(data.words, data.hidden, type, idx, captionId, t0, t1, true);
+                const wordData = getWordData(data.data, data.translationIdx);
+                const cloze = captionToAnkiCloze(wordData, data.hidden, data.captionIdx, type, idx, captionId, captionHash, t0, t1, true);
                 csv += cloze + '\n'
             }
             const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
             download(filename, csv);
         },
         rowYoutubeEmbedCode: function(rowIdx) {
-            const [type, eventData, sessionTime, captionId] = this.starEvents[rowIdx];
+            const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[rowIdx];
             const [_, idx, data] = eventData;
             const t0 = data.data.t0;
             const t1 = data.data.t1;
@@ -135,7 +136,7 @@ export default {
                         }
                         const idx = event[1];
                         const wordData = event[2].words;
-                        events.push([type, event, session.sessionTime, session.captionId]);
+                        events.push([type, event, session.sessionTime, session.captionId, session.captionHash]);
                     }
                 }
             }
@@ -148,7 +149,7 @@ export default {
 
             let lastSessionId = null;
             for (let i = this.starEvents.length - 1; i >= 0; i--) {
-                const [type, eventData, sessionTime, captionId] = this.starEvents[i];
+                const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[i];
                 let idx = null;
                 let data = null;
                 if (eventData.length === 3) {

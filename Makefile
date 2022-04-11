@@ -123,17 +123,20 @@ ext-caption:
 	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_captionmanager
 	cp browser_extension/dist_captionmanager/*.umd.js browser_extension/dist/
 	-cp browser_extension/dist_captionmanager/*.css browser_extension/dist/
+	make ext-copy
 
 ext-popup:
 	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
 	cp browser_extension/dist_popuproot/*.umd.js browser_extension/dist/
 	-cp browser_extension/dist_popuproot/*.css browser_extension/dist/
+	make ext-copy
 
 
 ext-dashboard:
 	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_dashboardroot
 	cp browser_extension/dist_dashboardroot/*.umd.js browser_extension/dist/
 	-cp browser_extension/dist_dashboardroot/*.css browser_extension/dist/
+	make ext-copy
 
 ext-clean:
 	rm -r browser_extension/dist
@@ -145,6 +148,8 @@ ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
+
+ext-copy:
 	cp browser_extension/deepl_main.js browser_extension/dist/
 	cp browser_extension/*.js browser_extension/dist/
 	cp browser_extension/*.html browser_extension/dist/

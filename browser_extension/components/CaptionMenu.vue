@@ -106,7 +106,7 @@ export default {
             this.$store.commit('setShowOptions', true);
         },
         showDictionary: function(event) {
-            if (this.data && ! this.data.dummy) {
+            if (this.data) {
                 this.$store.commit('setShowDictionary', {val: true});
             }
         },

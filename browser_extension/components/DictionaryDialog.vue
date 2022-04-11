@@ -65,7 +65,6 @@ export default {
             return this.texts.tr;
         },
         texts: function() {
-            if (this.caption.dummy) return '';
             const sm = this.caption.texts.join(' ');
             return {
                 sm: sm,

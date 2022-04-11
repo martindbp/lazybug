@@ -6,6 +6,7 @@
             :style="{ fontSize: captionFontSize+'px' }"
             v-bind:isLoading="isLoading"
             v-bind:translationType="translationType"
+            v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
@@ -185,7 +186,7 @@ export default {
             }
 
             if (captionData === null || this.currentCaptionIdx === null || Array.isArray(this.currentCaptionIdx)) {
-                if (this.currCaption !== null && this.currCaption.dummy !== true) {
+                if (this.currCaption !== null) {
                     this.currCaption = null;
                     this.minHeight = null;  // when the caption changes we reset any min height set
                 }
