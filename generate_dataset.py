@@ -28,16 +28,18 @@ def _make_width(img, width):
     w = min(img.shape[1] - left, width)
     shape = (img.shape[0], width, *img.shape[2:])
     out = np.zeros(shape, img.dtype)
-    out[:, :w] = img[:, left:(left+w)]
+    out_left = max((width - img.shape[1]) // 2, 0)
+    out[:, out_left:(out_left+w)] = img[:, left:(left+w)]
     return out
 
 
 def _make_height(img, height):
     top = max(math.floor((img.shape[0] - height) / 2), 0)
-    h = min(img.shape[1] - top, height)
+    h = min(img.shape[0] - top, height)
     shape = (height, img.shape[1], *img.shape[2:])
     out = np.zeros(shape, img.dtype)
-    out[:h, ...] = img[top:(top+h), ...]
+    out_top = max((height - img.shape[0]) // 2, 0)
+    out[out_top:(out_top+h), ...] = img[top:(top+h), ...]
     return out
 
 
@@ -54,7 +56,7 @@ def _increase_brightness(img, value=30):
     return img
 
 @task
-def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, scale=1.0, blur_kernel_size=0, brighten=False, sample_background_from_cutout=False):
+def generate_cutout_composite(cutout_filename, prob_filename, background_filename, out_width, out_height, scale=1.0, blur_kernel_size=0, brighten=False, sample_background_from_cutout=False):
     cutout = cv2.imread(cutout_filename, cv2.IMREAD_UNCHANGED)
     prob = cv2.imread(prob_filename, cv2.IMREAD_GRAYSCALE)
 
@@ -103,11 +105,15 @@ def generate_cutout_composite(cutout_filename, prob_filename, background_filenam
     composite = _make_width(composite, out_width)
     if blur_kernel_size > 0:
         composite = cv2.blur(composite, (blur_kernel_size, blur_kernel_size))
+
+    composite = _make_height(composite, out_height)
     composite_filename = FileRef(ext='jpg')
     cv2.imwrite(composite_filename, composite)
 
     mask = 255*(prob > 255//2).astype('uint8')
     mask = _make_width(mask, out_width)
+    mask = _make_height(mask, out_height)
+
     cv2.imshow('composite mask', mask)
     cv2.imshow('composite', composite)
     cv2.waitKey(1)
@@ -177,6 +183,7 @@ def render_final_image_and_mask(
         out_width,
         out_height,
         invert,
+        blackout_top_bottom=None,
 ):
     text_img = cv2.imread(text_image_path, cv2.IMREAD_UNCHANGED)
     text_mask = cv2.imread(text_mask_path, cv2.IMREAD_GRAYSCALE)
@@ -254,6 +261,10 @@ def render_final_image_and_mask(
     if invert:
         rendered = 255 - rendered
 
+    if blackout_top_bottom is not None:
+        rendered[:blackout_top_bottom, ...] = 0
+        rendered[-blackout_top_bottom:, ...] = 0
+
     mask = 255*(text_mask > 0.3*255).astype('uint8')
     image_out = FileRef(ext='jpg')
     mask_out = FileRef(ext='png')
@@ -329,6 +340,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                     prob_filename,
                     background_filename,
                     out_width,
+                    out_height,
                     blur_kernel_size=blur_kernel_size,
                     scale=scale,
                     sample_background_from_cutout=(5 <= i <= 9),
@@ -373,6 +385,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
         render_text_positions = []
         for (text_image_path, text_mask_path, text_widths), params in zip(text_image_paths, text_image_parameters):
             text = params[0]
+            font_size = params[4]
             background_image_path = random.choice(background_image_paths)
             blur_background = random.random() < 0.3
             blur_after_render = random.random() < 0.1
@@ -403,7 +416,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             if random.random() < 0.05:
                 bg_alpha = 1.0 if random.random() < 0.5 else random.random()
 
-            out_height_buffer = floor(random.random() * 30)
+            blackout_top_bottom_max = (out_height - font_size) // 2
             img, mask, text_positions = render_final_image_and_mask(
                 text,
                 text_image_path,
@@ -420,8 +433,9 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                 text_x_offset_percent,
                 jpeg_quality,
                 out_width,
-                out_height + 2*out_height_buffer,
+                out_height,
                 invert,
+                blackout_top_bottom=ceil(random.random()*blackout_top_bottom_max) if random.random() < 0.5 else None,
             )
             render_image_paths.append(img)
             render_mask_paths.append(mask)
