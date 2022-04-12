@@ -75,7 +75,7 @@ def write_hash_file(filename, hash):
 def train_pipeline():
     seed = 42
     corpus = get_corpus(seed=seed)
-    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 35000, 1024, 80, seed=seed)
+    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 110, seed=seed, fill_with_synthetic=True)
 
     net = train_unet(images_dir, masks_dir)
     net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
@@ -87,7 +87,7 @@ def train_pipeline():
 def finetune_pipeline():
     seed = 42
     corpus = get_corpus(seed=seed)
-    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 80, seed=seed, fill_with_synthetic=True)
+    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 120, seed=seed, fill_with_synthetic=True)
 
     net = _get_latest_net()
     net = train_unet(images_dir, masks_dir, epochs=6, lr=0.0007, net=net)
