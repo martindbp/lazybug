@@ -55,7 +55,7 @@ const FIELD_TO_LABEL = {
 
 
 function wrapInColorSpan(str, color) {
-    return `<span style="background: ${color}">${str}</span>`;
+    return `<span style="border-radius: 3px; border: 2px dotted ${color}">${str}</span>`;
 }
 
 export default {
@@ -175,11 +175,11 @@ export default {
                     const alignment = data.data.alignments[alignmentIdx];
                     const [startIdx, endIdx, ...rest] = alignment;
 
-                    let hzColor = '#00BFFF';
+                    let hzColor = 'gray';
                     if (type === 'hz') {
-                        hzColor = 'lightgreen';
+                        hzColor = 'darkorange';
                     }
-                    fullHz = `${text.substring(0, startIdx)}<span style="background: ${hzColor}">${text.substring(startIdx, endIdx)}</span>${text.substring(endIdx)}`;
+                    fullHz = `${text.substring(0, startIdx)}<span style="border-radius: 3px; border: 2px dotted ${hzColor}">${text.substring(startIdx, endIdx)}</span>${text.substring(endIdx)}`;
 
                     py = idx !== null ? wordData.py[idx] : '';
                     hz = idx !== null ? wordData.hz[idx] : '';
@@ -192,9 +192,9 @@ export default {
 
                 const id = `${sessionTime}-${dt}-${captionId}-${py}-${hz}-${tr}-${wordData.translation}`;
 
-                if (type === 'py') py = wrapInColorSpan(py, 'lightgreen');
-                else if (type === 'tr') tr = wrapInColorSpan(tr, 'lightgreen');
-                else if (type === 'translation') translation = wrapInColorSpan(translation, 'lightgreen');
+                if (type === 'py') py = wrapInColorSpan(py, 'darkorange');
+                else if (type === 'tr') tr = wrapInColorSpan(tr, 'darkorange');
+                else if (type === 'translation') translation = wrapInColorSpan(translation, 'darkorange');
 
                 rows.push({
                     id: id,
