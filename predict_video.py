@@ -460,10 +460,9 @@ def filter_components(mask, small_threshold=25):
     return new_mask > 0
 
 
-def frames_diff(frame, last_frame, dominant_caption_color):
+def frames_diff(frame, last_frame, dominant_caption_color, height_buffer_px):
     if dominant_caption_color is None:
         return mean_frame_diff(frame, last_frame) < 1.0
-
 
     color_distance_threshold = 30
     frame = cv2.blur(frame, (3, 3))
@@ -485,11 +484,13 @@ def frames_diff(frame, last_frame, dominant_caption_color):
     return intersection_over_union < 0.97
 
 
-def find_next_diff(line, buffer_frames, threshold=10):
+def find_next_diff(line, buffer_frames, threshold=10, height_buffer_px=0):
     # Go back through the frame buffer to determine the change if any
     frame_blur = cv2.blur(line.img, (3,3))
 
     for i, (buffer_t, buffer_frame) in enumerate(buffer_frames):
+        if height_buffer_px > 0:
+            buffer_frame = buffer_frame[height_buffer_px:-height_buffer_px, ...]
         buffer_frame_blur = cv2.blur(buffer_frame, (3,3))
         mean_diff = mean_frame_diff(buffer_frame_blur, frame_blur, line.mask)
         if mean_diff > threshold:
@@ -509,10 +510,8 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
     text, char_probs, prob_distributions = predict_chars(ocr_fn, mask, probs, frame)
 
     # Remove the height buffer that was added when extracting the frames from the video
-    mask_orig = None
     if height_buffer_px > 0:
         frame = frame[height_buffer_px:-height_buffer_px, ...]
-        mask_orig = mask.copy()
         mask = mask[height_buffer_px:-height_buffer_px, ...]
         probs = probs[height_buffer_px:-height_buffer_px, ...]
 
@@ -551,8 +550,6 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
 
     cv2.imshow('frame', frame_copy)
     cv2.imshow('probs', (255*probs).astype('uint8'))
-    if mask_orig is not None:
-        cv2.imshow('mask_orig', mask_orig)
     cv2.waitKey(1)
     caption_line = CaptionLine(
         text, frame_t, frame_t, logprob,
@@ -753,7 +750,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
             return [line]
 
         # Go forwards from last_line
-        diff_idx = find_next_diff(last_line, frame_buffer, threshold=threshold)
+        diff_idx = find_next_diff(last_line, frame_buffer, threshold=threshold, height_buffer_px=height_buffer_px)
         if diff_idx is None:
             print(f'{last_line} --> no diff ({frame_t})')
             return [line]  # didn't find any diff
@@ -764,7 +761,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
         return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
     else:
         # Go backwards from line
-        diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold)
+        diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold, height_buffer_px=height_buffer_px)
 
         if diff_idx is None:
             print(f'no diff <- O ({frame_t})')
@@ -827,7 +824,7 @@ def predict_video_captions(
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     frame_size = None
-    iters = 2 if refine_bounding_rect else 0
+    iters = 1 if refine_bounding_rect else 0
     for j in range(iters):
         best_top_bottom = None
         best_logprob_sum = -float('inf')
@@ -918,7 +915,7 @@ def predict_video_captions(
                     continue
 
                 check_diff_against_frame = last_processed_frame if last_processed_frame is not None else frame_buffer[0][1]
-                if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color) and len(frame_buffer) < 40:
+                if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color, height_buffer_px) and len(frame_buffer) < 40:
                     print('no diff')
                     continue
 
