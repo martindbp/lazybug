@@ -232,7 +232,6 @@ export default {
 
                 console.log(message);
                 self.$store.commit('setCaptionDataAndHash', message);
-                self.createSession();
                 // Append the initial pinned peek values
                 for (const type of ['py', 'hz', 'tr', 'translation']) {
                     if (self.$store.state.options.pin[type] === true) {

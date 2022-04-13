@@ -13,7 +13,7 @@ function initIndexedDb() {
         network: 'id',
         states: 'id',
         other: 'id',
-        log: '[captionId+captionHash+sessionTime]',
+        log: '[captionId+captionHash+sessionTime], sessionTime',
     });
 }
 
@@ -253,27 +253,33 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             });
         });
     }
-    else if (message.type === 'createSession') {
-        db.log.add({captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime, events: []})
-        .then(function() {
-            sendResponse(null);
-        })
-        .catch(function(error) {
-            console.log(error);
-            sendResponse('error');
-        });
-    }
     else if (message.type === 'appendSessionLog') {
-        db.log.where({captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime}).modify(
-            x => x.events.push(message.data)
-        )
-        .then(function() {
-            sendResponse();
+        const whereQuery = {captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime};
+        db.log.where(whereQuery).count(function(count) {
+            if (count === 0) {
+                whereQuery.events = [message.data];
+                db.log.put(whereQuery)
+                .then(function() {
+                    sendResponse(null);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    sendResponse('error');
+                });
+            }
+            else {
+                db.log.where(whereQuery).modify(
+                    x => x.events.push(message.data)
+                )
+                .then(function() {
+                    sendResponse();
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    sendResponse('error');
+                });
+            }
         })
-        .catch(function(error) {
-            console.log(error);
-            sendResponse('error');
-        });
     }
     else if (message.type === 'poll') {
         console.log('Polling');
@@ -294,13 +300,22 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getLog') {
-        db.log.toArray()
+        db.log
+        .reverse()
+        .offset(message.offset)
+        .limit(message.limit)
+        .toArray()
         .then(function(data) {
             sendResponse({data: data});
         })
         .catch(function(error) {
             console.log(error);
             sendResponse('error');
+        });
+    }
+    else if (message.type === 'getLogRows') {
+        db.log.count().then(function(data) {
+            sendResponse({data: data});
         });
     }
     else if (message.type === 'translation') {

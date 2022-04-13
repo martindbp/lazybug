@@ -107,18 +107,6 @@ function clearPersonalData() {
     });
 }
 
-function createSession(state) {
-    console.log('Create session', state.captionId, state.captionHash, state.sessionTime);
-    chrome.runtime.sendMessage({
-        type: 'createSession',
-        captionId: state.captionId,
-        captionHash: state.captionHash,
-        sessionTime: state.sessionTime
-    }, function onResponse(message) {
-        return true;
-    });
-}
-
 function appendSessionLog(state, data) {
     console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data);
     chrome.runtime.sendMessage({
@@ -132,9 +120,20 @@ function appendSessionLog(state, data) {
     });
 }
 
-function getLog(callback) {
+function getLog(offset, limit, callback) {
     return chrome.runtime.sendMessage({
         type: 'getLog',
+        offset: offset,
+        limit: limit,
+    }, function onResponse(message) {
+        callback(message.data);
+        return true;
+    });
+}
+
+function getLogRows(callback) {
+    return chrome.runtime.sendMessage({
+        type: 'getLogRows',
     }, function onResponse(message) {
         callback(message.data);
         return true;

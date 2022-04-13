@@ -373,9 +373,7 @@ export default {
 
             if (setState !== null) {
                 applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
-                const eventData = [getEvent(action, type)];
-                if (i !== null && i !== undefined) eventData.push(i);
-
+                const eventData = [getEvent(action, type), i];
                 if (setState === StateStarred) {
                     eventData.push(this.getCurrentState());
                 }

@@ -6,10 +6,11 @@
             title="Starred"
             :rows="rows"
             :columns="columns"
-            :selected-rows-label="getSelectedString"
             selection="multiple"
             v-model:selected="selected"
-            :pagination="pagination"
+            :loading="loading"
+            @request="onRequest"
+            hide-pagination
         >
           <template v-slot:body="props">
               <q-tr v-if="props.row.isNewSession">
@@ -38,6 +39,50 @@
                   </q-td>
               </q-tr>
           </template>
+
+          <template v-slot:top>
+              <div class="text-h5">Starred</div>
+              <q-btn
+                   icon="first_page"
+                   color="grey-8"
+                   round
+                   dense
+                   flat
+                   :disable="isFirstPage"
+                   @click="firstPage"
+               />
+
+              <q-btn
+                   icon="chevron_left"
+                   color="grey-8"
+                   round
+                   dense
+                   flat
+                   :disable="isFirstPage"
+                   @click="prevPage"
+               />
+
+              <q-btn
+                   icon="chevron_right"
+                   color="grey-8"
+                   round
+                   dense
+                   flat
+                   :disable="isLastPage"
+                   @click="nextPage"
+               />
+
+              <q-btn
+                   icon="last_page"
+                   color="grey-8"
+                   round
+                   dense
+                   flat
+                   :disable="isLastPage"
+                   @click="lastPage"
+               />
+                  {{ getSelectedString() }}
+          </template>
         </q-table>
         <div class="q-mt-md" v-if="selected.length > 0">
             <q-btn label="Export to Anki" @click="exportToAnki"/>
@@ -58,9 +103,10 @@ function wrapInColorSpan(str, color) {
     return `<span style="border-radius: 3px; border: 2px dotted ${color}">${str}</span>`;
 }
 
+const ROWS_PER_PAGE = 4;
+
 export default {
     data: function() { return {
-        log: null,
         columns: [
             {name: 'hz', field: 'hz', label: FIELD_TO_LABEL.hz},
             {name: 'py', field: 'py', label: FIELD_TO_LABEL.py},
@@ -68,27 +114,78 @@ export default {
             {name: 'translation', field: 'translation', label: FIELD_TO_LABEL.translation},
         ],
         selected: [],
-        pagination: {
-            rowsPerPage: 50
-        },
+        starEvents: [],
+        rows: [],
+        page: 0,
+        numRows: 0,
+        numPages: 0,
+        loading: true,
     }},
     mounted: function() {
         const self = this;
-        getLog(function(data) {
-            self.log = data;
+        getLogRows(function(numRows) {
+            self.numRows = numRows;
+            self.numPages = Math.ceil(numRows / ROWS_PER_PAGE);
         });
     },
+    computed: {
+        isFirstPage: function() {
+            return this.page === 0;
+        },
+        isLastPage: function() {
+            return this.page === this.numPages - 1;
+        },
+    },
+    watch: {
+        page: {
+            immediate: true,
+            handler: function(newValue) {
+                this.requestPageData(newValue);
+            },
+        },
+        numRows: {
+            handler: function(newValue) {
+                this.requestPageData(this.page);
+            },
+        }
+    },
     methods: {
+        firstPage: function() {
+            this.page = 0;
+        },
+        lastPage: function() {
+            this.page = this.numPages - 1;
+        },
+        prevPage: function() {
+            this.page = Math.max(0, this.page - 1);
+        },
+        nextPage: function() {
+            this.page = Math.min(this.numPages - 1, this.page + 1);
+        },
+        requestPageData: function(page) {
+            const self = this;
+            this.loading = true;
+            const offset = page * ROWS_PER_PAGE;
+            const limit = Math.min(ROWS_PER_PAGE, this.numRows - offset);
+            if (limit === 0) return;
+
+            console.log('Fetching', offset, limit);
+            getLog(offset, limit, function(data) {
+                self.starEvents = self.filterStarEvents(data);
+                self.rows = self.starEventsToRows(self.starEvents);
+                self.loading = false;
+            });
+        },
         reverseEventsMap: function(eventId) {
             return reverseEventsMap[eventId];
         },
         getSelectedString: function() {
-            return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''} selected of ${this.rows.length}`
+            return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''}`;
         },
         exportToAnki: function() {
             let csv = '';
             for (const item of this.selected) {
-                const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[item.idx];
+                const [type, eventData, sessionTime, captionId, captionHash] = item.event;
                 const [_, idx, data] = eventData;
                 const t0 = data.data.t0;
                 const t1 = data.data.t1;
@@ -111,13 +208,11 @@ export default {
         timestampToYYYMMDD: function(val) {
             return (new Date(val)).toISOString().split('T')[0];
         },
-    },
-    computed: {
-        starEvents: function() {
+        filterStarEvents: function(sessions) {
             const events = [];
-            if (this.log === null) return events;
+            if (sessions === null) return events;
 
-            for (const session of this.log) {
+            for (const session of sessions) {
                 for (const event of session.events) {
                     const eventName = reverseEventsMap[event[0]];
                     if (eventName.startsWith("EVENT_STAR")) {
@@ -135,7 +230,6 @@ export default {
                             type = 'translation';
                         }
                         const idx = event[1];
-                        const wordData = event[2].words;
                         events.push([type, event, session.sessionTime, session.captionId, session.captionHash]);
                     }
                 }
@@ -143,22 +237,12 @@ export default {
 
             return events;
         },
-        rows: function() {
+        starEventsToRows: function(events) {
             const rows = [];
-            if (this.log === null) return rows;
-
             let lastSessionId = null;
-            for (let i = this.starEvents.length - 1; i >= 0; i--) {
-                const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[i];
-                let idx = null;
-                let data = null;
-                if (eventData.length === 3) {
-                    idx = eventData[1];
-                    data = eventData[2];
-                }
-                else {
-                    data = eventData[1];
-                }
+            for (let i = 0; i < events.length; i++) {
+                const [type, eventData, sessionTime, captionId, captionHash] = events[i];
+                let [_, idx, data] = eventData;
                 const wordData = getWordData(data.data, data.translationIdx);
                 const dt = data.dt;
 
@@ -170,7 +254,7 @@ export default {
                 let tr = null;
                 let translation = wordData.translation;
                 const text = data.data.texts.join(' ');
-                if (idx !== null) {
+                if (! [null, undefined].includes(idx)) {
                     const alignmentIdx = wordData.alignmentIndices[idx];
                     const alignment = data.data.alignments[alignmentIdx];
                     const [startIdx, endIdx, ...rest] = alignment;
@@ -208,6 +292,7 @@ export default {
                     video: captionId,
                     isNewSession: sessionId !== lastSessionId,
                     data: data,
+                    event: events[i],
                 });
                 lastSessionId = sessionId;
             }
