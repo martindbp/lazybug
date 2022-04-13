@@ -209,8 +209,8 @@ def render_final_image_and_mask(
 
     text_padding = (out_height - text_height) // 2
 
-    bg_y_offset = max(0, 10 + floor(bg_y_offset_percent * (background.shape[0] - out_height - 20)))
-    bg_x_offset = max(0, floor(bg_x_offset_percent * (background.shape[1] - out_width - 20)))
+    bg_y_offset = max(0, floor(bg_y_offset_percent * (background.shape[0] - out_height)))
+    bg_x_offset = max(0, floor(bg_x_offset_percent * (background.shape[1] - out_width)))
 
     background_crop = background[bg_y_offset:bg_y_offset+out_height, bg_x_offset:bg_x_offset+out_width, :]
     text_x_offset = max(0, floor(text_x_offset_percent * (out_width - text_width)))
