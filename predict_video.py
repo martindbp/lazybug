@@ -614,7 +614,7 @@ def replace_or_add_line(
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
     replaced = False
 
-    if new_line.text != '':
+    if new_line.text != '' and not force_add:
         too_many_low_prob_chars = (new_line.char_probs < HIGH_PROB_CHAR).sum() / len(new_line.text) > 0.7 and len(new_line.text) > 1
         if (caption_type == 'hanzi' and len(filter_text_hanzi(new_line.text)) == 0) or (filter_out_too_many_low_prob_chars and too_many_low_prob_chars):
             print('Too many low prob characters:', new_line, ', removing')
@@ -990,14 +990,26 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
     assert 'type' in action
     assert 'join' in action
 
+    next_caption_line = 0
     # We update the original conditional captions and return those instead
-    next_conditional_idx = 0
-    for line in caption_lines['lines']:
-        if line[0] == '':
+    for cond_line in conditional_captions['lines']:
+        cond_line_t0, cond_line_t1 = cond_line[1], cond_line[2]
+        if cond_line[3] is None:
             continue
 
-        for i in range(next_conditional_idx, len(conditional_captions['lines'])):
-            cond_line = conditional_captions['lines'][i]
+        for i in range(next_caption_line, len(caption_lines['lines'])):
+            line = caption_lines['lines'][i]
+            line_t0, line_t1 = line[1], line[2]
+            if line[3] is None:
+                continue
+
+            if line_t0 > cond_line_t1 or line_t1 < cond_line_t0:
+                # No overlap
+                continue
+
+            # We have overlap
+            next_caption_line = i + 1
+
             # Prepend the text
             if action['type'] == 'prepend':
                 cond_line[0] = line[0] + action['join'] + cond_line[0]
@@ -1011,9 +1023,6 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
             cond_rect[2] = min(cond_rect[2], line[3][2])  # min y
             cond_rect[3] = max(cond_rect[3], line[3][3])  # max y
             cond_line[3] = cond_rect
-
-            next_conditional_idx = i + 1
-            break
 
     return conditional_captions
 
