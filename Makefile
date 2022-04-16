@@ -81,8 +81,8 @@ names-list:
 
 download-yt:
 	mkdir -p $(out)/$(show)
-	cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} yt-dlp -o "../videos/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs --default-search "ytsearch" -- {}
-	mv ../videos/$(show)/*.vtt data/remote/private/caption_data/translations/
+	cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} yt-dlp -o "$(out)/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs --default-search "ytsearch" -- {}
+	mv $(out)/$(show)/*.vtt data/remote/private/caption_data/translations/
 
 process-video-captions:
 	merkl -v run predict_video.process_video_captions ${show} ${videos}
