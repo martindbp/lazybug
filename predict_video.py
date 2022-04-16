@@ -1142,8 +1142,10 @@ def convert_vtt_to_caption_format(translations_path, params=None, video_length=N
         'lines': lines
     }
     if params is not None:
-        data['caption_top'] = params[0]['caption_top']
-        data['caption_bottom'] = params[0]['caption_bottom']
+        if 'caption_top' in params[0]:
+            data['caption_top'] = params[0]['caption_top']
+        if 'caption_bottom' in params[0]:
+            data['caption_bottom'] = params[0]['caption_bottom']
         if 'caption_left' in params[0]:
             data['caption_left'] = params[0]['caption_left']
         if 'caption_right' in params[0]:
@@ -1418,7 +1420,8 @@ def process_video_captions(
                     if os.path.exists(path):
                         json_captions = convert_vtt_to_caption_format(path, params, video_length, frame_size)
                         meta_captions = add_metadata(json_captions, vid, show_name)
-                        meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-hanzi.json'
+                        meta_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param["type"]}.json'
+                        meta_captions >> f'data/remote/private/caption_data/meta_trimmed_captions/{vid}-{param["type"]}.json'
                         out.append(meta_captions)
                         break
                 continue
