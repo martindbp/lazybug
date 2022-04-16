@@ -870,6 +870,10 @@ export default {
     display: none !important;
 }
 
+.nonhanzi .statsbadge {
+    display: none !important;
+}
+
 .captioncard:hover:not(.fulltranslation):not(.captioncardhidden) .starbadge {
     display: none !important;
 }
