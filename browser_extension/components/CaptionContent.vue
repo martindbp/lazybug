@@ -391,6 +391,10 @@ export default {
                     updateClipboard(this.wordData[type][i], this.$q, 'Copied to clipboard');
                 }
             }
+
+            if (['dict', 'copy'].includes(action)) {
+                this.resetShowContextMenu(this.wordData);
+            }
         },
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
