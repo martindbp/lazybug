@@ -17,13 +17,13 @@ from transformer_segmentation import segment_sentences
 
 from merkl import task, Eval, FileRef
 
-@task(serializer=json, deps=[FileRef('data/remote/private/pinyin_freqs.txt')])
+@task(serializer=json, deps=[FileRef('data/git/pinyin_freqs.txt')])
 def make_pinyin_freq_db():
     pinyin_single = defaultdict(lambda: defaultdict(list))
     pinyin_all = defaultdict(lambda: defaultdict(list))
 
     sentences = []
-    with open('data/remote/private/pinyin_freqs.txt', 'r') as f:
+    with open('data/git/pinyin_freqs.txt', 'r') as f:
         lines = f.read().split('\n')
         lines = [line for line in lines if not line.startswith('#')]
         hzs = lines[::2]
