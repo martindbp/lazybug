@@ -851,6 +851,8 @@ def predict_video_captions(
                     sum_log_prob += line.logprob
                     bounding_rects.append(line.bounding_rect)
 
+                line.zero_out_numpy()
+
                 if len(bounding_rects) > 10 or frame_time - start_time_s > 120:
                     break
 
