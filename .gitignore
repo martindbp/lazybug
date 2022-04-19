@@ -3,8 +3,8 @@
 node_modules
 __pycache__
 .merkl
-browser_extension/dist/*
-browser_extension/dist_*/*
+browser_extension/dist/
+browser_extension/dist_components/
 data/remote
 data/local
 synced.txt

@@ -120,27 +120,29 @@ test-cases:
 	make process-segmentation-alignments show=huanlesong
 
 ext-caption:
-	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_captionmanager
-	cp browser_extension/dist_captionmanager/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_captionmanager/*.css browser_extension/dist/
+	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_components/captionmanager
+	cp browser_extension/dist_components/captionmanager/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_components/captionmanager/*.css browser_extension/dist/
 	make ext-copy
 
 ext-popup:
-	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_popuproot
-	cp browser_extension/dist_popuproot/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_popuproot/*.css browser_extension/dist/
+	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_components/popuproot
+	cp browser_extension/dist_components/popuproot/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_components/popuproot/*.css browser_extension/dist/
 	make ext-copy
 
 
 ext-dashboard:
-	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_dashboardroot
-	cp browser_extension/dist_dashboardroot/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_dashboardroot/*.css browser_extension/dist/
+	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_components/dashboardroot
+	cp browser_extension/dist_components/dashboardroot/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_components/dashboardroot/*.css browser_extension/dist/
 	make ext-copy
 
 ext-clean:
-	rm -r browser_extension/dist
+	- rm -r browser_extension/dist
+	- rm -r browser_extension/dist_components
 	mkdir -p browser_extension/dist
+	mkdir -p browser_extension/dist_components
 	make css
 	make ext
 
