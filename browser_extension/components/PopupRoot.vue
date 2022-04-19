@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="popupcontainer">
         <q-toggle
           v-model="extensionToggle"
           color="green"
@@ -10,6 +10,7 @@
             <q-btn label="Measure caption" @click="measureCaption" />
             <q-btn label="Print playlist" @click="printPlaylist" />
         </div>
+        <a href="https://www.patreon.com/martindbp">Donate</a>
     </div>
 </template>
 
@@ -81,4 +82,9 @@ export default {
 </script>
 
 <style>
+
+#popupcontainer {
+    text-align: center;
+}
+
 </style>

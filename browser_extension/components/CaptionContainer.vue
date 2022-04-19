@@ -18,12 +18,18 @@
             <br />
             <br />
             <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
+            <br />
+            <br />
+            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null">
             Video has <i>{{ translationType }}</i> sentence translations
             <br />
             <br />
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
+            <br />
+            <br />
+            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <CaptionContent
             :class="{ showpeekall: showMenu }"
