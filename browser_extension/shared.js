@@ -53,6 +53,7 @@ function fetchResource(filename, callback) {
     chrome.runtime.sendMessage({type: 'fetchResource', filename: filename}, function onResponse(message) {
         if (['error', null, undefined].includes(message)) {
             console.log('Failed to fetch ' + filename);
+            callback('error');
             return false;
         }
         callback(message.data);
@@ -64,6 +65,7 @@ function fetchVersionedResource(filename, callback) {
     chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
         if (['error', null, undefined].includes(message)) {
             console.log('Failed to fetch ' + filename);
+            callback('error');
             return false;
         }
         callback(message.data);
@@ -73,11 +75,9 @@ function fetchVersionedResource(filename, callback) {
 
 function getIndexedDbData(storageName, keys, callback) {
     chrome.runtime.sendMessage({type: 'getIndexedDbData', storage: storageName, keys: keys}, function onResponse(message) {
-        if (message === 'error') {
-            return false;
-        }
-        if (message === undefined || message == null) {
+        if (['error', null, undefined].includes(message)) {
             console.log('Failed to get data ' + keys);
+            callback('error');
             return false;
         }
         callback(message.data);
@@ -88,6 +88,7 @@ function getIndexedDbData(storageName, keys, callback) {
 function setIndexedDbData(storageName, keys, values, callback) {
     chrome.runtime.sendMessage({type: 'setIndexedDbData', storage: storageName, keys: keys, values: values}, function onResponse(message) {
         if (message === 'error') {
+            callback('error');
             return false;
         }
         if (callback) callback();

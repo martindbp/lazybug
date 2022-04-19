@@ -22,6 +22,7 @@ const store = new Vuex.Store({
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log
+        resourceFetchError: null,
         showInfo: null,
         DICT: null,
         HSK_WORDS: null,
@@ -66,6 +67,13 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        resetResourceFetchError(state, val) {
+            // We only reset it if the currente error holds this resource type
+            // (not some other resource)
+            if (state.resourceFetchError === val) {
+                state.resourceFetchError = null;
+            }
+        },
         setIsMovingCaption(state, val) {
             state.isMovingCaption = val;
         },
@@ -81,7 +89,17 @@ const store = new Vuex.Store({
             state.captionData = val.data;
             state.captionHash = val.hash;
             if (state.captionData !== null) {
-                fetchResource(`shows/${state.captionData.show_name}.json`, function (data) { state.showInfo = data; });
+                if (state.resourceFetchError === 'show info') {
+                    state.resourceFetchError = null;
+                }
+                fetchResource(`shows/${state.captionData.show_name}.json`, function (data) {
+                    if (data === 'error') {
+                        state.resourceFetchError = 'show info';
+                    }
+                    else {
+                        state.showInfo = data;
+                    }
+                });
             }
         },
         setShowOptions(state, val) {
@@ -178,8 +196,24 @@ const store = new Vuex.Store({
     },
 });
 
-fetchVersionedResource('public_cedict.json', function (data) { store.commit('setDict', data); });
-fetchVersionedResource('hsk_words.json', function (data) { store.commit('setHskWords', data); });
+fetchVersionedResource('public_cedict.json', function (data) {
+    if (data === 'error') {
+        store.state.resourceFetchError = 'dictionary';
+    }
+    else {
+        store.commit('setDict', data);
+    }
+});
+
+fetchVersionedResource('hsk_words.json', function (data) {
+    if (data === 'error') {
+        store.state.resourceFetchError = 'HSK word list';
+    }
+    else {
+        store.commit('setHskWords', data);
+    }
+});
+
 getIndexedDbData('states', null, function (data) {
     if (data) {
         const dict = {};
@@ -189,6 +223,7 @@ getIndexedDbData('states', null, function (data) {
         store.commit('setStates', dict);
     }
 });
+
 getIndexedDbData('other', ['options'], function (data) {
     if (data[0]) store.commit('setOptions', data[0]);
 });

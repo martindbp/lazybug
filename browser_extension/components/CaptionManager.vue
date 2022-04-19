@@ -73,8 +73,16 @@ export default {
             this.videoDuration = this.AVElement.duration;
         }
         this.setObserversAndHandlers();
+        this.$store.commit('resetResourceFetchError');
         const self = this;
-        fetchVersionedResource('show_list.json', function (data, hash) { self.showList = data; });
+        fetchVersionedResource('show_list.json', function (data, hash) {
+            if (data === 'error') {
+                self.$store.state.resourceFetchError = 'show list';
+            }
+            else {
+                self.showList = data;
+            }
+        });
     },
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);
@@ -221,11 +229,14 @@ export default {
             this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
             if (this.captionId === null || [null, undefined].includes(chrome.runtime)) return;
 
+            this.$store.commit('resetResourceFetchError', 'caption data');
+
             const self = this;
             chrome.runtime.sendMessage({'type': 'getCaptions', 'data': {
                 'captionId': self.captionId,
             }}, function onResponse(message) {
                 if (message === 'error') {
+                    self.$store.state.resourceFetchError = 'caption data';
                     return false;
                 }
                 if (self.$store.state.captionHash === message.hash) return true;
@@ -451,6 +462,7 @@ export default {
             return (
                 this.captionId !== null && (
                     this.showList === null ||
+                    this.$store.state.showInfo === null ||
                     this.$store.state.captionData === null ||
                     this.$store.state.DICT === null ||
                     this.$store.state.HSK_WORDS === null

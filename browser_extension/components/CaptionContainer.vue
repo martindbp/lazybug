@@ -7,7 +7,10 @@
             v-bind:data="showData"
             v-on:seeked="$emit('seeked')"
         />
-        <div class="loadingcontent" v-if="isLoading">
+        <div class="loadingcontent" v-if="$store.state.resourceFetchError !== null">
+            Error fetching {{ $store.state.resourceFetchError }}, try reloading page
+        </div>
+        <div class="loadingcontent" v-else-if="isLoading">
             Loading resources...
         </div>
         <div class="initialcontent" v-else-if="showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
@@ -48,7 +51,7 @@ export default {
         'paused',
         'AVElement',
         'isLoading',
-        'translationType'
+        'translationType',
     ],
     components: {CaptionContent, CaptionMenu},
     data: function() { return {
