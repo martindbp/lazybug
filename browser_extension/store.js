@@ -67,12 +67,18 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setVideoId(state, val) {
+            state.videoId = val
+        },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
             // (not some other resource)
             if (state.resourceFetchError === val) {
                 state.resourceFetchError = null;
             }
+        },
+        setResourceFetchError(state, val) {
+            state.resourceFetchError = val;
         },
         setIsMovingCaption(state, val) {
             state.isMovingCaption = val;
@@ -198,7 +204,7 @@ const store = new Vuex.Store({
 
 fetchVersionedResource('public_cedict.json', function (data) {
     if (data === 'error') {
-        store.state.resourceFetchError = 'dictionary';
+        store.commit('setResourceFetchError', 'dictionary');
     }
     else {
         store.commit('setDict', data);
@@ -207,7 +213,7 @@ fetchVersionedResource('public_cedict.json', function (data) {
 
 fetchVersionedResource('hsk_words.json', function (data) {
     if (data === 'error') {
-        store.state.resourceFetchError = 'HSK word list';
+        store.commit('setResourceFetchError', 'HSK word list');
     }
     else {
         store.commit('setHskWords', data);

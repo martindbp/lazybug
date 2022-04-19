@@ -77,7 +77,7 @@ export default {
         const self = this;
         fetchVersionedResource('show_list.json', function (data, hash) {
             if (data === 'error') {
-                self.$store.state.resourceFetchError = 'show list';
+                self.$store.commit('setResourceFetchError', 'show list');
             }
             else {
                 self.showList = data;
@@ -157,7 +157,7 @@ export default {
         videoId: {
             immediate: true,
             handler: function() {
-                this.$store.state.videoId = this.videoId;
+                this.$store.commit('setVideoId', this.videoId);
             }
         },
         showList: {
@@ -236,7 +236,7 @@ export default {
                 'captionId': self.captionId,
             }}, function onResponse(message) {
                 if (message === 'error') {
-                    self.$store.state.resourceFetchError = 'caption data';
+                    self.$store.commit('setResourceFetchError', 'caption data');
                     return false;
                 }
                 if (self.$store.state.captionHash === message.hash) return true;
@@ -330,7 +330,7 @@ export default {
             chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 if (message.type === 'extensionToggle') {
                     // Reset captionOffset so we have a way get out of the situation where it's outside the window
-                    self.$store.state.captionOffset = [0, 0];
+                    self.$store.commit('setCaptionOffset', [0, 0]);
                     self.$store.commit('setOption', {key: 'extensionToggle', value: message.data});
                 }
                 return true;
