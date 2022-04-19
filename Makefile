@@ -156,6 +156,7 @@ ext-copy:
 	cp browser_extension/*.js browser_extension/dist/
 	cp browser_extension/*.html browser_extension/dist/
 	cp browser_extension/manifest.json browser_extension/dist/
+	cp browser_extension/deps/* browser_extension/dist/
 	cp -r browser_extension/images browser_extension/dist/
 	cp -r browser_extension/css browser_extension/dist/
 
