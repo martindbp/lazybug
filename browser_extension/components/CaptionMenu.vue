@@ -73,10 +73,10 @@ export default {
                 self.peekAll();
             }
             else if (shortcut === 'next') {
-                self.next();
+                self.next('keyboard');
             }
             else if (shortcut === 'prev') {
-                self.prev();
+                self.prev('keyboard');
             }
             else if (shortcut === 'replay') {
                 self.replay();
@@ -140,11 +140,16 @@ export default {
             this.$store.commit('setCaptionOffset', coords);
         },
         prev: function(event) {
-            if (this.prevCaption !== null) {
-                this.AVElement.currentTime = this.prevCaption.t0 + 1e-3;
-                this.AVElement.play();
-                this.$emit('seeked');
+            if (this.prevCaption === null) return;
+
+            if (event === 'keyboard' && Math.abs(this.AVElement.currentTime - this.prevCaption.t0) > 20) {
+                this.AVElement.currentTime = this.AVElement.currentTime - 5;
             }
+            else {
+                this.AVElement.currentTime = this.prevCaption.t0 + 1e-3;
+            }
+            this.AVElement.play();
+            this.$emit('seeked');
         },
         replay: function(event) {
             const goToCaption = this.data !== null ? this.data : this.prevCaption;
@@ -161,7 +166,13 @@ export default {
         },
         next: function(event) {
             if (this.nextCaption === null) return;
-            this.AVElement.currentTime = this.nextCaption.t0 + 1e-3;
+
+            if (event === 'keyboard' && Math.abs(this.AVElement.currentTime - this.nextCaption.t0) > 20) {
+                this.AVElement.currentTime = this.AVElement.currentTime + 5;
+            }
+            else {
+                this.AVElement.currentTime = this.nextCaption.t0 + 1e-3;
+            }
             this.AVElement.play();
             this.$emit('seeked');
         },
