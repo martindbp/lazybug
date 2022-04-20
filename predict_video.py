@@ -907,7 +907,8 @@ def predict_video_captions(
                     if curr_conditional_caption_idx >= len(conditional_captions['lines']):
                         curr_conditional_caption_idx = None
                 else:
-                    frame_buffer.append((frame_time, crop))
+                    if len(frame_buffer) < 30: # about a second
+                        frame_buffer.append((frame_time, crop))
                     continue
             else:
                 frame_buffer.append((frame_time, crop))
