@@ -140,6 +140,9 @@
                     <q-btn color="deep-orange" label="Clear personal data" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
                     <br>
                     (Will permanently delete personal data)
+                    <br>
+                    <br>
+                    <q-btn color="green" label="Download database" @click="downloadDb" />
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -241,6 +244,12 @@ export default {
         clearPersonalData: function() {
             clearPersonalData();
             this.clickedClearPersonalData = true;
+        },
+        downloadDb: function() {
+            getDatabaseJson(function(data) {
+                const filename = 'database-'+(new Date(Date.now())).toISOString().split('T')[0]+'.json'
+                download(filename, JSON.stringify(data));
+            });
         }
     },
 }

@@ -23,6 +23,7 @@ const events = [
     'EVENT_HIDE_AUTO_PY',
     'EVENT_HIDE_AUTO_HZ',
     'EVENT_HIDE_AUTO_TR',
+    'EVENT_STAR_CAPTION',
     'EVENT_STAR_PY',
     'EVENT_STAR_HZ',
     'EVENT_STAR_TR',
@@ -30,6 +31,7 @@ const events = [
     'EVENT_PIN_PY',
     'EVENT_PIN_HZ',
     'EVENT_PIN_TR',
+    'EVENT_UNSTAR_CAPTION',
     'EVENT_UNSTAR_PY',
     'EVENT_UNSTAR_HZ',
     'EVENT_UNSTAR_TR',
@@ -104,6 +106,13 @@ function clearCache() {
 
 function clearPersonalData() {
     chrome.runtime.sendMessage({type: 'clearPersonalData'}, function onResponse(message) {
+        return true;
+    });
+}
+
+function getDatabaseJson(callback) {
+    chrome.runtime.sendMessage({type: 'getDatabaseJson'}, function onResponse(message) {
+        callback(message.data);
         return true;
     });
 }

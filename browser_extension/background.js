@@ -1,37 +1,55 @@
 try {
     importScripts('dexie.min.js');
+    importScripts('dexie-export-import.js');
+    importScripts('shared.js');
 } catch (e) {
     console.error(e);
 }
 
-let db = null;
+let personalDb = null;
+let cacheDb = null;
 const VERSION = 1;
 
 function initIndexedDb() {
-    db = new Dexie('zimuai');
-    db.version(VERSION).stores({
-        network: 'id',
+    personalDb = new Dexie('zimuai-personal');
+    personalDb.version(VERSION).stores({
         states: 'id',
         other: 'id',
         log: '[captionId+captionHash+sessionTime], sessionTime',
+    });
+
+    cacheDb = new Dexie('zimuai-cache');
+    cacheDb.version(VERSION).stores({
+        network: 'id',
     });
 }
 
 initIndexedDb();
 
 function clearIndexedDb() {
-    db.delete();
+    personalDb.delete();
+    cacheDb.delete();
     initIndexedDb();
 }
 
 function clearCache() {
-    db.network.clear();
+    cacheDb.network.clear();
 }
 
 function clearPersonalData() {
-    db.states.clear();
-    db.other.clear();
-    db.log.clear();
+    personalDb.states.clear();
+    personalDb.other.clear();
+    personalDb.log.clear();
+}
+
+function backgroundGetDatabaseJson(callback) {
+    personalDb.export({ prettyJson: true }).then(function(data) {
+        const fr = new FileReader();
+        fr.addEventListener("load", e => {
+            callback(JSON.parse(fr.result));
+        });
+        fr.readAsText(data);
+    });
 }
 
 function showBadgeStatus() {
@@ -78,12 +96,12 @@ function addStorageData(keys, values, store) {
 
 
 const CDN_URL = "https://cdn.zimu.ai/file/";
-function fetchResource(folder, resourceFilename, callback, failCallback) {
+function backgroundFetchResource(folder, resourceFilename, callback, failCallback) {
     console.log(folder, resourceFilename);
     let [filename, ext] = resourceFilename.split('.');
     const storageFilename = `${folder}/${filename}.${ext}`;
 
-    getStorageData([storageFilename], db.network)
+    getStorageData([storageFilename], cacheDb.network)
     .then(function(data) {
         if (data[0] === null) {
             return fetch(CDN_URL + storageFilename, {cache: 'default'})
@@ -100,7 +118,7 @@ function fetchResource(folder, resourceFilename, callback, failCallback) {
 
                     const keys = [storageFilename];
                     const values = [data];
-                    return addStorageData(keys, values, db.network)
+                    return addStorageData(keys, values, cacheDb.network)
                         .then(() => data);
                 });
         }
@@ -114,7 +132,7 @@ function fetchResource(folder, resourceFilename, callback, failCallback) {
 }
 
 
-function fetchVersionedResource(folder, resourceFilename, callback, failCallback) {
+function backgroundFetchVersionedResource(folder, resourceFilename, callback, failCallback) {
     console.log(folder, resourceFilename);
     let [filename, ext] = resourceFilename.split('.');
     
@@ -134,7 +152,7 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
     })
     .then(response => response.text());
 
-    const getStorageHashPromise = getStorageData([storageHashKey], db.network)
+    const getStorageHashPromise = getStorageData([storageHashKey], cacheDb.network)
         .then((data) => data[0]);
 
     let fetchHash = null;
@@ -161,16 +179,16 @@ function fetchVersionedResource(folder, resourceFilename, callback, failCallback
                     const keys = [storageFileKey, storageHashKey];
                     const values = [data, fetchHash];
                     if (storageHashKey) {
-                        return updateStorageData(keys, values, db.network)
+                        return updateStorageData(keys, values, cacheDb.network)
                             .then(() => data);
                     }
                     else {
-                        return addStorageData(keys, values, db.network)
+                        return addStorageData(keys, values, cacheDb.network)
                             .then(() => data);
                     }
                 });
         } else {
-            return getStorageData([storageFileKey], db.network)
+            return getStorageData([storageFileKey], cacheDb.network)
                    .then((data) => data[0]);
         }
     })
@@ -191,7 +209,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         sendResponse();
     }
     else if (message.type === 'fetchVersionedResource') {
-        fetchVersionedResource('zimu-public', message.filename, function (data, hash) {
+        backgroundFetchVersionedResource('zimu-public', message.filename, function (data, hash) {
             sendResponse({data: data, hash: hash});
         }, function(error) {
             console.log('ERROR');
@@ -200,7 +218,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'fetchResource') {
-        fetchResource('zimu-public', message.filename, function (data) {
+        backgroundFetchResource('zimu-public', message.filename, function (data) {
             sendResponse({data: data});
         }, function(error) {
             console.log('ERROR');
@@ -209,7 +227,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getCaptions') {
-        fetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
+        backgroundFetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
             sendResponse({data: data, hash: hash});
             chrome.runtime.sendMessage({type: 'requestSucceeded'});
         }, function(response) {
@@ -218,7 +236,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getIndexedDbData') {
-        const storage = db[message.storage];
+        const storage = personalDb[message.storage];
         getStorageData(message.keys, storage)
         .then(function(data) {
             console.log(message.keys, 'got', data);
@@ -227,7 +245,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         .catch((error) => sendResponse('error'));
     }
     else if (message.type === 'setIndexedDbData') {
-        const storage = db[message.storage];
+        const storage = personalDb[message.storage];
         const data = {};
         let keys = message.keys;
         let values = message.values;
@@ -254,11 +272,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'appendSessionLog') {
+        let hasStarEvents = reverseEventsMap[message.data[0]].startsWith('EVENT_STAR');
         const whereQuery = {captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime};
-        db.log.where(whereQuery).count(function(count) {
+        personalDb.log.where(whereQuery).count(function(count) {
             if (count === 0) {
                 whereQuery.events = [message.data];
-                db.log.put(whereQuery)
+                whereQuery.hasStarEvents = hasStarEvents;
+                personalDb.log.put(whereQuery)
                 .then(function() {
                     sendResponse(null);
                 })
@@ -268,9 +288,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 });
             }
             else {
-                db.log.where(whereQuery).modify(
-                    x => x.events.push(message.data)
-                )
+                personalDb.log.where(whereQuery).modify(function(x) {
+                    x.events.push(message.data)
+                    x.hasStarEvents = x.hasStarEvents || hasStarEvents;
+                })
                 .then(function() {
                     sendResponse();
                 })
@@ -300,7 +321,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getLog') {
-        db.log
+        personalDb.log
         .reverse()
         .offset(message.offset)
         .limit(message.limit)
@@ -313,8 +334,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             sendResponse('error');
         });
     }
+    else if (message.type === 'getDatabaseJson') {
+        backgroundGetDatabaseJson(function (data) {
+            sendResponse({data: data});
+        });
+    }
     else if (message.type === 'getLogRows') {
-        db.log.count().then(function(data) {
+        personalDb.log.count().then(function(data) {
             sendResponse({data: data});
         });
     }
