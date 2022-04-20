@@ -32,17 +32,17 @@ function clearIndexedDb() {
     initIndexedDb();
 }
 
-function clearCache() {
+function backgroundClearCache() {
     cacheDb.network.clear();
 }
 
-function clearPersonalData() {
+function backgroundClearPersonalData() {
     personalDb.states.clear();
     personalDb.other.clear();
     personalDb.log.clear();
 }
 
-function backgroundGetDatabaseJson(callback) {
+function backgroundExportDatabaseJson(callback) {
     personalDb.export({ prettyJson: true }).then(function(data) {
         const fr = new FileReader();
         fr.addEventListener("load", e => {
@@ -50,6 +50,22 @@ function backgroundGetDatabaseJson(callback) {
         });
         fr.readAsText(data);
     });
+}
+
+function backgroundImportDatabaseJson(data, callback) {
+    const str = JSON.stringify(data);
+    const bytes = new TextEncoder().encode(str);
+    const blob = new Blob([bytes], {
+        type: "application/json;charset=utf-8"
+    });
+
+    personalDb.import(blob, { overwriteValues: true })
+    .then(() => {
+        callback();
+    })
+    .catch((error) => {
+        callback(error);
+    });;
 }
 
 function showBadgeStatus() {
@@ -201,11 +217,11 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.type === 'clearCache') {
-        clearCache();
+        backgroundClearCache();
         sendResponse();
     }
     else if (message.type === 'clearPersonalData') {
-        clearPersonalData();
+        backgroundClearPersonalData();
         sendResponse();
     }
     else if (message.type === 'fetchVersionedResource') {
@@ -334,9 +350,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             sendResponse('error');
         });
     }
-    else if (message.type === 'getDatabaseJson') {
-        backgroundGetDatabaseJson(function (data) {
+    else if (message.type === 'exportDatabaseJson') {
+        backgroundExportDatabaseJson(function (data) {
             sendResponse({data: data});
+        });
+    }
+    else if (message.type === 'importDatabaseJson') {
+        backgroundImportDatabaseJson(message.data, function (message) {
+            sendResponse(message);
         });
     }
     else if (message.type === 'getLogRows') {

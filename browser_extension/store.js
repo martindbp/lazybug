@@ -220,16 +220,4 @@ fetchVersionedResource('hsk_words.json', function (data) {
     }
 });
 
-getIndexedDbData('states', null, function (data) {
-    if (data) {
-        const dict = {};
-        for (const item of data) {
-            dict[item.id] = item.value;
-        }
-        store.commit('setStates', dict);
-    }
-});
-
-getIndexedDbData('other', ['options'], function (data) {
-    if (data[0]) store.commit('setOptions', data[0]);
-});
+fetchPersonalDataToStore(store);

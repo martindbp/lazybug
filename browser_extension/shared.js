@@ -104,16 +104,40 @@ function clearCache() {
     });
 }
 
-function clearPersonalData() {
+function clearPersonalData(callback) {
     chrome.runtime.sendMessage({type: 'clearPersonalData'}, function onResponse(message) {
+        callback()
         return true;
     });
 }
 
-function getDatabaseJson(callback) {
-    chrome.runtime.sendMessage({type: 'getDatabaseJson'}, function onResponse(message) {
+function exportDatabaseJson(callback) {
+    chrome.runtime.sendMessage({type: 'exportDatabaseJson'}, function onResponse(message) {
         callback(message.data);
         return true;
+    });
+}
+
+function importDatabaseJson(data, callback) {
+    chrome.runtime.sendMessage({type: 'importDatabaseJson', data: data}, function onResponse(message) {
+        callback(message);
+        return true;
+    });
+}
+
+function fetchPersonalDataToStore(store) {
+    getIndexedDbData('states', null, function (data) {
+        if (data) {
+            const dict = {};
+            for (const item of data) {
+                dict[item.id] = item.value;
+            }
+            store.commit('setStates', dict);
+        }
+    });
+
+    getIndexedDbData('other', ['options'], function (data) {
+        if (data[0]) store.commit('setOptions', data[0]);
     });
 }
 

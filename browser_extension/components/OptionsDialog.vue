@@ -142,7 +142,10 @@
                     (Will permanently delete personal data)
                     <br>
                     <br>
-                    <q-btn color="green" label="Download database" @click="downloadDb" />
+                    <q-btn color="green" label="Export Database File" @click="exportDb" />
+                    <br>
+                    <br>
+                    <q-btn color="blue" label="Import Database File" @click="importDb" />
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
@@ -242,14 +245,43 @@ export default {
             this.clickedClearCache = true;
         },
         clearPersonalData: function() {
-            clearPersonalData();
-            this.clickedClearPersonalData = true;
+            const self = this;
+            clearPersonalData(function() {
+                fetchPersonalDataToStore(self.$store);
+                self.clickedClearPersonalData = true;
+            });
         },
-        downloadDb: function() {
-            getDatabaseJson(function(data) {
+        exportDb: function() {
+            exportDatabaseJson(function(data) {
                 const filename = 'database-'+(new Date(Date.now())).toISOString().split('T')[0]+'.json'
                 download(filename, JSON.stringify(data));
             });
+        },
+        importDb: function() {
+            var fileChooser = document.createElement("input");
+            fileChooser.type = 'file';
+
+            fileChooser.addEventListener('change', function (evt) {
+                var f = evt.target.files[0];
+                if(f) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        const data = JSON.parse(e.target.result);
+                        importDatabaseJson(data, function(error) {
+                            if ([null, undefined].includes(error)) {
+                                alert('Something went wrong: ' + error);
+                            }
+                            else {
+                                alert('Successfully imported database');
+                            }
+                       });
+                    }
+                    reader.readAsText(f);
+                }
+            });
+
+            document.body.appendChild(fileChooser);
+            fileChooser.click();
         }
     },
 }
