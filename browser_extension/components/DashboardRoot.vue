@@ -33,7 +33,7 @@
                      >
                   </q-td>
               </q-tr>
-              <q-tr v-show="props.expand" :props="props">
+              <q-tr v-if="props.expand" v-show="props.expand" :props="props">
                   <q-td colspan="100%">
                       <div v-html="rowYoutubeEmbedCode(props.row.idx)" />
                   </q-td>
