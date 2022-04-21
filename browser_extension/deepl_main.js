@@ -20,8 +20,8 @@ if (ZIMUDEVMODE) {
             inputTextArea.value = message.data;
             inputTextArea.dispatchEvent(new Event('input', { 'bubbles': true, 'cancelable': true }));
             lastTranslationTime = Date.now();
-            nextWaitTime = 60000 * Math.random(); // Wait somewhere beteen 0 and 60 seconds
-            if (message.data.length < 100) nextWaitTime = 2000;
+            nextWaitTime = 5*60000 * Math.random(); // Wait somewhere beteen 0 and 5 minutes
+            if (message.data.length < 100) nextWaitTime = 10000; // 10 s
 
             const originalValue = outputTextArea.value;
             const interval = setInterval(function() {
