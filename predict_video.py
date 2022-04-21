@@ -899,8 +899,14 @@ def predict_video_captions(
                 if frame_time < cond_start:
                     continue
                 if frame_time > cond_end:
-                    frame_t, frame = frame_buffer[len(frame_buffer) // 2]
-                    line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
+                    if len(frame_buffer) == 0:
+                        # The conditional time range was too short, there were no frames
+                        frame_t = (cond_end + cond_start) / 2
+                        line = CaptionLine('', cond_start, cond_end, 0, None, None, None, None, None)
+                    else:
+                        frame_t, frame = frame_buffer[len(frame_buffer) // 2]
+                        line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
+
                     frame_buffer_lines = [line]
 
                     curr_conditional_caption_idx += 1
