@@ -29,9 +29,11 @@ ner_driver = None
 
 PINYIN_CLASSIFIERS = Future.from_file('data/git/pinyin_classifiers.py', raise_file_not_found=False)
 
-def cedict_max_freq_pinyin(hz, match_py_syllable=None):
+def cedict_max_freq_pinyin(hz, match_py_syllable=None, return_frequency=False):
     # NOTE: if match_py_syllable is provided, we want to match this specific syllable
     if hz not in CEDICT.v:
+        if return_frequency:
+            return None, None
         return None
 
     entries = CEDICT.v.get(hz)
@@ -51,7 +53,28 @@ def cedict_max_freq_pinyin(hz, match_py_syllable=None):
             max_freq = freq
             max_freq_py = py
 
+    if return_frequency:
+        return max_freq_py, max_freq
+
     return max_freq_py
+
+
+def sum_segmentation_frequencies(hzs):
+    sum_freq = 0
+    for hz in hzs:
+        if hz == '':
+            continue
+        max_py, max_freq = cedict_max_freq_pinyin(hz, return_frequency=True)
+        if max_freq is None or max_freq < 0:
+            # Take the sum of char frequencies
+            for char in hz:
+                max_py, max_freq = cedict_max_freq_pinyin(hz, return_frequency=True)
+                if max_freq is not None and max_freq >= 0:
+                    sum_freq += max_freq
+        else:
+            sum_freq += max_freq
+
+    return sum_freq
 
 
 def cedict_all_possible_pinyins(hz, split=True, no_tone=True, lower=True):
@@ -163,7 +186,7 @@ def segmentations_to_pinyin(segmentations):
 
                 # Apply special cases here:
                 if idx_matches[-1][1] == '长' and hz not in CEDICT.v:
-                    # For example: 护士长 should be hu4shi5zhang3, not hu4shi5zhang3
+                    # For example: 护士长 should be hu4shi5zhang3, not hu4shi5chang2
                     word_pys[-1] = 'zhang3'
 
                 sentence_pys.append(''.join(word_pys))
@@ -283,9 +306,15 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
 
                     joined_hz = ''.join([hz for _, _, hz in components])  # now without titles
 
-                    if len(joined_hz) > 1 and joined_hz in CEDICT.v and not is_name_according_to_cedict(joined_hz, None, strict=False):
+                    # NOTE: commented this out because there are names which are words, like 时光
+                    # In the end it's probably OK that e.g. shifu shows as a name, compared to false negatives on other names
+                    #if len(joined_hz) > 1 and joined_hz in CEDICT.v and not is_name_according_to_cedict(joined_hz, None, strict=False):
                         # To avoid e.g. 师傅 being treated as a name, when "shifu" appears in translation, ignore
                         # longer words if they're in CEDICT but is not a name according to it
+                        #continue
+
+                    # Even if shifu is present in the translation, we don't want to join it
+                    if joined_hz == '师父':
                         continue
 
                     if len(filter_text_hanzi(full_joined_hz)) != len(full_joined_hz):
@@ -502,7 +531,22 @@ def _ners_batch(hzs):
     return ner_driver(hzs, batch_size=16)
 
 BLACKLIST = {
-    '我去', '得很', '这不', '不想', '有了', '一对', '可心', '不得', '好走', '喝茶', '都会', '把门', '小的', '个人','你好'
+    '我去',
+    '得很',
+    '这不',
+    '不想',
+    '有了',
+    '一对',
+    '可心',
+    '不得',
+    '好走',
+    '喝茶',
+    '都会',
+    '把门',
+    '小的',
+    '个人',
+    '你好',
+    '十分',
 }
 
 @task
@@ -742,17 +786,21 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     break
 
         #
-        # Join words accross segmentation boundaries if the joined word is in cedict, but previously segmented words are not (or are shorter)
+        # Join words accross segmentation boundaries if the joined word is in cedict, but previously segmented words are not (or are shorter / has overall character frequency sum)
+        # And example that had to be fixed: 特别的 was split as "特 别的". In this case both are in cedict, but 特别 should take precedence
         #
         for i in range(len(new_ws_sentence) - 2 + 1):
             components = new_ws_sentence[i : i + 2]
             max_len_in_cedict = 1  # 1 because single chars are always in cedict
+            max_len_str = ''
             for hz in components:
                 for from_idx in range(0, len(hz)):
                     for to_idx in range(from_idx, len(hz) + 1):
                         sub_hz = hz[from_idx:to_idx]
                         if sub_hz in CEDICT.v:
-                            max_len_in_cedict = max(max_len_in_cedict, len(sub_hz))
+                            if len(sub_hz) > max_len_in_cedict:
+                                max_len_in_cedict = len(sub_hz)
+                                max_len_str = sub_hz
 
             for offset_start in range(0, len(components[0])):
                 do_break = False
@@ -766,8 +814,11 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
 
                     translation_options = get_translation_options_cedict(joined_hz, py=None, deepl=None, add_empty=False)
                     if (
-                        len(joined_hz) > max_len_in_cedict and
                         joined_hz in CEDICT.v and
+                        (
+                            len(joined_hz) > max_len_in_cedict or
+                            (len(joined_hz) == max_len_in_cedict and sum_segmentation_frequencies([joined_hz]) > sum_segmentation_frequencies([max_len_str]))
+                        ) and
                         len(translation_options) > 0 and
                         joined_hz not in BLACKLIST
                     ):
