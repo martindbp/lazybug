@@ -1027,10 +1027,11 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
 
             # Take the bounding rect union
             cond_rect = list(cond_line[3])
-            cond_rect[0] = min(cond_rect[0], line[3][0])  # min x
-            cond_rect[1] = max(cond_rect[1], line[3][1])  # max x
-            cond_rect[2] = min(cond_rect[2], line[3][2])  # min y
-            cond_rect[3] = max(cond_rect[3], line[3][3])  # max y
+            if line[3] is not None and len(line[3]) == 4:
+                cond_rect[0] = min(cond_rect[0], line[3][0])  # min x
+                cond_rect[1] = max(cond_rect[1], line[3][1])  # max x
+                cond_rect[2] = min(cond_rect[2], line[3][2])  # min y
+                cond_rect[3] = max(cond_rect[3], line[3][3])  # max y
             cond_line[3] = cond_rect
 
     return conditional_captions
