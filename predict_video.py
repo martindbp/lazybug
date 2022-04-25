@@ -1017,9 +1017,13 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
 
             # Prepend the text
             if action['type'] == 'prepend':
-                cond_line[0] = line[0] + action['join'] + cond_line[0]
+                if line[0].strip() != '':
+                    cond_line[0] = line[0] + action['join'] + cond_line[0]
             elif action['type'] == 'append':
-                cond_line[0] = cond_line[0] + action['join'] + line[0]
+                if cond_line[0].strip() == '':
+                    cond_line[0] = line[0]
+                else:
+                    cond_line[0] = cond_line[0] + action['join'] + line[0]
 
             # Take the bounding rect union
             cond_rect = list(cond_line[3])
