@@ -329,7 +329,9 @@ export default {
             );
         },
         clickContextMenu(action, type, i) {
-            this.cancelCloseContextMenu = true;
+            if (this.waitingBeforeClosingMenu) {
+                this.cancelCloseContextMenu = true;
+            }
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
 
@@ -433,6 +435,9 @@ export default {
             };
         },
         click: function(type, i = null) {
+            if (this.waitingBeforeClosingMenu) {
+                this.cancelCloseContextMenu = true;
+            }
             if (type === 'translation') {
                 if (this.hiddenStates[type] === true) {
                     if (this.hiddenAndNotPeeking[type] === false) {
@@ -471,14 +476,15 @@ export default {
                 this.showContextMenu[type][i]
             ) {
                 const self = this;
-                event.target.addEventListener('mouseenter', function() {
-                    self.cancelclosecontextmenu = true;
+                const mouseOverListener = event.target.addEventListener('mouseover', function() {
+                    self.cancelCloseContextMenu = true;
                 }, { once: true });
 
                 this.cancelCloseContextMenu = false;
                 this.waitingBeforeClosingMenu = true;
                 setTimeout(function() {
                     this.waitingBeforeClosingMenu = false;
+                    event.target.removeEventListener('mouseover', mouseOverListener);
                     if (self.cancelCloseContextMenu) {
                         self.cancelCloseContextMenu = false;
                         return;
