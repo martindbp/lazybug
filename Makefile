@@ -32,24 +32,24 @@ pre-public-sync:
 	make public-cedict
 	make names-list
 
-sync-up-public:
+push-public:
 	touch synced.txt
 	b2 sync --noProgress data/remote/public b2://zimu-public --skipNewer | tee synced.txt
 	make purge-cloudflare-public
 
-sync-up-private:
+push-private:
 	b2 sync data/remote/private b2://zimu-private --skipNewer
 
-sync-up-private-essentials:
+push-private-essentials:
 	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*' --skipNewer
 
-sync-down-public:
+pull-public:
 	b2 sync b2://zimu-public data/remote/public
 
-sync-down-private:
+pull-private:
 	b2 sync b2://zimu-private data/remote/private
 
-sync-down-private-essentials:
+pull-private-essentials:
 	b2 sync b2://zimu-private data/remote/private --excludeRegex '.*caption_data.*'
 
 check-cloudflare-env:
