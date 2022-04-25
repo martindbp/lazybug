@@ -15,7 +15,7 @@ function initIndexedDb() {
     personalDb.version(VERSION).stores({
         states: 'id',
         other: 'id',
-        log: '[captionId+captionHash+sessionTime], sessionTime',
+        log: '[captionId+captionHash+sessionTime], sessionTime, hasStarEvents',
     });
 
     cacheDb = new Dexie('zimuai-cache');
@@ -293,7 +293,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         personalDb.log.where(whereQuery).count(function(count) {
             if (count === 0) {
                 whereQuery.events = [message.data];
-                whereQuery.hasStarEvents = hasStarEvents;
+                whereQuery.hasStarEvents = hasStarEvents ? 1 : 0; // booleans not indexable
                 personalDb.log.put(whereQuery)
                 .then(function() {
                     sendResponse(null);
@@ -306,7 +306,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             else {
                 personalDb.log.where(whereQuery).modify(function(x) {
                     x.events.push(message.data)
-                    x.hasStarEvents = x.hasStarEvents || hasStarEvents;
+                    x.hasStarEvents = Math.max(x.hasStarEvents, hasStarEvents);
                 })
                 .then(function() {
                     sendResponse();
@@ -338,6 +338,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     else if (message.type === 'getLog') {
         personalDb.log
+        .where({ hasStarEvents: 1 })
         .reverse()
         .offset(message.offset)
         .limit(message.limit)
