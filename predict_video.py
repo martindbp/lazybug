@@ -999,14 +999,13 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
     assert 'type' in action
     assert 'join' in action
 
-    next_caption_line = 0
     # We update the original conditional captions and return those instead
     for cond_line in conditional_captions['lines']:
         cond_line_t0, cond_line_t1 = cond_line[1], cond_line[2]
         if cond_line[3] is None:
             continue
 
-        for i in range(next_caption_line, len(caption_lines['lines'])):
+        for i in range(len(caption_lines['lines'])):
             line = caption_lines['lines'][i]
             line_t0, line_t1 = line[1], line[2]
             if line[3] is None:
@@ -1015,9 +1014,6 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
             if line_t0 > cond_line_t1 or line_t1 < cond_line_t0:
                 # No overlap
                 continue
-
-            # We have overlap
-            next_caption_line = i + 1
 
             # Prepend the text
             if action['type'] == 'prepend':
@@ -1033,6 +1029,7 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
                 cond_rect[2] = min(cond_rect[2], line[3][2])  # min y
                 cond_rect[3] = max(cond_rect[3], line[3][3])  # max y
             cond_line[3] = cond_rect
+            break
 
     return conditional_captions
 
