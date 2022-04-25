@@ -329,9 +329,7 @@ export default {
             );
         },
         clickContextMenu(action, type, i) {
-            if (this.waitingBeforeClosingMenu) {
-                this.cancelCloseContextMenu = true;
-            }
+            this.cancelCloseContextMenu = true;
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
 
@@ -474,7 +472,7 @@ export default {
             ) {
                 const self = this;
                 event.target.addEventListener('mouseenter', function() {
-                    self.cancelCloseContextMenu = true;
+                    self.cancelclosecontextmenu = true;
                 }, { once: true });
 
                 this.cancelCloseContextMenu = false;
