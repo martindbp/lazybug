@@ -404,7 +404,8 @@ export default {
             let seasonName = null;
             let episodeName = null;
             if (showInfo) {
-                showName = showInfo.name;
+                if (typeof showInfo.name === "object") showName = showInfo.name.hz;
+                else showName = showInfo.name;
                 const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, this.$store.state.captionId);
                 if (seasonIdx !== null) {
                     let seasonName = showInfo.seasons[seasonIdx].name;
