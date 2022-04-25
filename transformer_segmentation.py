@@ -202,7 +202,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
     global_known_name_hzs_set = set(global_known_name_hzs)
 
     # These chars have simple translations that may show up spuriously in the target translation
-    DISALLOW_HZ = '了啦吧呢啊吗呗嘛呀元'
+    DISALLOW_HZ = '了啦吧呢啊吗呗嘛呀元咯'
     # These are pinyin/wade-giles that are common words in english or tend to show up in translations
     DISALLOW_SINGLE_PY = [
         'you',
@@ -223,6 +223,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
         'men',
         'he',
         'la',
+        'lo',
         # Words, but not very common (or hasn't been a problem yet):
         #'hang',
         #'ran',
