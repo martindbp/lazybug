@@ -7,7 +7,6 @@
         <q-btn label="Dashboard" @click="dashboard" />
         <q-btn label="I'm feeling lucky" @click="imFeelingLucky" :loading="feelingLuckyLoading" />
         <div v-if="dev">
-            <q-btn label="SRS" @click="srs" />
             <q-btn label="Measure caption" @click="measureCaption" />
             <q-btn label="Print playlist" @click="printPlaylist" />
         </div>
@@ -28,6 +27,7 @@ export default {
     }},
     mounted: function() {
         const self = this;
+        this.updateBadge();
         getIndexedDbData('other', ['options'], function (data) {
             if (data[0]) {
                 self.extensionToggle = data[0].extensionToggle;
@@ -56,6 +56,7 @@ export default {
             });
         },
         updateBadge: function() {
+            /*
             if (this.extensionToggle) {
                 chrome.action.setBadgeText({text:''});
             }
@@ -63,6 +64,7 @@ export default {
                 chrome.action.setBadgeBackgroundColor({color:[255, 0, 0, 255]});
                 chrome.action.setBadgeText({text:'OFF'});
             }
+            */
         },
         measureCaption: function() {
             chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
