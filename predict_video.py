@@ -1143,10 +1143,15 @@ def convert_vtt_to_caption_format(translations_path, params=None, video_length=N
     translations = [t for t in webvtt.read(translations_path)]
     # Convert newlines to spaces
     lines = []
-    for caption in translations:
+    for i, caption in enumerate(translations):
         text = caption.text.replace('\n', ' ')
         t0 = timestamp_to_seconds(caption.start)
         t1 = timestamp_to_seconds(caption.end)
+        if i > 0:
+            # Fix overlapping captions
+            last_t1 = timestamp_to_seconds(translations[i-1].end)
+            if last_t1 > t0:
+                t0 = last_t1
         lines.append([text, t0, t1, None, None, None, None])
 
     data = {
