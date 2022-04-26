@@ -27,10 +27,10 @@ chrome.runtime.onMessage.addListener(msgObj => {
         function stopMeasuring() {
             console.log('Stop measuring');
             var videoRect = AVElement.getBoundingClientRect();
-            var videoTop = Math.round(AVElement.videoHeight * (mouseDownClientY - videoRect.top) / videoRect.height);
-            var videoBottom = Math.round(AVElement.videoHeight * (clientY - videoRect.top) / videoRect.height);
-            var videoLeft = Math.round(AVElement.videoWidth * (mouseDownClientX - videoRect.left) / videoRect.width);
-            var videoRight = Math.round(AVElement.videoWidth * (clientX - videoRect.left) / videoRect.width);
+            var videoTop = AVElement.videoHeight * (mouseDownClientY - videoRect.top) / videoRect.height;
+            var videoBottom = AVElement.videoHeight * (clientY - videoRect.top) / videoRect.height;
+            var videoLeft = AVElement.videoWidth * (mouseDownClientX - videoRect.left) / videoRect.width;
+            var videoRight = AVElement.videoWidth * (clientX - videoRect.left) / videoRect.width;
             captionBottom = videoBottom / AVElement.videoHeight;
             captionTop = videoTop / AVElement.videoHeight;
             captionLeft = videoLeft / AVElement.videoWidth;
