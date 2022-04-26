@@ -391,6 +391,7 @@ wade_giles_pinyin_pairs = [
     ('mei', 'mei'),
     ('men', 'men'),
     ('meng', 'meng'),
+    ('me', 'me'),
     ('mi', 'mi'),
     ('miao', 'miao'),
     ('mieh', 'mie'),
