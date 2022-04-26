@@ -23,7 +23,9 @@ const store = new Vuex.Store({
         captionData: null,
         captionHash: null, // use this for event log
         resourceFetchError: null,
+        showList: null,
         showInfo: null,
+        videoList: null,
         DICT: null,
         HSK_WORDS: null,
         states: Vue.ref({}),
@@ -69,6 +71,12 @@ const store = new Vuex.Store({
     mutations: {
         setVideoId(state, val) {
             state.videoId = val
+        },
+        setVideoList(state, val) {
+            state.videoList = val;
+        },
+        setShowList(state, val) {
+            state.showList = val;
         },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
@@ -202,22 +210,24 @@ const store = new Vuex.Store({
     },
 });
 
-fetchVersionedResource('public_cedict.json', function (data) {
-    if (data === 'error') {
-        store.commit('setResourceFetchError', 'dictionary');
-    }
-    else {
-        store.commit('setDict', data);
-    }
-});
+const FETCH_PUBLIC_RESOURCES = [
+    ['public_cedict.json', 'dictionary', 'setDict'],
+    ['hsk_words.json', 'HSK word list', 'setHskWords'],
+    ['video_list.json', 'video list', 'setVideoList'],
+    ['show_list.json', 'show list', 'setShowList'],
+];
 
-fetchVersionedResource('hsk_words.json', function (data) {
-    if (data === 'error') {
-        store.commit('setResourceFetchError', 'HSK word list');
-    }
-    else {
-        store.commit('setHskWords', data);
-    }
-});
+store.commit('resetResourceFetchError');
+
+for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
+    fetchVersionedResource(filename, function (data) {
+        if (data === 'error') {
+            store.commit('setResourceFetchError', errorName);
+        }
+        else {
+            store.commit(mutation, data);
+        }
+    });
+}
 
 fetchPersonalDataToStore(store);

@@ -59,7 +59,6 @@ export default {
             minHeight: null,
             captionFontSize: null,
             seeked: false,
-            showList: null,
             prevCaption: null,
             currCaption: null,
             nextCaption: null,
@@ -73,16 +72,6 @@ export default {
             this.videoDuration = this.AVElement.duration;
         }
         this.setObserversAndHandlers();
-        this.$store.commit('resetResourceFetchError');
-        const self = this;
-        fetchVersionedResource('show_list.json', function (data, hash) {
-            if (data === 'error') {
-                self.$store.commit('setResourceFetchError', 'show list');
-            }
-            else {
-                self.showList = data;
-            }
-        });
     },
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);
@@ -160,7 +149,7 @@ export default {
                 this.$store.commit('setVideoId', this.videoId);
             }
         },
-        showList: {
+        '$store.state.videoList': {
             immediate: true,
             handler: function() {
                 this.fetchCaptionMaybe();
@@ -461,7 +450,7 @@ export default {
         isLoading: function() {
             return (
                 this.captionId !== null && (
-                    this.showList === null ||
+                    this.$store.state.videoList === null ||
                     this.$store.state.showInfo === null ||
                     this.$store.state.captionData === null ||
                     this.$store.state.DICT === null ||
@@ -488,7 +477,7 @@ export default {
             if (this.videoId !== null) {
                 captionId = 'youtube-' + this.videoId;
             }
-            if (this.showList === null || ! this.showList.includes(captionId)) {
+            if (this.$store.state.videoList === null || ! this.$store.state.videoList.includes(captionId)) {
                 return null;
             }
 

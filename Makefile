@@ -28,6 +28,7 @@ zip-ext:
 
 pre-public-sync:
 	make show-list
+	make video-list
 	make cedict
 	make public-cedict
 	make names-list
@@ -93,8 +94,14 @@ process-translations:
 process-segmentation-alignments:
 	merkl -v run predict_video.process_segmentation_alignment ${show} ${video}
 
+video-list:
+	ls data/remote/public/subtitles/*.hash | xargs -I{} basename {} .hash | python text_list_to_json_array.py > data/remote/public/video_list.json
+	LIST_HASH=$$(md5sum data/remote/public/video_list.json | cut -d " " -f1) ; \
+	echo $$LIST_HASH > data/remote/public/video_list.hash ; \
+	mv data/remote/public/video_list.json "data/remote/public/video_list-$$LIST_HASH.json"
+
 show-list:
-	ls data/remote/public/subtitles/*.hash | xargs -I{} basename {} .hash | python text_list_to_json_array.py > data/remote/public/show_list.json 
+	ls data/remote/public/shows/*.json | xargs -I{} basename {} .json | python text_list_to_json_array.py > data/remote/public/show_list.json
 	LIST_HASH=$$(md5sum data/remote/public/show_list.json | cut -d " " -f1) ; \
 	echo $$LIST_HASH > data/remote/public/show_list.hash ; \
 	mv data/remote/public/show_list.json "data/remote/public/show_list-$$LIST_HASH.json"
