@@ -48,6 +48,11 @@ model = None
 HIGH_PROB_CHAR = 0.90
 
 
+def write_hash_file(filename, hash):
+    with open(filename, 'w') as f:
+        f.write(hash)
+
+
 @dataclass
 class CaptionLine:
     text: str
@@ -1400,8 +1405,8 @@ def make_public_cedict_db():
     cedict = make_cedict(freqs=None, filename='data/remote/public/cedict_ts.u8')
     public_cedict = _make_public_cedict(cedict)
     public_cedict >> f'data/remote/public/public_cedict-{public_cedict.hash}.json'
-    with open(f'data/remote/public/public_cedict.hash', 'w') as f:
-        f.write(public_cedict.hash)
+
+    public_cedict.on_completed = partial(write_hash_file, filename=f'data/remote/public/public_cedict.hash', hash=public_cedict.hash)
 
     return public_cedict
 
@@ -1600,8 +1605,7 @@ def process_segmentation_alignment(show_name=None, *, force_redo=False, video_id
             alignment_translations.clear_cache(delete_output_files=True)
             json_captions_final.clear_cache(delete_output_files=True)
 
-        with open(f'data/remote/public/subtitles/{vid}.hash', 'w') as f:
-            f.write(json_captions_final.hash)
+        json_captions_final.on_completed = partial(write_hash_file, filename=f'data/remote/public/subtitles/{vid}.hash', hash=json_captions_final.hash)
         out.append(json_captions_final)
 
     return out
