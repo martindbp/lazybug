@@ -24,7 +24,6 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_t
     translation_words = [words for (_, words, _) in alignment_translations]
     indices = [indices for (_, _, indices) in alignment_translations]
 
-    datas = []
     empty_translations = []
     all_embedding_translations, all_embedding_hzs, all_embedding_pys, all_embedding_indices = [], [], [], []
     for line_idx, (sentence_hz, sentence_translations, words, word_indices, alignment_line_transl) in enumerate(zip(
@@ -95,7 +94,6 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_t
         all_embedding_hzs.append(embedding_hzs)
         all_embedding_pys.append(embedding_pys)
         all_embedding_indices.append(embedding_indices)
-        datas.append(data)
 
         # Update the translations with the fixed translations where empty
         for i, (deepl_transl, transl, hz, py) in enumerate(zip(deepl_transls, embedding_translations, embedding_hzs, embedding_pys)):
@@ -149,10 +147,6 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_t
             line_alignments.append(alignment)
 
         all_line_alignments.append(line_alignments)
-
-
-    with open(f'out_examples_{caption_data["caption_id"]}.json', 'w') as f:
-        json.dump(datas, f)
 
     for line, line_alignment, alignment_line_transl in zip(caption_data['lines'], all_line_alignments, alignment_line_translations):
         line[-1].append(alignment_line_transl)
