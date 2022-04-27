@@ -416,7 +416,12 @@ def get_video_caption_area(
         right_resized = int(caption_right_px * scale_factor)
 
         padding = (out_height - font_height) // 2
-        crop = resized[top_resized-padding-height_buffer_px:bottom_resized+padding+height_buffer_px, left_resized:right_resized]
+
+        top = top_resized-padding-height_buffer_px
+        bottom = top + out_height + 2*height_buffer_px
+        crop = resized[top:bottom, left_resized:right_resized]
+        if crop.shape[0] != out_height + 2*height_buffer_px:
+            breakpoint()
         assert crop.shape[0] == out_height + 2*height_buffer_px
 
         curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
