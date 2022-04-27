@@ -96,8 +96,8 @@
                           {{ getSelectedString() }}
                   </template>
                 </q-table>
-                <div class="q-mt-md" v-if="selected.length > 0">
-                    <q-btn label="Export to Anki" @click="exportToAnki"/>
+                <div class="q-mt-md">
+                    <q-btn :disabled="selected.length === 0" label="Export to Anki" @click="exportToAnki"/>
                 </div>
             </q-tab-panel>
             <q-tab-panel name="options">
