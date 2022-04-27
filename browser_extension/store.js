@@ -49,7 +49,7 @@ const store = new Vuex.Store({
         timingOffset: 0,
         options: Vue.ref({
             extensionToggle: true,
-            autoPause: true,
+            autoPause: false,
             characterSet: 'sm',
             blurCaptions: true,
             pin: {
