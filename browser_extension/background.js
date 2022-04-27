@@ -362,7 +362,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getLogRows') {
-        personalDb.log.count().then(function(data) {
+        personalDb.log.where({ hasStarEvents: 1 }).count().then(function(data) {
             sendResponse({data: data});
         });
     }
