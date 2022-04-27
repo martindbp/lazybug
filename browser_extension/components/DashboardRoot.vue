@@ -300,7 +300,7 @@ export default {
                     py = idx !== null ? wordData.py[idx] : '';
                     hz = idx !== null ? wordData.hz[idx] : '';
                     tr = idx !== null ? wordData.tr[idx] : '';
-                    translation = null;
+                    //translation = null;
                 }
                 else {
                     fullHz = text;
