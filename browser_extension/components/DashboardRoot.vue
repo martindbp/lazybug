@@ -14,7 +14,6 @@
             <q-tab-panel name="history">
                 <q-table
                     style="width: 100%; display: inline-block"
-                    ref="tableRef"
                     title="Starred"
                     :rows="rows"
                     :columns="columns"
@@ -22,6 +21,7 @@
                     v-model:selected="selected"
                     :loading="loading"
                     @request="onRequest"
+                    :pagination="pagination"
                     hide-pagination
                 >
                   <template v-slot:body="props">
@@ -144,6 +144,9 @@ export default {
         ],
         selected: [],
         starEvents: [],
+        pagination: {
+            rowsPerPage: 0,
+        },
         rows: [],
         page: 0,
         numRows: 0,
@@ -205,6 +208,7 @@ export default {
             getLog(offset, limit, function(data) {
                 self.starEvents = self.filterStarEvents(data);
                 self.rows = self.starEventsToRows(self.starEvents);
+                self.pagination.rowsPerPage = self.rows.length;
                 self.loading = false;
             });
         },
