@@ -9,7 +9,6 @@
                 <q-tab name="subtitle" label="Subtitle" />
                 <q-tab name="knowledge" label="Knowledge" />
                 <q-tab name="keyboard" label="Keyboard" />
-                <q-tab name="other" label="Other" />
             </q-tabs>
 
             <q-tab-panels v-model="tab">
@@ -133,20 +132,6 @@
                     <br>
                     <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
                 </q-tab-panel>
-                <q-tab-panel name="other" style="width: 400px">
-                    <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
-                    <br>
-                    <br>
-                    <q-btn color="deep-orange" label="Clear personal data" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
-                    <br>
-                    (Will permanently delete personal data)
-                    <br>
-                    <br>
-                    <q-btn color="green" label="Export Database File" @click="exportDb" />
-                    <br>
-                    <br>
-                    <q-btn color="blue" label="Import Database File" @click="importDb" />
-                </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
                 <q-btn flat label="Close" @click="clickClose"></q-btn>
@@ -172,8 +157,6 @@ export default {
             ["peekTr", "Peek Word Translation Row"],
         ],
         choosingShortcut: null,
-        clickedClearCache: false,
-        clickedClearPersonalData: false,
     }},
     computed: {
         show: {
@@ -240,49 +223,6 @@ export default {
         resetShortcuts: function() {
             this.$store.commit('setOption', {key: 'keyboardShortcuts', value: DEFAULT_SHORTCUTS});
         },
-        clearCache: function() {
-            clearCache();
-            this.clickedClearCache = true;
-        },
-        clearPersonalData: function() {
-            const self = this;
-            clearPersonalData(function() {
-                fetchPersonalDataToStore(self.$store);
-                self.clickedClearPersonalData = true;
-            });
-        },
-        exportDb: function() {
-            exportDatabaseJson(function(data) {
-                const filename = 'database-'+(new Date(Date.now())).toISOString().split('T')[0]+'.json'
-                download(filename, JSON.stringify(data));
-            });
-        },
-        importDb: function() {
-            var fileChooser = document.createElement("input");
-            fileChooser.type = 'file';
-
-            fileChooser.addEventListener('change', function (evt) {
-                var f = evt.target.files[0];
-                if(f) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        const data = JSON.parse(e.target.result);
-                        importDatabaseJson(data, function(error) {
-                            if ([null, undefined].includes(error)) {
-                                alert('Something went wrong: ' + error);
-                            }
-                            else {
-                                alert('Successfully imported database');
-                            }
-                       });
-                    }
-                    reader.readAsText(f);
-                }
-            });
-
-            document.body.appendChild(fileChooser);
-            fileChooser.click();
-        }
     },
 }
 </script>

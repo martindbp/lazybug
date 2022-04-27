@@ -1,92 +1,121 @@
 <template>
-    <div class="q-pa-md">
-        <q-table
-            style="display: inline-block"
-            ref="tableRef"
-            title="Starred"
-            :rows="rows"
-            :columns="columns"
-            selection="multiple"
-            v-model:selected="selected"
-            :loading="loading"
-            @request="onRequest"
-            hide-pagination
-        >
-          <template v-slot:body="props">
-              <q-tr v-if="props.row.isNewSession">
-                  <q-td colspan="100%">
-                      <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
-                          {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}</div>
-                  </q-td>
-              </q-tr>
-              <q-tr :props="props">
-                  <q-td>
-                      <q-checkbox v-model="props.selected" color="primary" />
-                  </q-td>
-                  <q-td
-                     v-for="col in props.cols"
-                     :key="col.name"
-                     :props="props"
-                     @click="props.expand = !props.expand"
-                     :style="{ cursor: 'pointer', fontSize: col.name === 'hz' ? '1.2em' : '1em' }"
-                     v-html="col.value"
-                     >
-                  </q-td>
-              </q-tr>
-              <q-tr v-if="props.expand" v-show="props.expand" :props="props">
-                  <q-td colspan="100%">
-                      <div v-html="rowYoutubeEmbedCode(props.row.idx)" />
-                  </q-td>
-              </q-tr>
-          </template>
+    <div class="q-pa-md" style="width: 50%; left: 25%; position: absolute; min-width: 500px;">
+        <q-card>
+        <q-tabs
+           v-model="tab"
+           no-caps
+           class="bg-orange text-white shadow-2"
+         >
+            <q-tab name="history" label="History" />
+            <q-tab name="options" label="Options" />
+        </q-tabs>
 
-          <template v-slot:top>
-              <div class="text-h5">Starred</div>
-              <q-btn
-                   icon="first_page"
-                   color="grey-8"
-                   round
-                   dense
-                   flat
-                   :disable="isFirstPage"
-                   @click="firstPage"
-               />
+        <q-tab-panels v-model="tab">
+            <q-tab-panel name="history">
+                <q-table
+                    style="width: 100%; display: inline-block"
+                    ref="tableRef"
+                    title="Starred"
+                    :rows="rows"
+                    :columns="columns"
+                    selection="multiple"
+                    v-model:selected="selected"
+                    :loading="loading"
+                    @request="onRequest"
+                    hide-pagination
+                >
+                  <template v-slot:body="props">
+                      <q-tr v-if="props.row.isNewSession">
+                          <q-td colspan="100%">
+                              <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
+                                  {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}</div>
+                          </q-td>
+                      </q-tr>
+                      <q-tr :props="props">
+                          <q-td>
+                              <q-checkbox v-model="props.selected" color="primary" />
+                          </q-td>
+                          <q-td
+                             v-for="col in props.cols"
+                             :key="col.name"
+                             :props="props"
+                             @click="props.expand = !props.expand"
+                             :style="{ cursor: 'pointer', fontSize: col.name === 'hz' ? '1.2em' : '1em' }"
+                             v-html="col.value"
+                             >
+                          </q-td>
+                      </q-tr>
+                      <q-tr v-if="props.expand" v-show="props.expand" :props="props">
+                          <q-td colspan="100%">
+                              <div v-html="rowYoutubeEmbedCode(props.row.idx)" />
+                          </q-td>
+                      </q-tr>
+                  </template>
 
-              <q-btn
-                   icon="chevron_left"
-                   color="grey-8"
-                   round
-                   dense
-                   flat
-                   :disable="isFirstPage"
-                   @click="prevPage"
-               />
+                  <template v-slot:top>
+                      <div class="text-h5">Starred</div>
+                      <q-btn
+                           icon="first_page"
+                           color="grey-8"
+                           round
+                           dense
+                           flat
+                           :disable="isFirstPage"
+                           @click="firstPage"
+                       />
 
-              <q-btn
-                   icon="chevron_right"
-                   color="grey-8"
-                   round
-                   dense
-                   flat
-                   :disable="isLastPage"
-                   @click="nextPage"
-               />
+                      <q-btn
+                           icon="chevron_left"
+                           color="grey-8"
+                           round
+                           dense
+                           flat
+                           :disable="isFirstPage"
+                           @click="prevPage"
+                       />
 
-              <q-btn
-                   icon="last_page"
-                   color="grey-8"
-                   round
-                   dense
-                   flat
-                   :disable="isLastPage"
-                   @click="lastPage"
-               />
-                  {{ getSelectedString() }}
-          </template>
-        </q-table>
-        <div class="q-mt-md" v-if="selected.length > 0">
-            <q-btn label="Export to Anki" @click="exportToAnki"/>
-        </div>
+                      <q-btn
+                           icon="chevron_right"
+                           color="grey-8"
+                           round
+                           dense
+                           flat
+                           :disable="isLastPage"
+                           @click="nextPage"
+                       />
+
+                      <q-btn
+                           icon="last_page"
+                           color="grey-8"
+                           round
+                           dense
+                           flat
+                           :disable="isLastPage"
+                           @click="lastPage"
+                       />
+                          {{ getSelectedString() }}
+                  </template>
+                </q-table>
+                <div class="q-mt-md" v-if="selected.length > 0">
+                    <q-btn label="Export to Anki" @click="exportToAnki"/>
+                </div>
+            </q-tab-panel>
+            <q-tab-panel name="options">
+                <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
+                <br>
+                <br>
+                <q-btn color="deep-orange" label="Clear personal data" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
+                <br>
+                (Will permanently delete personal data)
+                <br>
+                <br>
+                <q-btn color="green" label="Export Database File" @click="exportDb" />
+                <br>
+                <br>
+                <q-btn color="blue" label="Import Database File" @click="importDb" />
+            </q-tab-panel>
+        </q-tab-panels>
+        </q-card>
     </div>
 </template>
 
@@ -120,6 +149,9 @@ export default {
         numRows: 0,
         numPages: 0,
         loading: true,
+        tab: Vue.ref('history'),
+        clickedClearCache: false,
+        clickedClearPersonalData: false,
     }},
     mounted: function() {
         const self = this;
@@ -299,6 +331,50 @@ export default {
 
             return rows;
         },
+        clearCache: function() {
+            clearCache();
+            this.clickedClearCache = true;
+        },
+        clearPersonalData: function() {
+            const self = this;
+            clearPersonalData(function() {
+                fetchPersonalDataToStore(self.$store);
+                self.clickedClearPersonalData = true;
+            });
+        },
+        exportDb: function() {
+            exportDatabaseJson(function(data) {
+                const filename = 'database-'+(new Date(Date.now())).toISOString().split('T')[0]+'.json'
+                download(filename, JSON.stringify(data));
+            });
+        },
+        importDb: function() {
+            var fileChooser = document.createElement("input");
+            fileChooser.style.display = 'none';
+            fileChooser.type = 'file';
+
+            fileChooser.addEventListener('change', function (evt) {
+                var f = evt.target.files[0];
+                if(f) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        const data = JSON.parse(e.target.result);
+                        importDatabaseJson(data, function(error) {
+                            if (! [null, undefined].includes(error)) {
+                                alert('Something went wrong: ' + error);
+                            }
+                            else {
+                                alert('Successfully imported database');
+                            }
+                       });
+                    }
+                    reader.readAsText(f);
+                }
+            });
+
+            document.body.appendChild(fileChooser);
+            fileChooser.click();
+        }
     },
 };
 </script>
