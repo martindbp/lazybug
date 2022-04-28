@@ -128,10 +128,6 @@ const FIELD_TO_LABEL = {
 };
 
 
-function wrapInColorSpan(str, color) {
-    return `<span style="border-radius: 3px; border: 2px dotted ${color}">${str}</span>`;
-}
-
 const ROWS_PER_PAGE = 4;
 
 export default {
@@ -168,7 +164,7 @@ export default {
             return this.page === 0;
         },
         isLastPage: function() {
-            return this.page === this.numPages - 1;
+            return this.numPages === 0 || this.page === this.numPages - 1;
         },
     },
     watch: {
@@ -199,12 +195,13 @@ export default {
         },
         requestPageData: function(page) {
             const self = this;
-            this.loading = true;
             const offset = page * ROWS_PER_PAGE;
             const limit = Math.min(ROWS_PER_PAGE, this.numRows - offset);
+            this.loading = false;
             if (limit === 0) return;
 
             console.log('Fetching', offset, limit);
+            this.loading = true;
             getLog(offset, limit, function(data) {
                 self.starEvents = self.filterStarEvents(data);
                 self.rows = self.starEventsToRows(self.starEvents);
@@ -253,6 +250,7 @@ export default {
                     const eventId = session.eventIds[i];
                     const eventData = session.eventData[i];
                     const eventName = reverseEventsMap[eventId];
+                    console.log(eventId, eventName);
                     if (eventName.startsWith("EVENT_STAR")) {
                         let type = null;
                         if (eventName.endsWith('PY')) {
@@ -287,7 +285,6 @@ export default {
 
                 let py = null;
                 let hz = null;
-                let fullHz = null;
                 let tr = null;
                 let translation = wordData.translation;
                 const text = data.data.texts.join(' ');
@@ -296,33 +293,23 @@ export default {
                     const alignment = data.data.alignments[alignmentIdx];
                     const [startIdx, endIdx, ...rest] = alignment;
 
-                    let hzColor = 'gray';
-                    if (type === 'hz') {
-                        hzColor = 'darkorange';
-                    }
-                    fullHz = `${text.substring(0, startIdx)}<span style="border-radius: 3px; border: 2px dotted ${hzColor}">${text.substring(startIdx, endIdx)}</span>${text.substring(endIdx)}`;
-
                     py = idx !== null ? wordData.py[idx] : '';
                     hz = idx !== null ? wordData.hz[idx] : '';
                     tr = idx !== null ? wordData.tr[idx] : '';
-                    //translation = null;
+                    translation = null;
                 }
                 else {
-                    fullHz = text;
+                    hz = text;
                 }
 
                 const id = `${sessionTime}-${dt}-${captionId}-${py}-${hz}-${tr}-${wordData.translation}`;
-
-                if (type === 'py') py = wrapInColorSpan(py, 'darkorange');
-                else if (type === 'tr') tr = wrapInColorSpan(tr, 'darkorange');
-                else if (type === 'translation') translation = wrapInColorSpan(translation, 'darkorange');
 
                 rows.push({
                     id: id,
                     idx: i,
                     type: type,
                     py: py,
-                    hz: fullHz,
+                    hz: hz,
                     tr: tr,
                     translation: translation,
                     time: sessionTime,
@@ -331,6 +318,7 @@ export default {
                     data: data,
                     event: events[i],
                 });
+
                 lastSessionId = sessionId;
             }
 
@@ -343,7 +331,6 @@ export default {
         clearPersonalData: function() {
             const self = this;
             clearPersonalData(function() {
-                fetchPersonalDataToStore(self.$store);
                 self.clickedClearPersonalData = true;
             });
         },

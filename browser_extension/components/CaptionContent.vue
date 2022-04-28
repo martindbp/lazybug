@@ -19,7 +19,6 @@
                         :style="{opacity: hiddenAndNotPeeking.py[i] ? 0 : 1}"
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
-                        <q-badge v-if="starredStates.py[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
@@ -28,8 +27,8 @@
                         :idx="i"
                         :hide="!hiddenStates.py[i]"
                         :pin="purePeekStates.py[i] && hiddenStates.py[i]"
-                        :star="!hiddenAndNotPeeking.py[i] && ! starredStates.py[i]"
-                        :unstar="starredStates.py[i]"
+                        :star="!hiddenAndNotPeeking.py[i] && ! starredStates.words[i]"
+                        :unstar="starredStates.words[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -54,7 +53,7 @@
                         :style="{opacity: hiddenAndNotPeeking.hz[i] ? 0 : 1}"
                     >
                         {{ sm2tr(hz) }}
-                        <q-badge v-if="starredStates.hz[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
+                        <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
@@ -63,8 +62,8 @@
                         :idx="i"
                         :hide="!hiddenStates.hz[i]"
                         :pin="purePeekStates.hz[i] && hiddenStates.hz[i]"
-                        :star="!hiddenAndNotPeeking.hz[i] && ! starredStates.hz[i]"
-                        :unstar="starredStates.hz[i]"
+                        :star="!hiddenAndNotPeeking.hz[i] && ! starredStates.words[i]"
+                        :unstar="starredStates.words[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -90,7 +89,6 @@
                         :style="{opacity: hiddenAndNotPeeking.tr[i] ? 0 : 1}"
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
-                        <q-badge v-if="starredStates.tr[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <ContentContextMenu
@@ -99,8 +97,8 @@
                         :idx="i"
                         :hide="!hiddenStates.tr[i]"
                         :pin="purePeekStates.tr[i] && hiddenStates.tr[i]"
-                        :star="!hiddenAndNotPeeking.tr[i] && ! starredStates.tr[i]"
-                        :unstar="starredStates.tr[i]"
+                        :star="!hiddenAndNotPeeking.tr[i] && ! starredStates.words[i]"
+                        :unstar="starredStates.words[i]"
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
@@ -229,7 +227,13 @@ export default {
             return states;
         },
         starredStates: function() {
-            return this.getStates(StateStarred, StateNone, StateNone);
+            const translationState = getState(this.$store.state.states, this.stateKey('translation'), StateStarred, StateNone)
+            const states = {'words': [], 'translation': translationState === StateStarred};
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const state = getState(this.$store.state.states, this.stateKey('word', i), StateStarred, StateNone);
+                states.words.push(state === StateStarred);
+            }
+            return states;
         },
     },
     updated: function() {
@@ -301,8 +305,8 @@ export default {
                 peeking: i !== null && this.purePeekStates[type][i],
                 captioncardhidden: i !== null && this.hiddenAndNotPeeking[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
-                starred: i !== null && this.starredStates[type][i],
-                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates[type][i],
+                starred: i !== null && this.starredStates.words[i],
+                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
                 pinned: this.$store.state.options.pin[type],
             };
@@ -352,7 +356,10 @@ export default {
                 setState = StateStarred;
                 let content = '';
                 if (type === 'translation') content = this.wordData.translation;
-                else content = this.wordData[type][i];
+                else {
+                    content = `${this.wordData.hz[i]}/${this.wordData.py[i]}`;
+                    type = 'word';
+                }
 
                 this.$q.notify({
                     type: 'positive',
@@ -369,6 +376,7 @@ export default {
             else if (action === 'unstar') {
                 stateType = StateStarred;
                 setState = StateNone;
+                type = 'word';
             }
 
             if (setState !== null) {
@@ -780,6 +788,10 @@ export default {
 .centerrow .captioncardhidden {
     border: 1px dashed white;
     border-radius: 3px;
+}
+
+.centerrow .captioncardhidden.starred  {
+    border: 1px dashed darkorange !important;
 }
 
 .cardcontent {

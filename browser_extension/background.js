@@ -20,9 +20,8 @@ function backgroundClearCache() {
 }
 
 function backgroundClearPersonalData() {
-    personalDb.states.clear();
-    personalDb.other.clear();
-    personalDb.log.clear();
+    personalDb.delete();
+    personalDb = initPersonalDb();
 }
 
 function backgroundExportDatabaseJson(callback) {

@@ -24,9 +24,7 @@ const events = [
     'EVENT_HIDE_AUTO_HZ',
     'EVENT_HIDE_AUTO_TR',
     'EVENT_STAR_CAPTION',
-    'EVENT_STAR_PY',
-    'EVENT_STAR_HZ',
-    'EVENT_STAR_TR',
+    'EVENT_STAR_WORD',
     'EVENT_STAR_TRANSLATION',
     'EVENT_PIN_PY',
     'EVENT_PIN_HZ',
@@ -260,9 +258,10 @@ function getStateKey(type, hz, pys, tr, translation) {
     let key = null;
     if (pys === null && ['py', 'tr'].includes(type)) return null;
     var pysWithoutTones = ['py', 'tr'].includes(type) ? pys.map(py => py.slice(0, -1)) : null;
-    if (type == 'hz') key = `hz-${hz}`;
-    if (type == 'py') key = `py-${hz}-${pysWithoutTones.join('/')}`;
-    if (type == 'tr') {
+    if (type == 'word') key = `word-${hz}`;
+    else if (type == 'hz') key = `hz-${hz}`;
+    else if (type == 'py') key = `py-${hz}-${pysWithoutTones.join('/')}`;
+    else if (type == 'tr') {
         if (tr && isName(tr)) {
             // If the translation is capitalized, we want it to be tracked separately
             key = `tr-${hz}-${pysWithoutTones.join('/')}-${tr}`;
@@ -271,7 +270,8 @@ function getStateKey(type, hz, pys, tr, translation) {
             key = `tr-${hz}-${pysWithoutTones.join('/')}`;
         }
     }
-    if (type == 'translation') key = `tr-${translation}`;
+    else if (type == 'translation') key = `tr-${translation}`;
+
     return key;
 }
 
