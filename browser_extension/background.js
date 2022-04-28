@@ -1,35 +1,18 @@
 try {
-    importScripts('dexie.min.js');
-    importScripts('dexie-export-import.js');
     importScripts('shared.js');
+    importScripts('db.js');
 } catch (e) {
     console.error(e);
 }
 
-let personalDb = null;
-let cacheDb = null;
-const VERSION = 1;
-
-function initIndexedDb() {
-    personalDb = new Dexie('zimuai-personal');
-    personalDb.version(VERSION).stores({
-        states: 'id',
-        other: 'id',
-        log: '[captionId+captionHash+sessionTime], sessionTime, hasStarEvents',
-    });
-
-    cacheDb = new Dexie('zimuai-cache');
-    cacheDb.version(VERSION).stores({
-        network: 'id',
-    });
-}
-
-initIndexedDb();
+let personalDb = initPersonalDb();
+let cacheDb = initCacheDb();
 
 function clearIndexedDb() {
     personalDb.delete();
     cacheDb.delete();
-    initIndexedDb();
+    personalDb = initPersonalDb();
+    cacheDb = initCacheDb();
 }
 
 function backgroundClearCache() {
@@ -288,12 +271,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'appendSessionLog') {
-        let hasStarEvents = reverseEventsMap[message.data[0]].startsWith('EVENT_STAR');
         const whereQuery = {captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime};
         personalDb.log.where(whereQuery).count(function(count) {
             if (count === 0) {
-                whereQuery.events = [message.data];
-                whereQuery.hasStarEvents = hasStarEvents ? 1 : 0; // booleans not indexable
+                whereQuery.eventIds = [message.data[0]];
+                whereQuery.eventData = [message.data.slice(1)];
                 personalDb.log.put(whereQuery)
                 .then(function() {
                     sendResponse(null);
@@ -305,8 +287,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             }
             else {
                 personalDb.log.where(whereQuery).modify(function(x) {
-                    x.events.push(message.data)
-                    x.hasStarEvents = Math.max(x.hasStarEvents, hasStarEvents);
+                    x.eventIds.push(message.data[0]);
+                    x.eventData.push(message.data.slice(1));
                 })
                 .then(function() {
                     sendResponse();
@@ -337,14 +319,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getLog') {
+        // NOTE: this paging filters using index in DB, but sorts in memory, see https://dexie.org/docs/Collection/Collection.offset()#a-better-paging-approach for potential fix
         personalDb.log
-        .where({ hasStarEvents: 1 })
+        .where('eventIds').between(events.indexOf('EVENT_STAR_CAPTION'), events.indexOf('EVENT_STAR_TRANSLATION') + 1)
         .reverse()
-        .offset(message.offset)
-        .limit(message.limit)
-        .toArray()
+        .sortBy('sessionTime')
         .then(function(data) {
-            sendResponse({data: data});
+            sendResponse({data: data.slice(message.offset, message.offset+message.limit)});
         })
         .catch(function(error) {
             console.log(error);
@@ -362,7 +343,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getLogRows') {
-        personalDb.log.where({ hasStarEvents: 1 }).count().then(function(data) {
+        personalDb.log
+        .where('eventIds').between(events.indexOf('EVENT_STAR_CAPTION'), events.indexOf('EVENT_STAR_TRANSLATION') + 1)
+        .count()
+        .then(function(data) {
             sendResponse({data: data});
         });
     }

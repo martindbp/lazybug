@@ -222,7 +222,7 @@ export default {
             let csv = '';
             for (const item of this.selected) {
                 const [type, eventData, sessionTime, captionId, captionHash] = item.event;
-                const [_, idx, data] = eventData;
+                const [idx, data] = eventData;
                 const t0 = data.data.t0;
                 const t1 = data.data.t1;
 
@@ -235,7 +235,7 @@ export default {
         },
         rowYoutubeEmbedCode: function(rowIdx) {
             const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[rowIdx];
-            const [_, idx, data] = eventData;
+            const [idx, data] = eventData;
             const t0 = data.data.t0;
             const t1 = data.data.t1;
             const [site, id] = captionId.split('-');
@@ -249,8 +249,10 @@ export default {
             if (sessions === null) return events;
 
             for (const session of sessions) {
-                for (const event of session.events) {
-                    const eventName = reverseEventsMap[event[0]];
+                for (let i = 0; i < session.eventIds.length; i++) {
+                    const eventId = session.eventIds[i];
+                    const eventData = session.eventData[i];
+                    const eventName = reverseEventsMap[eventId];
                     if (eventName.startsWith("EVENT_STAR")) {
                         let type = null;
                         if (eventName.endsWith('PY')) {
@@ -265,8 +267,7 @@ export default {
                         else if (eventName.endsWith('TRANSLATION')) {
                             type = 'translation';
                         }
-                        const idx = event[1];
-                        events.push([type, event, session.sessionTime, session.captionId, session.captionHash]);
+                        events.push([type, eventData, session.sessionTime, session.captionId, session.captionHash]);
                     }
                 }
             }
@@ -278,7 +279,7 @@ export default {
             let lastSessionId = null;
             for (let i = 0; i < events.length; i++) {
                 const [type, eventData, sessionTime, captionId, captionHash] = events[i];
-                let [_, idx, data] = eventData;
+                let [idx, data] = eventData;
                 const wordData = getWordData(data.data, data.translationIdx);
                 const dt = data.dt;
 
