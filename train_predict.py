@@ -72,7 +72,7 @@ def write_hash_file(filename, hash):
 def train_pipeline():
     seed = 42
     corpus = get_corpus(seed=seed)
-    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 110, seed=seed, fill_with_synthetic=True)
+    images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 110, seed=seed, invert=False, fill_with_synthetic=True)
 
     net = train_unet(images_dir, masks_dir)
     net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'

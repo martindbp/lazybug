@@ -298,7 +298,7 @@ def combine(arg):
 
 
 @pipeline
-def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int = 42, fill_with_synthetic=True):
+def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int = 42, invert=False, fill_with_synthetic=True):
     random.seed(seed+1)
 
     print('Generating composites')
@@ -389,7 +389,6 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
             background_image_path = random.choice(background_image_paths)
             blur_background = random.random() < 0.3
             blur_after_render = random.random() < 0.1
-            invert = random.random() < 0.3
             down_upscale_after_render = 1
             if random.random() < 0.05:
                 r = random.random()
