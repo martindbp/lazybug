@@ -17,7 +17,7 @@ parser.add_argument('--show', type=str, default='')
 parser.add_argument('--keys', action='store_true')
 parser.add_argument('--num', type=int, default=30)
 parser.add_argument('--dilate-foreground', type=int, default=2)
-parser.add_argument('--dilate-move-foreground', type=str, default='')
+parser.add_argument('--move-foreground', type=str, default='')
 parser.add_argument('--erode-foreground', type=int, default=0)
 parser.add_argument('--dilate-unknown', type=int, default=3)
 
@@ -246,10 +246,10 @@ while True:
                 foreground = cv2.dilate(foreground, np.ones((3, 3), np.uint8), iterations=args.dilate_foreground)
 
             if args.erode_foreground > 0:
-                foreground = cv2.erode(foreground, np.ones((3, 3), np.uint8), iterations=args.dilate_foreground)
+                foreground = cv2.erode(foreground, np.ones((3, 3), np.uint8), iterations=args.erode_foreground)
 
-            if args.dilate_move_foreground:
-                dy, dx = args.dilate_move_foreground.split(',')
+            if args.move_foreground:
+                dy, dx = args.move_foreground.split(',')
                 dy, dx = int(dy), int(dx)
                 foreground = foreground | np.roll(foreground.copy(), (dy, dx), axis=(0, 1))
 
