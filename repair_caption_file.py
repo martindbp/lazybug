@@ -36,6 +36,9 @@ for filename in files:
     y_offset = data['caption_top'] * data['frame_size'][0]
     is_already_absolute = False
     for line in data['lines']:
+        if line[3] is None:
+            continue
+
         rects = line[3] if isinstance(line[3][0], list) else [line[3]]
 
         for rect in rects:
@@ -57,6 +60,5 @@ for filename in files:
     data['version'] = 1
     data['show_name'] = show_name
 
-    if not is_already_absolute:
-        with open(filename, 'w') as f:
-            json.dump(data, f)
+    with open(filename, 'w') as f:
+        json.dump(data, f)
