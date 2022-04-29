@@ -54,68 +54,52 @@
 
                   <template v-slot:top>
                       <div class="text-h5">Starred</div>
-                      <q-btn
-                           icon="first_page"
-                           color="grey-8"
-                           round
-                           dense
-                           flat
-                           :disable="isFirstPage"
-                           @click="firstPage"
-                       />
-
-                      <q-btn
-                           icon="chevron_left"
-                           color="grey-8"
-                           round
-                           dense
-                           flat
-                           :disable="isFirstPage"
-                           @click="prevPage"
-                       />
-
-                      <q-btn
-                           icon="chevron_right"
-                           color="grey-8"
-                           round
-                           dense
-                           flat
-                           :disable="isLastPage"
-                           @click="nextPage"
-                       />
-
-                      <q-btn
-                           icon="last_page"
-                           color="grey-8"
-                           round
-                           dense
-                           flat
-                           :disable="isLastPage"
-                           @click="lastPage"
-                       />
-                          {{ getSelectedString() }}
+                      <q-btn icon="first_page" color="grey-8" round dense flat :disable="isFirstPage" @click="firstPage" />
+                      <q-btn icon="chevron_left" color="grey-8" round dense flat :disable="isFirstPage" @click="prevPage" />
+                      <q-btn icon="chevron_right" color="grey-8" round dense flat :disable="isLastPage" @click="nextPage" />
+                      <q-btn icon="last_page" color="grey-8" round dense flat :disable="isLastPage" @click="lastPage" />
+                      {{ getSelectedString() }}
                   </template>
                 </q-table>
                 <div class="q-mt-md">
-                    <q-btn :disabled="selected.length === 0" label="Export to Anki" @click="exportToAnki"/>
+                    <q-btn :disabled="selected.length === 0" label="Export to Anki" @click="showExportModal = true"/>
                 </div>
             </q-tab-panel>
             <q-tab-panel name="options">
                 <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
                 <br>
                 <br>
-                <q-btn color="deep-orange" label="Clear personal data" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
+                <q-btn color="deep-orange" label="Clear database" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
                 <br>
                 (Will permanently delete personal data)
                 <br>
                 <br>
-                <q-btn color="green" label="Export Database File" @click="exportDb" />
+                <q-btn color="green" label="Download database backup" @click="exportDb" />
                 <br>
                 <br>
-                <q-btn color="blue" label="Import Database File" @click="importDb" />
+                <q-btn color="blue" label="Restore database from backup" @click="importDb" />
             </q-tab-panel>
         </q-tab-panels>
         </q-card>
+        <q-dialog v-model="showExportModal" persistent>
+            <q-card>
+                <q-card-section class="row items-center">
+                    <div class="q-pa-md q-gutter-y-sm column">
+                        <q-toggle label="Cloze word hanzi + pinyin" v-model="clozeWordPyHz" />
+                        <q-toggle label="Cloze word translation" v-model="clozeWordTr" />
+                        <q-toggle label="Cloze whole word" v-model="clozeWordAll" />
+                        <q-toggle label="Basic pinyin" v-model="basicPy" />
+                        <q-toggle label="Basic word translation" v-model="basicTr" />
+                        <q-toggle label="Basic word hanzi" v-model="basicHz" />
+                    </div>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn flat label="Export" color="primary" v-close-popup @click="exportToAnki" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </div>
 </template>
 
@@ -151,6 +135,13 @@ export default {
         tab: Vue.ref('history'),
         clickedClearCache: false,
         clickedClearPersonalData: false,
+        showExportModal: false,
+        clozeWordPyHz: false,
+        clozeWordTr: false,
+        clozeWordAll: false,
+        basicPy: false,
+        basicHz: false,
+        basicTr: false,
     }},
     mounted: function() {
         const self = this;
@@ -219,20 +210,44 @@ export default {
             let csv = '';
             for (const item of this.selected) {
                 const [type, eventData, sessionTime, captionId, captionHash] = item.event;
-                const [idx, data] = eventData;
+                const [wordIdx, data] = eventData;
                 const t0 = data.data.t0;
                 const t1 = data.data.t1;
 
                 const wordData = getWordData(data.data, data.translationIdx);
-                const cloze = captionToAnkiCloze(wordData, data.hidden, data.captionIdx, type, idx, captionId, captionHash, t0, t1, true);
-                csv += cloze + '\n'
+                const rowData = {
+                    captionId: captionId,
+                    captionHash: captionHash,
+                    wordData: wordData,
+                    hidden: data.hidden,
+                    captionIdx: data.captionIdx,
+                    wordIdx: wordIdx,
+                    t0: t0,
+                    t1: t1,
+                };
+                let search = '';
+                if (wordIdx === null) {
+                    search = wordData.translation;
+                }
+                else {
+                    search = wordData.hz[wordIdx] + '/' + wordData.py[wordIdx];
+                }
+
+                const exportVals = [];
+                for (const exportType of ['clozeWordPyHz', 'clozeWordTr', 'clozeWordAll', 'basicPy', 'basicHz', 'basicTr']) {
+                    exportVals.push(this[exportType] ? '1' : '');
+                }
+
+                exportVals.push(wordIdx === null ? '1' : '')
+
+                csv += search + '\t' + JSON.stringify(rowData) + '\t' + exportVals.join('\t') + '\n';
             }
             const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
             download(filename, csv);
         },
         rowYoutubeEmbedCode: function(rowIdx) {
             const [type, eventData, sessionTime, captionId, captionHash] = this.starEvents[rowIdx];
-            const [idx, data] = eventData;
+            const [wordIdx, data] = eventData;
             const t0 = data.data.t0;
             const t1 = data.data.t1;
             const [site, id] = captionId.split('-');
@@ -277,7 +292,7 @@ export default {
             let lastSessionId = null;
             for (let i = 0; i < events.length; i++) {
                 const [type, eventData, sessionTime, captionId, captionHash] = events[i];
-                let [idx, data] = eventData;
+                let [wordIdx, data] = eventData;
                 const wordData = getWordData(data.data, data.translationIdx);
                 const dt = data.dt;
 
@@ -288,14 +303,14 @@ export default {
                 let tr = null;
                 let translation = wordData.translation;
                 const text = data.data.texts.join(' ');
-                if (! [null, undefined].includes(idx)) {
-                    const alignmentIdx = wordData.alignmentIndices[idx];
+                if (! [null, undefined].includes(wordIdx)) {
+                    const alignmentIdx = wordData.alignmentIndices[wordIdx];
                     const alignment = data.data.alignments[alignmentIdx];
                     const [startIdx, endIdx, ...rest] = alignment;
 
-                    py = idx !== null ? wordData.py[idx] : '';
-                    hz = idx !== null ? wordData.hz[idx] : '';
-                    tr = idx !== null ? wordData.tr[idx] : '';
+                    py = wordIdx !== null ? wordData.py[wordIdx] : '';
+                    hz = wordIdx !== null ? wordData.hz[wordIdx] : '';
+                    tr = wordIdx !== null ? wordData.tr[wordIdx] : '';
                     translation = null;
                 }
                 else {
