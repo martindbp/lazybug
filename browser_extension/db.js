@@ -10,7 +10,7 @@ function initPersonalDb() {
     personalDb.version(1).stores({
         states: 'id',
         other: 'id',
-        log: '[captionId+captionHash+sessionTime], sessionTime, captionHash, *eventIds',
+        log: '[captionId+captionHash+sessionTime], sessionTime, captionHash, *eventIds, synced',
     });
 
     return personalDb;

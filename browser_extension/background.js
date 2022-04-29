@@ -275,6 +275,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             if (count === 0) {
                 whereQuery.eventIds = [message.data[0]];
                 whereQuery.eventData = [message.data.slice(1)];
+                whereQuery.synced = false;
                 personalDb.log.put(whereQuery)
                 .then(function() {
                     sendResponse(null);
@@ -288,6 +289,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 personalDb.log.where(whereQuery).modify(function(x) {
                     x.eventIds.push(message.data[0]);
                     x.eventData.push(message.data.slice(1));
+                    x.synced = false;
                 })
                 .then(function() {
                     sendResponse();
