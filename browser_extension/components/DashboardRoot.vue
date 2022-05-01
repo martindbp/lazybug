@@ -235,7 +235,7 @@ export default {
 
                 exportVals.push(wordIdx === null ? '1' : '')
 
-                csv += search + '\t' + JSON.stringify(rowData) + '\t' + exportVals.join('\t') + '\n';
+                csv += search + ';' + JSON.stringify(rowData) + ';' + exportVals.join(';') + '\n';
             }
             const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
             download(filename, csv);

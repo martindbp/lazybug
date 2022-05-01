@@ -85,6 +85,9 @@ download-yt:
 	cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} yt-dlp -o "$(out)/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs --default-search "ytsearch" -- {}
 	mv $(out)/$(show)/*.vtt data/remote/private/caption_data/translations/
 
+mv-files:
+	cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} echo mv "data/remote/private/caption_data/raw_captions/youtube-{}{.json,-hanzi.json}"
+
 process-video-captions:
 	merkl -v run predict_video.process_video_captions ${show} ${videos}
 
@@ -182,3 +185,18 @@ hsk-words:
 	HSK_WORDS_HASH=$$(md5sum data/git/hsk_words.json | cut -d " " -f1) ; \
 	echo $$HSK_WORDS_HASH > data/remote/public/hsk_words.hash ; \
 	cp data/git/hsk_words.json "data/remote/public/hsk_words-$$HSK_WORDS_HASH.json"
+
+logo:
+	cp browser_extension/images/logo.svg browser_extension/images/logo_changed.svg
+	sed -i -E 's/#f65c40/#1C7287/g' browser_extension/images/logo_changed.svg
+	sed -i -E 's/#0f62e4/#db931f/g' browser_extension/images/logo_changed.svg
+
+anki-templates:
+	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_py_hz_front.js
+	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_tr_front.js
+	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_all_front.js
+	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_translation_front.js
+	sed -i -E 's/CLOZE_TYPE/cloze_word_py_hz/g' data/remote/public/anki_templates/cloze_word_py_hz_front.js
+	sed -i -E 's/CLOZE_TYPE/cloze_word_tr/g' data/remote/public/anki_templates/cloze_word_tr_front.js
+	sed -i -E 's/CLOZE_TYPE/cloze_word_all/g' data/remote/public/anki_templates/cloze_word_all_front.js
+	sed -i -E 's/CLOZE_TYPE/cloze_translation/g' data/remote/public/anki_templates/cloze_translation_front.js
