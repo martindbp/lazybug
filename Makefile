@@ -196,7 +196,16 @@ anki-templates:
 	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_tr_front.js
 	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_all_front.js
 	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_translation_front.js
+	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_py_hz_front.js
+	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_tr_front.js
+	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_hz_front.js
+	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_py_hz_back.js
+	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_tr_back.js
+	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_hz_back.js
 	sed -i -E 's/CLOZE_TYPE/cloze_word_py_hz/g' data/remote/public/anki_templates/cloze_word_py_hz_front.js
 	sed -i -E 's/CLOZE_TYPE/cloze_word_tr/g' data/remote/public/anki_templates/cloze_word_tr_front.js
 	sed -i -E 's/CLOZE_TYPE/cloze_word_all/g' data/remote/public/anki_templates/cloze_word_all_front.js
 	sed -i -E 's/CLOZE_TYPE/cloze_translation/g' data/remote/public/anki_templates/cloze_translation_front.js
+	sed -i -E 's/CLOZE_TYPE/basic_py_hz/g' data/remote/public/anki_templates/basic_py_hz_*.js 
+	sed -i -E 's/CLOZE_TYPE/basic_tr/g' data/remote/public/anki_templates/basic_tr_*.js 
+	sed -i -E 's/CLOZE_TYPE/basic_hz/g' data/remote/public/anki_templates/basic_hz_*.js 

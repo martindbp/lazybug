@@ -88,6 +88,9 @@
                         <q-toggle label="Cloze word hanzi + pinyin" v-model="clozeWordPyHz" />
                         <q-toggle label="Cloze word translation" v-model="clozeWordTr" />
                         <q-toggle label="Cloze whole word" v-model="clozeWordAll" />
+                        <q-toggle label="Basic produce Chinese" v-model="basicPyHz" />
+                        <q-toggle label="Basic produce translation" v-model="basicTr" />
+                        <q-toggle label="Basic produce Hanzi" v-model="basicHz" />
                     </div>
                 </q-card-section>
 
@@ -136,6 +139,9 @@ export default {
         clozeWordPyHz: false,
         clozeWordTr: false,
         clozeWordAll: false,
+        basicPyHz: false,
+        basicTr: false,
+        basicHz: false,
     }},
     mounted: function() {
         const self = this;
@@ -229,11 +235,11 @@ export default {
                 }
 
                 const exportVals = [];
-                for (const exportType of ['clozeWordPyHz', 'clozeWordTr', 'clozeWordAll']) {
+                for (const exportType of ['clozeWordPyHz', 'clozeWordTr', 'clozeWordAll', 'basicPyHz', 'basicTr', 'basicHz']) {
                     exportVals.push(this[exportType] ? '1' : '');
                 }
 
-                exportVals.push(wordIdx === null ? '1' : '')
+                exportVals.push(wordIdx === null ? '1' : '');
 
                 csv += search + ';' + JSON.stringify(rowData) + ';' + exportVals.join(';') + '\n';
             }
