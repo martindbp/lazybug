@@ -1,10 +1,11 @@
 <template>
-    <div v-if="captionId && AVElement && !isLikelyAnAd && $store.state.options.extensionToggle">
+    <div v-if="captionId && AVElement && $store.state.options.extensionToggle">
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
             :style="{ fontSize: captionFontSize+'px' }"
             v-bind:isLoading="isLoading"
+            v-bind:isLikelyAnAd="isLikelyAnAd"
             v-bind:translationType="translationType"
             v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:firstCaption="firstCaption"

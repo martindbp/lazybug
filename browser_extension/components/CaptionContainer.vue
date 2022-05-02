@@ -13,22 +13,23 @@
         <div class="loadingcontent" v-else-if="isLoading">
             Loading resources...
         </div>
+        <div class="initialcontent" v-else-if="isLikelyAnAd">
+            Ad detected
+            <br/><br/><br/>
+            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
+        </div>
         <div class="initialcontent" v-else-if="showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
             Video has <i>{{ translationType }}</i> sentence translations
-            <br />
-            <br />
+            <br/><br/>
             <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
-            <br />
-            <br />
+            <br/><br/>
             <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null">
             Video has <i>{{ translationType }}</i> sentence translations
-            <br />
-            <br />
+            <br/><br/>
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
-            <br />
-            <br />
+            <br/><br/>
             <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <CaptionContent
@@ -57,6 +58,7 @@ export default {
         'paused',
         'AVElement',
         'isLoading',
+        'isLikelyAnAd',
         'translationType',
     ],
     components: {CaptionContent, CaptionMenu},
