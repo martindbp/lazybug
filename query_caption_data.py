@@ -30,7 +30,10 @@ for filename in glob.glob('data/remote/public/subtitles/*.json'):
                 print(' '.join(line[0]))
                 pys = []
                 for (_, _, hz, word_pys, tr) in words:
-                    pys.append(''.join(py[1] for py in word_pys))
+                    try:
+                        pys.append(''.join(py[1] for py in word_pys))
+                    except:
+                        pass
 
                 print(''.join(pys))
             else:
