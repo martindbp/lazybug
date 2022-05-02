@@ -638,7 +638,7 @@ def replace_or_add_line(
                 print('WARNING: out of bounds')
                 return 1.0
 
-            if last_line.text[i] == ' ':
+            if s1 == ' ':
                 # We have a very low penalty for substituting a space, since there are often spurious spaces in the OCR
                 return 0.01
 
@@ -1269,6 +1269,60 @@ def add_metadata(caption_data, caption_id, show_name):
     return caption_data
 
 
+@task
+def fix_fade(captions):
+    # When there is fade in/out there is often an extra caption line at the
+    # beginning/end. We can add an extra pass that identifies lines that are
+    # similar enough, where the beginning/end are very quick. Then we pick the
+    # longest duration one, since it's likely outside of the fade duration. 
+
+    last_line = None
+    new_lines = []
+    for line in captions:
+        if last_line is None or line.t0 - last_line.t1 > 0.01 or line.text == '' or last_line.text == '':
+            # Not back-to-back
+            last_line = line
+            new_lines.append(line)
+            print('Appending line', line)
+            continue
+
+        with open(f'data/remote/private/caption_data/char_probability_distributions/{last_line.data_hash}.pickle', 'rb') as f:
+            last_line_prob_distributions = pickle.load(f)
+
+        with open(f'data/remote/private/caption_data/char_probability_distributions/{line.data_hash}.pickle', 'rb') as f:
+            line_prob_distributions = pickle.load(f)
+
+        def _subst_cost(s1, s2, i, j):
+            if s1 == ' ':
+                # We have a very low penalty for substituting a space, since there are often spurious spaces in the OCR
+                return 0.01
+
+            return 0 if s1 == s2 else 1
+
+        dist, ops = weighted_levenshtein(last_line.text, line.text, _subst_cost, return_ops=True)
+        mean_dist = dist / min(len(line.text), len(last_line.text))
+        print(line.text, last_line.text, mean_dist)
+        if (mean_dist <= 0.5 or last_line.text == line.text) and (line.t1-line.t0 < 0.1 or last_line.t1-last_line.t0 < 0.1):
+            longest_line = line if line.t1 - line.t0 > last_line.t1 - last_line.t0 else last_line
+            line = CaptionLine(
+                longest_line.text, last_line.t0, line.t1, longest_line.logprob,
+                longest_line.img, longest_line.mask, longest_line.probs,
+                longest_line.char_probs, longest_line.prob_distributions,
+                longest_line.bounding_rect,
+                data_hash=longest_line.data_hash,
+                conditional_caption_idx=longest_line.conditional_caption_idx
+            )
+            new_lines[-1] = line
+            print('Replacing with', line)
+        else:
+            print('Appending line', line)
+            new_lines.append(line)
+
+        last_line = line
+
+    return new_lines
+
+
 def _merge_params(params):
     params = [p for p in params if p is not None]
 
@@ -1477,6 +1531,10 @@ def process_video_captions(
                 refine_bounding_rect=param.get('refine_bounding_rect', False),
                 height_buffer_px=param.get('height_buffer_px', 0),
             )
+
+            if param.get('fade_in_out', False) is True:
+                captions = fix_fade(captions)
+
             json_captions = caption_lines_to_json(captions, frame_size, param, video_length, conditional_params)
             json_captions >> f'data/remote/private/caption_data/raw_captions/{vid}-{param_id}.json'
 
