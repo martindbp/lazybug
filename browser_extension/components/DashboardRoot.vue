@@ -291,6 +291,7 @@ export default {
         starEventsToRows: function(events) {
             const rows = [];
             let lastSessionId = null;
+            const seenIds = new Set();
             for (let i = 0; i < events.length; i++) {
                 const [type, eventData, sessionTime, captionId, captionHash] = events[i];
                 let [wordIdx, data] = eventData;
@@ -319,6 +320,8 @@ export default {
                 }
 
                 const id = `${sessionTime}-${dt}-${captionId}-${py}-${hz}-${tr}-${wordData.translation}`;
+                if (seenIds.has(id)) continue;
+                seenIds.add(id);
 
                 rows.push({
                     id: id,
