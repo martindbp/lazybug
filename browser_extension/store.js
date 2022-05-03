@@ -133,7 +133,6 @@ const store = new Vuex.Store({
         },
         setStates(state, states) {
             state.states = states;
-            setIndexedDbData('states', null, states, function() {});
         },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
