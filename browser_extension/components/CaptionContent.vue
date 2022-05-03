@@ -648,7 +648,7 @@ export default {
 
             const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来',];
             const simpleCharsPre = ['不', '有'];
-            const simpleCharsPost = ['地', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去',];
+            const simpleCharsPost = ['地', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好'];
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
