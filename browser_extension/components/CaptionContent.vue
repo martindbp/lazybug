@@ -644,11 +644,12 @@ export default {
         },
         applySimpleCompounds: function() {
             // Where there is a main component, and an additional "simple" character like 了
-            // For example, 地上, 拿不着, 这样的, 不服气, 知道了, But not 想不到
+            // For example, 地上, 拿不着, 这样的, 不服气, 知道了, middle chars: 离不开, 想不到
 
             const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来',];
             const simpleCharsPre = ['不', '有'];
-            const simpleCharsPost = ['地', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好'];
+            const simpleCharsMiddle = ['不'];
+            const simpleCharsPost = ['地', '不着', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好', '者'];
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -684,6 +685,15 @@ export default {
                                 this.isHiddenStoreOrLvlStates(type, postHz, postPys)
                             );
                         }
+                    }
+
+                    for (const middleChar of simpleCharsMiddle) {
+                        if (! hz.substring(1, hz.length-1).includes(middleChar)) continue;
+
+                        const middleIdx = hz.indexOf(middleChar);
+                        const prePostHz = hz.substring(0, middleIdx) + hz.substring(middleIdx + 1);
+                        const prePostPys = pys.slice(0, middleIdx).concat(pys.slice(middleIdx + 1));
+                        allHidden[type] = allHidden[type] || this.isHiddenStoreOrLvlStates(type, prePostHz, prePostPys);
                     }
                 }
 
