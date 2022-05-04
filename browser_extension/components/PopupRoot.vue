@@ -29,10 +29,12 @@ export default {
         const self = this;
         this.updateBadge();
         getIndexedDbData('other', ['options'], function (data) {
+            let setVal = true;
             if (data[0]) {
-                self.extensionToggle = data[0].extensionToggle;
-                self.updateBadge();
+                setVal = data[0].extensionToggle;
             }
+            self.extensionToggle = setVal;
+            self.updateBadge();
         });
 
         fetchVersionedResource('show_list.json', function (data) {

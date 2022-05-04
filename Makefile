@@ -24,7 +24,8 @@ test:
 	python -m unittest discover -s helpers/ -p 'test_*.py'
 
 zip-ext:
-	zip -r data/remote/public/browser_extension.zip browser_extension/
+	- rm data/remote/public/browser_extension.zip
+	cd browser_extension/dist && zip -r ../../data/remote/public/browser_extension.zip *
 
 pre-public-sync:
 	make show-list
@@ -160,6 +161,7 @@ ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
+	make zip-ext
 
 ext-copy:
 	cp browser_extension/deepl_main.js browser_extension/dist/
@@ -175,6 +177,7 @@ release:
 	python make_release_manifest.py browser_extension/manifest.json > browser_extension/dist/manifest.json
 	rm browser_extension/dist/deepl_main.js
 	rm browser_extension/dist/local.html
+	make zip-ext
 
 css:
 	sass browser_extension/css/zimu_quasar.sass browser_extension/dist/zimu_quasar.css

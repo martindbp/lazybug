@@ -136,6 +136,10 @@ function fetchPersonalDataToStore(store) {
 
     getIndexedDbData('other', ['options'], function (data) {
         if (data[0]) store.commit('setOptions', data[0]);
+        else {
+            // No options, so we set the default
+            setIndexedDbData('other', ['options'], [store.options], function() {});
+        }
     });
 }
 
