@@ -30,9 +30,7 @@ const events = [
     'EVENT_PIN_HZ',
     'EVENT_PIN_TR',
     'EVENT_UNSTAR_CAPTION',
-    'EVENT_UNSTAR_PY',
-    'EVENT_UNSTAR_HZ',
-    'EVENT_UNSTAR_TR',
+    'EVENT_UNSTAR_WORD',
     'EVENT_UNSTAR_TRANSLATION',
     'EVENT_BLUR',
 ];
