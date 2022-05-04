@@ -41,6 +41,10 @@ function backgroundImportDatabaseJson(data, callback) {
         type: "application/json;charset=utf-8"
     });
 
+    // Deleting curent
+    personalDb.delete();
+    personalDb = initPersonalDb();
+
     personalDb.import(blob, { overwriteValues: true })
     .then(() => {
         callback();
