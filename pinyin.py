@@ -259,6 +259,7 @@ wade_giles_pinyin_pairs = [
     ('chung', 'chong'),
     ('en', 'en'),
     ('erh', 'er'),
+    ('erh', 'r'),
     ('fa', 'fa'),
     ('fan', 'fan'),
     ('fang', 'fang'),
