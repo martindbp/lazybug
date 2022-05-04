@@ -330,7 +330,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         .reverse()
         .sortBy('sessionTime')
         .then(function(data) {
-            sendResponse({data: data.slice(message.offset, message.offset+message.limit)});
+            sendResponse({data: data.slice(message.offset, message.offset+message.limit+1)});
         })
         .catch(function(error) {
             console.log(error);
