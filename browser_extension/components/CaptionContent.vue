@@ -646,8 +646,8 @@ export default {
             // Where there is a main component, and an additional "simple" character like 了
             // For example, 地上, 拿不着, 这样的, 不服气, 知道了, middle chars: 离不开, 想不到
 
-            const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来',];
-            const simpleCharsPre = ['不', '有'];
+            const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来', '不'];
+            const simpleCharsPre = ['有'];
             const simpleCharsMiddle = ['不'];
             const simpleCharsPost = ['地', '不着', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好', '者'];
 
