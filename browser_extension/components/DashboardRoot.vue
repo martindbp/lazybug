@@ -85,12 +85,7 @@
             <q-card>
                 <q-card-section class="row items-center">
                     <div class="q-pa-md q-gutter-y-sm column">
-                        <q-toggle label="Cloze word hanzi + pinyin" v-model="clozeWordPyHz" />
-                        <q-toggle label="Cloze word translation" v-model="clozeWordTr" />
-                        <q-toggle label="Cloze whole word" v-model="clozeWordAll" />
-                        <q-toggle label="Basic produce Chinese" v-model="basicPyHz" />
-                        <q-toggle label="Basic produce translation" v-model="basicTr" />
-                        <q-toggle label="Basic produce Hanzi" v-model="basicHz" />
+                        <q-toggle v-for="(card, idx) in ankiCards" :label="card" v-model="ankiCardsToggled[idx]" @update:model-value="updateAnkiCardsToggled"/>
                     </div>
                 </q-card-section>
 
@@ -136,12 +131,6 @@ export default {
         clickedClearCache: false,
         clickedClearPersonalData: false,
         showExportModal: false,
-        clozeWordPyHz: false,
-        clozeWordTr: false,
-        clozeWordAll: false,
-        basicPyHz: false,
-        basicTr: false,
-        basicHz: false,
     }},
     mounted: function() {
         const self = this;
@@ -151,6 +140,14 @@ export default {
         });
     },
     computed: {
+        ankiCards: {
+            get: function() { return this.$store.state.options.anki.cards; },
+            set: function(val) { this.$store.commit('setAnkiCards', val); },
+        },
+        ankiCardsToggled: {
+            get: function() { return this.$store.state.options.anki.toggled; },
+            set: function(val) { this.$store.commit('setAnkiCardsToggled', val); },
+        },
         isFirstPage: function() {
             return this.page === 0;
         },
@@ -172,6 +169,9 @@ export default {
         }
     },
     methods: {
+        updateAnkiCardsToggled: function() {
+            this.$store.commit('setAnkiCardsToggled', this.ankiCardsToggled);
+        },
         firstPage: function() {
             this.page = 0;
         },

@@ -66,6 +66,24 @@ const store = new Vuex.Store({
             },
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
+            anki: {
+                cards: [
+                    "Cloze word hanzi + pinyin",
+                    "Cloze word translation",
+                    "Cloze whole word",
+                    "Basic produce Chinese",
+                    "Basic produce translation",
+                    "Basic produce Hanzi",
+                ],
+                toggled: [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                ],
+            },
         }),
     },
     mutations: {
@@ -205,6 +223,14 @@ const store = new Vuex.Store({
         },
         setHskWords(state, words) {
             state.HSK_WORDS = words;
+        },
+        setAnkiCards(state, val) {
+            state.options.anki.cards = val;
+            syncOptions(state);
+        },
+        setAnkiCardsToggled(state, val) {
+            state.options.anki.toggled = val;
+            syncOptions(state);
         },
     },
 });
