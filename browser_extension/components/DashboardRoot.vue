@@ -256,8 +256,8 @@ export default {
                 }
 
                 const exportVals = [];
-                for (const exportType of ['clozeWordPyHz', 'clozeWordTr', 'clozeWordAll', 'basicPyHz', 'basicTr', 'basicHz']) {
-                    exportVals.push(this[exportType] ? '1' : '');
+                for (const val of this.ankiCardsToggled) {
+                    exportVals.push(val ? '1' : '');
                 }
 
                 exportVals.push(wordIdx === null ? '1' : '');
