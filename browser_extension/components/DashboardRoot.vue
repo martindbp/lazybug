@@ -83,9 +83,16 @@
         </q-card>
         <q-dialog v-model="showExportModal" persistent>
             <q-card>
-                <q-card-section class="row items-center">
+                <q-card-section v-if="editAnkiCards" class="row items-center">
+                    <div class="q-pa-md q-gutter-y-sm column">
+                        <q-input v-model="ankiCardsEditText" filled type="textarea" />
+                        <q-btn flat label="Done" color="primary" @click="doneEditAnkiCards" />
+                    </div>
+                </q-card-section>
+                <q-card-section v-else class="row items-center">
                     <div class="q-pa-md q-gutter-y-sm column">
                         <q-toggle v-for="(card, idx) in ankiCards" :label="card" v-model="ankiCardsToggled[idx]" @update:model-value="updateAnkiCardsToggled"/>
+                        <q-btn flat label="Edit Cards" color="primary" @click="startEditAnkiCards"/>
                     </div>
                 </q-card-section>
 
@@ -131,6 +138,8 @@ export default {
         clickedClearCache: false,
         clickedClearPersonalData: false,
         showExportModal: false,
+        editAnkiCards: false,
+        ankiCardsEditText: '',
     }},
     mounted: function() {
         const self = this;
@@ -169,6 +178,18 @@ export default {
         }
     },
     methods: {
+        startEditAnkiCards: function() {
+            this.ankiCardsEditText = this.ankiCards.join('\n');
+            this.editAnkiCards = true;
+        },
+        doneEditAnkiCards: function() {
+            this.editAnkiCards = false;
+            this.ankiCards = this.ankiCardsEditText.split('\n').filter((card) => card.trim().length > 0);
+            const toggled = [];
+            for (let i = 0; i < this.ankiCards.length; i++) toggled.push(false);
+            this.ankiCardsToggled = toggled;
+            this.ankiCardsEditText = '';
+        },
         updateAnkiCardsToggled: function() {
             this.$store.commit('setAnkiCardsToggled', this.ankiCardsToggled);
         },
