@@ -161,7 +161,6 @@ ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
-	make zip-ext
 
 ext-copy:
 	cp browser_extension/deepl_main.js browser_extension/dist/
