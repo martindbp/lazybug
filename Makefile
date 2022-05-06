@@ -105,7 +105,7 @@ video-list:
 	mv data/remote/public/video_list.json "data/remote/public/video_list-$$LIST_HASH.json"
 
 show-list:
-	ls data/remote/public/shows/*.json | xargs -I{} basename {} .json | python text_list_to_json_array.py > data/remote/public/show_list.json
+	python list_available_shows.py | xargs -I{} basename {} .json | python text_list_to_json_array.py > data/remote/public/show_list.json
 	LIST_HASH=$$(md5sum data/remote/public/show_list.json | cut -d " " -f1) ; \
 	echo $$LIST_HASH > data/remote/public/show_list.hash ; \
 	mv data/remote/public/show_list.json "data/remote/public/show_list-$$LIST_HASH.json"
