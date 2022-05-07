@@ -4,17 +4,17 @@ POS_WINDOW_SIZE = 2
 
 def 得(prev_psos, pos, next_psos, prev_words, next_words):
     if pos.startswith('DE'):
-        if prev_psos[-1].startswith('VD'):
-            if prev_psos[0].startswith('C'):
+        if next_psos[1].startswith('Cba'):
+            if prev_psos[-1].startswith('VC'):
                 return 'dei3'
             else:
                 return 'de5'
         else:
-            if next_psos[1].startswith('Cba'):
-                if prev_psos[0].startswith('Cbb'):
-                    return 'dei3'
-                else:
+            if prev_psos[-1].startswith('VD'):
+                if prev_psos[0].startswith('N'):
                     return 'de5'
+                else:
+                    return 'dei3'
             else:
                 if prev_psos[0].startswith('Ncd'):
                     if next_psos[0].startswith('Dfa'):
@@ -91,10 +91,7 @@ def 干(prev_psos, pos, next_psos, prev_words, next_words):
     if next_psos[0].startswith('T'):
         return 'gan4'
     else:
-        if next_psos[0].startswith('D'):
-            return 'gan4'
-        else:
-            return 'gan1'
+        return 'gan4'
 
 
 def 没(prev_psos, pos, next_psos, prev_words, next_words):
@@ -216,6 +213,29 @@ def 地(prev_psos, pos, next_psos, prev_words, next_words):
         return 'de5'
 
 
+def 切(prev_psos, pos, next_psos, prev_words, next_words):
+    if pos.startswith('V'):
+        if next_psos[1].startswith('S'):
+            return 'qie4'
+        else:
+            return 'qie1'
+    else:
+        return 'qie4'
+
+
+def 更(prev_psos, pos, next_psos, prev_words, next_words):
+    if prev_psos[0].startswith('Nb'):
+        if prev_psos[-1].startswith('N'):
+            return 'geng1'
+        else:
+            return 'geng4'
+    else:
+        if prev_psos[-1].startswith('Nc'):
+            return 'geng4'
+        else:
+            return 'geng4'
+
+
 def 吧(prev_psos, pos, next_psos, prev_words, next_words):
     if next_psos[0].startswith('T'):
         return 'ba1'
@@ -258,13 +278,6 @@ def 哪(prev_psos, pos, next_psos, prev_words, next_words):
         return 'na5'
     else:
         return 'na3'
-
-
-def 更(prev_psos, pos, next_psos, prev_words, next_words):
-    if prev_psos[0].startswith('Cbb'):
-        return 'geng1'
-    else:
-        return 'geng4'
 
 
 def 倒(prev_psos, pos, next_psos, prev_words, next_words):
@@ -569,6 +582,15 @@ single_readings = {
 	"摸": "mo1",
 	"来": "lai2",
 	"刨": "bao4",
+	"而": "er2",
+	"动": "dong4",
+	"块": "kuai4",
+	"再": "zai4",
+	"两": "liang3",
+	"啥": "sha2",
+	"件": "jian4",
+	"爸": "ba4",
+	"但": "dan4",
 	"呜": "wu1",
 	"别": "bie2",
 	"哭": "ku1",
@@ -620,7 +642,6 @@ single_readings = {
 	"流": "liu2",
 	"让": "rang4",
 	"必": "bi4",
-	"而": "er2",
 	"克": "ke4",
 	"于": "yu2",
 	"其": "qi2",
@@ -635,7 +656,6 @@ single_readings = {
 	"话": "hua4",
 	"问": "wen4",
 	"缘": "yuan2",
-	"两": "liang3",
 	"娶": "qu3",
 	"红": "hong2",
 	"墙": "qiang2",
@@ -686,7 +706,6 @@ single_readings = {
 	"堆": "dui1",
 	"敢": "gan3",
 	"们": "men5",
-	"但": "dan4",
 	"提": "ti2",
 	"拌": "ban4",
 	"被": "bei4",
@@ -740,7 +759,6 @@ single_readings = {
 	"总": "zong3",
 	"因": "yin1",
 	"果": "guo3",
-	"件": "jian4",
 	"乱": "luan4",
 	"造": "zao4",
 	"靠": "kao4",
@@ -757,7 +775,6 @@ single_readings = {
 	"换": "huan4",
 	"学": "xue2",
 	"火": "huo3",
-	"再": "zai4",
 	"奇": "qi2",
 	"缺": "que1",
 	"较": "jiao4",
@@ -772,7 +789,6 @@ single_readings = {
 	"响": "xiang3",
 	"揭": "jie1",
 	"锅": "guo1",
-	"切": "qie1",
 	"少": "shao3",
 	"谁": "shei2",
 	"赚": "zhuan4",
@@ -826,7 +842,6 @@ single_readings = {
 	"守": "shou3",
 	"苦": "ku3",
 	"赶": "gan3",
-	"爸": "ba4",
 	"特": "te4",
 	"怕": "pa4",
 	"锁": "suo3",
@@ -870,7 +885,6 @@ single_readings = {
 	"均": "jun1",
 	"美": "mei3",
 	"贵": "gui4",
-	"块": "kuai4",
 	"恒": "heng2",
 	"永": "yong3",
 	"轻": "qing1",
@@ -1020,7 +1034,6 @@ single_readings = {
 	"表": "biao3",
 	"冬": "dong1",
 	"药": "yao4",
-	"动": "dong4",
 	"闹": "nao4",
 	"懒": "lan3",
 	"正": "zheng4",
@@ -1622,7 +1635,6 @@ single_readings = {
 	"减": "jian3",
 	"误": "wu4",
 	"呵": "he1",
-	"啥": "sha2",
 	"秋": "qiu1",
 	"皆": "jie1",
 	"贼": "zei2",
