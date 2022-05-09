@@ -408,6 +408,7 @@ wade_giles_pinyin_pairs = [
     ('nan', 'nan'),
     ('nang', 'nang'),
     ('nao', 'nao'),
+    ('ne', 'ne'),
     ('nei', 'nei'),
     ('nen', 'nen'),
     ('neng', 'neng'),
