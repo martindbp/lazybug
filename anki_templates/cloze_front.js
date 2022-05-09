@@ -3,16 +3,16 @@
 
 <script>
 
-const cardType = 'CLOZE_TYPE';
-
-const json = {{ data }};
+// NOTE: we don't declare global variables with e.g. const, because it breaks with importing the FrontSide in anki cards
+cardType = 'CLOZE_TYPE';
+json = {{ data }};
 
 function truncateTranslationLength(py, hz) {
     // Calculates a max length based on the length of `py` and `hz`
     return Math.max(15, Math.ceil(Math.max(py.length, hz.length) * 2));  // add 100% to longest
 }
 
-const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
 function addEmbedding(event) {
     const [site, id] = json.captionId.split('-');

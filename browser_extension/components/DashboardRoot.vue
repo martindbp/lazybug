@@ -81,25 +81,60 @@
             </q-tab-panel>
         </q-tab-panels>
         </q-card>
-        <q-dialog v-model="showExportModal" persistent>
+        <q-dialog class="anki" v-model="showExportModal" persistent>
             <q-card>
-                <q-card-section v-if="editAnkiCards" class="row items-center">
-                    <div class="q-pa-md q-gutter-y-sm column">
-                        <q-input v-model="ankiCardsEditText" filled type="textarea" />
-                        <q-btn flat label="Done" color="primary" @click="doneEditAnkiCards" />
-                    </div>
-                </q-card-section>
-                <q-card-section v-else class="row items-center">
-                    <div class="q-pa-md q-gutter-y-sm column">
-                        <q-toggle v-for="(card, idx) in ankiCards" :label="card" v-model="ankiCardsToggled[idx]" @update:model-value="updateAnkiCardsToggled"/>
-                        <q-btn flat label="Edit Cards" color="primary" @click="startEditAnkiCards"/>
-                    </div>
-                </q-card-section>
+                <q-tabs
+                   v-model="ankiCardTab"
+                   no-caps
+                   class="bg-orange text-white shadow-2"
+                 >
+                    <q-tab name="basic" label="Basic" />
+                    <q-tab name="cloze" label="Cloze" />
+                    <q-tab name="advanced" label="Advanced" />
+                </q-tabs>
+                <q-tab-panels v-model="ankiCardTab">
+                    <q-tab-panel name="basic">
+                        <q-card-section class="row items-center">
+                            <div class="q-pa-md q-gutter-y-sm column">
+                                <q-toggle v-for="(card, idx) in ankiCardsBasic" :label="card" v-model="ankiCardsBasicToggled[idx]" @update:model-value="updateAnkiCardsBasicToggled"/>
+                            </div>
+                        </q-card-section>
 
-                <q-card-actions align="right">
-                    <q-btn flat label="Cancel" color="primary" v-close-popup />
-                    <q-btn flat label="Export" color="primary" v-close-popup @click="exportToAnki" />
-                </q-card-actions>
+                        <q-card-actions align="right">
+                            <q-btn flat label="Cancel" color="primary" v-close-popup />
+                            <q-btn flat label="Export" color="primary" v-close-popup @click="exportToAnkiBasic" />
+                        </q-card-actions>
+                    </q-tab-panel>
+                    <q-tab-panel name="cloze">
+                        <q-card-section class="row items-center">
+                            <q-toggle label="Include word translation hint" v-model="ankiCardsClozeIncludeHint" @update:model-value="updateAnkiCardsClozeIncludeHint"/>
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                            <q-btn flat label="Cancel" color="primary" v-close-popup />
+                            <q-btn flat label="Export" color="primary" v-close-popup @click="exportToAnkiCloze" />
+                        </q-card-actions>
+                    </q-tab-panel>
+                    <q-tab-panel name="advanced">
+                        <q-card-section v-if="editAnkiCards" class="row items-center">
+                            <div class="q-pa-md q-gutter-y-sm column">
+                                <q-input v-model="ankiCardsEditText" filled type="textarea" />
+                                <q-btn flat label="Done" color="primary" @click="doneEditAnkiCards" />
+                            </div>
+                        </q-card-section>
+                        <q-card-section v-else class="row items-center">
+                            <div class="q-pa-md q-gutter-y-sm column">
+                                <q-toggle v-for="(card, idx) in ankiCardsAdvanced" :label="card" v-model="ankiCardsAdvancedToggled[idx]" @update:model-value="updateAnkiCardsAdvancedToggled"/>
+                                <q-btn flat label="Edit Cards" color="primary" @click="startEditAnkiCards"/>
+                            </div>
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                            <q-btn flat label="Cancel" color="primary" v-close-popup />
+                            <q-btn flat label="Export" color="primary" v-close-popup @click="exportToAnkiAdvanced" />
+                        </q-card-actions>
+                    </q-tab-panel>
+                </q-tab-panels>
             </q-card>
         </q-dialog>
     </div>
@@ -137,9 +172,19 @@ export default {
         tab: Vue.ref('history'),
         clickedClearCache: false,
         clickedClearPersonalData: false,
+        ankiCardTab: Vue.ref('basic'),
         showExportModal: false,
         editAnkiCards: false,
         ankiCardsEditText: '',
+        ankiCardsBasic: [
+            'Pinyin -> Translation',
+            'Translation -> Pinyin + Hanzi',
+            'Hanzi -> Pinyin + Translation',
+        ],
+        ankiCardsCloze: [
+            'Normal cloze',
+            'Cloze w/ word translation hint',
+        ],
     }},
     mounted: function() {
         const self = this;
@@ -149,13 +194,21 @@ export default {
         });
     },
     computed: {
-        ankiCards: {
-            get: function() { return this.$store.state.options.anki.cards; },
-            set: function(val) { this.$store.commit('setAnkiCards', val); },
+        ankiCardsAdvanced: {
+            get: function() { return this.$store.state.options.anki.advancedCards; },
+            set: function(val) { this.$store.commit('setAnkiAdvancedCards', val); },
         },
-        ankiCardsToggled: {
-            get: function() { return this.$store.state.options.anki.toggled; },
-            set: function(val) { this.$store.commit('setAnkiCardsToggled', val); },
+        ankiCardsBasicToggled: {
+            get: function() { return this.$store.state.options.anki.basicToggled; },
+            set: function(val) { this.$store.commit('setAnkiCardsBasicToggled', val); },
+        },
+        ankiCardsClozeIncludeHint: {
+            get: function() { return this.$store.state.options.anki.clozeIncludeHint; },
+            set: function(val) { this.$store.commit('setAnkiCardsClozeIncludeHint', val); },
+        },
+        ankiCardsAdvancedToggled: {
+            get: function() { return this.$store.state.options.anki.advancedToggled; },
+            set: function(val) { this.$store.commit('setAnkiCardsAdvancedToggled', val); },
         },
         isFirstPage: function() {
             return this.page === 0;
@@ -179,19 +232,25 @@ export default {
     },
     methods: {
         startEditAnkiCards: function() {
-            this.ankiCardsEditText = this.ankiCards.join('\n');
+            this.ankiCardsEditText = this.ankiCardsAdvanced.join('\n');
             this.editAnkiCards = true;
         },
         doneEditAnkiCards: function() {
             this.editAnkiCards = false;
-            this.ankiCards = this.ankiCardsEditText.split('\n').filter((card) => card.trim().length > 0);
+            this.ankiCardsAdvanced = this.ankiCardsEditText.split('\n').filter((card) => card.trim().length > 0);
             const toggled = [];
-            for (let i = 0; i < this.ankiCards.length; i++) toggled.push(false);
-            this.ankiCardsToggled = toggled;
+            for (let i = 0; i < this.ankiCardsAdvanced.length; i++) toggled.push(false);
+            this.ankiCardsAdvancedToggled = toggled;
             this.ankiCardsEditText = '';
         },
-        updateAnkiCardsToggled: function() {
-            this.$store.commit('setAnkiCardsToggled', this.ankiCardsToggled);
+        updateAnkiCardsBasicToggled: function() {
+            this.$store.commit('setAnkiCardsBasicToggled', this.ankiCardsBasicToggled);
+        },
+        updateAnkiCardsClozeIncludeHint: function() {
+            this.$store.commit('setAnkiCardsClozeIncludeHint', this.ankiCardsClozeIncludeHint);
+        },
+        updateAnkiCardsAdvancedToggled: function() {
+            this.$store.commit('setAnkiCardsAdvancedToggled', this.ankiCardsAdvancedToggled);
         },
         firstPage: function() {
             this.page = 0;
@@ -227,7 +286,72 @@ export default {
         getSelectedString: function() {
             return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''}`;
         },
-        exportToAnki: function() {
+        exportToAnkiBasic: function() {
+            let csv = '';
+            for (const item of this.selected) {
+                const [type, eventData, sessionTime, captionId, captionHash] = item.event;
+                const [wordIdx, data] = eventData;
+
+                const wordData = getWordData(data.data, data.translationIdx);
+                if (wordIdx === null) {
+                    // Full Hanzi -> Full Translation
+                    csv += data.data.texts.join(' ') + ';' + wordData.translation + '\n';
+                }
+                else {
+                    if (this.ankiCardsBasicToggled[0]) {
+                        // Pinyin -> Translation
+                        csv += wordData.py[wordIdx] + ';' + wordData.tr[wordIdx] + '\n';
+                    }
+                    if (this.ankiCardsBasicToggled[1]) {
+                        // Translation -> Pinyin + Hanzi
+                        csv += wordData.tr[wordIdx] + ';' + wordData.py[wordIdx] + ' / ' + wordData.hz[wordIdx] + '\n';
+                    }
+                    else if (this.ankiCardsBasicToggled[2]) {
+                        // Hanzi -> Pinyin + Translation
+                        csv += wordData.hz[wordIdx] + ';' + wordData.py[wordIdx] + ' / ' + wordData.tr[wordIdx] + '\n';
+                    }
+                }
+            }
+            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            download(filename, csv);
+        },
+        exportToAnkiCloze: function() {
+            let csv = '';
+            for (const item of this.selected) {
+                const [type, eventData, sessionTime, captionId, captionHash] = item.event;
+                const [wordIdx, data] = eventData;
+
+                const wordData = getWordData(data.data, data.translationIdx);
+                if (wordIdx === null) {
+                    continue; // no cloze for this kind
+                }
+                else {
+                    // Pinyin + Hanzi
+                    let pinyin = '';
+                    let hanzi = '';
+                    for (let i = 0; i < wordData.hz.length; i++) {
+                        if (i == wordIdx) {
+                            hanzi += `{{c1::${wordData.hz[i]}}}`;
+                            pinyin += `{{c1::${wordData.py[i]}}}`;
+                        }
+                        else {
+                            hanzi += wordData.hz[i];
+                            pinyin += wordData.py[i];
+                        }
+                    }
+
+                    if (this.ankiCardsClozeIncludeHint) {
+                        csv += `${pinyin}<br>${hanzi}<br><br>Word translation: ${wordData.tr[wordIdx]};${wordData.translation}\n`;
+                    }
+                    else {
+                        csv += `${pinyin}<br>${hanzi}<br>;${wordData.translation}\n`;
+                    }
+                }
+            }
+            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            download(filename, csv);
+        },
+        exportToAnkiAdvanced: function() {
             let csv = '';
             for (const item of this.selected) {
                 const [type, eventData, sessionTime, captionId, captionHash] = item.event;
@@ -256,7 +380,7 @@ export default {
                 }
 
                 const exportVals = [];
-                for (const val of this.ankiCardsToggled) {
+                for (const val of this.ankiCardsAdvancedToggled) {
                     exportVals.push(val ? '1' : '');
                 }
 
@@ -412,4 +536,11 @@ export default {
 </script>
 
 <style>
+.anki .q-panel {
+    height: auto !important;
+}
+
+.anki .q-panel > div {
+    height: auto !important;
+}
 </style>
