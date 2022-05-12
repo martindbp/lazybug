@@ -219,7 +219,7 @@ def get_alignment_translations(caption_data, global_known_names=[], fixed_transl
         for hz, seg, pos, py in zip(hzs, segs, psos, pys):
             seg_type = None
             include = False
-            
+
             #if nailed_down:
                 #seg_type = 'nailed_down'
             if len(filter_text_hanzi(hz)) == 0:
@@ -228,7 +228,7 @@ def get_alignment_translations(caption_data, global_known_names=[], fixed_transl
                 seg_type = 'mw'  # measure word
             elif match_fixed_translation(hz, py) is not None:
                 seg_type = 'skip'
-            elif hz in confirmed_people_hz or hz in ner_people:
+            elif hz in confirmed_people_hz or hz in ner_people_hz:
                 seg_type = 'name'
             elif hz in fixed_translations:
                 if fixed_translations[hz][0].isupper():
