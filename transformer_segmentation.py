@@ -583,17 +583,20 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
 
     # Convert back to simplified, and split out any spaces to their own segments (the segmentation has these errors)
     ws = []
-    for ws_sentence in ws_trad:
+    for ws_sentence, pos in zip(ws_trad, psos):
         wss = []
         for c in ws_sentence:
-            if c == ' ':
+            c = c.strip()
+            if c == '':
                 wss.append(c)
                 continue
 
-            c = HanziConv.toSimplified(c)
-            c = [' ' if p == '' else p for p in c.split(' ')]
+            c = [HanziConv.toSimplified(c)]
             wss += c
 
+        if len(wss) != len(pos):
+            # Leaving this "assert" here for now, had some bugs with this
+            breakpoint()
         ws.append(wss)
 
     sentence_ners = []
@@ -683,7 +686,7 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     new_components = new_components + [component_after]
 
                 new_ws_sentence = new_ws_sentence[:i] + new_components + new_ws_sentence[i + window_size :]
-                new_pos_sentence = new_pos_sentence[:i] + ['joined_name']*window_size + new_pos_sentence[i + window_size :]
+                new_pos_sentence = new_pos_sentence[:i] + ['joined_name']*len(new_components) + new_pos_sentence[i + window_size :]
                 sentence_compounds.append((joined_hz, None))
                 found_match = True
                 break
