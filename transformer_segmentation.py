@@ -411,6 +411,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
                             joined_py = ''.join(component_pys)
                             transl_matches[transl_idx].append((full_joined_hz, joined_py, window_size, joined_idx_start, joined_idx_end, i, None, None))
 
+
         for transl_idx, matches in enumerate(transl_matches):
             matches = list(sorted(matches, key=lambda x: (-len(x[0]), -get_difficulty(x[0], x[1]))))
             non_conflicting_matches = []
@@ -578,26 +579,44 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
         ws_trad = _seg_batch(hzs_trad)
 
     with Eval():
-        psos = _pos_batch(ws_trad)
+        psos_sentence = _pos_batch(ws_trad)
         sentence_ners_trad = _ners_batch(hzs_trad)
 
     # Convert back to simplified, and split out any spaces to their own segments (the segmentation has these errors)
     ws = []
-    for ws_sentence, pos in zip(ws_trad, psos):
+    psos = []
+    for ws_sentence, pos in zip(ws_trad, psos_sentence):
         wss = []
-        for c in ws_sentence:
-            c = c.strip()
-            if c == '':
+        poss = []
+        for c, p in zip(ws_sentence, pos):
+            p = [p]
+            if c == ' ':
                 wss.append(c)
+                poss.append('')
                 continue
 
-            c = [HanziConv.toSimplified(c)]
-            wss += c
+            # Problem here is sometimes the segmentation produces trailing spaces like "我 ", which we need to preserve for later
+            # So split on them and add empy POS for the ones with spaces
+            c = [' ' if s == '' else s for s in HanziConv.toSimplified(c).split(' ')]
+            if len(c) > 1:
+                if not (c[0] == ' ' or c[-1] == ' '):
+                    breakpoint()  # assert
+                if c[0] == ' ':
+                    # Prepend pos
+                    p = [''] + p
+                else:
+                    # Append
+                    p.append('')
 
-        if len(wss) != len(pos):
+            wss += c
+            poss += p
+
+        if len(wss) != len(poss):
             # Leaving this "assert" here for now, had some bugs with this
             breakpoint()
+
         ws.append(wss)
+        psos.append(poss)
 
     sentence_ners = []
     for ners in sentence_ners_trad:
@@ -851,7 +870,7 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
         all_compounds.append(sentence_compounds)
 
     final_ws = []
-    for hz, ws_sentence in zip(hzs, ws):
+    for i, (hz, ws_sentence) in enumerate(zip(hzs, ws)):
         final_ws_sentence = []
         next_idx = 0
         for w in ws_sentence:
