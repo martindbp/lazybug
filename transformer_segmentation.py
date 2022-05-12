@@ -771,7 +771,8 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                         if not has_difficult_char:
                             continue
 
-                    if force_join or (check_hz in CEDICT.v and check_hz not in BLACKLIST):
+                    translation_options = get_translation_options_cedict(joined_hz, py=None, deepl=None, add_empty=False)
+                    if force_join or (check_hz in CEDICT.v and check_hz not in BLACKLIST and len(translation_options) > 0):
                         found_match = True
                         difficulty = get_difficulty(joined_hz)
                         if difficulty > best_difficulty:
@@ -790,7 +791,7 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
                     break
 
         #
-        # Join words accross segmentation boundaries if the joined word is in cedict, but previously segmented words are not (or are shorter / has overall character frequency sum)
+        # Join words across segmentation boundaries if the joined word is in cedict, but previously segmented words are not (or are shorter / has overall character frequency sum)
         # And example that had to be fixed: 特别的 was split as "特 别的". In this case both are in cedict, but 特别 should take precedence
         #
         for i in range(len(new_ws_sentence) - 2 + 1):
