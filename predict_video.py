@@ -835,6 +835,8 @@ def predict_video_captions(
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     frame_size = None
     iters = 1 if refine_bounding_rect else 0
+    subsample_frames_until_first_seen = 30*15 # 25 seconds
+    subsample_frames_after_first_seenS = 30*2 # 2 seconds
     for j in range(iters):
         best_top_bottom = None
         best_logprob_sum = -float('inf')
@@ -849,7 +851,10 @@ def predict_video_captions(
             sum_log_prob = 0
             bounding_rects = []
             for i, (frame_time, crop, frame) in enumerate(caption_images):
-                if i % 60 != 0:
+                if (
+                    (len(bounding_rects) == 0 and i % subsample_frames_until_first_seen != 0) or
+                    (len(bounding_rects) > 0 and i % subsample_frames_after_first_seen != 0)
+                ):
                     continue
 
                 if frame_size is None:
@@ -863,7 +868,7 @@ def predict_video_captions(
 
                 line.zero_out_numpy()
 
-                if len(bounding_rects) > 10 or frame_time - start_time_s > 120:
+                if len(bounding_rects) > 10 or (len(bounding_rects) > 0 and frame_time - start_time_s > 120):
                     break
 
             if sum_log_prob > best_logprob_sum and len(bounding_rects) > 0:
