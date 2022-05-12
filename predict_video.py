@@ -836,7 +836,7 @@ def predict_video_captions(
     frame_size = None
     iters = 1 if refine_bounding_rect else 0
     subsample_frames_until_first_seen = 30*15 # 25 seconds
-    subsample_frames_after_first_seenS = 30*2 # 2 seconds
+    subsample_frames_after_first_seen = 30*2 # 2 seconds
     for j in range(iters):
         best_top_bottom = None
         best_logprob_sum = -float('inf')
@@ -851,10 +851,12 @@ def predict_video_captions(
             sum_log_prob = 0
             bounding_rects = []
             for i, (frame_time, crop, frame) in enumerate(caption_images):
-                if (
-                    (len(bounding_rects) == 0 and i % subsample_frames_until_first_seen != 0) or
-                    (len(bounding_rects) > 0 and i % subsample_frames_after_first_seen != 0)
-                ):
+                if len(bounding_rects) == 0 and i % subsample_frames_until_first_seen != 0:
+                    print('Skipping not seen first yet')
+                    continue
+
+                if len(bounding_rects) > 0 and i % subsample_frames_after_first_seen != 0:
+                    print('Skipping has seen first')
                     continue
 
                 if frame_size is None:
