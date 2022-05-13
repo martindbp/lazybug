@@ -1498,7 +1498,7 @@ def process_video_captions(
 
                 vtt_types = None
                 if param['type'] == 'hanzi':
-                    vtt_types = ['zh', 'zh-Hans']
+                    vtt_types = ['zh', 'zh-Hans', 'zh-CN']
                 elif param['type'] == 'english':
                     vtt_types = ['en', 'en-US']
 
