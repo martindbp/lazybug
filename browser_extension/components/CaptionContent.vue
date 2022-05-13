@@ -221,19 +221,10 @@ export default {
             return states;
         },
         hiddenStates: function() {
-            const states = this.getStates(StateHidden, StateNone, StateHidden);
-            // Translation is always hidden:
-            states.translation = true;
-            return states;
+            return hiddenStates(this.$store.state.states, this.wordData);
         },
         starredStates: function() {
-            const translationState = getState(this.$store.state.states, this.stateKey('translation'), StateStarred, StateNone)
-            const states = {'words': [], 'translation': translationState === StateStarred};
-            for (let i = 0; i < this.wordData.hz.length; i++) {
-                const state = getState(this.$store.state.states, this.stateKey('word', i), StateStarred, StateNone);
-                states.words.push(state === StateStarred);
-            }
-            return states;
+            return starredStates(this.$store.state.states, this.wordData);
         },
     },
     updated: function() {
@@ -312,25 +303,8 @@ export default {
             };
             return cl;
         },
-        getStates: function(compareTo, defaultValue, defaultValueTranslation) {
-            const translationState = getState(this.$store.state.states, this.stateKey('translation'), compareTo, defaultValueTranslation)
-            const states = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
-            for (let i = 0; i < this.wordData.hz.length; i++) {
-                for (var type of ['hz', 'py', 'tr']) {
-                    const state = getState(this.$store.state.states, this.stateKey(type, i), compareTo, defaultValue);
-                    states[type].push(state === compareTo);
-                }
-            }
-            return states;
-        },
         stateKey: function(type, i = null) {
-            return getStateKey(
-                type,
-                i === null ? null : this.wordData.hz[i],
-                i === null ? null : this.wordData.pys[i],
-                i === null ? null : this.wordData.tr[i],
-                this.wordData.translation
-            );
+            return wordDataStateKey(this.wordData, type, i);
         },
         clickContextMenu(action, type, i) {
             if (this.waitingBeforeClosingMenu) {

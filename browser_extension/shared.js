@@ -256,6 +256,45 @@ function isName(tr) {
     return /^[A-Z][^A-Z]+/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
 }
 
+function hiddenStates(states, wordData) {
+    const hidden = getStates(states, wordData, StateHidden, StateNone, StateHidden);
+    // Translation is always hidden:
+    hidden.translation = true;
+    return hidden;
+}
+
+function starredStates(states, wordData) {
+    const translationState = getState(states, wordDataStateKey(wordData, 'translation'), StateStarred, StateNone)
+    const starred = {'words': [], 'translation': translationState === StateStarred};
+    for (let i = 0; i < wordData.hz.length; i++) {
+        const state = getState(states, wordDataStateKey(wordData, 'word', i), StateStarred, StateNone);
+        starred.words.push(state === StateStarred);
+    }
+    return starred;
+}
+
+function getStates(states, wordData, compareTo, defaultValue, defaultValueTranslation) {
+    const translationState = getState(states, wordDataStateKey(wordData, 'translation'), compareTo, defaultValueTranslation)
+    const statesOut = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
+    for (let i = 0; i < wordData.hz.length; i++) {
+        for (var type of ['hz', 'py', 'tr']) {
+            const state = getState(states, wordDataStateKey(wordData, type, i), compareTo, defaultValue);
+            statesOut[type].push(state === compareTo);
+        }
+    }
+    return statesOut;
+}
+
+function wordDataStateKey(wordData, type, i = null) {
+    return getStateKey(
+        type,
+        i === null ? null : wordData.hz[i],
+        i === null ? null : wordData.pys[i],
+        i === null ? null : wordData.tr[i],
+        wordData.translation
+    );
+}
+
 function getStateKey(type, hz, pys, tr, translation) {
     let key = null;
     if (pys === null && ['py', 'tr'].includes(type)) return null;
