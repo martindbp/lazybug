@@ -231,6 +231,10 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
         #'dui',  # DUI
     ]
     TITLES = [
+        ('叔叔', 'post'),
+        ('叔', 'post'),
+        ('阿姨', 'post'),
+        ('姨', 'post'),
         ('老师', 'post'),
         ('警官', 'post'),
         ('医生', 'post'),
