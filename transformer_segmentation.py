@@ -591,6 +591,7 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
         poss = []
         for c, p in zip(ws_sentence, pos):
             p = [p]
+            c = re.sub(' +', ' ', c)
             if c == ' ':
                 wss.append(c)
                 poss.append('')
@@ -598,7 +599,13 @@ def segment_sentences(hzs: List[str], join_compound_words=True):
 
             # Problem here is sometimes the segmentation produces trailing spaces like "我 ", which we need to preserve for later
             # So split on them and add empy POS for the ones with spaces
-            c = [' ' if s == '' else s for s in HanziConv.toSimplified(c).split(' ')]
+            prev = c
+            c = [HanziConv.toSimplified(c.strip())]
+            if prev[0] == ' ':
+                c = [' '] + c
+            elif prev[-1] == ' ':
+                c.append(' ')
+
             if len(c) > 1:
                 if not (c[0] == ' ' or c[-1] == ' '):
                     breakpoint()  # assert
