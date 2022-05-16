@@ -175,6 +175,7 @@ release:
 	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
 	python make_release_manifest.py browser_extension/manifest.json > browser_extension/dist/manifest.json
 	rm browser_extension/dist/deepl_main.js
+	rm browser_extension/dist/devtools.js
 	rm browser_extension/dist/local.html
 	make zip-ext
 
