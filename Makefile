@@ -26,6 +26,8 @@ test:
 zip-ext:
 	- rm data/remote/public/browser_extension.zip
 	cd browser_extension/dist && zip -r ../../data/remote/public/browser_extension.zip *
+	VERSION=$$(grep "\"version\"" browser_extension/manifest.json | cut -d"\"" -f 4) ; \
+	cp -r data/remote/public/browser_extension.zip data/remote/public/browser_extension_$$VERSION.zip
 
 pre-public-sync:
 	make show-list
