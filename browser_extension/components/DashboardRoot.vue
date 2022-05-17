@@ -360,6 +360,7 @@ export default {
                 const t1 = data.data.t1;
 
                 const wordData = getWordData(data.data, data.translationIdx);
+
                 const rowData = {
                     type: type,
                     captionId: captionId,
@@ -377,6 +378,11 @@ export default {
                 }
                 else {
                     search = wordData.hz[wordIdx] + '/' + wordData.py[wordIdx];
+
+                    const hz = wordData.hz[wordIdx];
+                    if (this.$store.state.DICT[hz] !== undefined) {
+                        rowData.dictionary = dictItemsToDict(this.$store.state.DICT[hz]);
+                    }
                 }
 
                 const exportVals = [];
