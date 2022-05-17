@@ -100,7 +100,7 @@ const store = new Vuex.Store({
             state.videoId = val
         },
         setVideoList(state, val) {
-            state.videoList = val;
+            state.videoList = new Set(val);
         },
         setShowList(state, val) {
             state.showList = val;

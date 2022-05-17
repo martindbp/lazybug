@@ -469,7 +469,7 @@ export default {
             if (this.videoId !== null) {
                 captionId = 'youtube-' + this.videoId;
             }
-            if (this.$store.state.videoList === null || ! this.$store.state.videoList.includes(captionId)) {
+            if (this.$store.state.videoList === null || ! this.$store.state.videoList.has(captionId)) {
                 return null;
             }
 
