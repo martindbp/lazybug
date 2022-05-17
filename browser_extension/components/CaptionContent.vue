@@ -143,7 +143,7 @@
                         :click="clickContextMenu"
                         :copy="true"
                         :switch="data.translations.length > 1"
-                        :switchlabel="this.translationIdx === 0 ? 'Switch to Machine translations' : 'Switch to Human translations'"
+                        :switchlabel="translationIdx === 0 ? 'Switch to Machine translations' : 'Switch to Human translations'"
                     />
                 </td>
             </tr>
