@@ -6,12 +6,13 @@
         <span v-if="copy" class="contexticon copy" title="Copy" v-html="copyIcon" @click.stop.prevent="clickButton('copy')"></span>
         <span v-if="star" class="contexticon star" title="Star" v-html="hollowstarIcon" @click.stop.prevent="clickButton('star')"></span>
         <span v-if="unstar" class="contexticon unstar" title="Unstar" v-html="starIcon" @click.stop.prevent="clickButton('unstar')"></span>
+        <span v-if="switch" class="contexticon switch" :title="switchlabel" v-html="switchIcon" @click.stop.prevent="clickButton('switch')"></span>
     </span>
 </template>
 
 <script>
 export default {
-    props: ['type', 'idx', 'hide', 'star', 'unstar', 'pin', 'dict', 'copy', 'click'],
+    props: ['type', 'idx', 'hide', 'star', 'unstar', 'pin', 'dict', 'copy', 'click', 'switch', 'switchlabel'],
     data: function () { return {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),
@@ -21,6 +22,7 @@ export default {
         copyIcon: getIconSvg("copy", 18),
         starIcon: getIconSvg("star", 18),
         hollowstarIcon: getIconSvg("hollowstar", 18),
+        switchIcon: getIconSvg("switch", 18),
     }},
     methods: {
         clickButton: function(action) {

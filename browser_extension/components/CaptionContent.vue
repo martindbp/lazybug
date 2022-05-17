@@ -142,6 +142,8 @@
                         :dict="false"
                         :click="clickContextMenu"
                         :copy="true"
+                        :switch="data.translations.length > 1"
+                        :switchlabel="this.translationIdx === 0 ? 'Switch to Machine translations' : 'Switch to Human translations'"
                     />
                 </td>
             </tr>
@@ -209,7 +211,7 @@ export default {
             };
         },
         wordData: function() {
-            return getWordData(this.data, this.translationIdx);
+            return getWordData(this.data, this.translationIdx, this.currentCaptionIdx);
         },
         hiddenAndNotPeeking: function() {
             const states = {'py': [], 'hz': [], 'tr': [], 'translation': this.hiddenStates['translation'] && ! this.purePeekStates['translation']};
@@ -266,7 +268,9 @@ export default {
             },
         },
         wordData: function(newData, oldData) {
-            this.resetShowContextMenu(newData);
+            if (newData === null || oldData === null || newData.captionIdx !== oldData.captionIdx) {
+                this.resetShowContextMenu(newData);
+            }
         }
     },
     methods: {
@@ -372,6 +376,9 @@ export default {
                 else {
                     updateClipboard(this.wordData[type][i], this.$q, 'Copied to clipboard');
                 }
+            }
+            else if (action === 'switch') {
+                this.$store.commit('switchTranslation');
             }
 
             if (['dict', 'copy'].includes(action)) {

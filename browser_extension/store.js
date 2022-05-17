@@ -93,6 +93,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        switchTranslation(state) {
+            state.options.displayTranslation = (state.options.displayTranslation + 1) % 2;
+        },
         setVideoId(state, val) {
             state.videoId = val
         },
