@@ -15,7 +15,8 @@ function truncateTranslationLength(py, hz) {
 getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
 function addEmbedding(event) {
-    const [site, id] = json.captionId.split('-');
+    const parts = json.captionId.split('-');
+    const id = parts.slice(1).join('-');
     const embedding = getYoutubeEmbedCode(id, json.t0, json.t1, true);
     event.target.outerHTML = embedding;
 }
