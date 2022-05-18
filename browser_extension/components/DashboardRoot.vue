@@ -27,8 +27,10 @@
                   <template v-slot:body="props">
                       <q-tr v-if="props.row.isNewSession">
                           <q-td colspan="100%">
-                              <div style="font-size: 1.2em" ><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
-                                  {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}</div>
+                              <div style="font-size: 1.2em" >
+                                  <q-checkbox @update:model-value="checkedSession(props.row)" :model-value="selectedSessions[props.row.sessionId] ? true : false" color="primary" /><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
+                                  {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}
+                              </div>
                           </q-td>
                       </q-tr>
                       <q-tr :props="props">
@@ -160,6 +162,7 @@ export default {
             {name: 'translation', field: 'translation', label: FIELD_TO_LABEL.translation},
         ],
         selected: [],
+        selectedSessions: {},
         starEvents: [],
         pagination: {
             rowsPerPage: 0,
@@ -231,6 +234,30 @@ export default {
         }
     },
     methods: {
+        checkedSession: function(row) {
+            this.selectedSessions[row.sessionId] = ! this.selectedSessions[row.sessionId];
+
+            // First remove any of the session items that are selected
+            const newSelected = [];
+            for (let i = 0; i < this.selected.length; i++) {
+                const r = this.selected[i];
+                if (r.sessionId !== row.sessionId) {
+                    newSelected.push(r);
+                }
+            }
+
+            if (this.selectedSessions[row.sessionId]) {
+                // Add in all the session rows
+                for (let i = row.idx; i < this.rows.length; i++) {
+                    const r = this.rows[i];
+                    if (r.sessionId !== row.sessionId) break;
+
+                    newSelected.push(r);
+                }
+            }
+
+            this.selected = newSelected;
+        },
         startEditAnkiCards: function() {
             this.ankiCardsEditText = this.ankiCardsAdvanced.join('\n');
             this.editAnkiCards = true;
@@ -484,6 +511,7 @@ export default {
                     translation: translation,
                     time: sessionTime,
                     video: captionId,
+                    sessionId: sessionId,
                     isNewSession: sessionId !== lastSessionId,
                     data: data,
                     event: events[i],
