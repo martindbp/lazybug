@@ -64,7 +64,20 @@
                   </template>
                 </q-table>
                 <div class="q-mt-md">
-                    <q-btn :disabled="selected.length === 0" label="Export to Anki" @click="showExportModal = true"/>
+                    <q-btn-dropdown :disabled="selected.length === 0" color="primary" label="Export">
+                        <q-list>
+                            <q-item clickable v-close-popup @click="showExportModal = true">
+                                <q-item-section>
+                                    <q-item-label>Anki CSV</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                            <q-item clickable v-close-popup @click="exportPleco">
+                                <q-item-section>
+                                    <q-item-label>Pleco (word list)</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </q-list>
+                    </q-btn-dropdown>
                 </div>
             </q-tab-panel>
             <q-tab-panel name="options">
@@ -154,6 +167,7 @@ const FIELD_TO_LABEL = {
 const ROWS_PER_PAGE = 4;
 
 export default {
+    mixins: [mixin],
     data: function() { return {
         columns: [
             {name: 'hz', field: 'hz', label: FIELD_TO_LABEL.hz},
@@ -313,6 +327,25 @@ export default {
         getSelectedString: function() {
             return this.selected.length === 0 ? '' : `${this.selected.length} item${this.selected.length > 1 ? 's' : ''}`;
         },
+        exportPleco: function() {
+            let list = '';
+            for (const item of this.selected) {
+                const [type, eventData, sessionTime, captionId, captionHash] = item.event;
+                const [wordIdx, data] = eventData;
+
+                const wordData = getWordData(data.data, data.translationIdx);
+                if (wordIdx === null) {
+                    continue
+                }
+                else {
+                    const sm = wordData.hz[wordIdx];
+                    const trad = this.sm2tr(sm, false);
+                    list += `${sm}[${trad}]\n`;
+                }
+            }
+            const filename = `export-${(new Date(Date.now())).toISOString().split('T')[0]}.pleco.txt`;
+            download(filename, list);
+        },
         exportToAnkiBasic: function() {
             let csv = '';
             for (const item of this.selected) {
@@ -322,24 +355,24 @@ export default {
                 const wordData = getWordData(data.data, data.translationIdx);
                 if (wordIdx === null) {
                     // Full Hanzi -> Full Translation
-                    csv += data.data.texts.join(' ') + ';' + wordData.translation + '\n';
+                    csv += `${data.data.texts.join(' ')};${wordData.translation}\n`;
                 }
                 else {
                     if (this.ankiCardsBasicToggled[0]) {
                         // Pinyin -> Translation
-                        csv += wordData.py[wordIdx] + ';' + wordData.tr[wordIdx] + '\n';
+                        csv += `${wordData.py[wordIdx]};${wordData.tr[wordIdx]}\n`;
                     }
                     if (this.ankiCardsBasicToggled[1]) {
                         // Translation -> Pinyin + Hanzi
-                        csv += wordData.tr[wordIdx] + ';' + wordData.py[wordIdx] + ' / ' + wordData.hz[wordIdx] + '\n';
+                        csv += `${wordData.tr[wordIdx]};${wordData.py[wordIdx]} / ${wordData.hz[wordIdx]}\n`;
                     }
                     else if (this.ankiCardsBasicToggled[2]) {
                         // Hanzi -> Pinyin + Translation
-                        csv += wordData.hz[wordIdx] + ';' + wordData.py[wordIdx] + ' / ' + wordData.tr[wordIdx] + '\n';
+                        csv += `${wordData.hz[wordIdx]};${wordData.py[wordIdx]} / ${wordData.tr[wordIdx]}\n`;
                     }
                 }
             }
-            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         exportToAnkiCloze: function() {
@@ -375,7 +408,7 @@ export default {
                     }
                 }
             }
-            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         exportToAnkiAdvanced: function() {
@@ -419,9 +452,9 @@ export default {
 
                 exportVals.push(wordIdx === null ? '1' : '');
 
-                csv += search + ';' + JSON.stringify(rowData) + ';' + exportVals.join(';') + '\n';
+                csv += `${search};${JSON.stringify(rowData)};${exportVals.join(';')}\n`;
             }
-            const filename = 'anki-export-'+(new Date(Date.now())).toISOString().split('T')[0]+'.csv'
+            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         rowYoutubeEmbedCode: function(rowIdx) {

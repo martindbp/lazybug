@@ -13,9 +13,9 @@ function combinations(options, accumulatorArray, currCombination = [], currIdx =
 
 const mixin = {
     methods: {
-        sm2tr(text) {
+        sm2tr(text, optionsOverride = true) {
             if (this.$store.state.DICT === null) return null;
-            if (this.$store.state.options.characterSet == 'sm') return text;
+            if (optionsOverride && this.$store.state.options.characterSet == 'sm') return text;
 
             let trText = '';
             let nextIdx = 0;
