@@ -28,7 +28,7 @@
                       <q-tr v-if="props.row.isNewSession">
                           <q-td colspan="100%">
                               <div style="font-size: 1.2em" >
-                                  <q-checkbox @update:model-value="checkedSession(props.row)" :model-value="selectedSessions[props.row.sessionId] ? true : false" color="primary" /><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
+                                  <q-checkbox @update:model-value="checkedSession(props.row)" :model-value="selectedSessions[props.row.sessionId] ? true : false" color="primary" style="margin-right: 30px" /><b>{{ timestampToYYYMMDD(props.row.time) }}</b>:
                                   {{ props.row.data.showName }} {{ props.row.data.seasonName }} {{ props.row.data.episodeName }}
                               </div>
                           </q-td>
