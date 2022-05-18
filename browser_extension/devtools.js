@@ -27,14 +27,10 @@ chrome.runtime.onMessage.addListener(msgObj => {
         function stopMeasuring() {
             console.log('Stop measuring');
             var videoRect = AVElement.getBoundingClientRect();
-            var videoTop = AVElement.videoHeight * (mouseDownClientY - videoRect.top) / videoRect.height;
-            var videoBottom = AVElement.videoHeight * (clientY - videoRect.top) / videoRect.height;
-            var videoLeft = AVElement.videoWidth * (mouseDownClientX - videoRect.left) / videoRect.width;
-            var videoRight = AVElement.videoWidth * (clientX - videoRect.left) / videoRect.width;
-            captionBottom = videoBottom / AVElement.videoHeight;
-            captionTop = videoTop / AVElement.videoHeight;
-            captionLeft = videoLeft / AVElement.videoWidth;
-            captionRight = videoRight / AVElement.videoWidth;
+            var videoTop = (mouseDownClientY - videoRect.top) / videoRect.height;
+            var videoBottom = (clientY - videoRect.top) / videoRect.height;
+            var videoLeft = (mouseDownClientX - videoRect.left) / videoRect.width;
+            var videoRight = (clientX - videoRect.left) / videoRect.width;
             measureDiv.remove();
             measureDiv = null;
             window.removeEventListener("mousemove", moveHandler);
@@ -47,10 +43,10 @@ chrome.runtime.onMessage.addListener(msgObj => {
                 "ocr_params": [
                     {
                         "type": "hanzi",
-                        "caption_top": captionTop,
-                        "caption_bottom": captionBottom,
-                        "caption_left": captionLeft,
-                        "caption_right": captionRight,
+                        "caption_top": videoTop,
+                        "caption_bottom": videoBottom,
+                        "caption_left": videoLeft,
+                        "caption_right": videoRight,
                         "start_time": 0
                     }
                 ]
