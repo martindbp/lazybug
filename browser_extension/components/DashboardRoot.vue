@@ -343,7 +343,7 @@ export default {
                     list += `${sm}[${trad}]\n`;
                 }
             }
-            const filename = `export-${(new Date(Date.now())).toISOString().split('T')[0]}.pleco.txt`;
+            const filename = `export-pleco-${(new Date(Date.now())).toISOString().split('T')[0]}.txt`;
             download(filename, list);
         },
         exportToAnkiBasic: function() {
@@ -372,7 +372,7 @@ export default {
                     }
                 }
             }
-            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
+            const filename = `export-anki-basic-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         exportToAnkiCloze: function() {
@@ -408,7 +408,7 @@ export default {
                     }
                 }
             }
-            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
+            const filename = `export-anki-cloze-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         exportToAnkiAdvanced: function() {
@@ -454,7 +454,7 @@ export default {
 
                 csv += `${search};${JSON.stringify(rowData)};${exportVals.join(';')}\n`;
             }
-            const filename = `anki-export-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
+            const filename = `export-anki-advanced-${(new Date(Date.now())).toISOString().split('T')[0]}.csv`;
             download(filename, csv);
         },
         rowYoutubeEmbedCode: function(rowIdx) {
