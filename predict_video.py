@@ -843,7 +843,7 @@ def predict_video_captions(
         best_offset = 0
         offsets = [0] if j >= 1 else range(-2, 3)
         for y_offset in offsets:
-            y_offset /= 300
+            y_offset /= 500
             caption_images = get_video_caption_area(
                 video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height, height_buffer_px
             )
