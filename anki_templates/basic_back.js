@@ -3,11 +3,11 @@
 
 <script>
 
-const cardType = 'CLOZE_TYPE';
+cardType = 'CLOZE_TYPE';
 
-const json = {{ data }};
+json = {{ data }};
 
-let html = '';
+html = '';
 if (cardType === 'basic_py_hz') {
     html = json.wordData.hz[json.wordIdx] + ' - ' + json.wordData.py[json.wordIdx];
 }
