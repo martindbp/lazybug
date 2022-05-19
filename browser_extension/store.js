@@ -50,6 +50,7 @@ const store = new Vuex.Store({
         options: Vue.ref({
             extensionToggle: true,
             autoPause: false,
+            WPSThreshold: 2.0,
             characterSet: 'sm',
             blurCaptions: true,
             pin: {

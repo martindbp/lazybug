@@ -15,7 +15,9 @@
             v-bind:currTime="currTime"
             v-bind:paused="paused"
             v-bind:AVElement="AVElement"
+            v-bind:pauseDuration="pauseDuration"
             v-on:seeked="seekedFromMenu = true"
+            v-on:mouseOver="pauseDuration = null"
         />
         <CaptionBlur
             id="blurroot"
@@ -64,6 +66,7 @@ export default {
             currCaption: null,
             nextCaption: null,
             translationType: null, // human vs. machine
+            pauseDuration: null,
         };
     },
     mounted: function(){
@@ -255,6 +258,7 @@ export default {
                 this.automaticallyPausedThisCaption = true;
             }
             this.seekedFromMenu = false;
+            this.pauseDuration = null;
         },
         setObserversAndHandlers: function() {
             const self = this;
@@ -331,25 +335,46 @@ export default {
                     return;
                 }
 
-                const captionChanged = (
-                    (self.currCaption !== null && newTime >= self.currCaption.t1 + CAPTION_END_BUFFER_TIME) ||
-                    (
-                        self.nextCaption !== null &&
-                        newTime >= self.nextCaption.t0 &&
-                        newTime <= self.nextCaption.t1
-                    )
+                const isNextCaption = (
+                    self.nextCaption !== null &&
+                    newTime >= self.nextCaption.t0 &&
+                    newTime <= self.nextCaption.t1
                 );
-
+                let wordsPerSecond = 0;
+                if (isNextCaption && self.currCaption) {
+                    wordsPerSecond = self.currCaption.alignments.length / (newTime - self.currCaption.t0);
+                    console.log('WORDS PER SECOND', wordsPerSecond);
+                }
                 if (
-                    self.options.autoPause &&
+                    self.options.autoPause === 'basic' &&
                     ! self.automaticallyPausedThisCaption &&
                     ! self.paused &&
-                    captionChanged &&
+                    isNextCaption &&
                     ! self.seeked &&
                     ! self.seekedFromMenu
                 ) {
                     self.automaticallyPausedThisCaption = true;
                     self.AVElement.pause();
+                }
+                else if (
+                    self.options.autoPause === 'WPS' &&
+                    ! self.automaticallyPausedThisCaption &&
+                    ! self.paused &&
+                    isNextCaption &&
+                    ! self.seeked &&
+                    ! self.seekedFromMenu &&
+                    wordsPerSecond > self.options.WPSThreshold
+                ) {
+                    self.automaticallyPausedThisCaption = true;
+                    self.AVElement.pause();
+                    self.pauseDuration = self.currCaption.alignments.length / self.options.WPSThreshold - (newTime - self.currCaption.t0);
+                    console.log('PAUSING FOR', self.pauseDuration);
+                    setTimeout(function() {
+                        if (self.pauseDuration !== null) {
+                            self.AVElement.play(); // resume
+                            self.pauseDuration = null;
+                        }
+                    }, self.pauseDuration * 1000);
                 }
                 else {
                     self.currTime = newTime;

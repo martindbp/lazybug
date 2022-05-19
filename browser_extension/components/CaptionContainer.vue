@@ -40,6 +40,7 @@
             v-bind:currTime="currTime"
             v-bind:currentCaptionIdx="currentCaptionIdx"
         />
+        <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>
     </div>
 </template>
 
@@ -60,6 +61,7 @@ export default {
         'isLoading',
         'isLikelyAnAd',
         'translationType',
+        'pauseDuration',
     ],
     components: {CaptionContent, CaptionMenu},
     data: function() { return {
@@ -67,9 +69,19 @@ export default {
         showData: null,
         fadeOut: false,
     }},
+    updated: function() {
+        const self = this;
+        this.$nextTick(function () {
+            if (self.pauseDuration !== null) {
+                self.$refs.pauseProgressBar.style.transition = `width ${self.pauseDuration}s linear`;
+                self.$refs.pauseProgressBar.style.width = '0%';
+            }
+        });
+    },
     methods: {
         mouseOver: function() {
             this.showMenu = true;
+            this.$emit('mouseOver');
         },
         mouseOut: function() {
             this.showMenu = false;
@@ -142,4 +154,13 @@ export default {
     transition: background-color 300ms linear;
 }
 
+.pauseprogressbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 5px;
+    background-color: green;
+    border-radius: 3px;
+}
 </style>

@@ -90,8 +90,18 @@
                     />
                     <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
                     <div class="q-gutter-sm">
-                        <q-checkbox v-model="autoPause" label="Auto-pause subtitle" />
+                        <br>
+                        <q-item-label>Auto Pause</q-item-label>
+                        <q-radio v-model="autoPause" val="off" label="Off" />
+                        <q-radio v-model="autoPause" val="basic" label="After All" />
+                        <q-radio v-model="autoPause" val="WPS" label="After Fast" />
+                        <br>
+                        <div v-if="autoPause === 'WPS'">
+                            <q-item-label header>Words Per Second</q-item-label>
+                            <q-slider label v-model="WPSThreshold" :min="0.0" :max="4.0" step="0.1" />
+                        </div>
                     </div>
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="blurCaptions" label="Blur Captions" />
                     </div>
@@ -157,6 +167,12 @@ export default {
             ["peekTr", "Peek Word Translation Row"],
         ],
         choosingShortcut: null,
+        autoPauseOptions: [
+            { label: 'Off', value: 'off' },
+            { label: 'After every subtitle', value: 'basic' },
+            { label: 'After fast subtitles', value: 'WPS' },
+        ],
+        autoPause: 'off',
     }},
     computed: {
         show: {
@@ -190,6 +206,10 @@ export default {
         autoPause: {
             get: function() { return this.$store.state.options.autoPause; },
             set: function(val) { this.$store.commit('setOption', {key: 'autoPause', value: val}); },
+        },
+        WPSThreshold: {
+            get: function() { return this.$store.state.options.WPSThreshold; },
+            set: function(val) { this.$store.commit('setOption', {key: 'WPSThreshold', value: val}); },
         },
         blurCaptions: {
             get: function() { return this.$store.state.options.blurCaptions; },

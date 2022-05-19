@@ -44,14 +44,29 @@ function backgroundImportDatabaseJson(data, callback) {
     // Deleting curent
     personalDb.delete();
     personalDb = initPersonalDb();
+    DexieExportImport.peakImportFile(blob).then(function(fileMeta) {
+        const version = fileMeta.data.databaseVersion;
 
-    personalDb.import(blob, { overwriteValues: true })
-    .then(() => {
-        callback();
-    })
-    .catch((error) => {
-        callback(error);
-    });;
+        personalDb.delete();
+        personalDb = initPersonalDb(version);
+
+        personalDb.import(blob, { overwriteValues: true })
+        .then(() => {
+            return personalDb.close();
+        })
+        .then(() => {
+            applyDbVersions(personalDb, PERSONAL_DB_VERSIONS, version);
+        })
+        .then(() => {
+            return personalDb.open();
+        })
+        .then(() => {
+            callback();
+        })
+        .catch((error) => {
+            callback(error);
+        });
+    });
 }
 
 function showBadgeStatus() {
@@ -344,6 +359,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     else if (message.type === 'importDatabaseJson') {
         backgroundImportDatabaseJson(message.data, function (message) {
+            if (message !== undefined) message = String(message);
             sendResponse(message);
         });
     }
