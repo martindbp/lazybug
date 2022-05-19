@@ -250,6 +250,8 @@ while True:
 
             if args.move_foreground:
                 dy, dx = args.move_foreground.split(',')
+                dx = dx.replace('n', '-')
+                dy = dy.replace('n', '-')
                 dy, dx = int(dy), int(dx)
                 foreground = foreground | np.roll(foreground.copy(), (dy, dx), axis=(0, 1))
 
