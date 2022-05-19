@@ -341,33 +341,29 @@ export default {
                     newTime <= self.nextCaption.t1
                 );
                 let wordsPerSecond = 0;
-                if (isNextCaption && self.currCaption) {
-                    wordsPerSecond = self.currCaption.alignments.length / (newTime - self.currCaption.t0);
+                if (isNextCaption && (self.currCaption || self.prevCaption)) {
+                    const c = self.currCaption || self.prevCaption;
+                    wordsPerSecond = c.alignments.length / (newTime - c.t0);
                     console.log('WORDS PER SECOND', wordsPerSecond);
                 }
-                if (
-                    self.options.autoPause === 'basic' &&
+
+                const canPause = (
+                    isNextCaption &&
                     ! self.automaticallyPausedThisCaption &&
                     ! self.paused &&
-                    isNextCaption &&
                     ! self.seeked &&
                     ! self.seekedFromMenu
-                ) {
+                );
+
+                if (self.options.autoPause === 'basic' && canPause) {
                     self.automaticallyPausedThisCaption = true;
                     self.AVElement.pause();
                 }
-                else if (
-                    self.options.autoPause === 'WPS' &&
-                    ! self.automaticallyPausedThisCaption &&
-                    ! self.paused &&
-                    isNextCaption &&
-                    ! self.seeked &&
-                    ! self.seekedFromMenu &&
-                    wordsPerSecond > self.options.WPSThreshold
-                ) {
+                else if (self.options.autoPause === 'WPS' && canPause && wordsPerSecond > self.options.WPSThreshold) {
                     self.automaticallyPausedThisCaption = true;
                     self.AVElement.pause();
-                    self.pauseDuration = self.currCaption.alignments.length / self.options.WPSThreshold - (newTime - self.currCaption.t0);
+                    const c = self.currCaption || self.prevCaption;
+                    self.pauseDuration = c.alignments.length / self.options.WPSThreshold - (newTime - c.t0);
                     console.log('PAUSING FOR', self.pauseDuration);
                     setTimeout(function() {
                         if (self.pauseDuration !== null) {
