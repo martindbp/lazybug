@@ -333,7 +333,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
 
                 scale = 1.0
                 if random.random() < 0.5:
-                    scale = 0.98 if random.random() < 0.5 else 1.02
+                    scale = 0.985 if random.random() < 0.5 else 1.015
 
                 composite, mask = generate_cutout_composite(
                     cutout_filename,
@@ -434,7 +434,7 @@ def pipeline(corpus: list, num: int, out_width: int, out_height: int, seed: int 
                 out_width,
                 out_height,
                 invert,
-                blackout_top_bottom=ceil(random.random()*blackout_top_bottom_max) if random.random() < 0.5 else None,
+                #blackout_top_bottom=ceil(random.random()*blackout_top_bottom_max) if random.random() < 0.5 else None,
             )
             render_image_paths.append(img)
             render_mask_paths.append(mask)
