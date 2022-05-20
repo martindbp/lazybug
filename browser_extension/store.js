@@ -21,7 +21,7 @@ const store = new Vuex.Store({
         videoId: null,
         sessionTime: null,
         captionData: null,
-        captionHash: null, // use this for event log
+        captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
         resourceFetchErrors: [],
         showList: null,
         showInfo: null,

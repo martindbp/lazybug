@@ -221,10 +221,14 @@ export default {
     },
     methods: {
         fetchCaptionMaybe: function() {
-            this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
-            if (this.captionId === null || [null, undefined].includes(chrome.runtime)) return;
+            if (this.captionId === null || [null, undefined].includes(chrome.runtime)) {
+                this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
+                return;
+            }
+            if (this.$store.state.captionHash === 'fetching') return;
 
             this.$store.commit('resetResourceFetchError', 'caption data');
+            this.$store.commit('setCaptionDataAndHash', {data: null, hash: 'fetching'});
 
             const self = this;
             chrome.runtime.sendMessage({'type': 'getCaptions', 'data': {
@@ -232,6 +236,7 @@ export default {
             }}, function onResponse(message) {
                 if (message === 'error') {
                     self.$store.commit('setResourceFetchError', 'caption data');
+                    self.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
                     return false;
                 }
                 self.$store.commit('resetResourceFetchError', 'caption data');
