@@ -111,7 +111,6 @@ function addStorageData(keys, values, store) {
 }
 
 
-const CDN_URL = "https://cdn.zimu.ai/file/";
 function backgroundFetchResource(folder, resourceFilename, callback, failCallback) {
     console.log(folder, resourceFilename);
     let [filename, ext] = resourceFilename.split('.');

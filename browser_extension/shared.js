@@ -1,3 +1,4 @@
+const CDN_URL = "https://cdn.zimu.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 
 const events = [
