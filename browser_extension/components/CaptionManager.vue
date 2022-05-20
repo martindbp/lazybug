@@ -67,6 +67,7 @@ export default {
             nextCaption: null,
             translationType: null, // human vs. machine
             pauseDuration: null,
+            keyboardListener: null,
         };
     },
     mounted: function(){
@@ -80,6 +81,7 @@ export default {
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);
         window.removeEventListener('load', this.updateCaptionPositionBlurFontSize);
+        window.removeEventListener('keydown', this.keyboardListener);
         document.removeEventListener('fullscreenchange', this.fullscreenChangeListener);
         if (this.mutationObserver !== null) this.mutationObserver.disconnect();
         if (this.resizeObserver !== null) this.resizeObserver.disconnect();
@@ -319,6 +321,10 @@ export default {
 
             document.addEventListener('DOMContentLoaded', () => {
                 self.AVElement = document.querySelector(self.AVElementSelector);
+            });
+
+            this.keyboardListener = window.addEventListener("keydown", function(event) {
+                self.pauseDuration = null; // cancel auto pausing for any key down
             });
         },
         fullscreenChangeListener: function() {
