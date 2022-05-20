@@ -7,8 +7,8 @@
             v-bind:data="showData"
             v-on:seeked="$emit('seeked')"
         />
-        <div class="loadingcontent" v-if="$store.state.resourceFetchError !== null">
-            Error fetching {{ $store.state.resourceFetchError }}, try reloading page
+        <div class="loadingcontent" v-if="$store.state.resourceFetchErrors.length > 0">
+            Error fetching {{ $store.state.resourceFetchErrors.join(', ') }}, try reloading page
         </div>
         <div class="loadingcontent" v-else-if="isLoading">
             Loading resources...

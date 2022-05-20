@@ -22,7 +22,7 @@ const store = new Vuex.Store({
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log
-        resourceFetchError: null,
+        resourceFetchErrors: [],
         showList: null,
         showInfo: null,
         videoList: null,
@@ -109,12 +109,12 @@ const store = new Vuex.Store({
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
             // (not some other resource)
-            if (state.resourceFetchError === val) {
-                state.resourceFetchError = null;
+            if (state.resourceFetchErrors.includes(val)) {
+                state.resourceFetchErrors.splice(state.resourceFetchErrors.indexOf(val), 1);
             }
         },
         setResourceFetchError(state, val) {
-            state.resourceFetchError = val;
+            state.resourceFetchErrors.push(val);
         },
         setIsMovingCaption(state, val) {
             state.isMovingCaption = val;
@@ -131,12 +131,12 @@ const store = new Vuex.Store({
             state.captionData = val.data;
             state.captionHash = val.hash;
             if (state.captionData !== null) {
-                if (state.resourceFetchError === 'show info') {
-                    state.resourceFetchError = null;
+                if (state.resourceFetchErrors.includes('show info')) {
+                    state.resourceFetchErrors.splice(state.resourceFetchErrors.indexOf('show info'), 1);
                 }
                 fetchResource(`shows/${state.captionData.show_name}.json`, function (data) {
                     if (data === 'error') {
-                        state.resourceFetchError = 'show info';
+                        state.resourceFetchErrors.push('show info');
                     }
                     else {
                         state.showInfo = data;
@@ -269,14 +269,13 @@ const FETCH_PUBLIC_RESOURCES = [
     ['show_list.json', 'show list', 'setShowList'],
 ];
 
-store.commit('resetResourceFetchError');
-
 for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
     fetchVersionedResource(filename, function (data) {
         if (data === 'error') {
             store.commit('setResourceFetchError', errorName);
         }
         else {
+            store.commit('resetResourceFetchError', errorName);
             store.commit(mutation, data);
         }
     });

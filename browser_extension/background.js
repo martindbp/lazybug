@@ -97,7 +97,6 @@ function updateStorageData(keys, values, store) {
         entries.push(store.update(keys[i], {value: values[i], timestamp: Date.now()}));
     }
 
-    console.log('Update', entries);
     return Promise.all(entries);
 }
 
@@ -177,7 +176,7 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
     .then(function(values) {
         fetchHash = values[0].trim();
         const storageHash = values[1];
-        console.log('Got hashes', fetchHash, storageHash);
+        console.log('Got hashes', fetchHash, storageHashKey, storageHash);
         if (fetchHash !== storageHash) {
             console.log('Fetching', folder, filename, fetchHash);
             return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
@@ -195,13 +194,17 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
 
                     const keys = [storageFileKey, storageHashKey];
                     const values = [data, fetchHash];
-                    if (storageHashKey) {
+                    if (storageHash) {
                         return updateStorageData(keys, values, cacheDb.network)
                             .then(() => data);
                     }
                     else {
                         return addStorageData(keys, values, cacheDb.network)
-                            .then(() => data);
+                            .then(() => data)
+                            .catch((error) => {
+                                // BulkError, probably requested same resource twice
+                                return data;
+                            });
                     }
                 });
         } else {

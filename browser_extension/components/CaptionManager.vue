@@ -234,6 +234,7 @@ export default {
                     self.$store.commit('setResourceFetchError', 'caption data');
                     return false;
                 }
+                self.$store.commit('resetResourceFetchError', 'caption data');
                 if (self.$store.state.captionHash === message.hash) return true;
 
                 console.log(message);
