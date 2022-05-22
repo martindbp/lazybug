@@ -221,8 +221,8 @@ function captionArrayToDict(arr, captionData) {
             // TODO: use caption_left/right if available
             const xMin = captionData.frame_size[1] * 0.2;
             const xMax = captionData.frame_size[1] * 0.8;
-            const yMin = 0;
-            const yMax = captionData.frame_size[0] * (captionData.caption_bottom - captionData.caption_top);
+            const yMin = captionData.frame_size[0] * captionData.caption_top;
+            const yMax = captionData.frame_size[0] * captionData.caption_bottom;
             boundingRects = [[xMin, xMax, yMin, yMax]];
         }
         else {
