@@ -1500,7 +1500,7 @@ def process_video_captions(
                 if param['type'] == 'hanzi':
                     vtt_types = ['zh', 'zh-Hans', 'zh-CN']
                 elif param['type'] == 'english':
-                    vtt_types = ['en', 'en-US']
+                    vtt_types = ['en', 'en-US', 'en-UK', 'en-GB']
 
                 for vtt_type in vtt_types:
                     path = f'data/remote/private/caption_data/translations/{vid}.{vtt_type}.vtt'
