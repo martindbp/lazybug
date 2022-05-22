@@ -25,6 +25,7 @@ const store = new Vuex.Store({
         resourceFetchErrors: [],
         showList: null,
         showInfo: null,
+        thumbnailObserver: null,
         videoList: null,
         DICT: null,
         HSK_WORDS: null,
@@ -102,7 +103,9 @@ const store = new Vuex.Store({
         },
         setVideoList(state, val) {
             state.videoList = new Set(val);
-            initializeThumbnailBadges(state.videoList);
+            const newThumbnailObserver = initializeThumbnailBadges(state.videoList);
+            if (state.thumbnailObserver) state.thumbnailObserver.disconnect();
+            state.thumbnailObserver = newThumbnailObserver;
         },
         setShowList(state, val) {
             state.showList = val;
@@ -313,7 +316,7 @@ function initializeThumbnailBadges(videoList) {
         addBadge($img, videoList);
     }
 
-    new MutationObserver((mutations) => {
+    return new MutationObserver((mutations) => {
         let hasNewThumbnails = false;
         for (let mutation of mutations) {
             switch(mutation.type) {
