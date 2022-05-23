@@ -1,3 +1,4 @@
+const VERSION = chrome.runtime.getManifest().version;
 const CDN_URL = "https://cdn.zimu.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 

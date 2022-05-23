@@ -567,7 +567,7 @@ export default {
         },
         exportDb: function() {
             exportDatabaseJson(function(data) {
-                const filename = 'database-'+(new Date(Date.now())).toISOString().split('T')[0]+'.json'
+                const filename = `database-v${VERSION}-${(new Date(Date.now())).toISOString().split('T')[0]}.json`;
                 download(filename, JSON.stringify(data));
             });
         },
