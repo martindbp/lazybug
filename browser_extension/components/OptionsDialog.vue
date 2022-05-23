@@ -9,6 +9,7 @@
                 <q-tab name="subtitle" label="Subtitle" />
                 <q-tab name="knowledge" label="Knowledge" />
                 <q-tab name="keyboard" label="Keyboard" />
+                <q-tab name="other" label="Other" />
             </q-tabs>
 
             <q-tab-panels v-model="tab">
@@ -142,6 +143,23 @@
                     <br>
                     <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
                 </q-tab-panel>
+                <q-tab-panel name="other" style="width: 400px">
+                    <div class="q-gutter-sm">
+                        <q-btn
+                            style="margin-top: 10px; width: 80%"
+                            color="primary"
+                            label="Export Hanzi SRT"
+                            @click="exportSrt('hanzi')"
+                        />
+                        <q-btn
+                            style="margin-top: 10px; width: 80%"
+                            color="primary"
+                            label="Export English SRT"
+                            @click="exportSrt('english')"
+                        />
+                    </div>
+                    <br>
+                </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
                 <q-btn flat label="Close" @click="clickClose"></q-btn>
@@ -242,6 +260,33 @@ export default {
         },
         resetShortcuts: function() {
             this.$store.commit('setOption', {key: 'keyboardShortcuts', value: DEFAULT_SHORTCUTS});
+        },
+        exportSrt: function(type) {
+            let srtOut = '';
+            const captionData = this.$store.state.captionData;
+            for (let i = 0; i < captionData.lines.length; i++) {
+                const line = captionData.lines[i];
+                const data = captionArrayToDict(line, captionData);
+                srtOut += `${i+1}\n`;
+                const t0 = srtTimestamp(data.t0);
+                const t1 = srtTimestamp(data.t1);
+                srtOut += `${t0} -->  ${t1}\n`;
+                if (type === 'hanzi') {
+                    srtOut += data.texts.join(' ');
+                }
+                else {
+                    srtOut += data.translations[0];
+                }
+                srtOut += '\n\n';
+            }
+
+            let [showName, seasonName, episodeName] = getShowSeasonEpisodeName(this.$store.state.showInfo, this.$store.state.captionId);
+            let name = `${showName.hz || showName}`;
+            if (seasonName) name += `-${seasonName}`;
+            name += `-${episodeName}`;
+
+            let filename = `${name}-${type}.srt`;
+            download(filename, srtOut);
         },
     },
 }
