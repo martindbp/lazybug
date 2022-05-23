@@ -462,7 +462,8 @@ export default {
             const [wordIdx, data] = eventData;
             const t0 = data.data.t0;
             const t1 = data.data.t1;
-            const [site, id] = captionId.split('-');
+            const parts = captionId.split('-');
+            const id = parts.slice(1).join('-');
             return getYoutubeEmbedCode(id, t0, t1);
         },
         timestampToYYYMMDD: function(val) {
