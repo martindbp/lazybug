@@ -14,14 +14,41 @@ const PERSONAL_DB_VERSIONS = {
         });
     },
     '2': function(personalDb) {
+        // Add WPS auto pause options
         personalDb.version(2).stores({
             other: 'id',
-        }).upgrade (trans => {
+        }).upgrade(trans => {
             return trans.other.toCollection().modify(item => {
                 if (item.id === 'options') {
                     item.value.autoPause = item.value.autoPause ? 'basic' : 'off';
                     item.value.WPSThreshold = 2.0;
                 }
+            });
+        });
+    },
+    '3': function(personalDb) {
+        // Move showName, seaonName and episodeName from individual events to the session data
+        personalDb.version(3).stores({
+            log: '[captionId+captionHash+sessionTime], sessionTime, captionHash, *eventIds, synced',
+        }).upgrade(trans => {
+            return trans.log.toCollection().modify(item => {
+                let [showName, seasonName, episodeName] = [null, null, null];
+                for (let i = 0; i < item.eventIds.length; i++) {
+                    if (item.eventIds[i] === reverseEventsMap[item.eventIds[i]].startsWith('EVENT_STAR_')) {
+                        const eventData = item.eventData[i];
+                        const state = eventData[eventData.length-1];
+                        showName = state.showName;
+                        seasonName = state.seasonName;
+                        episodeName = state.episodeName;
+                        delete state.showName;
+                        delete state.seasonName;
+                        delete state.episodeName;
+                    }
+                }
+
+                item.showName = showName;
+                item.seasonName = seasonName;
+                item.episodeName = episodeName;
             });
         });
     }

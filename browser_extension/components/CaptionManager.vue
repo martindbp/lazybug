@@ -356,7 +356,6 @@ export default {
                 if (isNextCaption && (self.currCaption || self.prevCaption)) {
                     const c = self.currCaption || self.prevCaption;
                     wordsPerSecond = c.alignments.length / (newTime - c.t0);
-                    console.log('WORDS PER SECOND', wordsPerSecond);
                 }
 
                 const canPause = (

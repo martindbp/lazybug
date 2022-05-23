@@ -388,27 +388,6 @@ export default {
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
             const dt = Date.now() - this.$store.state.sessionTime;
-            const showInfo = this.$store.state.showInfo;
-            let showName = null;
-            let seasonName = null;
-            let episodeName = null;
-            if (showInfo) {
-                if (typeof showInfo.name === "object") showName = showInfo.name.hz;
-                else showName = showInfo.name;
-                const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, this.$store.state.captionId);
-                if (seasonIdx !== null) {
-                    let seasonName = showInfo.seasons[seasonIdx].name;
-                    if (! seasonName) {
-                        seasonName = showInfo.seasons.length > 1 ? 'Season ' + (seasonIdx + 1) : null;
-                    }
-
-                    let episodeName = showInfo.seasons[seasonIdx].episodes[episodeIdx].name;
-                    if (! episodeName) {
-                        episodeName = showInfo.seasons[seasonIdx].length > 1 ? 'Episode ' + (episodeIdx + 1) : null;
-                    }
-                }
-            }
-
             let captionIdx = this.currentCaptionIdx;
             if (Array.isArray(captionIdx)) {
                 captionIdx = captionIdx[0];
@@ -418,9 +397,6 @@ export default {
                 translationIdx: this.translationIdx,
                 hidden: this.hiddenStates,
                 dt: dt,
-                showName: showName,
-                seasonName: seasonName,
-                episodeName: episodeName,
                 captionIdx: captionIdx,
             };
         },

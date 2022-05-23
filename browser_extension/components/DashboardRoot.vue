@@ -479,6 +479,19 @@ export default {
                     const eventName = reverseEventsMap[eventId];
                     console.log(eventId, eventName);
                     if (eventName.startsWith("EVENT_STAR")) {
+                        if (session.showName === null) {
+                            eventData[1].showName = null;
+                        }
+                        else if (typeof session.showName === "object") {
+                            eventData[1].showName = session.showName.hz;
+                        }
+                        else {
+                            eventData[1].showName = session.showName;
+                        }
+
+                        eventData[1].seasonName = session.seasonName;
+                        eventData[1].episodeName = session.episodeName;
+
                         let type = null;
                         if (eventName.endsWith('PY')) {
                             type = 'py';

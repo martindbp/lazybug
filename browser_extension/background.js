@@ -291,13 +291,17 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'appendSessionLog') {
-        const whereQuery = {captionId: message.captionId, captionHash: message.captionHash, sessionTime: message.sessionTime};
+        const whereQuery = {
+            captionId: message.sessionData.captionId,
+            captionHash: message.sessionData.captionHash,
+            sessionTime: message.sessionData.sessionTime,
+        };
         personalDb.log.where(whereQuery).count(function(count) {
             if (count === 0) {
-                whereQuery.eventIds = [message.data[0]];
-                whereQuery.eventData = [message.data.slice(1)];
-                whereQuery.synced = false;
-                personalDb.log.put(whereQuery)
+                message.sessionData.eventIds = [message.data[0]];
+                message.sessionData.eventData = [message.data.slice(1)];
+                message.sessionData.synced = false;
+                personalDb.log.put(message.sessionData)
                 .then(function() {
                     sendResponse(null);
                 })
@@ -311,6 +315,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                     x.eventIds.push(message.data[0]);
                     x.eventData.push(message.data.slice(1));
                     x.synced = false;
+                    // The names can be null the first time you load a page, so always update these
+                    x.showName = message.sessionData.showName;
+                    x.seasonName = message.sessionData.seasonName;
+                    x.episodeName = message.sessionData.episodeName;
                 })
                 .then(function() {
                     sendResponse();
@@ -320,7 +328,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                     sendResponse('error');
                 });
             }
-        })
+        });
     }
     else if (message.type === 'poll') {
         console.log('Polling');

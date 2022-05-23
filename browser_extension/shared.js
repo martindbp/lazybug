@@ -144,12 +144,18 @@ function fetchPersonalDataToStore(store) {
 }
 
 function appendSessionLog(state, data) {
-    console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data);
+    const [showName, seasonName, episodeName] = getShowSeasonEpisodeName(state.showInfo, state.captionId);
+    console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data, showName, seasonName, episodeName);
     chrome.runtime.sendMessage({
         type: 'appendSessionLog',
-        captionId: state.captionId,
-        captionHash: state.captionHash,
-        sessionTime: state.sessionTime,
+        sessionData: {
+            captionId: state.captionId,
+            captionHash: state.captionHash,
+            sessionTime: state.sessionTime,
+            showName: showName,
+            seasonName: seasonName,
+            episodeName: episodeName,
+        },
         data: data,
     }, function onResponse(message) {
         return true;
@@ -571,6 +577,29 @@ function openDashboard() {
     chrome.runtime.sendMessage({type: 'openDashboard'}, function onResponse(message) {
         return true;
     });
+}
+
+function getShowSeasonEpisodeName(showInfo, captionId) {
+    let showName = null;
+    let seasonName = null;
+    let episodeName = null;
+    if (showInfo) {
+        showName = showInfo.name;
+        const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, captionId);
+        if (seasonIdx !== null) {
+            seasonName = showInfo.seasons[seasonIdx].name;
+            if (! seasonName) {
+                seasonName = showInfo.seasons.length > 1 ? 'Season ' + (seasonIdx + 1) : null;
+            }
+
+            episodeName = showInfo.seasons[seasonIdx].episodes[episodeIdx].name;
+            if (! episodeName) {
+                episodeName = showInfo.seasons[seasonIdx].episodes.length > 1 ? 'Episode ' + (episodeIdx + 1) : null;
+            }
+        }
+    }
+
+    return [showName, seasonName, episodeName];
 }
 
 // SVG icons from css.gg
