@@ -238,6 +238,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
         ('老师', 'post'),
         ('警官', 'post'),
         ('医生', 'post'),
+        ('大夫', 'post'),
         ('经理', 'post'),
         ('院长', 'post'),
         ('总', 'post'),
