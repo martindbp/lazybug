@@ -48,13 +48,13 @@ push-private-essentials:
 	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*' --skipNewer
 
 pull-public:
-	b2 sync b2://zimu-public data/remote/public
+	b2 sync b2://zimu-public data/remote/public --skipNewer
 
 pull-private:
-	b2 sync b2://zimu-private data/remote/private
+	b2 sync b2://zimu-private data/remote/private --skipNewer
 
 pull-private-essentials:
-	b2 sync b2://zimu-private data/remote/private --excludeRegex '.*caption_data.*'
+	b2 sync b2://zimu-private data/remote/private --skipNewer --excludeRegex '.*caption_data.*'
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID
