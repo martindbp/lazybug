@@ -330,7 +330,12 @@ export default {
             });
 
             this.keyboardListener = window.addEventListener("keydown", function(event) {
-                self.pauseDuration = null; // cancel auto pausing for any key down
+                if (self.pauseDuration !== null) {
+                    self.pauseDuration = null; // cancel auto pausing for any key down
+                    // Make sure it doesn't continue to regular keyboard shortcuts
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             });
         },
         fullscreenChangeListener: function() {
