@@ -93,11 +93,14 @@ chrome.runtime.onMessage.addListener(msgObj => {
         const playlistId = params["list"];
 
         let data = {
-            "name": "",
+            "name": {
+                "hz": "",
+                "py": "",
+                "en": ""
+            },
             "description": "",
             "seasons": [
                 {
-                    "name": title,
                     "youtube_playlist": playlistId,
                     "episodes": [
                     ]
