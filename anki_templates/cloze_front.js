@@ -21,6 +21,12 @@ function addEmbedding(event) {
     event.target.outerHTML = embedding;
 }
 
+function showAll(event) {
+    for (const $el of document.querySelectorAll('span:not(.clozedata)')) {
+        $el.style.display = 'inline';
+    }
+}
+
 function clozeContent(data) {
     return `<span class="clozeplaceholder" style="color:blue">[...]</span><span class="clozedata" style="display:none;color:blue">${data}</span>`;
 }
@@ -80,9 +86,9 @@ function makeCloze(wordData, hiddenStates, cardType, wordIdx, t0, t1, captionId)
         html += row;
     }
     html += '</table>';
-    html += `<br><button onClick="document.querySelectorAll('td').forEach((el) => el.style.visibility = 'visible')">Show context</button>`;
+    html += `<br><button onClick="showAll()">Show all</button>`;
     html += `<br><hr><br><div>${clozeContent(wordData.translation)}</div>`;
-    html += `<br><hr><button onClick="addEmbedding(event)">Play</button>`;
+    html += `<br><hr><button onClick="addEmbedding(event)">Play snippet</button>`;
 
     return html;
 }
