@@ -622,6 +622,7 @@ export default {
                 const allHidden = {hz: false, tr: false, py: false};
                 for (const type of ['hz', 'py', 'tr']) {
                     if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateHidden) {
+                        allHidden[type] = true;
                         continue;
                     }
 
