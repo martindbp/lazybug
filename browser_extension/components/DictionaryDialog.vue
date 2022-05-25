@@ -31,6 +31,7 @@
                         </span>: {{ item.translations.join(' ‧ ') }}</div>
                     <q-separator color="orange" />
                 </div>
+                <div v-if="dictEntries.length > 0"><br/>Source <a href="https://cc-cedict.org/wiki/">(CC-EDICT)</a></div>
                 <div class="text-h5" v-if="dictEntries.length === 0 && text !== ''">
                     Click on a word to see the dictionary pinyin and translations
                 </div>
