@@ -94,8 +94,8 @@
                         <br>
                         <q-item-label>Auto Pause</q-item-label>
                         <q-radio v-model="autoPause" val="off" label="Off" />
-                        <q-radio v-model="autoPause" val="basic" label="After All" />
-                        <q-radio v-model="autoPause" val="WPS" label="After Fast" />
+                        <q-radio v-model="autoPause" val="basic" label="After every subtitle" />
+                        <q-radio v-model="autoPause" val="WPS" label="After fast subtitles" />
                         <br>
                         <div v-if="autoPause === 'WPS'">
                             <q-item-label header>Words Per Second</q-item-label>
