@@ -147,6 +147,7 @@ export default {
             handler: function() {
                 this.$store.commit('setCaptionId', this.captionId);
                 this.fetchCaptionMaybe();
+                lastCaptionIdxGlobal = 0;
             }
         },
         videoId: {
@@ -415,7 +416,7 @@ export default {
             const captionData = this.$store.state.captionData;
             if (captionData === null) return null;
 
-            const lines = captionData.lines
+            const lines = captionData.lines;
             const lastSeenCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], captionData);
             const lastSeenCaptionT0 = lastSeenCaption.t0 + (withTimingOffset ? lastSeenCaption.timingOffset : 0);
             if (this.currTime < lastSeenCaptionT0) {
