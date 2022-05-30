@@ -517,7 +517,7 @@ export default {
                             getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden ||
                             this.$store.state.options.hideLevels[type] === 7 || // all
                             ( // Any number + MW should be hidden if hide level is > 2
-                                hz.match(/^[一二三四五六七八九十百千万个]+$/) &&
+                                hz.match(CHINESE_NUMBERS_REGEX) &&
                                 this.$store.state.options.hideLevels[type] > 2
                             )
                         )
@@ -623,9 +623,9 @@ export default {
             // For example, 地上, 拿不着, 这样的, 不服气, 知道了, middle chars: 离不开, 想不到
 
             const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来', '不'];
-            const simpleCharsPre = ['有'];
-            const simpleCharsMiddle = ['不'];
-            const simpleCharsPost = ['地', '不着', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好', '者', '下去', '上去', '下来', '上来', '起来'];
+            const simpleCharsPre = ['有'].concat(simpleCharsPrePost);
+            const simpleCharsMiddle = ['不', '一', '两'];
+            const simpleCharsPost = ['地', '不着', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好', '者', '下去', '上去', '下来', '上来', '起来'].concat(simpleCharsPrePost);
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -637,6 +637,7 @@ export default {
 
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
+                if (pys === null) continue;  // non hanzi
 
                 const allHidden = {hz: false, tr: false, py: false};
                 for (const type of ['hz', 'py', 'tr']) {
@@ -645,23 +646,20 @@ export default {
                         continue;
                     }
 
-                    for (const indices of [[[0, 1], [1, hz.length]], [[hz.length-1, hz.length], [0, hz.length-1]]]) {
-                        const preIdx = indices[0];
-                        const postIdx = indices[1];
-                        let checkChars = [...simpleCharsPrePost];
-                        if (preIdx[0] === 0) checkChars = checkChars.concat(simpleCharsPre);
-                        else checkChars = checkChars.concat(simpleCharsPost);
+                    for (let middleIdx = 1; middleIdx < hz.length; middleIdx++) {
+                        const preHz = hz.substring(0, middleIdx);
+                        const postHz = hz.substring(middleIdx);
+                        const prePys = pys.slice(0, middleIdx);
+                        const postPys = pys.slice(middleIdx, pys.length);
 
-                        if (checkChars.includes(hz.substring(preIdx[0], preIdx[1]))) {
-                            const preHz = hz.substring(preIdx[0], preIdx[1]);
-                            const postHz = hz.substring(postIdx[0], postIdx[1]);
-                            const prePys = pys.slice(preIdx[0], preIdx[1]);
-                            const postPys = pys.slice(postIdx[0], postIdx[1]);
-                            allHidden[type] = allHidden[type] || (
-                                this.isHiddenStoreOrLvlStates(type, preHz, prePys) &&
-                                this.isHiddenStoreOrLvlStates(type, postHz, postPys)
-                            );
-                        }
+                        let preIsHidden = this.isHiddenStoreOrLvlStates(type, preHz, prePys);
+                        let postIsHidden = this.isHiddenStoreOrLvlStates(type, postHz, postPys);
+                        let preIsSimple = simpleCharsPre.includes(preHz) || preHz.match(CHINESE_NUMBERS_REGEX);
+                        let postIsSimple = simpleCharsPost.includes(postHz) || postHz.match(CHINESE_NUMBERS_REGEX);
+                        preIsHidden = preIsHidden || preIsSimple;
+                        postIsHidden = postIsHidden || postIsSimple
+
+                        allHidden[type] = allHidden[type] || ((preIsHidden && postIsHidden) && !(postIsSimple && preIsSimple));
                     }
 
                     for (const middleChar of simpleCharsMiddle) {
