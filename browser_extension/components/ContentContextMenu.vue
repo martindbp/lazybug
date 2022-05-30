@@ -17,7 +17,6 @@ export default {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),
         hideIcon: getIconSvg("hide", 18),
-        undoIcon: getIconSvg("undo", 18),
         pinIcon: getIconSvg("pin", 18),
         copyIcon: getIconSvg("copy", 18),
         starIcon: getIconSvg("star", 18),
@@ -38,7 +37,7 @@ export default {
     z-index: 999;
     background-color: rgb(50, 50, 50);
     position: absolute;
-    left: 0;
+    right: 0;
     top: -32px;
     font-size: 0;
     padding: 5px;

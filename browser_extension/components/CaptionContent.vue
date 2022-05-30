@@ -20,13 +20,16 @@
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <span v-if="hiddenAndNotPeeking.py[i]" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="purePeekStates.py[i]" class="iconcard peek" v-html="pinIcon"></span>
+                    <span v-if="!hiddenStates.py[i]" class="iconcard peek" v-html="hideIcon"></span>
+                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('py', i)" floating>...</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.py[i]"
                         type="py"
                         :idx="i"
-                        :hide="!hiddenStates.py[i]"
-                        :pin="purePeekStates.py[i] && hiddenStates.py[i]"
+                        :hide="false"
+                        :pin="false"
                         :star="!hiddenAndNotPeeking.py[i] && ! starredStates.words[i]"
                         :unstar="starredStates.words[i]"
                         :dict="true"
@@ -55,13 +58,16 @@
                         {{ sm2tr(hz) }}
                         <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <span v-if="hiddenAndNotPeeking.hz[i]" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="purePeekStates.hz[i]" class="iconcard peek" v-html="pinIcon"></span>
+                    <span v-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
+                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('hz', i)" floating>...</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.hz[i]"
                         type="hz"
                         :idx="i"
-                        :hide="!hiddenStates.hz[i]"
-                        :pin="purePeekStates.hz[i] && hiddenStates.hz[i]"
+                        :hide="false"
+                        :pin="false"
                         :star="!hiddenAndNotPeeking.hz[i] && ! starredStates.words[i]"
                         :unstar="starredStates.words[i]"
                         :dict="true"
@@ -90,13 +96,16 @@
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
+                    <span v-if="hiddenAndNotPeeking.tr[i]" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="purePeekStates.tr[i]" class="iconcard peek" v-html="pinIcon"></span>
+                    <span v-if="!hiddenStates.tr[i]" class="iconcard peek" v-html="hideIcon"></span>
+                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('tr', i)" floating>...</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.tr[i]"
                         type="tr"
                         :idx="i"
-                        :hide="!hiddenStates.tr[i]"
-                        :pin="purePeekStates.tr[i] && hiddenStates.tr[i]"
+                        :hide="false"
+                        :pin="false"
                         :star="!hiddenAndNotPeeking.tr[i] && ! starredStates.words[i]"
                         :unstar="starredStates.words[i]"
                         :dict="true"
@@ -131,7 +140,8 @@
                         {{ translation }}
                         <q-badge v-if="starredStates.translation" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
-                    <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking['translation']" v-html="eyecon"></span>
+                    <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking.translation" v-html="eyecon"></span>
+                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('translation')" floating>...</q-badge>
                     <ContentContextMenu
                         v-if="showContextMenu.translation"
                         type="translation"
@@ -169,10 +179,8 @@ export default {
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
         pinIcon: getIconSvg("pin", 18),
+        hideIcon: getIconSvg("hide", 18),
         unpinIcon: getIconSvg("unpin", 18),
-        bookIcon: getIconSvg("study", 18),
-        checkIcon: getIconSvg("check", 18),
-        undoIcon: getIconSvg("undo", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         showContextMenu: {hz: [], tr: [], py: [], translation: false},
         waitingBeforeClosingMenu: false,
@@ -314,30 +322,21 @@ export default {
             if (this.waitingBeforeClosingMenu) {
                 this.cancelCloseContextMenu = true;
             }
-            const d = this.$store.state.DICT;
-            const k = this.$store.state.states;
 
-            const pys = i === null ? null : this.wordData.pys[i];
-            const hz = i === null ? null : this.wordData.hz[i];
-            const tr = i === null ? null : this.wordData.tr[i];
-
-            let setState = null;
-            let stateType = null;
             if (action === 'hide') {
-                stateType = StateHidden;
-                setState = StateHidden;
                 // Peek it so that it doesn't become hidden right away
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
+                this.applyState(type, i, StateHidden, StateHidden);
             }
             else if (action === 'star') {
-                stateType = StateStarred;
-                setState = StateStarred;
                 let content = '';
                 if (type === 'translation') content = this.wordData.translation;
                 else {
                     content = `${this.wordData.hz[i]}/${this.wordData.py[i]}`;
                     type = 'word';
                 }
+
+                this.applyState(type, i, StateStarred, StateStarred);
 
                 this.$q.notify({
                     type: 'positive',
@@ -348,24 +347,14 @@ export default {
                 });
             }
             else if (action === 'pin') {
-                stateType = StateHidden;
-                setState = StateNone;
+                this.applyState(type, i, StateHidden, StateNone);
             }
             else if (action === 'unstar') {
-                stateType = StateStarred;
-                setState = StateNone;
                 type = 'word';
+                this.applyState(type, i, StateStarred, StateNone);
             }
 
-            if (setState !== null) {
-                applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
-                const eventData = [getEvent(action, type), i];
-                if (setState === StateStarred) {
-                    eventData.push(this.getCurrentState());
-                }
-                this.appendSessionLog(eventData);
-            }
-            else if (action === 'dict') {
+            if (action === 'dict') {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
                 this.$store.commit('setShowDictionary', {val: true, range: [startIdx, endIdx]});
             }
@@ -385,6 +374,28 @@ export default {
                 this.resetShowContextMenu(this.wordData);
             }
         },
+        applyState: function(type, i, stateType, setState) {
+            const d = this.$store.state.DICT;
+            const k = this.$store.state.states;
+
+            const pys = i === null ? null : this.wordData.pys[i];
+            const hz = i === null ? null : this.wordData.hz[i];
+            const tr = i === null ? null : this.wordData.tr[i];
+
+            applyState(d, k, type, hz, pys, tr, this.wordData.translation, stateType, setState, true, true);
+            let action = '';
+            if (stateType === StateHidden) {
+                action = setState === StateHidden ? 'hide' : 'pin';
+            }
+            else if (stateType === StateStarred) {
+                action = setState === StateStarred ? 'star' : 'unstar';
+            }
+            const eventData = [getEvent(action, type), i];
+            if (setState === StateStarred) {
+                eventData.push(this.getCurrentState());
+            }
+            this.appendSessionLog(eventData);
+        },
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
             const dt = Date.now() - this.$store.state.sessionTime;
@@ -400,40 +411,48 @@ export default {
                 captionIdx: captionIdx,
             };
         },
+        clickContextBadge: function(type, i = null) {
+            if (this.waitingBeforeClosingMenu) {
+                this.cancelCloseContextMenu = true;
+            }
+
+            this.resetShowContextMenu(this.wordData);
+            if (type === 'translation') {
+                this.showContextMenu[type] = true;
+            }
+            else {
+                this.showContextMenu[type][i] = true;
+            }
+        },
         click: function(type, i = null) {
             if (this.waitingBeforeClosingMenu) {
                 this.cancelCloseContextMenu = true;
             }
+            this.resetShowContextMenu(this.wordData);
+
             if (type === 'translation') {
-                if (this.hiddenStates[type] === true) {
-                    if (this.hiddenAndNotPeeking[type] === false) {
-                        const lastVal = this.showContextMenu[type];
-                        this.resetShowContextMenu(this.wordData);
-                        this.showContextMenu[type] = ! lastVal;
-                    }
-                    else {
-                        this.$store.commit('setPeekState', {'type': type, 'i': i});
-                        this.appendSessionLog([getEvent('peek', 'translation')]);
-                    }
-                }
-                else {
-                    const lastVal = this.showContextMenu[type];
-                    this.resetShowContextMenu(this.wordData);
-                    this.showContextMenu[type] = ! lastVal;
+                if (this.hiddenAndNotPeeking[type] === true) {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                    this.applyState(type, i, StateHidden, StateNone);
                 }
                 return;
             }
 
             if (this.wordData.pys[i] === null) return;
 
-            if (this.hiddenStates[type][i] === true && ! this.purePeekStates[type][i]) {
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
-                this.appendSessionLog([getEvent('peek', 'tr'), i]);
+            if (this.hiddenStates[type][i] === true) {
+                if (! this.purePeekStates[type][i]) {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                    this.appendSessionLog([getEvent('peek', 'tr'), i]);
+                }
+                else {
+                    // Pin it
+                    this.applyState(type, i, StateHidden, StateNone);
+                }
             }
             else {
-                const lastVal = this.showContextMenu[type][i];
-                this.resetShowContextMenu(this.wordData);
-                this.showContextMenu[type][i] = ! lastVal;
+                // Hide it
+                this.applyState(type, i, StateHidden, StateHidden);
             }
         },
         mouseleave: function(event, type, i = null) {
@@ -767,12 +786,11 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation) .cardcontent {
-    /*color: #32de84;*/
     color: gray;
 }
 
-.captioncard.peeking:hover .cardcontent {
-    color: lightgray;
+.captioncard:hover:not(.nonhanzi):not(.fulltranslation) .cardcontent {
+    color: rgb(100, 100, 100) !important;
 }
 
 .peekrow .cardcontent {
@@ -851,16 +869,38 @@ export default {
     padding-right: 0.3em;
 }
 
-.captioncardhidden .statsbadge {
+.captioncardhidden .statsbadge,
+.captioncardhidden .contextbadge {
     display: none !important;
 }
 
-.captioncard:not(:hover) .statsbadge {
+.captioncard:not(:hover) .statsbadge,
+.captioncard:not(:hover) .contextbadge {
     display: none !important;
 }
 
-.nonhanzi .statsbadge {
+.nonhanzi .statsbadge,
+.nonhanzi .contextbadge {
     display: none !important;
+}
+
+.captioncard .statsbadge,
+.captioncard .contextbadge {
+    margin-top: -5px;
+    margin-right: -5px;
+}
+
+.contextbadge {
+    background: gray !important;
+    border: 1px solid white;
+}
+
+.contextbadge:hover {
+    filter: brightness(1.5);
+}
+
+.contextbadge:active {
+    filter: brightness(2.5);
 }
 
 .captioncard:hover:not(.fulltranslation):not(.captioncardhidden) .starbadge {
@@ -869,11 +909,6 @@ export default {
 
 .captioncardhidden .starbadge {
     display: none !important;
-}
-
-.captioncard .statsbadge {
-    margin-top: -5px;
-    margin-right: -5px;
 }
 
 .captioncard .starbadge {
