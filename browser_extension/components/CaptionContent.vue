@@ -536,13 +536,14 @@ export default {
             }
         },
         applySimpleCompounds: function() {
+            if (this.$store.state.SIMPLE_CHARS === null) return;
             // Where there is a main component, and an additional "simple" character like 了
             // For example, 地上, 拿不着, 这样的, 不服气, 知道了, middle chars: 离不开, 想不到
 
-            const simpleCharsPrePost = ['上', '下', '啊', '吗', '呗', '嘛', '呀', '啦', '吧', '呢', '哟', '喽', '来', '不'];
-            const simpleCharsPre = ['有'].concat(simpleCharsPrePost);
-            const simpleCharsMiddle = ['不', '一', '两'];
-            const simpleCharsPost = ['地', '不着', '着', '了', '个', '点', '到', '儿', '里', '的', '得', '过', '子', '去', '好', '者', '下去', '上去', '下来', '上来', '起来'].concat(simpleCharsPrePost);
+            const simpleCharsPrePost = this.$store.state.SIMPLE_CHARS.pre_post;
+            const simpleCharsPre = this.$store.state.SIMPLE_CHARS.pre.concat(simpleCharsPrePost);
+            const simpleCharsMiddle = this.$store.state.SIMPLE_CHARS.middle;
+            const simpleCharsPost = this.$store.state.SIMPLE_CHARS.post.concat(simpleCharsPrePost);
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;

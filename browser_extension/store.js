@@ -29,6 +29,7 @@ const store = new Vuex.Store({
         videoList: null,
         DICT: null,
         HSK_WORDS: null,
+        SIMPLE_CHARS: null,
         states: Vue.ref({}),
         captionFontScale: 0.5,
         captionOffset: [0, 0],
@@ -109,6 +110,9 @@ const store = new Vuex.Store({
         },
         setShowList(state, val) {
             state.showList = val;
+        },
+        setSimpleCharsList(state, val) {
+            state.SIMPLE_CHARS = val;
         },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
@@ -271,6 +275,7 @@ const FETCH_PUBLIC_RESOURCES = [
     ['hsk_words.json', 'HSK word list', 'setHskWords'],
     ['video_list.json', 'video list', 'setVideoList'],
     ['show_list.json', 'show list', 'setShowList'],
+    ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
 ];
 
 for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {

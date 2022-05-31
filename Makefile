@@ -35,6 +35,8 @@ pre-public-sync:
 	make cedict
 	make public-cedict
 	make names-list
+	make hsk-words
+	make simple-chars
 
 push-public:
 	touch synced.txt
@@ -190,6 +192,11 @@ hsk-words:
 	HSK_WORDS_HASH=$$(md5sum data/git/hsk_words.json | cut -d " " -f1) ; \
 	echo $$HSK_WORDS_HASH > data/remote/public/hsk_words.hash ; \
 	cp data/git/hsk_words.json "data/remote/public/hsk_words-$$HSK_WORDS_HASH.json"
+
+simple-chars:
+	SIMPLE_CHARS_HASH=$$(md5sum data/git/simple_chars.json | cut -d " " -f1) ; \
+	echo $$SIMPLE_CHARS_HASH > data/remote/public/simple_chars.hash ; \
+	cp data/git/simple_chars.json "data/remote/public/simple_chars-$$SIMPLE_CHARS_HASH.json"
 
 logo:
 	cp browser_extension/images/logo.svg browser_extension/images/logo_changed.svg
