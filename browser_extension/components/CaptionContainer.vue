@@ -39,6 +39,7 @@
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
             v-bind:currentCaptionIdx="currentCaptionIdx"
+            v-bind:AVElement="AVElement"
         />
         <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>
     </div>

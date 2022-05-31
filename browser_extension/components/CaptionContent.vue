@@ -166,6 +166,7 @@ export default {
         currTime: { default: null },
         fadeOut: { default: false },
         currentCaptionIdx: { default: null },
+        AVElement: { default: null },
     },
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
@@ -282,6 +283,7 @@ export default {
             return wordDataStateKey(this.wordData, type, i);
         },
         clickContextMenu(action, type, i) {
+            this.AVElement.pause();
             if (action === 'hide') {
                 // Peek it so that it doesn't become hidden right away
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
@@ -367,6 +369,7 @@ export default {
             };
         },
         click: function(type, i = null) {
+            this.AVElement.pause();
             if (type === 'translation') {
                 if (this.hiddenAndNotPeeking[type] === true) {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
