@@ -654,12 +654,12 @@ export default {
 
                         let preIsHidden = this.isHiddenStoreOrLvlStates(type, preHz, prePys);
                         let postIsHidden = this.isHiddenStoreOrLvlStates(type, postHz, postPys);
-                        let preIsSimple = simpleCharsPre.includes(preHz) || preHz.match(CHINESE_NUMBERS_REGEX);
-                        let postIsSimple = simpleCharsPost.includes(postHz) || postHz.match(CHINESE_NUMBERS_REGEX);
-                        preIsHidden = preIsHidden || preIsSimple;
-                        postIsHidden = postIsHidden || postIsSimple
+                        let preIsSimple = simpleCharsPre.includes(preHz) || preHz.match(CHINESE_NUMBERS_REGEX) !== null;
+                        let postIsSimple = simpleCharsPost.includes(postHz) || postHz.match(CHINESE_NUMBERS_REGEX) !== null;
 
-                        allHidden[type] = allHidden[type] || ((preIsHidden && postIsHidden) && !(postIsSimple && preIsSimple));
+                        let isSimpleCompound = (preIsHidden && postIsSimple) || (preIsSimple && postIsHidden);
+
+                        allHidden[type] = allHidden[type] || isSimpleCompound;
                     }
 
                     for (const middleChar of simpleCharsMiddle) {
@@ -680,9 +680,11 @@ export default {
                         // Do nothing, we don't want to hide hz unless both py and tr are also hidden
                     }
                     else if (allHidden[type]) {
-                        console.log('applySimpleCompounds', type, hz, pys);
-                        applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
-                        this.appendSessionLog([getEvent('hide_auto', type), i]);
+                        if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateNone) {
+                            console.log('applySimpleCompounds', type, hz, pys);
+                            applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
+                            this.appendSessionLog([getEvent('hide_auto', type), i]);
+                        }
                     }
                 }
             }
