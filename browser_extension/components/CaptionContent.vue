@@ -12,7 +12,6 @@
                     @click.stop.prevent="click('py', i)"
                     v-for="(py, i) in wordData.py"
                     :key="i"
-                    @mouseleave="mouseleave($event, 'py', i)"
                 >
                     <span
                         class="cardcontent"
@@ -20,12 +19,11 @@
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.py[i]" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="purePeekStates.py[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-if="!hiddenStates.py[i]" class="iconcard peek" v-html="hideIcon"></span>
-                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('py', i)" floating>...</q-badge>
                     <ContentContextMenu
-                        v-if="showContextMenu.py[i]"
                         type="py"
                         :idx="i"
                         :hide="false"
@@ -49,7 +47,6 @@
                     @click.stop.prevent="click('hz', i)"
                     v-for="(hz, i) in wordData.hz"
                     :key="i"
-                    @mouseleave="mouseleave($event, 'hz', i)"
                 >
                     <span
                         class="cardcontent"
@@ -58,12 +55,11 @@
                         {{ sm2tr(hz) }}
                         <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.hz[i]" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="purePeekStates.hz[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
-                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('hz', i)" floating>...</q-badge>
                     <ContentContextMenu
-                        v-if="showContextMenu.hz[i]"
                         type="hz"
                         :idx="i"
                         :hide="false"
@@ -87,7 +83,6 @@
                     @click.stop.prevent="click('tr', i)"
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
-                    @mouseleave="mouseleave($event, 'tr', i)"
                 >
                     <span
                         class="cardcontent"
@@ -96,12 +91,11 @@
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
+                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.tr[i]" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="purePeekStates.tr[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-if="!hiddenStates.tr[i]" class="iconcard peek" v-html="hideIcon"></span>
-                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('tr', i)" floating>...</q-badge>
                     <ContentContextMenu
-                        v-if="showContextMenu.tr[i]"
                         type="tr"
                         :idx="i"
                         :hide="false"
@@ -126,7 +120,6 @@
                 <td
                     ref="fulltranslation"
                     @click.stop.prevent="click('translation')"
-                    @mouseleave="mouseleave($event, 'translation')"
                     :class="{
                         captioncard: true,
                         peeking: purePeekStates.translation,
@@ -141,9 +134,7 @@
                         <q-badge v-if="starredStates.translation" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking.translation" v-html="eyecon"></span>
-                    <q-badge class="contextbadge" @click.stop.prevent="clickContextBadge('translation')" floating>...</q-badge>
                     <ContentContextMenu
-                        v-if="showContextMenu.translation"
                         type="translation"
                         :star="! starredStates.translation"
                         :unstar="starredStates.translation"
@@ -182,9 +173,6 @@ export default {
         hideIcon: getIconSvg("hide", 18),
         unpinIcon: getIconSvg("unpin", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
-        showContextMenu: {hz: [], tr: [], py: [], translation: false},
-        waitingBeforeClosingMenu: false,
-        cancelCloseContextMenu: false,
     }},
     computed: {
         wordStats: function() {
@@ -251,12 +239,6 @@ export default {
             }
         });
     },
-    mounted: function() {
-        const self = this;
-        document.addEventListener('click', function(event) {
-            self.resetShowContextMenu(self.wordData);
-        });
-    },
     watch: {
         data: {
             immediate: true,
@@ -275,27 +257,8 @@ export default {
                 }
             },
         },
-        wordData: function(newData, oldData) {
-            if (newData === null || oldData === null || newData.captionIdx !== oldData.captionIdx) {
-                this.resetShowContextMenu(newData);
-            }
-        }
     },
     methods: {
-        resetShowContextMenu: function(newData) {
-            const show = {
-                translation: false,
-                hz: [],
-                tr: [],
-                py: []
-            }
-            for (let i = 0; i < newData.hz.length; i++) {
-                show.hz.push(false);
-                show.tr.push(false);
-                show.py.push(false);
-            }
-            this.showContextMenu = show;
-        },
         isPeek: function(type) {
             return (
                 !this.$store.state.peekStates.rows[type] &&
@@ -319,10 +282,6 @@ export default {
             return wordDataStateKey(this.wordData, type, i);
         },
         clickContextMenu(action, type, i) {
-            if (this.waitingBeforeClosingMenu) {
-                this.cancelCloseContextMenu = true;
-            }
-
             if (action === 'hide') {
                 // Peek it so that it doesn't become hidden right away
                 this.$store.commit('setPeekState', {'type': type, 'i': i});
@@ -369,10 +328,6 @@ export default {
             else if (action === 'switch') {
                 this.$store.commit('switchTranslation');
             }
-
-            if (['dict', 'copy'].includes(action)) {
-                this.resetShowContextMenu(this.wordData);
-            }
         },
         applyState: function(type, i, stateType, setState) {
             const d = this.$store.state.DICT;
@@ -411,25 +366,7 @@ export default {
                 captionIdx: captionIdx,
             };
         },
-        clickContextBadge: function(type, i = null) {
-            if (this.waitingBeforeClosingMenu) {
-                this.cancelCloseContextMenu = true;
-            }
-
-            this.resetShowContextMenu(this.wordData);
-            if (type === 'translation') {
-                this.showContextMenu[type] = true;
-            }
-            else {
-                this.showContextMenu[type][i] = true;
-            }
-        },
         click: function(type, i = null) {
-            if (this.waitingBeforeClosingMenu) {
-                this.cancelCloseContextMenu = true;
-            }
-            this.resetShowContextMenu(this.wordData);
-
             if (type === 'translation') {
                 if (this.hiddenAndNotPeeking[type] === true) {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
@@ -446,36 +383,13 @@ export default {
                     this.appendSessionLog([getEvent('peek', 'tr'), i]);
                 }
                 else {
-                    // Pin it
-                    this.applyState(type, i, StateHidden, StateNone);
+                    this.applyState(type, i, StateHidden, StateNone); // Pin it
                 }
             }
             else {
-                // Hide it
-                this.applyState(type, i, StateHidden, StateHidden);
-            }
-        },
-        mouseleave: function(event, type, i = null) {
-            if (
-                type === 'translation' && this.showContextMenu[type] ||
-                this.showContextMenu[type][i]
-            ) {
-                const self = this;
-                const mouseOverListener = event.target.addEventListener('mouseover', function() {
-                    self.cancelCloseContextMenu = true;
-                }, { once: true });
-
-                this.cancelCloseContextMenu = false;
-                this.waitingBeforeClosingMenu = true;
-                setTimeout(function() {
-                    this.waitingBeforeClosingMenu = false;
-                    event.target.removeEventListener('mouseover', mouseOverListener);
-                    if (self.cancelCloseContextMenu) {
-                        self.cancelCloseContextMenu = false;
-                        return;
-                    }
-                    self.resetShowContextMenu(self.wordData);
-                }, 500);
+                this.applyState(type, i, StateHidden, StateHidden); // Hide it
+                // Also peek it. This makes it more intuitive that if you click again you pin it back
+                this.$store.commit('setPeekState', {'type': type, 'i': i});
             }
         },
         clickPeekRow: function(type) {

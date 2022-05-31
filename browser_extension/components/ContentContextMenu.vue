@@ -33,16 +33,26 @@ export default {
 
 <style>
 
+.captioncard:not(.captioncardhidden):not(.placeholder):hover .contextmenu {
+    visibility: visible;
+    opacity: 1.0;
+}
+
 .contextmenu {
     z-index: 999;
     background-color: rgb(50, 50, 50);
     position: absolute;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     top: -32px;
     font-size: 0;
     padding: 5px;
     border-radius: 3px;
     line-height: 1em;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.20s;
+    transition-delay: 0.125s;
 }
 
 .contexticon svg {
