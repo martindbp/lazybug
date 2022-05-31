@@ -476,6 +476,7 @@ export default {
             for (const session of sessions) {
                 for (let i = 0; i < session.eventIds.length; i++) {
                     const eventId = session.eventIds[i];
+                    if (eventId === null) continue;
                     const eventData = session.eventData[i];
                     const eventName = reverseEventsMap[eventId];
                     console.log(eventId, eventName);
