@@ -169,7 +169,18 @@ function getLog(offset, limit, callback) {
         offset: offset,
         limit: limit,
     }, function onResponse(message) {
-        callback(message.data);
+        if (message === 'error') callback('error');
+        else callback(message.data);
+        return true;
+    });
+}
+
+function getRecent(callback) {
+    return chrome.runtime.sendMessage({
+        type: 'getRecent',
+    }, function onResponse(message) {
+        if (message === 'error') callback('error');
+        else callback(message.data);
         return true;
     });
 }
@@ -178,7 +189,8 @@ function getLogRows(callback) {
     return chrome.runtime.sendMessage({
         type: 'getLogRows',
     }, function onResponse(message) {
-        callback(message.data);
+        if (message === 'error') callback('error');
+        else callback(message.data);
         return true;
     });
 }
@@ -601,6 +613,18 @@ function getShowSeasonEpisodeName(showInfo, captionId) {
     }
 
     return [showName, seasonName, episodeName];
+}
+
+function resolveShowName(showName) {
+    if (showName === null) {
+        return null;
+    }
+    else if (typeof showName === "object") {
+        return showName.hz;
+    }
+    else {
+        return showName;
+    }
 }
 
 function pad(num, size) {

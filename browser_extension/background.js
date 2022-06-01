@@ -362,6 +362,35 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             sendResponse('error');
         });
     }
+    else if (message.type === 'getRecent') {
+        let seen = new Set();
+
+        personalDb.log
+        .reverse()
+        .sortBy('sessionTime')
+        .then(function(data) {
+            const videos = [];
+            for (const session of data) {
+                if (seen.has(session.captionId)) continue;
+                if (session.showName === null) continue;
+
+                videos.push({
+                    captionId: session.captionId,
+                    showName: session.showName,
+                    seasonName: session.seasonName,
+                    episodeName: session.episodeName
+                });
+
+                seen.add(session.captionId);
+                if (videos.length > 10) break;
+            }
+            sendResponse({data: videos});
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
+    }
     else if (message.type === 'exportDatabaseJson') {
         backgroundExportDatabaseJson(function (data) {
             sendResponse({data: data});
