@@ -1,23 +1,25 @@
 <template>
     <div id="popupcontainer">
-        <q-toggle
-          v-model="extensionToggle"
-          color="green"
-        />
-        <q-btn-dropdown color="primary" label="Go">
-            <q-list>
-                <q-item v-for="video in recent" clickable @click="clickRecent(video)">
-                    <q-item-section>
-                        <q-item-label> {{ videoLabel(video) }} </q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-list>
-        </q-btn-dropdown>
-        <q-btn label="Dashboard" @click="dashboard" />
-        <q-btn label="I'm feeling lucky" @click="imFeelingLucky" :loading="feelingLuckyLoading" />
+        <div style="position: relative; text-align: right">
+            <q-toggle
+                 style="position: fixed; left: 0;"
+                 v-model="extensionToggle"
+                 color="green"
+            />
+            <q-btn-dropdown color="primary" label="Go to" :loading="randomLoading">
+                <q-list>
+                    <q-item v-for="video in recent" clickable @click="clickRecent(video)">
+                        <q-item-section>
+                            <q-item-label> {{ videoLabel(video) }} </q-item-label>
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+            </q-btn-dropdown>
+        </div>
+        <q-btn flat label="Dashboard" @click="dashboard" />
         <div v-if="dev">
-            <q-btn label="Measure caption" @click="measureCaption" />
-            <q-btn label="Print playlist" @click="printPlaylist" />
+            <q-btn flat label="Measure caption" @click="measureCaption" />
+            <q-btn flat label="Print playlist" @click="printPlaylist" />
         </div>
         <a href="https://www.patreon.com/martindbp">Donate</a>
     </div>
@@ -33,7 +35,7 @@ export default {
         dev: ZIMUDEVMODE,
         showList: null,
         recent: null,
-        feelingLuckyLoading: false,
+        randomLoading: false,
     }},
     mounted: function() {
         const self = this;
@@ -57,13 +59,17 @@ export default {
         getRecent(function(data) {
             const videos = [];
             self.recent = data;
+            self.recent.push({ captionId: 'random' });
         });
     },
     methods: {
         videoLabel: function(video) {
+            if (video.captionId === 'random') return "Random Show";
             return `${resolveShowName(video.showName) || ''} ${video.seasonName || ''} ${video.episodeName || ''}`;
         },
         clickRecent: function(video) {
+            if (video.captionId === 'random') return this.random();
+
             const parts = video.captionId.split('-');
             const id = parts.slice(1).join('-');
             const url = `https://youtube.com/watch?v=${id}`;
@@ -90,15 +96,15 @@ export default {
                 });
             });
         },
-        imFeelingLucky: function() {
+        random: function() {
             if (this.showList === null) return;
 
-            this.feelingLuckyLoading = true;
+            this.randomLoading = true;
 
             const showName = this.showList[Math.floor(Math.random() * this.showList.length)];
             const self = this;
             fetchResource(`shows/${showName}.json`, function (data) {
-                self.feelingLuckyLoading = false;
+                self.randomLoading = false;
                 if (data === 'error') {
                     alert('Error while fetching show info');
                 }
@@ -130,6 +136,11 @@ export default {
 
 #popupcontainer {
     text-align: center;
+}
+
+#popuproot {
+    width: 200px;
+    min-height: 250px;
 }
 
 </style>
