@@ -640,7 +640,7 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation) .cardcontent {
-    color: gray;
+    color: rgb(150,150,150);
 }
 
 .captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)) .cardcontent {
