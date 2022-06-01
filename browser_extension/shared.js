@@ -318,7 +318,7 @@ function getStateKey(type, hz, pys, tr, translation) {
     if (type === 'word') {
         if (tr && isName(tr)) {
             // If the translation is capitalized, we want it to be tracked separately
-            return `word-${hz}-${pysWithoutTonesLower.join('/')}-${tr}`;
+            return `word-${hz}-${pysWithoutTonesLower.join('/')}-name`;
         }
         else {
             return `word-${hz}-${pysWithoutTonesLower.join('/')}`;
