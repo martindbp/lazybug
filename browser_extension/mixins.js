@@ -54,12 +54,9 @@ const mixin = {
             const d = this.$store.state.DICT;
             const states = {};
             for (let lvl = 1; lvl <= 6; lvl++) {
-                const hidePy = lvl <= this.$store.state.options.hideLevels.py;
-                const hideHz = lvl <= this.$store.state.options.hideLevels.hz;
-                const hideTr = lvl <= this.$store.state.options.hideLevels.tr;
+                const hide = lvl <= this.$store.state.options.hideWordsLevel;
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
-                    if (hideHz) applyState(d, states, 'hz', hz, null, null, null, StateHidden, StateHidden, true, false);
                     let entries = d[hz];
                     let entryPys = [];
                     if (entries === undefined) {
@@ -81,8 +78,7 @@ const mixin = {
                     }
 
                     for (let pys of entryPys) {
-                        if (hidePy) applyState(d, states, 'py', hz, pys, null, null, StateHidden, StateHidden, true, false);
-                        if (hideTr) applyState(d, states, 'tr', hz, pys, null, null, StateHidden, StateHidden, true, false);
+                        if (hide) applyState(d, states, 'word', hz, pys, null, null, StateHidden, StateHidden, true, false);
                     }
                 }
             }

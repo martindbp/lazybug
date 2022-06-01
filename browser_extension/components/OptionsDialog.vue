@@ -14,51 +14,16 @@
 
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="knowledge" style="width: 400px">
-                    Select the HSK level you want to hide
-                    <q-item-label header>Hanzi</q-item-label>
+                    Select the HSK level you want to hide automatically
                     <q-item dense>
                         <q-item-section>
                             <q-slider
                                 color="teal"
-                                v-model="hanziHideLevel"
+                                v-model="hideWordsLevel"
                                 :min="0"
                                 :max="7"
                                 :step="1"
-                                :label-value="hanziHideLevel < 7 ? hanziHideLevel : 'all'"
-                                label
-                                snap
-                                markers
-                            />
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item-label header>Pinyin</q-item-label>
-                    <q-item dense>
-                        <q-item-section>
-                            <q-slider
-                                color="teal"
-                                v-model="pinyinHideLevel"
-                                :min="0"
-                                :max="7"
-                                :step="1"
-                                :label-value="pinyinHideLevel < 7 ? pinyinHideLevel : 'all'"
-                                label
-                                snap
-                                markers
-                            />
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item-label header>Word translation</q-item-label>
-                    <q-item dense>
-                        <q-item-section>
-                            <q-slider
-                                color="teal"
-                                v-model="translationHideLevel"
-                                :min="0"
-                                :max="7"
-                                :step="1"
-                                :label-value="translationHideLevel < 7 ? translationHideLevel : 'all'"
+                                :label-value="hideWordsLevel < 7 ? hideWordsLevel : 'all'"
                                 label
                                 snap
                                 markers
@@ -201,17 +166,9 @@ export default {
             get: function() { return this.$store.state.timingOffset; },
             set: function(val) { this.$store.commit('setTimingOffset', val); },
         },
-        hanziHideLevel: {
-            get: function() { return this.$store.state.options.hideLevels.hz; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'hideLevels', key2: 'hz', value: val}); },
-        },
-        pinyinHideLevel: {
-            get: function() { return this.$store.state.options.hideLevels.py; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'hideLevels', key2: 'py', value: val}); },
-        },
-        translationHideLevel: {
-            get: function() { return this.$store.state.options.hideLevels.tr; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'hideLevels', key2: 'tr', value: val}); },
+        hideWordsLevel: {
+            get: function() { return this.$store.state.options.hideWordsLevel; },
+            set: function(val) { this.$store.commit('setOption', {key: 'hideWordsLevel', value: val}); },
         },
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },

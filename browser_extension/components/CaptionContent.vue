@@ -19,21 +19,7 @@
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.py[i]" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="purePeekStates.py[i]" class="iconcard peek" v-html="pinIcon"></span>
-                    <span v-if="!hiddenStates.py[i]" class="iconcard peek" v-html="hideIcon"></span>
-                    <ContentContextMenu
-                        type="py"
-                        :idx="i"
-                        :hide="false"
-                        :pin="false"
-                        :star="!hiddenAndNotPeeking.py[i] && ! starredStates.words[i]"
-                        :unstar="starredStates.words[i]"
-                        :dict="true"
-                        :click="clickContextMenu"
-                        :copy="true"
-                    />
                 </td>
             </tr>
             <tr class="centerrow">
@@ -60,7 +46,7 @@
                     <span v-if="purePeekStates.hz[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
                     <ContentContextMenu
-                        type="hz"
+                        type="word"
                         :idx="i"
                         :hide="false"
                         :pin="false"
@@ -91,21 +77,7 @@
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.tr[i]" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="purePeekStates.tr[i]" class="iconcard peek" v-html="pinIcon"></span>
-                    <span v-if="!hiddenStates.tr[i]" class="iconcard peek" v-html="hideIcon"></span>
-                    <ContentContextMenu
-                        type="tr"
-                        :idx="i"
-                        :hide="false"
-                        :pin="false"
-                        :star="!hiddenAndNotPeeking.tr[i] && ! starredStates.words[i]"
-                        :unstar="starredStates.words[i]"
-                        :dict="true"
-                        :click="clickContextMenu"
-                        :copy="true"
-                    />
                 </td>
             </tr>
         </table>
@@ -276,6 +248,7 @@ export default {
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
                 pinned: this.$store.state.options.pin[type],
+                nonhanzirow: type !== 'hz',
             };
             return cl;
         },
@@ -284,17 +257,11 @@ export default {
         },
         clickContextMenu(action, type, i) {
             this.AVElement.pause();
-            if (action === 'hide') {
-                // Peek it so that it doesn't become hidden right away
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
-                this.applyState(type, i, StateHidden, StateHidden);
-            }
-            else if (action === 'star') {
+            if (action === 'star') {
                 let content = '';
                 if (type === 'translation') content = this.wordData.translation;
                 else {
                     content = `${this.wordData.hz[i]}/${this.wordData.py[i]}`;
-                    type = 'word';
                 }
 
                 this.applyState(type, i, StateStarred, StateStarred);
@@ -307,11 +274,7 @@ export default {
                     ]
                 });
             }
-            else if (action === 'pin') {
-                this.applyState(type, i, StateHidden, StateNone);
-            }
             else if (action === 'unstar') {
-                type = 'word';
                 this.applyState(type, i, StateStarred, StateNone);
             }
 
@@ -324,7 +287,8 @@ export default {
                     updateClipboard(this.wordData[type], this.$q, 'Copied to clipboard');
                 }
                 else {
-                    updateClipboard(this.wordData[type][i], this.$q, 'Copied to clipboard');
+                    const text = `${this.wordData.hz[i]}-${this.wordData.py[i]}-${this.wordData.tr[i]}`;
+                    updateClipboard(text, this.$q, 'Copied to clipboard');
                 }
             }
             else if (action === 'switch') {
@@ -386,13 +350,15 @@ export default {
                     this.appendSessionLog([getEvent('peek', 'tr'), i]);
                 }
                 else {
-                    this.applyState(type, i, StateHidden, StateNone); // Pin it
+                    this.applyState('word', i, StateHidden, StateNone); // Pin it
                 }
             }
             else {
-                this.applyState(type, i, StateHidden, StateHidden); // Hide it
-                // Also peek it. This makes it more intuitive that if you click again you pin it back
-                this.$store.commit('setPeekState', {'type': type, 'i': i});
+                this.applyState('word', i, StateHidden, StateHidden); // Hide it
+                // Also peek all three. This makes it more intuitive that if you click again you pin it back
+                for (const t of ['py', 'hz', 'tr']) {
+                    this.$store.commit('setPeekState', {'type': t, 'i': i});
+                }
             }
         },
         clickPeekRow: function(type) {
@@ -426,23 +392,21 @@ export default {
                 if (hz.length === 0) continue;
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
-                for (var type of ['hz', 'py', 'tr']) {
-                    const key = this.stateKey(type, i);
-                    if (
-                        getState(k, key, StateHidden, StateNone) == StateNone &&
-                        (
-                            getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden ||
-                            this.$store.state.options.hideLevels[type] === 7 || // all
-                            ( // Any number + MW should be hidden if hide level is > 2
-                                hz.match(CHINESE_NUMBERS_REGEX) &&
-                                this.$store.state.options.hideLevels[type] > 2
-                            )
+                const key = this.stateKey('word', i);
+                if (
+                    getState(k, key, StateHidden, StateNone) == StateNone &&
+                    (
+                        getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden ||
+                        this.$store.state.options.hideWordsLevel === 7 || // all
+                        ( // Any number + MW should be hidden if hide level is > 2
+                            hz.match(CHINESE_NUMBERS_REGEX) &&
+                            this.$store.state.options.hideWordsLevel > 2
                         )
-                    ) {
-                        console.log('LVLS: Marking', type, hz, pys, tr, 'as hidden');
-                        applyState(d, k, type, hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
-                        this.appendSessionLog([getEvent('hide_auto', type), i]);
-                    }
+                    )
+                ) {
+                    console.log('LVLS: Marking', 'word', hz, pys, tr, 'as hidden');
+                    applyState(d, k, 'word', hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
+                    this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                 }
             }
         },
@@ -458,7 +422,7 @@ export default {
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
 
-                const key = getStateKey('py', hz, pys, null, null);
+                const key = getStateKey('word', hz, pys, null, null);
                 const currState = getState(k, key, StateHidden, StateNone);
 
                 if (d[hz] !== undefined || pys === null || isName(tr) || currState !== StateHidden) continue;
@@ -473,7 +437,7 @@ export default {
                         if (d[hzSub] === undefined) continue;
 
                         console.log('applyPinyinComponents: ', 'py', hzSub, pysSub);
-                        applyState(d, k, 'py', hzSub, pysSub, null, this.wordData.translation, StateHidden, StateHidden, false, true);
+                        applyState(d, k, 'word', hzSub, pysSub, tr, this.wordData.translation, StateHidden, StateHidden, false, true);
                     }
                 }
             }
@@ -509,29 +473,19 @@ export default {
                     }
                 }
 
-                const allHidden = {hz: true, tr: true, py: true};
+                let allHidden = true;
                 for (const [wordHz, wordPys] of words) {
-                    for (const type of ['hz', 'tr', 'py']) {
-                        allHidden[type] = allHidden[type] && this.isHiddenStoreOrLvlStates(type, wordHz, wordPys);
-                    }
+                    allHidden = allHidden && this.isHiddenStoreOrLvlStates('word', wordHz, wordPys);
                 }
 
-                for (const type of ['hz', 'tr', 'py']) {
-                    if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateHidden) {
-                        continue;
-                    }
+                if (getState(k, this.stateKey('word', i), StateHidden, StateNone) === StateHidden) {
+                    continue;
+                }
 
-                    if (type === 'py' && !allHidden.tr) {
-                        // Do nothing, we don't want to hide py unless tr is hidden first
-                    }
-                    else if (type === 'hz' && (!allHidden.tr || !allHidden.py)) {
-                        // Do nothing, we don't want to hide hz unless both py and tr are also hidden
-                    }
-                    else if (allHidden[type]) {
-                        console.log('applyCompoundWordsNotInDict', type, hz, pys);
-                        applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
-                        this.appendSessionLog([getEvent('hide_auto', type), i]);
-                    }
+                if (allHidden) {
+                    console.log('applyCompoundWordsNotInDict', 'word', hz, pys);
+                    applyState(d, k, 'word', hz, pys, tr, null, StateHidden, StateHidden, false, true);
+                    this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                 }
             }
         },
@@ -555,54 +509,43 @@ export default {
 
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];
-                if (pys === null) continue;  // non hanzi
+                if (pys === null || isName(tr)) continue; // non hanzi or name
 
-                const allHidden = {hz: false, tr: false, py: false};
-                for (const type of ['hz', 'py', 'tr']) {
-                    if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateHidden) {
-                        allHidden[type] = true;
-                        continue;
-                    }
-
-                    for (let middleIdx = 1; middleIdx < hz.length; middleIdx++) {
-                        const preHz = hz.substring(0, middleIdx);
-                        const postHz = hz.substring(middleIdx);
-                        const prePys = pys.slice(0, middleIdx);
-                        const postPys = pys.slice(middleIdx, pys.length);
-
-                        let preIsHidden = this.isHiddenStoreOrLvlStates(type, preHz, prePys);
-                        let postIsHidden = this.isHiddenStoreOrLvlStates(type, postHz, postPys);
-                        let preIsSimple = simpleCharsPre.includes(preHz) || preHz.match(CHINESE_NUMBERS_REGEX) !== null;
-                        let postIsSimple = simpleCharsPost.includes(postHz) || postHz.match(CHINESE_NUMBERS_REGEX) !== null;
-
-                        let isSimpleCompound = (preIsHidden && postIsSimple) || (preIsSimple && postIsHidden);
-
-                        allHidden[type] = allHidden[type] || isSimpleCompound;
-                    }
-
-                    for (const middleChar of simpleCharsMiddle) {
-                        if (! hz.substring(1, hz.length-1).includes(middleChar)) continue;
-
-                        const middleIdx = hz.indexOf(middleChar);
-                        const prePostHz = hz.substring(0, middleIdx) + hz.substring(middleIdx + 1);
-                        const prePostPys = pys.slice(0, middleIdx).concat(pys.slice(middleIdx + 1));
-                        allHidden[type] = allHidden[type] || this.isHiddenStoreOrLvlStates(type, prePostHz, prePostPys);
-                    }
+                let allHidden = false;
+                if (getState(k, this.stateKey('word', i), StateHidden, StateNone) === StateHidden) {
+                    allHidden = true;
                 }
 
-                for (const type of ['hz', 'py', 'tr']) {
-                    if (type === 'py' && !allHidden.tr) {
-                        // Do nothing, we don't want to hide py unless tr is hidden first
-                    }
-                    else if (type === 'hz' && (!allHidden.tr || !allHidden.py)) {
-                        // Do nothing, we don't want to hide hz unless both py and tr are also hidden
-                    }
-                    else if (allHidden[type]) {
-                        if (getState(k, this.stateKey(type, i), StateHidden, StateNone) === StateNone) {
-                            console.log('applySimpleCompounds', type, hz, pys);
-                            applyState(d, k, type, hz, pys, null, null, StateHidden, StateHidden, false, true);
-                            this.appendSessionLog([getEvent('hide_auto', type), i]);
-                        }
+                for (let middleIdx = 1; middleIdx < hz.length; middleIdx++) {
+                    const preHz = hz.substring(0, middleIdx);
+                    const postHz = hz.substring(middleIdx);
+                    const prePys = pys.slice(0, middleIdx);
+                    const postPys = pys.slice(middleIdx, pys.length);
+
+                    let preIsHidden = this.isHiddenStoreOrLvlStates('word', preHz, prePys);
+                    let postIsHidden = this.isHiddenStoreOrLvlStates('word', postHz, postPys);
+                    let preIsSimple = simpleCharsPre.includes(preHz) || preHz.match(CHINESE_NUMBERS_REGEX) !== null;
+                    let postIsSimple = simpleCharsPost.includes(postHz) || postHz.match(CHINESE_NUMBERS_REGEX) !== null;
+
+                    let isSimpleCompound = (preIsHidden && postIsSimple) || (preIsSimple && postIsHidden);
+
+                    allHidden = allHidden || isSimpleCompound;
+                }
+
+                for (const middleChar of simpleCharsMiddle) {
+                    if (! hz.substring(1, hz.length-1).includes(middleChar)) continue;
+
+                    const middleIdx = hz.indexOf(middleChar);
+                    const prePostHz = hz.substring(0, middleIdx) + hz.substring(middleIdx + 1);
+                    const prePostPys = pys.slice(0, middleIdx).concat(pys.slice(middleIdx + 1));
+                    allHidden = allHidden || this.isHiddenStoreOrLvlStates('word', prePostHz, prePostPys);
+                }
+
+                if (allHidden) {
+                    if (getState(k, this.stateKey('word', i), StateHidden, StateNone) === StateNone) {
+                        console.log('applySimpleCompounds', 'word', hz, pys);
+                        applyState(d, k, 'word', hz, pys, tr, null, StateHidden, StateHidden, false, true);
+                        this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                     }
                 }
             }
@@ -666,22 +609,15 @@ export default {
     border-radius: 5px;
 }
 
-/*
-.captioncard.captioncardhidden.starred {
-    border: 1px dashed darkorange;
-    border-radius: 3px;
-}
-*/
-
-.captioncard:not(.nonhanzi) {
+.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)) {
     cursor: pointer;
 }
 
-.captioncard:not(.nonhanzi):hover {
+.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)):hover {
     background-color: gray;
 }
 
-.captioncard:not(.nonhanzi):active {
+.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)):active {
     background-color: lightgray;
 }
 
@@ -707,7 +643,7 @@ export default {
     color: gray;
 }
 
-.captioncard:hover:not(.nonhanzi):not(.fulltranslation) .cardcontent {
+.captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)) .cardcontent {
     color: rgb(100, 100, 100) !important;
 }
 
@@ -787,38 +723,21 @@ export default {
     padding-right: 0.3em;
 }
 
-.captioncardhidden .statsbadge,
-.captioncardhidden .contextbadge {
+.captioncardhidden .statsbadge {
     display: none !important;
 }
 
-.captioncard:not(:hover) .statsbadge,
-.captioncard:not(:hover) .contextbadge {
+.captioncard:not(:hover) .statsbadge {
     display: none !important;
 }
 
-.nonhanzi .statsbadge,
-.nonhanzi .contextbadge {
+.nonhanzi .statsbadge {
     display: none !important;
 }
 
-.captioncard .statsbadge,
-.captioncard .contextbadge {
+.captioncard .statsbadge {
     margin-top: -5px;
     margin-right: -5px;
-}
-
-.contextbadge {
-    background: gray !important;
-    border: 1px solid white;
-}
-
-.contextbadge:hover {
-    filter: brightness(1.5);
-}
-
-.contextbadge:active {
-    filter: brightness(2.5);
 }
 
 .captioncard:hover:not(.fulltranslation):not(.captioncardhidden) .starbadge {

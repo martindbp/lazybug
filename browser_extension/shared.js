@@ -20,18 +20,12 @@ const events = [
     'EVENT_PEEK_HZ',
     'EVENT_PEEK_TR',
     'EVENT_PEEK_TRANSLATION',
-    'EVENT_HIDE_PY',
-    'EVENT_HIDE_HZ',
-    'EVENT_HIDE_TR',
-    'EVENT_HIDE_AUTO_PY',
-    'EVENT_HIDE_AUTO_HZ',
-    'EVENT_HIDE_AUTO_TR',
+    'EVENT_HIDE_WORD',
+    'EVENT_HIDE_AUTO_WORD',
     'EVENT_STAR_CAPTION',
     'EVENT_STAR_WORD',
     'EVENT_STAR_TRANSLATION',
-    'EVENT_PIN_PY',
-    'EVENT_PIN_HZ',
-    'EVENT_PIN_TR',
+    'EVENT_PIN_WORD',
     'EVENT_UNSTAR_CAPTION',
     'EVENT_UNSTAR_WORD',
     'EVENT_UNSTAR_TRANSLATION',
@@ -299,7 +293,7 @@ function getStates(states, wordData, compareTo, defaultValue, defaultValueTransl
     const statesOut = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
     for (let i = 0; i < wordData.hz.length; i++) {
         for (var type of ['hz', 'py', 'tr']) {
-            const state = getState(states, wordDataStateKey(wordData, type, i), compareTo, defaultValue);
+            const state = getState(states, wordDataStateKey(wordData, 'word', i), compareTo, defaultValue);
             statesOut[type].push(state === compareTo);
         }
     }
@@ -318,23 +312,21 @@ function wordDataStateKey(wordData, type, i = null) {
 
 function getStateKey(type, hz, pys, tr, translation) {
     let key = null;
-    if (pys === null && ['py', 'tr'].includes(type)) return null;
-    var pysWithoutTones = ['py', 'tr'].includes(type) ? pys.map(py => py.slice(0, -1)) : null;
-    if (type == 'word') key = `word-${hz}`;
-    else if (type == 'hz') key = `hz-${hz}`;
-    else if (type == 'py') key = `py-${hz}-${pysWithoutTones.join('/')}`;
-    else if (type == 'tr') {
+    if (pys === null && type === 'word') return null;
+    var pysWithoutTonesLower = type === 'word' ? pys.map(py => py.slice(0, -1).toLowerCase()) : null;
+
+    if (type === 'word') {
         if (tr && isName(tr)) {
             // If the translation is capitalized, we want it to be tracked separately
-            key = `tr-${hz}-${pysWithoutTones.join('/')}-${tr}`;
+            return `word-${hz}-${pysWithoutTonesLower.join('/')}-${tr}`;
         }
         else {
-            key = `tr-${hz}-${pysWithoutTones.join('/')}`;
+            return `word-${hz}-${pysWithoutTonesLower.join('/')}`;
         }
     }
-    else if (type == 'translation') key = `tr-${translation}`;
-
-    return key;
+    else if (type == 'translation') {
+        return `tr-${translation}`;
+    }
 }
 
 function applyState(DICT, states, type, hz, pys, tr, translation, stateType, stateVal, explicit, syncIndexedDb = false) {
@@ -345,7 +337,7 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
     keys.push(key);
     vals.push(setState(states, key, stateType, stateVal, explicit));
 
-    if (['hz', 'py', 'tr'].includes(type)) {
+    if (type === 'word') {
         // Add all the individual char/pys
         for (let startIdx = 0; startIdx < hz.length; startIdx++) {
             for (let endIdx = startIdx+1; endIdx < hz.length+1; endIdx++) {

@@ -62,11 +62,7 @@ const store = new Vuex.Store({
                 translation: false,
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
-            hideLevels: {
-                py: 0,
-                hz: 0,
-                tr: 0,
-            },
+            hideWordsLevel: 0,
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
             anki: {
