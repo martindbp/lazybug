@@ -337,7 +337,7 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
     keys.push(key);
     vals.push(setState(states, key, stateType, stateVal, explicit));
 
-    if (type === 'word') {
+    if (type === 'word' && stateType === StateHidden) {
         // Add all the individual char/pys
         for (let startIdx = 0; startIdx < hz.length; startIdx++) {
             for (let endIdx = startIdx+1; endIdx < hz.length+1; endIdx++) {
