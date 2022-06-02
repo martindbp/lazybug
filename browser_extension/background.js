@@ -7,6 +7,7 @@ try {
 
 let personalDb = initPersonalDb();
 let cacheDb = initCacheDb();
+const CACHE_HASHES_DURATION_S = 60*60;
 
 function clearIndexedDb() {
     personalDb.delete();
@@ -85,7 +86,7 @@ function getStorageData(keys, store) {
     console.log('Get storage', keys);
     return store.bulkGet(keys)
         .then(function(data) {
-            if (data) return data.map((item) => item ? item.value : null);
+            if (data) return data;
             return null;
         });
 }
@@ -138,7 +139,7 @@ function backgroundFetchResource(folder, resourceFilename, callback, failCallbac
                 });
         }
         else {
-            return data[0];
+            return data[0].value;
         }
     })
     .then(function(data) {
@@ -156,63 +157,79 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
 
     // NOTE: never cache the hash files, we purge those manually from Cloudflare
     console.log('Fetching hash for ', `${folder}/${filename}.hash`);
-    const fetchHashPromise = fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
-    .then(function(response) {
-        console.log('Fetching done for ', folder);
-        if (!response.ok) {
-            failCallback(response);
-            return null;
-        }
-        return response;
-    })
-    .then(response => response.text());
 
-    const getStorageHashPromise = getStorageData([storageHashKey], cacheDb.network)
-        .then((data) => data[0]);
+    let hash = null;
 
-    let fetchHash = null;
-    Promise.all([fetchHashPromise, getStorageHashPromise])
-    .then(function(values) {
-        fetchHash = values[0].trim();
-        const storageHash = values[1];
-        console.log('Got hashes', fetchHash, storageHashKey, storageHash);
-        if (fetchHash !== storageHash) {
-            console.log('Fetching', folder, filename, fetchHash);
-            return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
-                .then(function(response) {
-                    chrome.action.setBadgeText({text:''});
-                    if (!response.ok) {
-                        failCallback(response);
-                        return null;
-                    }
-                    return response;
-                })
-                .then((response) => response.json())
-                .then(function(data) {
-                    console.log('Fetching done for', folder, filename, fetchHash);
-
-                    const keys = [storageFileKey, storageHashKey];
-                    const values = [data, fetchHash];
-                    if (storageHash) {
-                        return updateStorageData(keys, values, cacheDb.network)
-                            .then(() => data);
-                    }
-                    else {
-                        return addStorageData(keys, values, cacheDb.network)
-                            .then(() => data)
-                            .catch((error) => {
-                                // BulkError, probably requested same resource twice
-                                return data;
-                            });
-                    }
-                });
-        } else {
+    getStorageData([storageHashKey], cacheDb.network)
+    .then(function(data) {
+        const storageHash = data ? data[0].value : null;
+        hash = storageHash;
+        const secondsSinceUpdated = storageHash ? (Date.now() - data[0].timestamp) / 1000 : null;
+        if (secondsSinceUpdated !== null & secondsSinceUpdated < CACHE_HASHES_DURATION_S) {
+            console.log(folder, 'hash file cache timestamp within duration');
             return getStorageData([storageFileKey], cacheDb.network)
-                   .then((data) => data[0]);
+                   .then((data) => data[0].value);
+        }
+        else {
+            console.log(folder, 'hash file cache timestamp is stale');
+            return fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
+            .then(function(response) {
+                console.log('Fetching done for ', folder);
+                if (!response.ok) {
+                    failCallback(response);
+                    return null;
+                }
+                return response;
+            })
+            .then(response => response.text())
+            .then((fetchHash) => {
+                fetchHash = fetchHash.trim();
+                hash = fetchHash;
+                if (fetchHash !== storageHash) {
+                    console.log('Fetching', folder, filename, fetchHash);
+                    return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
+                        .then(function(response) {
+                            chrome.action.setBadgeText({text:''});
+                            if (!response.ok) {
+                                failCallback(response);
+                                return null;
+                            }
+                            return response;
+                        })
+                        .then((response) => response.json())
+                        .then(function(data) {
+                            console.log('Fetching done for', folder, filename, fetchHash);
+
+                            const keys = [storageFileKey, storageHashKey];
+                            const values = [data, fetchHash];
+                            if (storageHash) {
+                                return updateStorageData(keys, values, cacheDb.network)
+                                    .then(() => data);
+                            }
+                            else {
+                                return addStorageData(keys, values, cacheDb.network)
+                                    .then(() => data)
+                                    .catch((error) => {
+                                        // BulkError, probably requested same resource twice
+                                        return data;
+                                    });
+                            }
+                        });
+                } else {
+                    // Need to update the timestamp for the hash file
+                    const keys = [storageHashKey];
+                    const values = [fetchHash];
+                    return updateStorageData(keys, values, cacheDb.network)
+                        .then(() => {
+                            return getStorageData([storageFileKey], cacheDb.network)
+                               .then((data) => data[0].value);
+                        });
+                }
+            })
         }
     })
     .then(function(data) {
-        callback(data, fetchHash);
+        callback(data, hash);
     }).catch((error) => {
         failCallback(error);
     });
@@ -259,7 +276,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         getStorageData(message.keys, storage)
         .then(function(data) {
             console.log(message.keys, 'got', data);
-            sendResponse({data: data});
+            const values = data.map((item) => item.value);
+            sendResponse({data: values});
         })
         .catch((error) => sendResponse('error'));
     }

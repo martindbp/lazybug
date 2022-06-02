@@ -130,7 +130,7 @@ function fetchPersonalDataToStore(store) {
     });
 
     getIndexedDbData('other', ['options'], function (data) {
-        if (data[0]) store.commit('setOptions', data[0]);
+        if (data !== 'error' && data[0]) store.commit('setOptions', data[0]);
         else {
             // No options, so we set the default
             setIndexedDbData('other', ['options'], [store.state.options], function() {});
@@ -594,12 +594,12 @@ function getShowSeasonEpisodeName(showInfo, captionId) {
         if (seasonIdx !== null) {
             seasonName = showInfo.seasons[seasonIdx].name;
             if (! seasonName) {
-                seasonName = showInfo.seasons.length > 1 ? 'Season ' + (seasonIdx + 1) : null;
+                seasonName = showInfo.seasons.length > 1 ? `S${pad(seasonIdx + 1, 2)}` : null;
             }
 
             episodeName = showInfo.seasons[seasonIdx].episodes[episodeIdx].name;
             if (! episodeName) {
-                episodeName = showInfo.seasons[seasonIdx].episodes.length > 1 ? 'Episode ' + (episodeIdx + 1) : null;
+                episodeName = showInfo.seasons[seasonIdx].episodes.length > 1 ? `E${pad(episodeIdx + 1)}`: null;
             }
         }
     }
