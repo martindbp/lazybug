@@ -217,11 +217,11 @@ export default {
             immediate: true,
             handler: function(newData, oldData) {
                 if (newData !== oldData) {
+                    this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     this.applyLvlStates();
                     this.applyPinyinComponents();
                     this.applyCompoundWordsNotInDict();
                     this.applySimpleCompounds();
-                    this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     for (const type of ['hz', 'tr', 'py', 'translation']) {
                         if (this.$store.state.options.pin[type] === true) {
                             this.$store.commit('setPeekState', {'type': type});
@@ -382,6 +382,15 @@ export default {
                 getState(this.$store.state.states, key, StateHidden, StateNone) === StateHidden
             );
         },
+        autoHideWord: function(i) {
+            this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
+            if (this.$store.state.options.peekAfterAutoHide) {
+                for (const type of ['py', 'hz', 'tr']) {
+                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                }
+                this.appendSessionLog([getEvent('peek', 'word'), i]);
+            }
+        },
         applyLvlStates: function() {
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -405,8 +414,8 @@ export default {
                     )
                 ) {
                     console.log('LVLS: Marking', 'word', hz, pys, tr, 'as hidden');
+                    this.autoHideWord(i);
                     applyState(d, k, 'word', hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
-                    this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                 }
             }
         },
@@ -484,8 +493,8 @@ export default {
 
                 if (allHidden) {
                     console.log('applyCompoundWordsNotInDict', 'word', hz, pys);
+                    this.autoHideWord(i);
                     applyState(d, k, 'word', hz, pys, tr, null, StateHidden, StateHidden, false, true);
-                    this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                 }
             }
         },
@@ -544,8 +553,8 @@ export default {
                 if (allHidden) {
                     if (getState(k, this.stateKey('word', i), StateHidden, StateNone) === StateNone) {
                         console.log('applySimpleCompounds', 'word', hz, pys);
+                        this.autoHideWord(i);
                         applyState(d, k, 'word', hz, pys, tr, null, StateHidden, StateHidden, false, true);
-                        this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
                     }
                 }
             }

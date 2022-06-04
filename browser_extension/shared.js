@@ -19,6 +19,7 @@ const events = [
     'EVENT_PEEK_PY',
     'EVENT_PEEK_HZ',
     'EVENT_PEEK_TR',
+    'EVENT_PEEK_WORD',
     'EVENT_PEEK_TRANSLATION',
     'EVENT_HIDE_WORD',
     'EVENT_HIDE_AUTO_WORD',

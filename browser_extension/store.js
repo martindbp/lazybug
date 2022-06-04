@@ -63,6 +63,7 @@ const store = new Vuex.Store({
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
             hideWordsLevel: 0,
+            peekAfterAutoHide: true,
             keyboardShortcutsToggle: true,
             keyboardShortcuts: DEFAULT_SHORTCUTS,
             anki: {

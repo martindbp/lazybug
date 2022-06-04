@@ -162,7 +162,7 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
 
     getStorageData([storageHashKey], cacheDb.network)
     .then(function(data) {
-        const storageHash = data ? data[0].value : null;
+        const storageHash = data && data[0] !== undefined ? data[0].value : null;
         hash = storageHash;
         const secondsSinceUpdated = storageHash ? (Date.now() - data[0].timestamp) / 1000 : null;
         if (secondsSinceUpdated !== null & secondsSinceUpdated < CACHE_HASHES_DURATION_S) {
