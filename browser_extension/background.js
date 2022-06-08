@@ -119,7 +119,7 @@ function backgroundFetchResource(folder, resourceFilename, callback, failCallbac
 
     getStorageData([storageFilename], cacheDb.network)
     .then(function(data) {
-        if (data[0] === null) {
+        if ([null, undefined].includes(data[0])) {
             return fetch(CDN_URL + storageFilename, {cache: 'default'})
                 .then(function(response) {
                     if (!response.ok) {
