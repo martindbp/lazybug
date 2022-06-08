@@ -435,6 +435,7 @@ function getWordData(data, translationIdx, captionIdx) {
 
     let nextIdx = 0;
     const text = data.texts.join(' ');
+    wordData.text = text;
     for (let i = 0; i < data.alignments.length; i++) {
         const [startIdx, endIdx, _, pyParts, wordTranslation] = data.alignments[i];
         if (startIdx > nextIdx) {

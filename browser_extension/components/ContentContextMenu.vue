@@ -2,26 +2,44 @@
     <span class="contextmenu">
         <span v-if="hide" class="contexticon hide" title="Hide" v-html="hideIcon" @click.stop.prevent="clickButton('hide')"></span>
         <span v-if="pin" class="contexticon pin" title="Pin" v-html="pinIcon" @click.stop.prevent="clickButton('pin')"></span>
+        <span v-if="unpin" class="contexticon unpin" title="Unpin" v-html="unpinIcon" @click.stop.prevent="clickButton('unpin')"></span>
         <span v-if="dict" class="contexticon dictionary" title="Look up in dictionary" v-html="dictionaryIcon" @click.stop.prevent="clickButton('dict')"></span>
         <span v-if="copy" class="contexticon copy" title="Copy" v-html="copyIcon" @click.stop.prevent="clickButton('copy')"></span>
         <span v-if="star" class="contexticon star" title="Star" v-html="hollowstarIcon" @click.stop.prevent="clickButton('star')"></span>
         <span v-if="unstar" class="contexticon unstar" title="Unstar" v-html="starIcon" @click.stop.prevent="clickButton('unstar')"></span>
         <span v-if="switch" class="contexticon switch" :title="switchlabel" v-html="switchIcon" @click.stop.prevent="clickButton('switch')"></span>
+        <span v-if="options" class="contexticon options" title="Options" v-html="optionsIcon" @click.stop.prevent="clickButton('options')"></span>
     </span>
 </template>
 
 <script>
 export default {
-    props: ['type', 'idx', 'hide', 'star', 'unstar', 'pin', 'dict', 'copy', 'click', 'switch', 'switchlabel'],
+    props: {
+        type: { default: 'word' },
+        idx: { default: null },
+        hide: { default: false },
+        star: { default: false },
+        unstar: { default: false },
+        pin: { default: false },
+        unpin: { default: false },
+        dict: { default: false },
+        copy: { default: false },
+        options: { default: false },
+        switch: { default: false },
+        switchlabel: { default: '' },
+        click: { default: null },
+    },
     data: function () { return {
         plusIcon: getIconSvg("math-plus", 18),
         dictionaryIcon: getIconSvg("dictionary", 18),
         hideIcon: getIconSvg("hide", 18),
         pinIcon: getIconSvg("pin", 18),
+        unpinIcon: getIconSvg("unpin", 18),
         copyIcon: getIconSvg("copy", 18),
         starIcon: getIconSvg("star", 18),
         hollowstarIcon: getIconSvg("hollowstar", 18),
         switchIcon: getIconSvg("switch", 18),
+        optionsIcon: getIconSvg("options", 18),
     }},
     methods: {
         clickButton: function(action) {

@@ -2,10 +2,17 @@
     <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
         <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
-                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null)" @click="clickPeekRow('py')">
-                    <span v-if="isPeek('py')" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="!isPeek('py')" class="iconcard peek" v-html="pinIcon"></span>
+                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
                     <span class="cardcontent">PY</span>
+                    <ContentContextMenu
+                        type="py"
+                        :pin="showPinRow('py')"
+                        :unpin="!showPinRow('py')"
+                        :copy="true"
+                        :options="true"
+                        :click="clickRowContextMenu"
+                    />
                 </td>
                 <td
                     :class="getClasses('py', i)"
@@ -23,10 +30,17 @@
                 </td>
             </tr>
             <tr class="centerrow">
-                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null)" @click="clickPeekRow('hz')">
-                    <span v-if="isPeek('hz')" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="!isPeek('hz')" class="iconcard peek" v-html="pinIcon"></span>
+                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
                     <span class="cardcontent">HZ</span>
+                    <ContentContextMenu
+                        type="hz"
+                        :pin="showPinRow('hz')"
+                        :unpin="!showPinRow('hz')"
+                        :copy="true"
+                        :options="true"
+                        :click="clickRowContextMenu"
+                    />
                 </td>
                 <td
                     :class="getClasses('hz', i)"
@@ -48,8 +62,6 @@
                     <ContentContextMenu
                         type="word"
                         :idx="i"
-                        :hide="false"
-                        :pin="false"
                         :star="!hiddenAndNotPeeking.hz[i] && ! starredStates.words[i]"
                         :unstar="starredStates.words[i]"
                         :dict="true"
@@ -59,10 +71,16 @@
                 </td>
             </tr>
             <tr class="bottomrow">
-                <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null)" @click="clickPeekRow('tr')">
-                    <span v-if="isPeek('tr')" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="!isPeek('tr')" class="iconcard peek" v-html="pinIcon"></span>
+                <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
                     <span class="cardcontent">TR</span>
+                    <ContentContextMenu
+                        type="tr"
+                        :pin="showPinRow('tr')"
+                        :unpin="!showPinRow('tr')"
+                        :options="true"
+                        :click="clickRowContextMenu"
+                    />
                 </td>
                 <td
                     :class="getClasses('tr', i)"
@@ -84,10 +102,16 @@
         <br/>
         <table class="contenttable" style="margin-top: -15px" v-if="data !== null">
             <tr>
-                <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null)" @click="clickPeekRow('translation')">
-                    <span v-if="isPeek('translation')" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-if="!isPeek('translation')" class="iconcard peek" v-html="pinIcon"></span>
+                <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')">
+                    <span class="iconcard peek" v-html="eyecon"></span>
                     <span class="cardcontent">EN</span>
+                    <ContentContextMenu
+                        type="translation"
+                        :pin="showPinRow('translation')"
+                        :unpin="!showPinRow('translation')"
+                        :options="true"
+                        :click="clickRowContextMenu"
+                    />
                 </td>
                 <td
                     ref="fulltranslation"
@@ -110,9 +134,6 @@
                         type="translation"
                         :star="! starredStates.translation"
                         :unstar="starredStates.translation"
-                        :pin="false"
-                        :hide="false"
-                        :dict="false"
                         :click="clickContextMenu"
                         :copy="true"
                         :switch="data.translations.length > 1"
@@ -233,13 +254,10 @@ export default {
         },
     },
     methods: {
-        isPeek: function(type) {
-            return (
-                !this.$store.state.peekStates.rows[type] &&
-                !this.$store.state.options.pin[type]
-            );
+        showPinRow: function(type) {
+            return !this.$store.state.options.pin[type];
         },
-        getClasses: function(type, i) {
+        getClasses: function(type, i, isPeekRow = false) {
             const cl = {
                 captioncard: true,
                 peeking: i !== null && this.purePeekStates[type][i],
@@ -249,13 +267,43 @@ export default {
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
                 autopeek: i !== null && this.$store.state.autoPeekStates[type][i],
-                pinned: this.$store.state.options.pin[type],
-                nonhanzirow: type !== 'hz',
+                //pinned: this.$store.state.options.pin[type],
+                nonhanzirow: type !== 'hz' && ! isPeekRow,
             };
             return cl;
         },
         stateKey: function(type, i = null) {
             return wordDataStateKey(this.wordData, type, i);
+        },
+        clickPeekRow: function(type) {
+            this.$store.commit('setPeekState', {'type': type});
+            this.appendSessionLog([getEvent('peek_row', type)]);
+        },
+        clickRowContextMenu(action, type) {
+            this.AVElement.pause();
+
+            if (action === 'copy') {
+                if (type === 'translation') {
+                    updateClipboard(this.wordData[type], this.$q, 'Copied to clipboard');
+                }
+                else if (type === 'py') {
+                    updateClipboard(this.wordData.py.join(' '), this.$q, 'Copied to clipboard');
+                }
+                else if (type === 'hz') {
+                    updateClipboard(this.wordData.text, this.$q, 'Copied to clipboard');
+                }
+                return;
+            }
+            else if (action === 'options') {
+                return;
+            }
+
+            this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: action === 'pin'});
+            this.appendSessionLog([getEvent('pin_row', type), action === 'pin']);
+            if (action === 'pin') {
+                this.$store.commit('setPeekState', {'type': type});
+                this.appendSessionLog([getEvent('peek_row', type)]);
+            }
         },
         clickContextMenu(action, type, i) {
             this.AVElement.pause();
@@ -351,30 +399,16 @@ export default {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
                     this.appendSessionLog([getEvent('peek', 'tr'), i]);
                 }
-                else {
+                else if (type === 'hz') {
                     this.applyState('word', i, StateHidden, StateNone); // Pin it
                 }
             }
-            else {
+            else if (type === 'hz') {
                 this.applyState('word', i, StateHidden, StateHidden); // Hide it
                 // Also peek all three. This makes it more intuitive that if you click again you pin it back
                 for (const t of ['py', 'hz', 'tr']) {
                     this.$store.commit('setPeekState', {'type': t, 'i': i});
                 }
-            }
-        },
-        clickPeekRow: function(type) {
-            if (this.$store.state.options.pin[type] === true) {
-                this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: false});
-                this.appendSessionLog([getEvent('pin_row', type), false]);
-            }
-            else if (this.$store.state.peekStates.rows[type] === true) {
-                this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: true});
-                this.appendSessionLog([getEvent('pin_row', type), true]);
-            }
-            else {
-                this.$store.commit('setPeekState', {'type': type});
-                this.appendSessionLog([getEvent('peek_row', type)]);
             }
         },
         isHiddenStoreOrLvlStates: function(type, hz, pys) {
@@ -684,18 +718,6 @@ export default {
     height: 20px;
     visibility: hidden;
     z-index: 999;
-}
-
-.pinned.peekrow .iconcard {
-    visibility: visible;
-}
-
-.pinned.peekrow .cardcontent {
-    visibility: hidden;
-}
-
-.pinned.peekrow svg {
-    background-color: #606060;
 }
 
 .iconcard.peek {
