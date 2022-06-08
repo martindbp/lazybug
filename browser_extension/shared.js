@@ -342,6 +342,8 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
         // Add all the individual char/pys
         for (let startIdx = 0; startIdx < hz.length; startIdx++) {
             for (let endIdx = startIdx+1; endIdx < hz.length+1; endIdx++) {
+                if (startIdx === 0 && endIdx === hz.length) continue;
+
                 const hzSub = hz.substring(startIdx, endIdx);
                 const pysSub = pys !== null ? pys.slice(startIdx, endIdx) : null;
                 if (DICT[hzSub] === undefined) continue;

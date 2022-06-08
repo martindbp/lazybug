@@ -146,6 +146,7 @@ export default {
         hideIcon: getIconSvg("hide", 18),
         unpinIcon: getIconSvg("unpin", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
+        autoPeeked: null,
     }},
     computed: {
         wordStats: function() {
@@ -247,6 +248,7 @@ export default {
                 starred: i !== null && this.starredStates.words[i],
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
+                autopeek: i !== null && this.$store.state.autoPeekStates[type][i],
                 pinned: this.$store.state.options.pin[type],
                 nonhanzirow: type !== 'hz',
             };
@@ -387,6 +389,7 @@ export default {
             if (this.$store.state.options.peekAfterAutoHide) {
                 for (const type of ['py', 'hz', 'tr']) {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});
+                    this.$store.commit('setPeekState', {'type': type, 'i': i, 'auto': true});
                 }
                 this.appendSessionLog([getEvent('peek', 'word'), i]);
             }
@@ -649,7 +652,11 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation) .cardcontent {
-    color: rgb(150,150,150);
+    color: rgb(180, 180, 180);
+}
+
+.captioncard.autopeek .cardcontent {
+    color: rgb(100, 100, 100) !important;
 }
 
 .captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)) .cardcontent {

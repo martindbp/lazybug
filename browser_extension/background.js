@@ -276,8 +276,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         getStorageData(message.keys, storage)
         .then(function(data) {
             console.log(message.keys, 'got', data);
-            const values = data.map((item) => item.value);
-            sendResponse({data: values});
+            if (message.keys !== null) {
+                const values = data.map((item) => item.value);
+                sendResponse({data: values});
+            }
+            else {
+                sendResponse({data: data});
+            }
         })
         .catch((error) => sendResponse('error'));
     }

@@ -45,6 +45,17 @@ const store = new Vuex.Store({
                 translation: false,
             }
         }),
+        autoPeekStates: Vue.ref({
+            py: [],
+            hz: [],
+            tr: [],
+            rows: {
+                py: false,
+                tr: false,
+                hz: false,
+                translation: false,
+            }
+        }),
         showOptions: false,
         showDictionary: false,
         showDictionaryRange: [-1, -1],
@@ -177,21 +188,22 @@ const store = new Vuex.Store({
             state.captionOffset = offset;
         },
         setPeekState(state, val) {
+            const states = val.auto ? state.autoPeekStates : state.peekStates;
             if ([undefined, null].includes(val.i)) {
                 if (val.type === 'translation') {
-                    state.peekStates[val.type] = true;
-                    state.peekStates.rows[val.type] = true;
+                    states[val.type] = true;
+                    states.rows[val.type] = true;
                 }
                 else {
-                    state.peekStates.rows[val.type] = true;
+                    states.rows[val.type] = true;
                     // Set peek state for all words
-                    for (let i = 0; i < state.peekStates[val.type].length; i++) {
-                        state.peekStates[val.type][i] = true;
+                    for (let i = 0; i < states[val.type].length; i++) {
+                        states[val.type][i] = true;
                     }
                 }
             }
             else {
-                state.peekStates[val.type][val.i] = true;
+                states[val.type][val.i] = true;
             }
         },
         resetPeekStates(state, val) {
@@ -212,6 +224,7 @@ const store = new Vuex.Store({
                     state.peekStates[type].push(false);
                 }
             }
+            state.autoPeekStates = JSON.parse(JSON.stringify(state.peekStates));
         },
         setPeekStates(state, val) {
             state.peekStates = val;
