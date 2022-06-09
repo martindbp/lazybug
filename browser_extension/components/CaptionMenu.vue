@@ -14,14 +14,12 @@
         <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
         <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" style="margin-right: 10px"/>
         <SvgButton title="Options" @click="showOptions" name="options" />
-        <OptionsDialog />
         <DictionaryDialog v-bind:caption="data" />
     </div>
 </template>
 
 <script>
 import SvgButton from './SvgButton.vue'
-import OptionsDialog from './OptionsDialog.vue'
 import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
@@ -29,7 +27,6 @@ export default {
     props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'AVElement'],
     components: {
         SvgButton,
-        OptionsDialog,
         DictionaryDialog,
     },
     data: function() { return {

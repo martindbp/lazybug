@@ -47,14 +47,16 @@ const mixin = {
         createSession() {
             createSession(this.$store.state);
         },
-    },
-    computed: {
-        lvlStates: function() {
+        getLvlStates: function(type, greaterThan, level) {
             if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
             const d = this.$store.state.DICT;
             const states = {};
             for (let lvl = 1; lvl <= 6; lvl++) {
-                const hide = lvl <= this.$store.state.options.hideWordsLevel;
+                let apply = false;
+                if (greaterThan) apply = lvl > level;
+                else apply = lvl <= level;
+
+                if (!apply) continue;
 
                 for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
                     let entries = d[hz];
@@ -72,17 +74,29 @@ const mixin = {
                         combinations(charPyOptions, entryPys);
                     }
                     else {
-                        for (let entry of entries) {
+                        for (const entry of entries) {
                             entryPys.push(dictArrayToDict(entry).pys);
                         }
                     }
 
-                    for (let pys of entryPys) {
-                        if (hide) applyState(d, states, 'word', hz, pys, null, null, StateHidden, StateHidden, true, false);
+                    for (const pys of entryPys) {
+                        applyState(d, states, type, hz, pys, null, null, StateHidden, StateHidden, true, false);
                     }
                 }
             }
             return states;
+        },
+    },
+    computed: {
+        hideWordsLevelStates: function() {
+            return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
+        },
+        pinLevelStates: function() {
+            return {
+                py: this.getLvlStates('py', false, this.$store.state.options.pinLevels.py),
+                hz: this.getLvlStates('hz', false, this.$store.state.options.pinLevels.hz),
+                tr: this.getLvlStates('tr', false, this.$store.state.options.pinLevels.tr),
+            }
         },
         videoWordStats: function() {
             if (this.$store.state.captionData === null) return {};

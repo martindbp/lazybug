@@ -109,7 +109,7 @@
                         type="translation"
                         :pin="showPinRow('translation')"
                         :unpin="!showPinRow('translation')"
-                        :options="true"
+                        :options="false"
                         :click="clickRowContextMenu"
                     />
                 </td>
@@ -244,11 +244,6 @@ export default {
                     this.applyPinyinComponents();
                     this.applyCompoundWordsNotInDict();
                     this.applySimpleCompounds();
-                    for (const type of ['hz', 'tr', 'py', 'translation']) {
-                        if (this.$store.state.options.pin[type] === true) {
-                            this.$store.commit('setPeekState', {'type': type});
-                        }
-                    }
                 }
             },
         },
@@ -295,6 +290,8 @@ export default {
                 return;
             }
             else if (action === 'options') {
+                this.$store.commit('setOptionsHighlightSection', `knowledge-${type}-lvl`);
+                this.$store.commit('setShowOptions', true);
                 return;
             }
 
@@ -414,7 +411,7 @@ export default {
         isHiddenStoreOrLvlStates: function(type, hz, pys) {
             const key = getStateKey(type, hz, pys, null, null);
             return (
-                getState(this.lvlStates, key, StateHidden, StateNone) === StateHidden ||
+                getState(this.hideWordsLevelStates, key, StateHidden, StateNone) === StateHidden ||
                 getState(this.$store.state.states, key, StateHidden, StateNone) === StateHidden
             );
         },
@@ -440,9 +437,9 @@ export default {
                 const tr = this.wordData.tr[i];
                 const key = this.stateKey('word', i);
                 if (
-                    getState(k, key, StateHidden, StateNone) == StateNone &&
+                    getState(k, key, StateHidden, StateNone) === StateNone &&
                     (
-                        getState(this.lvlStates, key, StateHidden, StateNone) == StateHidden ||
+                        getState(this.hideWordsLevelStates, key, StateHidden, StateNone) === StateHidden ||
                         this.$store.state.options.hideWordsLevel === 7 || // all
                         ( // Any number + MW should be hidden if hide level is > 2
                             hz.match(CHINESE_NUMBERS_REGEX) &&
@@ -453,6 +450,21 @@ export default {
                     console.log('LVLS: Marking', 'word', hz, pys, tr, 'as hidden');
                     this.autoHideWord(i);
                     applyState(d, k, 'word', hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
+
+                }
+
+                // Peek the ones that are pinned
+                for (const type of ['py', 'hz', 'tr']) {
+                    if (
+                        getState(k, key, StateHidden, StateHidden) && // the word is hidden
+                        this.$store.state.options.pin[type] && // pin for this type is on
+                        getState(this.pinLevelStates[type], key, StateHidden, StateNone) !== StateHidden // this word+type should be pinned
+                    ) {
+                        console.log('Auto pinning', type, key);
+                        this.$store.commit('setPeekState', {'type': type, 'i': i});
+                        this.$store.commit('setPeekState', {'type': type, 'i': i, 'auto': true});
+                        this.appendSessionLog([getEvent('peek', type), i]);
+                    }
                 }
             }
         },

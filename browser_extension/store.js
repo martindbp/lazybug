@@ -57,6 +57,7 @@ const store = new Vuex.Store({
             }
         }),
         showOptions: false,
+        optionsHighlightSection: null,
         showDictionary: false,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
@@ -71,6 +72,12 @@ const store = new Vuex.Store({
                 py: false,
                 tr: false,
                 translation: false,
+            },
+            pinLevels: {
+                hz: 0,
+                py: 0,
+                tr: 0,
+                translation: 0,
             },
             displayTranslation: 0, // index into [human, machine][min(idx, length)]
             hideWordsLevel: 0,
@@ -106,6 +113,9 @@ const store = new Vuex.Store({
     mutations: {
         switchTranslation(state) {
             state.options.displayTranslation = (state.options.displayTranslation + 1) % 2;
+        },
+        setOptionsHighlightSection(state, val) {
+            state.optionsHighlightSection = val;
         },
         setVideoId(state, val) {
             state.videoId = val

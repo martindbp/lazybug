@@ -14,22 +14,81 @@
 
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="knowledge" style="width: 400px">
-                    Select the HSK level you want to hide automatically
-                    <q-item dense>
-                        <q-item-section>
-                            <q-slider
-                                color="teal"
-                                v-model="hideWordsLevel"
-                                :min="0"
-                                :max="7"
-                                :step="1"
-                                :label-value="hideWordsLevel < 7 ? hideWordsLevel : 'all'"
-                                label
-                                snap
-                                markers
-                            />
-                        </q-item-section>
-                    </q-item>
+                    <q-card>
+                        Select the HSK level for the words you want to hide automatically
+                        <q-item dense>
+                            <q-item-section>
+                                <q-slider
+                                    color="teal"
+                                    v-model="hideWordsLevel"
+                                    :min="0"
+                                    :max="7"
+                                    :step="1"
+                                    :label-value="hideWordsLevel < 7 ? hideWordsLevel : 'all'"
+                                    label
+                                    snap
+                                    markers
+                                />
+                            </q-item-section>
+                        </q-item>
+                    </q-card>
+
+                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
+                        Pin pinyin at HSK level or above
+                        <q-item dense>
+                            <q-item-section>
+                                <q-slider
+                                    color="teal"
+                                    v-model="pinPysLevel"
+                                    :min="0"
+                                    :max="7"
+                                    :step="1"
+                                    :label-value="pinPysLevel < 7 ? pinPysLevel : 'none'"
+                                    label
+                                    snap
+                                    markers
+                                />
+                            </q-item-section>
+                        </q-item>
+                    </q-card>
+
+                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
+                        Pin hanzi at HSK level or above
+                        <q-item dense>
+                            <q-item-section>
+                                <q-slider
+                                    color="teal"
+                                    v-model="pinHzsLevel"
+                                    :min="0"
+                                    :max="7"
+                                    :step="1"
+                                    :label-value="pinHzsLevel < 7 ? pinHzsLevel : 'none'"
+                                    label
+                                    snap
+                                    markers
+                                />
+                            </q-item-section>
+                        </q-item>
+                    </q-card>
+
+                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
+                        Pin word translations at HSK level or above
+                        <q-item dense>
+                            <q-item-section>
+                                <q-slider
+                                    color="teal"
+                                    v-model="pinTrsLevel"
+                                    :min="0"
+                                    :max="7"
+                                    :step="1"
+                                    :label-value="pinTrsLevel < 7 ? pinTrsLevel : 'none'"
+                                    label
+                                    snap
+                                    markers
+                                />
+                            </q-item-section>
+                        </q-item>
+                    </q-card>
                 </q-tab-panel>
                 <q-tab-panel name="subtitle" style="width: 400px">
                     <q-item-label header>Chinese characters</q-item-label>
@@ -170,6 +229,18 @@ export default {
             get: function() { return this.$store.state.options.hideWordsLevel; },
             set: function(val) { this.$store.commit('setOption', {key: 'hideWordsLevel', value: val}); },
         },
+        pinPysLevel: {
+            get: function() { return this.$store.state.options.pinLevels.py; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'py', value: val}); },
+        },
+        pinHzsLevel: {
+            get: function() { return this.$store.state.options.pinLevels.hz; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'hz', value: val}); },
+        },
+        pinTrsLevel: {
+            get: function() { return this.$store.state.options.pinLevels.tr; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'tr', value: val}); },
+        },
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },
             set: function(val) { this.$store.commit('setOption', {key: 'characterSet', value: val}); },
@@ -203,6 +274,7 @@ export default {
             // Remove the "zimuquasardialog" class from the dialog parent, otherwise there's some flickering
             document.querySelector('.zimuquasardialog').classList.remove('zimuquasardialog');
             this.show = false;
+            this.$store.commit('setOptionsHighlightSection', null);
         },
         clickShortcut: function(shortcut) {
             this.choosingShortcut = shortcut;
@@ -254,6 +326,10 @@ export default {
     z-index: 9999;
     position: absolute;
     left: 0;
+}
+
+.q-card.highlight {
+    border: 2px solid red;
 }
 
 </style>

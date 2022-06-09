@@ -334,9 +334,12 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
     const keys = [];
     const vals = [];
 
-    let key = getStateKey(type, hz, pys, tr, translation);
+    let keyType = type;
+    if (['py', 'hz', 'tr'].includes(type)) keyType = 'word'; // convert everything but 'translation' to 'word' for keys
+    let key = getStateKey(keyType, hz, pys, tr, translation);
     keys.push(key);
     vals.push(setState(states, key, stateType, stateVal, explicit));
+
 
     if (type === 'word' && stateType === StateHidden) {
         // Add all the individual char/pys

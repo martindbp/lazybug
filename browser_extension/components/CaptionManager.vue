@@ -30,12 +30,14 @@
             v-bind:AVElement="AVElement"
             v-bind:videoFrameSize="videoFrameSize"
         />
+        <OptionsDialog />
     </div>
 </template>
 
 <script>
 import CaptionContainer from './CaptionContainer.vue'
 import CaptionBlur from './CaptionBlur.vue'
+import OptionsDialog from './OptionsDialog.vue'
 
 const DEFAULT_FONT_SIZE = 24;
 const DEFAULT_WIDTH = 916;
@@ -45,7 +47,11 @@ let lastCaptionIdxGlobal = 0;
 
 export default {
     mixins: [mixin],
-    components: {CaptionContainer, CaptionBlur},
+    components: {
+        CaptionContainer,
+        CaptionBlur,
+        OptionsDialog,
+    },
     data: function() {
         return {
             AVElementSelector: '#primary video, #player-theater-container video',
