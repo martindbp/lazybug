@@ -134,6 +134,12 @@ test-cases:
 	make process-segmentation-alignments show=doutinghao
 	make process-segmentation-alignments show=huanlesong
 
+web:
+	vue-cli-service build browser_extension/components/WebRoot.vue --target lib --dest browser_extension/dist_components/web
+	cp browser_extension/dist_components/web/*.umd.js browser_extension/dist/
+	-cp browser_extension/dist_components/web/*.css browser_extension/dist/
+	make ext-copy
+
 ext-caption:
 	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_components/captionmanager
 	cp browser_extension/dist_components/captionmanager/*.umd.js browser_extension/dist/
@@ -165,9 +171,10 @@ ext:
 	make ext-caption
 	make ext-popup
 	make ext-dashboard
+	make web
 
 ext-copy:
-	cp browser_extension/deepl_main.js browser_extension/dist/
+	cp browser_extension/deepl_ext.js browser_extension/dist/
 	cp browser_extension/*.js browser_extension/dist/
 	cp browser_extension/*.html browser_extension/dist/
 	cp browser_extension/manifest.json browser_extension/dist/
@@ -178,7 +185,7 @@ ext-copy:
 release:
 	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
 	python make_release_manifest.py browser_extension/manifest.json > browser_extension/dist/manifest.json
-	rm browser_extension/dist/deepl_main.js
+	rm browser_extension/dist/deepl_ext.js
 	rm browser_extension/dist/devtools.js
 	rm browser_extension/dist/local.html
 	make zip-ext

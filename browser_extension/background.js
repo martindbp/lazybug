@@ -1,12 +1,9 @@
-BROWSER_EXTENSION = true;
-
-if (BROWSER_EXTENSION) {
-    try {
-        importScripts('shared.js');
-        importScripts('db.js');
-    } catch (e) {
-        console.error(e);
-    }
+try {
+    importScripts('vars_ext.js');
+    importScripts('shared.js');
+    importScripts('db.js');
+} catch (e) {
+    console.log(e);
 }
 
 let personalDb = initPersonalDb();

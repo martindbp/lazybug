@@ -1,8 +1,10 @@
-try {
-    importScripts('dexie.min.js');
-    importScripts('dexie-export-import.js');
-} catch (e) {
-    console.error(e);
+if (BROWSER_EXTENSION) {
+    try {
+        importScripts('dexie.min.js');
+        importScripts('dexie-export-import.js');
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 const PERSONAL_DB_VERSIONS = {

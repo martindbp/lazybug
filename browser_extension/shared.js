@@ -1,5 +1,3 @@
-BROWSER_EXTENSION = true;
-
 let VERSION = null;
 if (BROWSER_EXTENSION) VERSION = chrome.runtime.getManifest().version;
 

@@ -26,7 +26,6 @@
 </template>
 
 <script>
-const ZIMUDEVMODE = true;
 export default {
     props: {
     },

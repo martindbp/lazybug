@@ -1,5 +1,3 @@
-BROWSER_EXTENSION = true;
-
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
     prev: 'ArrowLeft',

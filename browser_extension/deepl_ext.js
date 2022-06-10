@@ -1,5 +1,3 @@
-const ZIMUDEVMODE = true;
-
 if (ZIMUDEVMODE) {
     let translationInProgress = false;
     let lastTranslationTime = null;

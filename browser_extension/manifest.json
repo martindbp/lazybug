@@ -41,6 +41,7 @@
                 "CaptionManager.css"
              ],
             "js": [
+                "vars_ext.js",
                 "vue.runtime.global.prod.min.js",
                 "vuex.global.js",
                 "quasar.umd.prod.js",
@@ -49,7 +50,7 @@
                 "devtools.js",
                 "mixins.js",
                 "CaptionManager.umd.js",
-                "main.js"
+                "ext.js"
             ]
         },
         {
@@ -58,7 +59,8 @@
             ],
             "run_at": "document_end",
             "js": [
-                "deepl_main.js"
+                "vars_ext.js",
+                "deepl_ext.js"
             ]
         }
     ],
