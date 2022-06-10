@@ -7,7 +7,6 @@ install:
 	# For some reason, some module is trying to import "vue/compiler-sfc" instead of "@vue/compiler-sfc"
 	# The hack below works
 	ln -s /usr/local/lib/node_modules/@vue /usr/local/lib/node_modules/vue
-	browser_extension/dist/
 
 clean:
 	rm -rf dataset
@@ -25,8 +24,8 @@ test:
 
 zip-ext:
 	- rm data/remote/public/browser_extension.zip
-	cd browser_extension/dist && zip -r ../../data/remote/public/browser_extension.zip *
-	VERSION=$$(grep "\"version\"" browser_extension/manifest.json | cut -d"\"" -f 4) ; \
+	cd frontend/dist && zip -r ../../data/remote/public/browser_extension.zip *
+	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	cp -r data/remote/public/browser_extension.zip data/remote/public/browser_extension_$$VERSION.zip
 
 pre-public-sync:
@@ -134,66 +133,66 @@ test-cases:
 	make process-segmentation-alignments show=doutinghao
 	make process-segmentation-alignments show=huanlesong
 
-web:
-	vue-cli-service build browser_extension/components/WebRoot.vue --target lib --dest browser_extension/dist_components/web
-	cp browser_extension/dist_components/web/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_components/web/*.css browser_extension/dist/
-	make ext-copy
+frontend-web:
+	vue-cli-service build frontend/components/WebRoot.vue --target lib --dest frontend/dist_components/web
+	cp frontend/dist_components/web/*.umd.js frontend/dist/
+	-cp frontend/dist_components/web/*.css frontend/dist/
+	make frontend-copy
 
-ext-caption:
-	vue-cli-service build browser_extension/components/CaptionManager.vue --target lib --dest browser_extension/dist_components/captionmanager
-	cp browser_extension/dist_components/captionmanager/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_components/captionmanager/*.css browser_extension/dist/
-	make ext-copy
+frontend-caption:
+	vue-cli-service build frontend/components/CaptionManager.vue --target lib --dest frontend/dist_components/captionmanager
+	cp frontend/dist_components/captionmanager/*.umd.js frontend/dist/
+	-cp frontend/dist_components/captionmanager/*.css frontend/dist/
+	make frontend-copy
 
-ext-popup:
-	vue-cli-service build browser_extension/components/PopupRoot.vue --target lib --dest browser_extension/dist_components/popuproot
-	cp browser_extension/dist_components/popuproot/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_components/popuproot/*.css browser_extension/dist/
-	make ext-copy
+frontend-popup:
+	vue-cli-service build frontend/components/PopupRoot.vue --target lib --dest frontend/dist_components/popuproot
+	cp frontend/dist_components/popuproot/*.umd.js frontend/dist/
+	-cp frontend/dist_components/popuproot/*.css frontend/dist/
+	make frontend-copy
 
 
-ext-dashboard:
-	vue-cli-service build browser_extension/components/DashboardRoot.vue --target lib --dest browser_extension/dist_components/dashboardroot
-	cp browser_extension/dist_components/dashboardroot/*.umd.js browser_extension/dist/
-	-cp browser_extension/dist_components/dashboardroot/*.css browser_extension/dist/
-	make ext-copy
+frontend-dashboard:
+	vue-cli-service build frontend/components/DashboardRoot.vue --target lib --dest frontend/dist_components/dashboardroot
+	cp frontend/dist_components/dashboardroot/*.umd.js frontend/dist/
+	-cp frontend/dist_components/dashboardroot/*.css frontend/dist/
+	make frontend-copy
 
-ext-clean:
-	- rm -r browser_extension/dist
-	- rm -r browser_extension/dist_components
-	mkdir -p browser_extension/dist
-	mkdir -p browser_extension/dist_components
+frontend-clean:
+	- rm -r frontend/dist
+	- rm -r frontend/dist_components
+	mkdir -p frontend/dist
+	mkdir -p frontend/dist_components
 	make css
-	make ext
+	make frontend
 
-ext:
-	make ext-caption
-	make ext-popup
-	make ext-dashboard
-	make web
+frontend:
+	make frontend-caption
+	make frontend-popup
+	make frontend-dashboard
+	make frontend-web
 
-ext-copy:
-	cp browser_extension/deepl_ext.js browser_extension/dist/
-	cp browser_extension/*.js browser_extension/dist/
-	cp browser_extension/*.html browser_extension/dist/
-	cp browser_extension/manifest.json browser_extension/dist/
-	cp browser_extension/deps/* browser_extension/dist/
-	cp browser_extension/css/* browser_extension/dist/
-	cp -r browser_extension/images browser_extension/dist/
+frontend-copy:
+	cp frontend/deepl_frontend.js frontend/dist/
+	cp frontend/*.js frontend/dist/
+	cp frontend/*.html frontend/dist/
+	cp frontend/manifest.json frontend/dist/
+	cp frontend/deps/* frontend/dist/
+	cp frontend/css/* frontend/dist/
+	cp -r frontend/images frontend/dist/
 
 release:
-	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' browser_extension/dist/*.js
-	python make_release_manifest.py browser_extension/manifest.json > browser_extension/dist/manifest.json
-	rm browser_extension/dist/deepl_ext.js
-	rm browser_extension/dist/devtools.js
-	rm browser_extension/dist/local.html
+	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' frontend/dist/*.js
+	python make_release_manifest.py frontend/manifest.json > frontend/dist/manifest.json
+	rm frontend/dist/deepl_ext.js
+	rm frontend/dist/devtools.js
+	rm frontend/dist/local.html
 	make zip-ext
 
 css:
-	sass browser_extension/css/zimu_quasar.sass browser_extension/dist/zimu_quasar.css
-	sed -i -E 's/\.zimu (body|html|:root)/\1/g' browser_extension/dist/zimu_quasar.css
-	sed -i -E 's/rem;/em;/g' browser_extension/dist/zimu_quasar.css
+	sass frontend/css/zimu_quasar.sass frontend/dist/zimu_quasar.css
+	sed -i -E 's/\.zimu (body|html|:root)/\1/g' frontend/dist/zimu_quasar.css
+	sed -i -E 's/rem;/em;/g' frontend/dist/zimu_quasar.css
 
 hsk-words:
 	HSK_WORDS_HASH=$$(md5sum data/git/hsk_words.json | cut -d " " -f1) ; \
@@ -204,27 +203,3 @@ simple-chars:
 	SIMPLE_CHARS_HASH=$$(md5sum data/git/simple_chars.json | cut -d " " -f1) ; \
 	echo $$SIMPLE_CHARS_HASH > data/remote/public/simple_chars.hash ; \
 	cp data/git/simple_chars.json "data/remote/public/simple_chars-$$SIMPLE_CHARS_HASH.json"
-
-logo:
-	cp browser_extension/images/logo.svg browser_extension/images/logo_changed.svg
-	sed -i -E 's/#f65c40/#1C7287/g' browser_extension/images/logo_changed.svg
-	sed -i -E 's/#0f62e4/#db931f/g' browser_extension/images/logo_changed.svg
-
-anki-templates:
-	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_py_hz_front.js
-	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_tr_front.js
-	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_word_all_front.js
-	cp anki_templates/cloze_front.js data/remote/public/anki_templates/cloze_translation_front.js
-	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_py_hz_front.js
-	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_tr_front.js
-	cp anki_templates/basic_front.js data/remote/public/anki_templates/basic_hz_front.js
-	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_py_hz_back.js
-	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_tr_back.js
-	cp anki_templates/basic_back.js data/remote/public/anki_templates/basic_hz_back.js
-	sed -i -E 's/CLOZE_TYPE/cloze_word_py_hz/g' data/remote/public/anki_templates/cloze_word_py_hz_front.js
-	sed -i -E 's/CLOZE_TYPE/cloze_word_tr/g' data/remote/public/anki_templates/cloze_word_tr_front.js
-	sed -i -E 's/CLOZE_TYPE/cloze_word_all/g' data/remote/public/anki_templates/cloze_word_all_front.js
-	sed -i -E 's/CLOZE_TYPE/cloze_translation/g' data/remote/public/anki_templates/cloze_translation_front.js
-	sed -i -E 's/CLOZE_TYPE/basic_py_hz/g' data/remote/public/anki_templates/basic_py_hz_*.js 
-	sed -i -E 's/CLOZE_TYPE/basic_tr/g' data/remote/public/anki_templates/basic_tr_*.js 
-	sed -i -E 's/CLOZE_TYPE/basic_hz/g' data/remote/public/anki_templates/basic_hz_*.js 
