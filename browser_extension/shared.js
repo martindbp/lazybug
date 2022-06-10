@@ -1,4 +1,8 @@
-const VERSION = chrome.runtime.getManifest().version;
+BROWSER_EXTENSION = true;
+
+let VERSION = null;
+if (BROWSER_EXTENSION) VERSION = chrome.runtime.getManifest().version;
+
 const CDN_URL = "https://cdn.zimu.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;
@@ -45,78 +49,58 @@ function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
 }
 
-function fetchResource(filename, callback) {
-    chrome.runtime.sendMessage({type: 'fetchResource', filename: filename}, function onResponse(message) {
-        if (['error', null, undefined].includes(message)) {
-            console.log('Failed to fetch ' + filename);
-            callback('error');
+function sendMessageToBackground(message, callback) {
+    const responseHandler = function onResponse(response) {
+        if (['error'].includes(response)) {
+            console.log('Failed for message ', message);
+            if (callback) callback('error');
             return false;
         }
-        callback(message.data);
+        if (callback) {
+            if ([null, undefined].includes(response)) callback(response);
+            else callback(response.data);
+        }
         return true;
-    });
+    }
+
+    if (BROWSER_EXTENSION) {
+        chrome.runtime.sendMessage(message, responseHandler);
+    }
+    else {
+        backgroundMessageHandler(message, null, responseHandler);
+    }
+}
+
+function fetchResource(filename, callback) {
+    sendMessageToBackground({type: 'fetchResource', filename: filename}, callback);
 };
 
 function fetchVersionedResource(filename, callback) {
-    chrome.runtime.sendMessage({type: 'fetchVersionedResource', filename: filename}, function onResponse(message) {
-        if (['error', null, undefined].includes(message)) {
-            console.log('Failed to fetch ' + filename);
-            callback('error');
-            return false;
-        }
-        callback(message.data);
-        return true;
-    });
+    sendMessageToBackground({type: 'fetchVersionedResource', filename: filename}, callback);
 };
 
 function getIndexedDbData(storageName, keys, callback) {
-    chrome.runtime.sendMessage({type: 'getIndexedDbData', storage: storageName, keys: keys}, function onResponse(message) {
-        if (['error', null, undefined].includes(message)) {
-            console.log('Failed to get data ' + keys);
-            callback('error');
-            return false;
-        }
-        callback(message.data);
-        return true;
-    });
+    sendMessageToBackground({type: 'getIndexedDbData', storage: storageName, keys: keys}, callback);
 }
 
 function setIndexedDbData(storageName, keys, values, callback) {
-    chrome.runtime.sendMessage({type: 'setIndexedDbData', storage: storageName, keys: keys, values: values}, function onResponse(message) {
-        if (message === 'error') {
-            callback('error');
-            return false;
-        }
-        if (callback) callback();
-        return true;
-    });
+    sendMessageToBackground({type: 'setIndexedDbData', storage: storageName, keys: keys, values: values}, callback);
 }
 
 function clearCache() {
-    chrome.runtime.sendMessage({type: 'clearCache'}, function onResponse(message) {
-        return true;
-    });
+    sendMessageToBackground({type: 'clearCache'});
 }
 
 function clearPersonalData(callback) {
-    chrome.runtime.sendMessage({type: 'clearPersonalData'}, function onResponse(message) {
-        callback()
-        return true;
-    });
+    sendMessageToBackground({type: 'clearPersonalData'}, callback);
 }
 
 function exportDatabaseJson(callback) {
-    chrome.runtime.sendMessage({type: 'exportDatabaseJson'}, function onResponse(message) {
-        callback(message.data);
-        return true;
-    });
+    sendMessageToBackground({type: 'exportDatabaseJson'}, callback);
 }
 
 function importDatabaseJson(data, callback) {
-    chrome.runtime.sendMessage({type: 'importDatabaseJson', data: data}, function onResponse(message) {
-        callback(message);
-        return true;
-    });
+    sendMessageToBackground({type: 'importDatabaseJson', data: data}, callback);
 }
 
 function fetchPersonalDataToStore(store) {
@@ -142,7 +126,7 @@ function fetchPersonalDataToStore(store) {
 function appendSessionLog(state, data) {
     const [showName, seasonName, episodeName] = getShowSeasonEpisodeName(state.showInfo, state.captionId);
     console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data, showName, seasonName, episodeName);
-    chrome.runtime.sendMessage({
+    sendMessageToBackground({
         type: 'appendSessionLog',
         sessionData: {
             captionId: state.captionId,
@@ -153,41 +137,27 @@ function appendSessionLog(state, data) {
             episodeName: episodeName,
         },
         data: data,
-    }, function onResponse(message) {
-        return true;
     });
 }
 
 function getLog(offset, limit, callback) {
-    return chrome.runtime.sendMessage({
+    return sendMessageToBackground({
         type: 'getLog',
         offset: offset,
         limit: limit,
-    }, function onResponse(message) {
-        if (message === 'error') callback('error');
-        else callback(message.data);
-        return true;
-    });
+    }, callback);
 }
 
 function getRecent(callback) {
-    return chrome.runtime.sendMessage({
+    return sendMessageToBackground({
         type: 'getRecent',
-    }, function onResponse(message) {
-        if (message === 'error') callback('error');
-        else callback(message.data);
-        return true;
-    });
+    }, callback);
 }
 
 function getLogRows(callback) {
-    return chrome.runtime.sendMessage({
+    return sendMessageToBackground({
         type: 'getLogRows',
-    }, function onResponse(message) {
-        if (message === 'error') callback('error');
-        else callback(message.data);
-        return true;
-    });
+    }, callback);
 }
 
 const YOUTUBE_REGEXP = /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/;
@@ -586,9 +556,7 @@ function download(filename, text) {
 }
 
 function openDashboard() {
-    chrome.runtime.sendMessage({type: 'openDashboard'}, function onResponse(message) {
-        return true;
-    });
+    sendMessageToBackground({type: 'openDashboard'});
 }
 
 function getShowSeasonEpisodeName(showInfo, captionId) {

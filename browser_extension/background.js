@@ -1,8 +1,12 @@
-try {
-    importScripts('shared.js');
-    importScripts('db.js');
-} catch (e) {
-    console.error(e);
+BROWSER_EXTENSION = true;
+
+if (BROWSER_EXTENSION) {
+    try {
+        importScripts('shared.js');
+        importScripts('db.js');
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 let personalDb = initPersonalDb();
@@ -189,7 +193,9 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
                     console.log('Fetching', folder, filename, fetchHash);
                     return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
                         .then(function(response) {
-                            chrome.action.setBadgeText({text:''});
+                            if (BROWSER_EXTENSION) {
+                                chrome.action.setBadgeText({text:''});
+                            }
                             if (!response.ok) {
                                 failCallback(response);
                                 return null;
@@ -235,7 +241,7 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
     });
 }
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+function backgroundMessageHandler(message, sender, sendResponse) {
     if (message.type === 'clearCache') {
         backgroundClearCache();
         sendResponse();
@@ -265,9 +271,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     else if (message.type === 'getCaptions') {
         backgroundFetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
             sendResponse({data: data, hash: hash});
-            chrome.runtime.sendMessage({type: 'requestSucceeded'});
         }, function(response) {
-            chrome.runtime.sendMessage({type: 'requestFailed'});
             sendResponse('error');
         });
     }
@@ -326,7 +330,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 message.sessionData.synced = false;
                 personalDb.log.put(message.sessionData)
                 .then(function() {
-                    sendResponse(null);
+                    sendResponse();
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -358,7 +362,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         fetch('http://localhost:8000').then(function(response) {
             if (!response.ok) {
                 console.log('No server running');
-                sendResponse(null);
+                sendResponse();
                 return null;
             }
             return response;
@@ -367,7 +371,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         .then(data => sendResponse({'data': data}))
         .catch((error) => {
             console.log('No server running');
-            sendResponse(null);
+            sendResponse();
             return null;
         });
     }
@@ -434,13 +438,19 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         });
     }
     else if (message.type === 'translation') {
-        fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse(null));
+        fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse());
     }
     else if (message.type === 'openDashboard') {
-        chrome.tabs.create({
-          url: "dashboard.html",
-        });
+        if (BROWSER_EXTENSION) {
+            chrome.tabs.create({
+              url: "dashboard.html",
+            });
+        }
     }
 
     return true;
-});
+}
+
+if (BROWSER_EXTENSION) {
+    chrome.runtime.onMessage.addListener(backgroundMessageHandler);
+}

@@ -1,3 +1,5 @@
+BROWSER_EXTENSION = true;
+
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
     prev: 'ArrowLeft',
@@ -281,14 +283,16 @@ const store = new Vuex.Store({
     },
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'extensionToggle') {
-        // Reset captionOffset so we have a way get out of the situation where it's outside the window
-        store.commit('setCaptionOffset', [0, 0]);
-        store.commit('setOption', {key: 'extensionToggle', value: message.data});
-    }
-    return true;
-});
+if (BROWSER_EXTENSION) {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.type === 'extensionToggle') {
+            // Reset captionOffset so we have a way get out of the situation where it's outside the window
+            store.commit('setCaptionOffset', [0, 0]);
+            store.commit('setOption', {key: 'extensionToggle', value: message.data});
+        }
+        return true;
+    });
+}
 
 const FETCH_PUBLIC_RESOURCES = [
     ['public_cedict.json', 'dictionary', 'setDict'],
