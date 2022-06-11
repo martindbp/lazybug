@@ -1211,6 +1211,11 @@ def add_human_translations_merge_lines(caption_data, ocr_params, human_translati
 
     if human_translations is not None:
         human_translations['timing_offset'] = english_offset
+        human_translations_per_caption = len(human_translations['lines']) / len(caption_data['lines'])
+        if human_translations_per_caption < 0.5 and remove_unmatched_captions:
+            print(f'Too few human translations ({human_translations_per_caption} per caption, skipping')
+            return caption_data
+
         align_translations_and_captions(
             caption_data,
             human_translations,
