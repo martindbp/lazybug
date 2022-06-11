@@ -6,7 +6,7 @@
                  v-model="extensionToggle"
                  color="green"
             />
-            <q-btn-dropdown color="primary" label="Go to" :loading="randomLoading">
+            <q-btn-dropdown color="primary" label="Go to">
                 <q-list>
                     <q-item v-for="video in recent" clickable @click="clickRecent(video)">
                         <q-item-section>
@@ -34,7 +34,6 @@ export default {
         dev: ZIMUDEVMODE,
         showList: null,
         recent: null,
-        randomLoading: false,
     }},
     mounted: function() {
         const self = this;
@@ -98,24 +97,14 @@ export default {
         random: function() {
             if (this.showList === null) return;
 
-            this.randomLoading = true;
-
-            const showName = this.showList[Math.floor(Math.random() * this.showList.length)];
-            const self = this;
-            fetchResource(`shows/${showName}.json`, function (data) {
-                self.randomLoading = false;
-                if (data === 'error') {
-                    alert('Error while fetching show info');
-                }
-                else {
-                    const firstEpisode = data.seasons[0].episodes[0].id;
-                    const [tmp, videoId] = firstEpisode.split('youtube-');
-                    chrome.tabs.create({
-                        url: `https://youtube.com/watch?v=${videoId}`,
-                    });
-                }
+            const showNames = Object.keys(this.showList).filter((name) => this.showList[name].released);
+            const showName = showNames[Math.floor(Math.random() * showNames.length)];
+            const data = this.showList[showName];
+            const firstEpisode = data.seasons[0].episodes[0].id;
+            const [tmp, videoId] = firstEpisode.split('youtube-');
+            chrome.tabs.create({
+                url: `https://youtube.com/watch?v=${videoId}`,
             });
-
         }
     },
     watch: {

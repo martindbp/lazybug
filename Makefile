@@ -131,7 +131,7 @@ video-list:
 
 .PHONY: show-list
 show-list:
-	python list_available_shows.py | xargs -I{} basename {} .json | python text_list_to_json_array.py > data/remote/public/show_list.json
+	python make_shows_list.py
 	LIST_HASH=$$(md5sum data/remote/public/show_list.json | cut -d " " -f1) ; \
 	echo $$LIST_HASH > data/remote/public/show_list.hash ; \
 	mv data/remote/public/show_list.json "data/remote/public/show_list-$$LIST_HASH.json"

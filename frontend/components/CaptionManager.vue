@@ -487,7 +487,7 @@ export default {
             return (
                 this.captionId !== null && (
                     this.$store.state.videoList === null ||
-                    this.$store.state.showInfo === null ||
+                    getShowInfo(this.$store) === null ||
                     this.$store.state.captionData === null ||
                     this.$store.state.DICT === null ||
                     this.$store.state.HSK_WORDS === null

@@ -15,6 +15,13 @@ function syncOptions(state) {
     setIndexedDbData('other', ['options'], [state.options], function() {});
 }
 
+function getShowInfo(store, state = null) {
+    if (state === null) state = store.state;
+    if (state.captionData === null || state.showList === null) return null;
+
+    return state.showList[state.captionData.show_name];
+}
+
 const store = new Vuex.Store({
     state: {
         captionId: null,
@@ -24,7 +31,6 @@ const store = new Vuex.Store({
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
         resourceFetchErrors: [],
         showList: null,
-        showInfo: null,
         thumbnailObserver: null,
         videoList: null,
         DICT: null,
@@ -156,19 +162,6 @@ const store = new Vuex.Store({
         setCaptionDataAndHash(state, val) {
             state.captionData = val.data;
             state.captionHash = val.hash;
-            if (state.captionData !== null) {
-                if (state.resourceFetchErrors.includes('show info')) {
-                    state.resourceFetchErrors.splice(state.resourceFetchErrors.indexOf('show info'), 1);
-                }
-                fetchResource(`shows/${state.captionData.show_name}.json`, function (data) {
-                    if (data === 'error') {
-                        state.resourceFetchErrors.push('show info');
-                    }
-                    else {
-                        state.showInfo = data;
-                    }
-                });
-            }
         },
         setShowOptions(state, val) {
             state.showOptions = val;

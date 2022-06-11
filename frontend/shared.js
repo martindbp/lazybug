@@ -122,7 +122,7 @@ function fetchPersonalDataToStore(store) {
 }
 
 function appendSessionLog(state, data) {
-    const [showName, seasonName, episodeName] = getShowSeasonEpisodeName(state.showInfo, state.captionId);
+    const [showName, seasonName, episodeName] = getShowSeasonEpisodeName(getShowInfo(null, state), state.captionId);
     console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data, showName, seasonName, episodeName);
     sendMessageToBackground({
         type: 'appendSessionLog',
