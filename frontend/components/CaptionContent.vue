@@ -262,7 +262,7 @@ export default {
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
                 autopeek: i !== null && this.$store.state.autoPeekStates[type][i],
-                //pinned: this.$store.state.options.pin[type],
+                pinned: this.$store.state.options.pin[type],
                 nonhanzirow: type !== 'hz' && ! isPeekRow,
             };
             return cl;
@@ -701,8 +701,12 @@ export default {
     color: rgb(180, 180, 180);
 }
 
-.captioncard.autopeek .cardcontent {
+.captioncard.autopeek.hiddenstate .cardcontent {
     color: rgb(100, 100, 100) !important;
+}
+
+.captioncard.pinned.hiddenstate .cardcontent {
+    color: rgb(180, 180, 180) !important;
 }
 
 .captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)) .cardcontent {
