@@ -188,7 +188,7 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
                 hash = fetchHash;
                 if (fetchHash !== storageHash) {
                     console.log('Fetching', folder, filename, fetchHash);
-                    return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'default'})
+                    return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'no-cache'})
                         .then(function(response) {
                             if (BROWSER_EXTENSION) {
                                 chrome.action.setBadgeText({text:''});
