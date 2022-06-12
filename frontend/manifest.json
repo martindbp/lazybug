@@ -32,7 +32,9 @@
             "matches": [
                 "*://*.youtube.com/*",
                 "*://*.youtu.be/*",
-                "file:///*"
+                "file:///*/*.mp4",
+                "file:///*/*.webp",
+                "file:///*/*.webm"
             ],
             "run_at": "document_end",
             "css": [
