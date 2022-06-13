@@ -173,7 +173,8 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
         }
         else {
             console.log(folder, 'hash file cache timestamp is stale');
-            return fetch(CDN_URL + `${folder}/${filename}.hash`, {cache: 'no-cache'})
+            const ms = Date.now();
+            return fetch(CDN_URL + `${folder}/${filename}.hash?dummy=${ms}`, {cache: 'no-cache'})
             .then(function(response) {
                 console.log('Fetching done for ', folder);
                 if (!response.ok) {
