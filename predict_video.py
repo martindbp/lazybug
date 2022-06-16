@@ -1214,6 +1214,8 @@ def add_human_translations_merge_lines(caption_data, ocr_params, human_translati
         human_translations_per_caption = len(human_translations['lines']) / len(caption_data['lines'])
         if human_translations_per_caption < 0.5 and remove_unmatched_captions:
             print(f'Too few human translations ({human_translations_per_caption} per caption, skipping')
+            for line in caption_lines:
+                line.append([])
             return caption_data
 
         align_translations_and_captions(

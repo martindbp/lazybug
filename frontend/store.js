@@ -292,13 +292,13 @@ if (BROWSER_EXTENSION) {
         ['public_cedict.json', 'dictionary', 'setDict'],
         ['hsk_words.json', 'HSK word list', 'setHskWords'],
         ['video_list.json', 'video list', 'setVideoList'],
-        ['show_list.json', 'show list', 'setShowList'],
+        ['show_list_full.json', 'show list', 'setShowList'],
         ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
     ];
 }
 else {
     FETCH_PUBLIC_RESOURCES = [
-        ['show_list.json', 'show list', 'setShowList'],
+        ['show_list_full.json', 'show list', 'setShowList'],
     ];
 }
 

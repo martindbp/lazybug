@@ -107,9 +107,11 @@ for filename in glob.glob('data/remote/public/shows/*.json'):
 # Normalize the difficulty scores
 for name, show in released_shows.items():
     if 'difficulty' not in show:
+        if 'difficulty_manual' not in show:
+            print('ERROR', name, 'has no difficulty score, need to set difficulty_manual')
         continue
     show['difficulty']  = (show['difficulty'] - min_score) / (max_score - min_score)
     print(name, show['difficulty'])
 
-with open('data/remote/public/show_list.json', 'w') as f:
+with open('data/remote/public/show_list_full.json', 'w') as f:
     json.dump(released_shows, f)

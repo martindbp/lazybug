@@ -1,16 +1,44 @@
 <template>
-    <div class="q-pa-md" style="width: 50%; left: 25%; position: absolute; min-width: 500px;">
+    <div class="q-pa-md" style="display: inline-block">
         <q-table
           title="Shows"
           :rows="rows"
           :columns="columns"
           :pagination="pagination"
+          :loading="isLoading"
           row-key="name-en"
-        />
+        >
+            <template v-slot:body-cell-difficulty="props">
+                <q-td :props="props">
+                    <q-rating
+                      readonly
+                      v-model="props.value"
+                      max="3"
+                      size="1em"
+                      color="red-5"
+                      icon="star_border"
+                      icon-selected="star"
+                      icon-half="star_half"
+                    />
+                </q-td>
+            </template>
+            <template v-slot:body-cell-douban="props">
+                <q-td :props="props">
+                    <q-badge color="green">
+                        {{ props.value }}
+                    </q-badge>
+                </q-td>
+            </template>
+        </q-table>
     </div>
 </template>
 
 <script>
+var roundToScale = function(n,scale) {
+    console.log(n, parseFloat((Math.round(n / scale) * scale).toFixed(1)));
+    return parseFloat((Math.round(n / scale) * scale).toFixed(1));
+};
+
 export default {
     data: function() { return {
         pagination: {
@@ -22,25 +50,25 @@ export default {
             required: true,
             label: 'Name',
             align: 'left',
-            field: row => row.name.en || row.name,
+            field: row => row.name.en ? `${row.name.en}` : row.name,
             format: val => `${val}`,
             sortable: true
           },
           {
-            name: 'name-zh',
+            name: 'difficulty',
             required: true,
-            label: 'Hanzi',
+            label: 'Difficulty',
             align: 'left',
-            field: row => row.name.hz || '-',
+            field: row => roundToScale(3.5*(row.difficulty || row.difficulty_manual), 0.5),
             format: val => `${val}`,
             sortable: true
           },
           {
-            name: 'name-py',
+            name: 'douban',
             required: true,
-            label: 'Pinyin',
+            label: 'Douban score',
             align: 'left',
-            field: row => row.name.py || '-',
+            field: row => row.douban || 'N/A',
             format: val => `${val}`,
             sortable: true
           },
@@ -59,6 +87,9 @@ export default {
         rows: function() {
             if (this.$store.state.showList === null) return [];
             return Object.values(this.$store.state.showList).filter((show) => show.released);
+        },
+        isLoading: function() {
+            return this.$store.state.showList === null;
         },
     }
 };
