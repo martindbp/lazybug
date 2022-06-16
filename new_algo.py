@@ -7,6 +7,8 @@ from iteration_utilities import unique_everseen
 from han import get_translation_options_cedict, CEDICT
 
 import numpy as np
+import torch
+from torch.autograd import Variable
 from wordfreq import word_frequency
 from word_forms.word_forms import get_word_forms
 
@@ -86,7 +88,7 @@ DEFAULT_SCORE_PARAMS = {
     'hz_information_pow': 2,
 }
 
-def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARAMS, differentiable=False):
+def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARAMS):
     # Higher score for:
     #  * longer words (squared?)
     #  * longer translation matches
@@ -100,7 +102,12 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
     #  * if pinyin matches cedict entry
     #  * for keeping low frequency chars together, e.g.  排查 出 better than 排 查出
     #
-    # When differentiable=True, the score_params should be tensors (weights), and a differentiable score is returned
+
+    def _get_score_param(key):
+        val = score_params[key]
+        if isinstance(val, torch.tensor):
+            return val[0]
+        return val
 
     segmentation = config[0]
     options = config[1]
@@ -130,7 +137,9 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
             for entry in CEDICT.v[char][1]:
                 max_freq = max(max_freq, entry[-2])
 
-            information = -np.log(max_freq)
+            if max_freq == 0:
+                breakpoint()
+            information = -np.log(max(10e-8, max_freq))
             total_hz_information += max(0, information - score_params['hz_min_information'])
 
         final_score += pow(total_hz_information / score_params['hz_max_information'], score_params['hz_information_pow'])
@@ -150,12 +159,18 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
 
             # Keep track of the maximum match score for each translation letter
             arr = translation_scores[translation_idx]
-            tr_information = -np.log(word_frequency(tr, 'en'))
+            tr_information = -np.log(max(10e-8, word_frequency(tr, 'en')))
             information_factor = tr_information * score_params['information_factor']
-            match_score = score_params['match_type'][match_type] + information_factor + option_information_ratio
+            name = 'exact'
+            if match_type == MORPHOLOGICAL_MATCH:
+                name = 'morphological'
+            elif match_type == SYNONYM_MATCH:
+                name = 'synonym'
+
+            match_score = score_params['match_type_'+name] + information_factor + option_information_ratio
             for i in range(start_idx, start_idx+len(tr)):
                 arr[i] = max(arr[i], match_score)
-            #arr[start_idx:start_idx+len(tr)] = np.maximum(arr[start_idx:start_idx+len(tr)], match_score)
+
             if tr in seen_words_for_translation:
                 final_score -= score_params['reuse_penalty']*match_score
             else:
@@ -251,10 +266,10 @@ def match_information_ratio(match):
     total_matched_information = 0
     matched_words = []
     for w, (matched_w, *_) in zip(match[0], match[2]):
-        word_information = -np.log(word_frequency(w, 'en'))
+        word_information = -np.log(max(10e-8, word_frequency(w, 'en')))
         total_information += word_information
         if matched_w != 'noop':
-            matched_word_information = min(-np.log(word_frequency(matched_w, 'en')), word_information)
+            matched_word_information = min(-np.log(max(10e-8, word_frequency(matched_w, 'en'))), word_information)
             total_matched_information += matched_word_information
             matched_words.append(matched_w)
 
@@ -262,7 +277,7 @@ def match_information_ratio(match):
     return ratio
 
 
-def optimize_segmentation_pinyin_and_translations(hz, translations):
+def optimize_segmentation_pinyin_and_translations(hz, translations, score_params):
     #
     # Get all possible words segmentations
     #
@@ -376,69 +391,103 @@ def optimize_segmentation_pinyin_and_translations(hz, translations):
             configurations.append((words, combination))
 
     #print('Num configurations', len(configurations))
-    max_score = -float('inf')
-    max_score_config = None
+    configs_out = []
+    config_scores_out = []
     for config in configurations:
-        score = evaluate_configuration(config, translations, differentiable=False)
-        #print(score, config)
-        if score > max_score:
-            max_score = score
-            max_score_config = config
+        score = evaluate_configuration(config, translations, score_params=score_params)
+        configs_out.append(config)
+        config_scores_out.append(score)
 
-    #print(max_score)
-    #print(max_score_config)
-    return max_score_config
+    return config_scores_out, configs_out
 
 
 examples = [
-    ("爸爸亲眼看见你把这个", "I just saw that you threw this", "Dad saw you put this.", {
-        "爸爸 亲眼 看见 你 把 这个": 1,
-        "爸爸 亲眼 看见 你 把 这 个": 0.7 ,
-    }),
-    ("你把那手机关了.", "Mute your phone.", "You turned that phone off.", {
-        "你 把 那 手机 关 了 .": 1,
-    }),
-    ("循环解除了.", "The cycle passed.", "The cycle has been lifted.", {
-        "循环 解除 了 .": 1,
-    }),
-    ("你带人从东门进去.", "Go from the east gate.", "You take the men in through the east gate.", {
-        "你 带 人 从 东 门 进去 .": 1,
-        "你 带 人 从 东门 进去 .": 1,
-    }),
-    ("我刚一睁开眼睛", "I just opened my eyes", "When I opened my eyes", {
-        "我 刚一 睁开 眼睛": 1,
-        "我 刚 一 睁开 眼睛": 0.8,
-    }),
-    ("市里马上来人.", "Someone from city bureau will come soon.", "The city will be here soon.", {
-        "市 里 马上 来 人 .": 1
-    }),
-    ("说了车会出事.", "We said there would be an accident.", "We said the car would crash.", {
-        "说 了 车 会 出事 .": 1
-    }),
-    ("那个人", "that person", "that person", {
-        "那个人": 1,
-    }),
-    ("我们早晚会被叫过去的.", "We will be questioned sooner or later.", "We'll be called in sooner or later.", {
-        "我们 早晚 会 被 叫 过去 的 .": 1
-    }),
-    ("然后不管不顾去开会?", "Can I forget everything and attend the meeting then?", "And then you go to a meeting without a care in the world?", {
-        "然后 不管不顾 去 开会 ?": 1,
-    }),
-    ("他们俩会出现在", "they would", "they would be present", "They'll both show up at", {
-        "他们 俩 会 出现 在": 1,
-    }),
-    ("得先排查出", "have to check", "I have to find out", {
-        "得 先 排查 出": 1,
-    }),
+    ("爸爸亲眼看见你把这个", "I just saw that you threw this", "Dad saw you put this.", "爸爸 亲眼 看见 你 把 这个", "爸 爸 亲 眼看 见 你 把 这 个"),
+    ("你把那手机关了.", "Mute your phone.", "You turned that phone off.", "你 把 那 手机 关 了 .", "你 把 那 手 机关 了 ."),
+    ("循环解除了.", "The cycle passed.", "The cycle has been lifted.", "循环 解除 了 .", "循环 解 除了 ."),
+    ("你带人从东门进去.", "Go from the east gate.", "You take the men in through the east gate.", "你 带 人 从 东 门 进去 .", "你 带 人从 东 门 进去 ."),
+    ("我刚一睁开眼睛", "I just opened my eyes", "When I opened my eyes", "我 刚一 睁开 眼睛", "我 刚一 睁 开眼 睛"),
+    ("市里马上来人.", "Someone from city bureau will come soon.", "The city will be here soon.", "市 里 马上 来 人 .", "市里 马上 来 人 ."),
+    ("说了车会出事.", "We said there would be an accident.", "We said the car would crash.", "说 了 车 会 出事 .", "说 了 车 会 出 事 ."),
+    ("那个人", "that person", "that person", "那个人", "那 个人"),
+    ("我们早晚会被叫过去的.", "We will be questioned sooner or later.", "We'll be called in sooner or later.", "我们 早晚 会 被 叫 过去 的 .", "我们 早 晚会 被 叫 过去 的 ."),
+    ("然后不管不顾去开会?", "Can I forget everything and attend the meeting then?", "And then you go to a meeting without a care in the world?", "然后 不管不顾 去 开会 ?", "然后 不管 不顾 去 开会 ?"),
+    ("他们俩会出现在", "they would", "they would be present", "They'll both show up at", "他们 俩 会 出现 在", "他们 俩 会 出 现在"),
+    ("得先排查出", "have to check", "I have to find out", "得 先 排查 出", "得 先 排 查出"),
+    ("号码归属人叫肖鹤云." "The owner of the number is Xiao Heyun.", "The number belongs to a person named Xiao He-yun.", "号码 归属 人 叫 肖鹤云 .", "号码 归属 人叫 肖 鹤云 ."),
 ]
 
+def create_value_tensor(val):
+    return Variable(torch.tensor([val], dtype=float), requires_grad=True)
 
-sum_score = 0
-for hz, *translations, correct_segs in examples:
-    seg, *_ = optimize_segmentation_pinyin_and_translations(hz, translations)
-    seg_str = ' '.join(seg)
-    score = correct_segs.get(seg_str, 0)
-    print(f'{score}\t{seg_str}')
-    sum_score += score
+#match_type_exact 0.9694201295132068 -7.626661859708163
+#match_type_morphological 0.5213996370906425 5.822887178702049
+#match_type_synonym 0.32009879693532994 6.417889504537964
+#reuse_penalty 5.15764999800173 39.50457953686117
+#information_factor 0.6386526121647206 44.13881984612936
+#option_information_ratio_factor 2.9866223496092466 -3.1817329031770787
+#hz_min_information 4.377319436260156 65.10725346690772
+#hz_max_information 2.7942716962033383 128.11959193275166
+#hz_information_pow 1.1098594089505958 -144.46985999531228
 
-print('Sum score:', sum_score)
+#PYTORCH_SCORE_PARAMS = {
+    #'match_type_exact': create_value_tensor(0.97),
+    #'match_type_morphological': create_value_tensor(0.52),
+    #'match_type_synonym': create_value_tensor(0.32),
+    #'reuse_penalty': create_value_tensor(5.15),
+    #'information_factor': create_value_tensor(0.64),
+    #'option_information_ratio_factor': create_value_tensor(2.98),
+    #'hz_min_information': create_value_tensor(4.37),
+    #'hz_max_information': create_value_tensor(2.79),
+    #'hz_information_pow': create_value_tensor(1.1),
+#}
+
+
+PYTORCH_SCORE_PARAMS = {
+    'match_type_exact': create_value_tensor(1),
+    'match_type_morphological': create_value_tensor(0.5),
+    'match_type_synonym': create_value_tensor(0.3),
+    'reuse_penalty': create_value_tensor(5),
+    'information_factor': create_value_tensor(1/2),
+    'option_information_ratio_factor': create_value_tensor(3),
+    'hz_min_information': create_value_tensor(4),
+    'hz_max_information': create_value_tensor(2),
+    'hz_information_pow': create_value_tensor(2),
+}
+
+
+def forward():
+    loss = 0
+    for hz, *translations, correct_seg, wrong_seg in examples:
+        scores, configs = optimize_segmentation_pinyin_and_translations(
+            hz, translations, score_params=PYTORCH_SCORE_PARAMS
+        )
+        config_scores = {}
+        for score, config in zip(scores, configs):
+            config_scores[' '.join(config[0])] = score
+
+        correct_score = config_scores.get(correct_seg, 0)
+        wrong_score = config_scores.get(wrong_seg, 0)
+        if wrong_score > correct_score:
+            loss += correct_score - wrong_score
+        else:
+            loss += torch.log(1 + correct_score - wrong_score)
+        #loss += min(10, correct_score - score)
+
+    loss = loss / len(examples)
+    loss.backward()
+    print('Loss', loss)
+
+learning_rate = 1e-2
+for t in range(100):
+    forward()
+
+    for key, val in PYTORCH_SCORE_PARAMS.items():
+        if val.grad:
+            print(key, val.data.item(), val.grad.data.item())
+            val.data += learning_rate * val.grad.data.item()
+        else:
+            print(key, None)
+    #learning_rate *= 1/2
+
+#print('Sum score:', sum_score)

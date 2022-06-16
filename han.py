@@ -96,7 +96,7 @@ def load_hsk_unihan_jieba():
             JIEBA_POS_FREQ[hz] = (pos, int(freq))
 
 
-@task(serializer=json, deps=[FileRef('data/git/cedict_ignore.txt'), FileRef('data/git/cedict_freq_override.txt')])
+@task(serializer=json, deps=[FileRef('data/git/cedict_ts.u8'), FileRef('data/git/cedict_ignore.txt'), FileRef('data/git/cedict_freq_override.txt')])
 def make_cedict(freqs=None, filename=FileRef('data/git/cedict_ts.u8')) -> Cedict:
     load_hsk_unihan_jieba()
     cedict_ignore = set()
@@ -386,8 +386,8 @@ def clean_cedict_translation(tr, hz=None, py=None, split_or=True, remove_parens=
     for s in lstrip:
         if tr.startswith(s):
             tr = tr[len(s):]
-    tr.replace('fig. ', '')
-    tr.replace('lit. ', '')
+    tr = tr.replace('fig. ', '')
+    tr = tr.replace('lit. ', '')
     tr = tr.replace('?', '')
     tr = tr.replace("'", " '")
 
@@ -473,8 +473,9 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
         deepl = re.sub('-', ' ', deepl)
         options.append((deepl.split(' '), False, py))
 
-    if hz in SKIP: # and add_empty:
-        options.append(([''], False, py))
+    if hz in SKIP:
+        if add_empty:
+            options.append(([''], False, py))
         return options
 
     if hz not in CEDICT.v:
@@ -483,6 +484,7 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
         return options
 
     entries = CEDICT.v.get(hz)[1]
+
     #if hz in ALLOW_EMPTY and add_empty:
     if add_empty and deepl not in [None, '', '[UNK]']:
         options.append(([''], False, py))
@@ -498,12 +500,13 @@ def get_translation_options_cedict(hz, py, deepl, add_empty=True, split_or=True)
 
         transls = transl.split('/')
 
-        # By convention, anyting after ! is for exact matching only
+        # By convention, anything after ! is for exact matching only
         rest_is_exact_match_only = False
         for tr in transls:
             if tr == '!':
                 rest_is_exact_match_only = True
-                options.insert(0, ([''], False, entry_py))
+                if add_empty:
+                    options.insert(0, ([''], False, entry_py))
                 continue
 
             # We include options with and without parenthesised text, e.g. 九 -> "(long) time", we want
