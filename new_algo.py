@@ -8,6 +8,7 @@ from han import get_translation_options_cedict, CEDICT
 
 import numpy as np
 import torch
+from torch.optim import Adam
 from torch.autograd import Variable
 from wordfreq import word_frequency
 from word_forms.word_forms import get_word_forms
@@ -76,19 +77,7 @@ EXACT_MATCH = 0
 MORPHOLOGICAL_MATCH = 1
 SYNONYM_MATCH = 2
 
-DEFAULT_SCORE_PARAMS = {
-    'match_type': {
-        EXACT_MATCH: 1, MORPHOLOGICAL_MATCH: 0.5, SYNONYM_MATCH: 0.3
-    },
-    'reuse_penalty': 5,
-    'information_factor': 1/2,
-    'option_information_ratio_factor': 3,
-    'hz_min_information': 4,
-    'hz_max_information': 2,
-    'hz_information_pow': 2,
-}
-
-def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARAMS):
+def evaluate_configuration(config, translations, score_params):
     # Higher score for:
     #  * longer words (squared?)
     #  * longer translation matches
@@ -135,14 +124,13 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
             # If a char has multiple entries/pinyins, pick the most common for frequency/information
             max_freq = -float('inf')
             for entry in CEDICT.v[char][1]:
-                max_freq = max(max_freq, entry[-2])
+                if entry[-2] is not None:
+                    max_freq = max(max_freq, entry[-2])
 
-            if max_freq == 0:
-                breakpoint()
-            information = -np.log(max(10e-8, max_freq))
-            total_hz_information += max(0, information - score_params['hz_min_information'])
+            information = 10 if max_freq == -float('inf') else -np.log(max(10e-8, max_freq))
+            total_hz_information += max(0, information - torch.abs(score_params['hz_min_information']))
 
-        final_score += pow(total_hz_information / score_params['hz_max_information'], score_params['hz_information_pow'])
+        final_score += pow(max(0, (total_hz_information - torch.abs(score_params['hz_offset_information']))), 2) * torch.abs(score_params['hz_max_information'])
 
         if option == 'noop':  # no more score increase if there is no match for word
             continue
@@ -151,7 +139,7 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
         option_translation_length = sum([len(tr) for tr in option_translation])
 
         matches = option[2]
-        option_information_ratio = score_params['option_information_ratio_factor'] * (pow(match_information_ratio(option), 2) - 0.5)
+        option_information_ratio = torch.abs(score_params['option_information_ratio_factor']) * (pow(match_information_ratio(option), 2) - 0.5)
 
         for tr, translation_idx, start_idx, match_type in matches:
             if tr == 'noop':
@@ -160,7 +148,7 @@ def evaluate_configuration(config, translations, score_params=DEFAULT_SCORE_PARA
             # Keep track of the maximum match score for each translation letter
             arr = translation_scores[translation_idx]
             tr_information = -np.log(max(10e-8, word_frequency(tr, 'en')))
-            information_factor = tr_information * score_params['information_factor']
+            information_factor = tr_information * torch.abs(score_params['information_factor'])
             name = 'exact'
             if match_type == MORPHOLOGICAL_MATCH:
                 name = 'morphological'
@@ -277,6 +265,90 @@ def match_information_ratio(match):
     return ratio
 
 
+def get_segmentation_configurations(seg, translations, max_matches=3):
+    word_translation_options = []
+    for w in seg:
+        # Find all cedict options with word morphologies and synonyms that match any of the translations
+        cedict_opt = get_translation_options_matched_forms(w, *translations)
+
+        word_matches = []
+        for tr, py, match_opts in cedict_opt:
+            # Get all match combination, but only within each translation
+            match_opts_for_translation = []
+            for translation_idx in range(len(translations)):
+                filtered_match_opts = []
+                for tmp, matches in match_opts:
+                    filtered_matches = [m for m in matches if m[1] == translation_idx]
+                    if len(filtered_matches) == 0:
+                        filtered_matches.append(('noop', None, None, None))  # needed for finding combinations, can't be empty
+                    filtered_match_opts.append((tmp, filtered_matches))
+                match_opts_for_translation.append(filtered_match_opts)
+
+            combs = [
+                list(itertools.islice(itertools.product(*[matches for _, matches in match_opts_for_translation[translation_idx]]), 10000))
+                for translation_idx in range(len(translations))
+            ]
+            combs = sum(combs, [])
+            for combination in combs:
+                word_matches.append((tr, py, combination))
+
+        # Only keep the shortest, highest score match for a translation word, e.g if we have:
+        #   (['go'], [('go', 0, 3, 0)])
+        # then we don't keep:
+        #   (['to go'], [('noop', None, None, None), ('go', 0, 3, 0)])
+        # since it can't possibly be better
+
+        #print(w, 'has', len(word_matches), 'matches')
+
+        seen_matches = {}
+        for tr, py, matches in word_matches:
+            joined_match_str = ' '.join([str(match[:-1]) for match in matches if match[0] != 'noop'])  # NOTE: remove match_type before stringifying
+
+            if joined_match_str == '':
+                continue
+            _, _, prev = seen_matches.get(joined_match_str, (None, None, None))
+            match_sum_types = sum([match[-1] for match in matches if match[0] != 'noop'])
+            prev_sum_types = float('inf')
+            if prev:
+                prev_sum_types = sum([match[-1] for match in prev if match[0] != 'noop'])
+
+            if match_sum_types < prev_sum_types:
+                # Has better match types, overwrite
+                seen_matches[joined_match_str] = (tr, py, matches)
+
+        unique_matches = list(seen_matches.values())
+
+        # Calculate the overall information for each match (over the words in the option) and select the top N 
+        unique_matches = sorted(unique_matches, key=match_information_ratio)
+        unique_matches = unique_matches[:max_matches]
+
+        if len(unique_matches) == 0:
+            unique_matches.append('noop')
+
+        word_translation_options.append(unique_matches)
+
+        #print('Reduced down to', len(unique_matches), 'matches')
+
+    for combination in list(itertools.product(*word_translation_options)):
+        yield (seg, combination)
+
+
+def evaluate_configs(configurations, translations, score_params):
+    configs_out = []
+    config_scores_out = []
+    max_config = None
+    max_score = -float('inf')
+    for config in configurations:
+        score = evaluate_configuration(config, translations, score_params=score_params)
+        configs_out.append(config)
+        config_scores_out.append(score)
+        if score > max_score:
+            max_score = score
+            max_config = config
+
+    return config_scores_out, configs_out, max_score, max_config
+
+
 def optimize_segmentation_pinyin_and_translations(hz, translations, score_params):
     #
     # Get all possible words segmentations
@@ -304,101 +376,31 @@ def optimize_segmentation_pinyin_and_translations(hz, translations, score_params
             print(''.join([words[idx] for idx in options if idx != 'noop']))
             breakpoint()
     
-    #
-    # For each segmentation, find all cedict options with word morphologies and synonyms that match any of the translations
-    #
-    for segmentation in segmentations:
-        for i, word in enumerate(segmentation):
-            segmentation[i] = (word, get_translation_options_matched_forms(word, *translations))
-
-    #print('Num segmentations', len(segmentations))
+    print('Num segmentations', len(segmentations))
     #
     # Generate all possible configurations of segmentation PLUS matched translation options
     #
-    configurations = []
-    for seg in segmentations:
-        word_translation_options = []
-        for w, cedict_opt in seg:
-            word_matches = []
-            for tr, py, match_opts in cedict_opt:
-                # Get all match combination, but only within each translation
-                match_opts_for_translation = []
-                for translation_idx in range(len(translations)):
-                    filtered_match_opts = []
-                    for tmp, matches in match_opts:
-                        filtered_matches = [m for m in matches if m[1] == translation_idx]
-                        if len(filtered_matches) == 0:
-                            filtered_matches.append(('noop', None, None, None))  # needed for finding combinations, can't be empty
-                        filtered_match_opts.append((tmp, filtered_matches))
-                    match_opts_for_translation.append(filtered_match_opts)
 
-                combs = [
-                    list(itertools.islice(itertools.product(*[matches for _, matches in match_opts_for_translation[translation_idx]]), 10000))
-                    for translation_idx in range(len(translations))
-                ]
-                combs = sum(combs, [])
-                for combination in combs:
-                    word_matches.append((tr, py, combination))
+    configurations = None
+    max_matches = 3
+    while True:
+        configurations = []
+        for seg in segmentations:
+            for config in get_segmentation_configurations(seg, translations, max_matches):
+                configurations.append(config)
 
-            # Only keep the shortest, highest score match for a translation word, e.g if we have:
-            #   (['go'], [('go', 0, 3, 0)])
-            # then we don't keep:
-            #   (['to go'], [('noop', None, None, None), ('go', 0, 3, 0)])
-            # since it can't possibly be better
+        if len(configurations) > 1000:
+            max_matches = max(1, max_matches - 1)
+            if max_matches == 1:
+                break
+            print('Too many configurations, lowering max_matches to', max_matches)
+        else:
+            break
 
-            seen_matches = {}
-            for tr, py, matches in word_matches:
-                joined_match_str = ' '.join([str(match[:-1]) for match in matches if match[0] != 'noop'])  # NOTE: remove match_type before stringifying
-
-                if joined_match_str == '':
-                    continue
-                _, _, prev = seen_matches.get(joined_match_str, (None, None, None))
-                match_sum_types = sum([match[-1] for match in matches if match[0] != 'noop'])
-                prev_sum_types = float('inf')
-                if prev:
-                    prev_sum_types = sum([match[-1] for match in prev if match[0] != 'noop'])
-
-                if match_sum_types < prev_sum_types:
-                    # Has better match types, overwrite
-                    seen_matches[joined_match_str] = (tr, py, matches)
-
-            unique_matches = list(seen_matches.values())
-
-            # Calculate the overall information for each match (over the words in the option) and select the top N 
-            unique_matches = sorted(unique_matches, key=match_information_ratio)
-            unique_matches = unique_matches[:3]
-
-            #num_noop_matches = []
-            #word_matches = list(unique_everseen(word_matches, key=lambda x: json.dumps(x[1:])))
-            #for tr, py, matches in word_matches:
-                #num_non_noop = 0
-                #for match in matches:
-                    #if match[0] != 'noop':
-                        #num_non_noop += 1
-
-                #num_noop_matches.append((tr, py, matches, num_non_noop))
-
-            #num_noop_matches = sorted(num_noop_matches, key=lambda x: -x[-1])
-            #word_matches = [(tr, py, matches) for tr, py, matches, _ in num_noop_matches[:10]]
-
-            if len(unique_matches) == 0:
-                unique_matches.append('noop')
-
-            word_translation_options.append(unique_matches)
-
-        for combination in list(itertools.product(*word_translation_options)):
-            words = [w for w, _ in seg]
-            configurations.append((words, combination))
-
-    #print('Num configurations', len(configurations))
-    configs_out = []
-    config_scores_out = []
-    for config in configurations:
-        score = evaluate_configuration(config, translations, score_params=score_params)
-        configs_out.append(config)
-        config_scores_out.append(score)
-
-    return config_scores_out, configs_out
+    print('Num configurations', len(configurations))
+    e = evaluate_configs(configurations, translations, score_params)
+    print('done')
+    return e
 
 
 examples = [
@@ -414,33 +416,34 @@ examples = [
     ("然后不管不顾去开会?", "Can I forget everything and attend the meeting then?", "And then you go to a meeting without a care in the world?", "然后 不管不顾 去 开会 ?", "然后 不管 不顾 去 开会 ?"),
     ("他们俩会出现在", "they would", "they would be present", "They'll both show up at", "他们 俩 会 出现 在", "他们 俩 会 出 现在"),
     ("得先排查出", "have to check", "I have to find out", "得 先 排查 出", "得 先 排 查出"),
-    ("号码归属人叫肖鹤云." "The owner of the number is Xiao Heyun.", "The number belongs to a person named Xiao He-yun.", "号码 归属 人 叫 肖鹤云 .", "号码 归属 人叫 肖 鹤云 ."),
+    #("号码归属人叫肖鹤云.", "The owner of the number is Xiao Heyun.", "The number belongs to a person named Xiao He-yun.", "号码 归属 人 叫 肖鹤云 .", "号码 归属 人 叫 肖 鹤 云 ."),
+    ("就是视频上那人.", "It's the one who showed up on CCTV.", "That's the guy on the video.", "就是 视频 上 那 人 .", "就 是 视频 上 那 人 ."),
+    ("我现在脑子特别乱.", "I'm such a mess now.", "I'm very confused right now.", "我 现在 脑子 特别 乱 .", "我 现 在 脑子 特别 乱 ."),
+    ("你第一个不是故意的行.", "OK. You didn't mean it at first.", "You didn't mean the first one.", "你 第一 个 不是 故意 的 行 .", "你 第一 个 不 是 故意 的 行 ."),
+    ('将就着戴吧.', "I'll just have to wear what I have.", 'Just wear it.', '将就 着 戴 吧 .', '将 就着 戴 吧 .'),
+    ('说是足疾发作.', 'He explained it was because of his injury.', 'He said he had a foot problem.', '说 是 足 疾 发作 .', '说 是 足 疾 发 作 .'),
+    ('臣在西北多年,', 'After living in the northwest for years,', "I've been in the Northwest for many years,", '臣 在 西北 多年 ,', '臣 在 西北 多 年 ,'),
+    ('可不是嘛绣了好几日呢.', 'Well, it took me a good couple of days.', "It's been a few days.", '可不是 嘛 绣 了 好几 日 呢 .', '可不 是 嘛 绣 了 好几 日 呢 .'),
+    ('有什么计较不计较的.', "I don't mind Chun'er.", 'There is nothing to be concerned about.', '有 什么 计较 不 计较 的 .', '有 什么 计 较 不 计较 的 .'),
+    ('实在不需要穿得太出挑.', "It's really unnecessary to stand out.", "You don't need to wear too much.", '实在 不 需要 穿 得 太 出 挑 .', '实 在 不 需 要 穿 得 太 出 挑 .'),
+    ('怎么好端端地就哭起来了呢?', 'Why are you crying?', 'Why are you crying for no reason?', '怎么 好端端 地 就 哭 起来 了 呢 ?', '怎么 好 端 端 地 就 哭 起来 了 呢 ?'),
+    ('说是用白茉莉花磨碎了兑进去的.', 'It’s said to be made of ground white jasmine flowers.', 'It is said that the white jasmine flowers are ground and blended into it.', '说 是 用 白 茉莉花 磨碎 了 兑 进去 的 .', '说 是 用 白 茉莉 花 磨碎 了 兑 进去 的 .'),
+    ('还有个存折没什么钱.', 'A passbook, not too much money on it.', "And a bank book. There's no money.", '还有 个 存折 没什么 钱 .', '还 有 个 存折 没什么 钱 .'),
+    ('离我这儿不远.', "It's not far from here.", 'Not far from my place.', '离 我这儿 不 远 .', '离 我 这儿 不 远 .'),
+    ('说是家里着火了', 'saying his home was on fire', 'said that there was a fire at home', '说 是 家里 着火 了', '说 是 家 里 着火 了'),
+    ('那其他乘客呢?', 'What about the other passengers?', 'What about the other passengers?', '那 其他 乘客 呢 ?', '那 其 他 乘客 呢 ?'),
+    ('你以后见她可得注意着点.', 'You should be careful when you meet her.', 'You have to be careful when you see her in the future.', '你 以后 见 她 可 得 注意 着 点 .', '你 以 后 见 她 可 得 注意 着 点 .'),
+    ('第三次就是这次.', 'The third one was this time.', 'The third time was this time.', '第 三次 就是 这次 .', '第 三次 就 是 这 次 .'),
+    ('那怎么办?', 'What shall we do?', 'So what do we do?', '那 怎么办 ?', '那 怎么 办 ?'),
+    ('特别老那种.', 'Like, really old.', 'A very old one.', '特别 老 那种 .', '特别 老 那 种 .'),
+    ('说要同归于尽什么的.', 'something like die together.', 'Something about wanting to die together.', '说 要 同归于尽 什么的 .', '说 要 同归于尽 什么 的 .'),
+    ('不用紧张小姑娘.', 'Take it easy, little girl.', "Don't be nervous, young lady.", '不用 紧张 小 姑娘 .', '不 用 紧张 小 姑娘 .'),
+    ('来回多方便?', "Isn't it convenient?", 'How convenient is it to go back and forth?', '来回 多 方便 ?', '来回 多 方 便 ?'),
+    ('还一直都是劳动模范.', 'He was always a model worker.', 'He was also always a model worker.', '还 一直 都 是 劳动模范 .', '还 一直 都 是 劳动 模范 .'),
 ]
 
 def create_value_tensor(val):
     return Variable(torch.tensor([val], dtype=float), requires_grad=True)
-
-#match_type_exact 0.9694201295132068 -7.626661859708163
-#match_type_morphological 0.5213996370906425 5.822887178702049
-#match_type_synonym 0.32009879693532994 6.417889504537964
-#reuse_penalty 5.15764999800173 39.50457953686117
-#information_factor 0.6386526121647206 44.13881984612936
-#option_information_ratio_factor 2.9866223496092466 -3.1817329031770787
-#hz_min_information 4.377319436260156 65.10725346690772
-#hz_max_information 2.7942716962033383 128.11959193275166
-#hz_information_pow 1.1098594089505958 -144.46985999531228
-
-#PYTORCH_SCORE_PARAMS = {
-    #'match_type_exact': create_value_tensor(0.97),
-    #'match_type_morphological': create_value_tensor(0.52),
-    #'match_type_synonym': create_value_tensor(0.32),
-    #'reuse_penalty': create_value_tensor(5.15),
-    #'information_factor': create_value_tensor(0.64),
-    #'option_information_ratio_factor': create_value_tensor(2.98),
-    #'hz_min_information': create_value_tensor(4.37),
-    #'hz_max_information': create_value_tensor(2.79),
-    #'hz_information_pow': create_value_tensor(1.1),
-#}
 
 
 PYTORCH_SCORE_PARAMS = {
@@ -451,43 +454,98 @@ PYTORCH_SCORE_PARAMS = {
     'information_factor': create_value_tensor(1/2),
     'option_information_ratio_factor': create_value_tensor(3),
     'hz_min_information': create_value_tensor(4),
-    'hz_max_information': create_value_tensor(2),
-    'hz_information_pow': create_value_tensor(2),
+    'hz_max_information': create_value_tensor(1/2),
+    'hz_offset_information': create_value_tensor(0),
 }
 
 
 def forward():
     loss = 0
     for hz, *translations, correct_seg, wrong_seg in examples:
-        scores, configs = optimize_segmentation_pinyin_and_translations(
-            hz, translations, score_params=PYTORCH_SCORE_PARAMS
-        )
-        config_scores = {}
-        for score, config in zip(scores, configs):
-            config_scores[' '.join(config[0])] = score
+        correct_configs = list(get_segmentation_configurations(correct_seg.split(' '), translations))
+        wrong_configs = list(get_segmentation_configurations(wrong_seg.split(' '), translations))
 
-        correct_score = config_scores.get(correct_seg, 0)
-        wrong_score = config_scores.get(wrong_seg, 0)
-        if wrong_score > correct_score:
-            loss += correct_score - wrong_score
-        else:
-            loss += torch.log(1 + correct_score - wrong_score)
-        #loss += min(10, correct_score - score)
+        _, _, correct_score, _ = evaluate_configs(correct_configs, translations, PYTORCH_SCORE_PARAMS)
+        _, _, wrong_score, _ = evaluate_configs(wrong_configs, translations, PYTORCH_SCORE_PARAMS)
+        assert isinstance(correct_score, torch.Tensor) and isinstance(wrong_score,  torch.Tensor)
+
+        #loss += -torch.log(torch.sigmoid((correct_score - wrong_score)))
+        item_loss = (wrong_score - correct_score) # + 0.1 * torch.sqrt(torch.pow(wrong_score, 2) + torch.pow(correct_score, 2))
+        if item_loss > 0:
+            item_loss = torch.pow(item_loss, 2)
+#
+        #loss += -torch.pow(wrong_score, 2) + torch.pow(correct_score, 2) - torch.abs(wrong_score) - torch.abs(correct_score)
+        #if wrong_score > correct_score:
+            #loss = -torch.pow(wrong_score - correct_score, 2)
+        #else:
+            #loss += torch.log(1 + correct_score - wrong_score)
+
+        #loss += correct_score + wrong_score  # regularize so optimization doesn't just scale up scores
+
+        #loss /= len(hz)  # normalize by length of string
 
     loss = loss / len(examples)
+    w_regularization = sum(PYTORCH_SCORE_PARAMS.values(), 0)
+    w_regularization = 0.1 * torch.sqrt(torch.pow(w_regularization, 2))
+    loss += w_regularization
     loss.backward()
     print('Loss', loss)
+    return loss
 
-learning_rate = 1e-2
-for t in range(100):
-    forward()
+ORIG = dict(PYTORCH_SCORE_PARAMS)
+for key in ORIG:
+    ORIG[key] = ORIG[key].clone()
 
-    for key, val in PYTORCH_SCORE_PARAMS.items():
-        if val.grad:
-            print(key, val.data.item(), val.grad.data.item())
-            val.data += learning_rate * val.grad.data.item()
+
+def evaluate(score_params):
+    for hz, *translations, correct_seg, wrong_seg in examples:
+        correct_configs = list(get_segmentation_configurations(correct_seg.split(' '), translations))
+        wrong_configs = list(get_segmentation_configurations(wrong_seg.split(' '), translations))
+
+        _, _, correct_score_before, _ = evaluate_configs(correct_configs, translations, ORIG)
+        _, _, wrong_score_before, _ = evaluate_configs(wrong_configs, translations, ORIG)
+
+        _, _, correct_score, _ = evaluate_configs(correct_configs, translations, score_params)
+        _, _, wrong_score, _ = evaluate_configs(wrong_configs, translations, score_params)
+        print(wrong_score_before, '->', wrong_score, '\t\t', correct_score_before, '->', correct_score)
+
+    for hz, *translations, correct_seg, wrong_seg in examples:
+        scores, configs, max_score, max_config = optimize_segmentation_pinyin_and_translations(
+            hz, translations, score_params=score_params
+        )
+        max_config_str = ' '.join(max_config[0])
+        if max_config_str == correct_seg:
+            print('CORRECT', max_score.item(), max_config_str)
         else:
-            print(key, None)
-    #learning_rate *= 1/2
+            print('INCORRECT', max_score.item(), max_config_str, 'should be', correct_seg)
 
-#print('Sum score:', sum_score)
+        max_wrong_score = -float('inf')
+        max_wrong_config = None
+        for score, config in zip(scores, configs):
+            if ' '.join(config[0]) != correct_seg and score > max_wrong_score:
+                max_wrong_score = score
+                max_wrong_config = config
+
+        print('Highest score wrong config:', max_wrong_score.item(), max_wrong_config)
+
+
+def train():
+    adam = Adam(list(PYTORCH_SCORE_PARAMS.values()), lr=0.03)
+
+    best_loss = float('inf')
+    for t in range(50):
+        loss = forward()
+        if loss < best_loss:
+            best_loss = loss
+            best_params = dict(PYTORCH_SCORE_PARAMS)
+            print('Best params', best_params)
+            for key in best_params:
+                best_params[key] = best_params[key].clone()
+
+        adam.step()
+
+    evaluate(best_params)
+
+if __name__ == '__main__':
+    train()
+    #evaluate(PYTORCH_SCORE_PARAMS)

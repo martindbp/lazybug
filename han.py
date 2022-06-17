@@ -375,10 +375,15 @@ def clean_cedict_translation(tr, hz=None, py=None, split_or=True, remove_parens=
     if _filter_translation(tr):
         return []
 
+    # Remove the parens after a word, but not before. e.g.
+    # /to be next to (colloquial)/ -> should remove
+    # /(long) time/ -> should not remove
+    #tr = re.sub(r'(.*)\(.*\)$', r'\1', tr).strip()
+
     if remove_parens:
-        tr = re.sub('\(.*\)', '', tr)
-    else:
-        tr = tr.replace('(', '').replace(')', '')
+        tr = re.sub(r'\(.*\)$', '', tr).strip()
+
+    tr = tr.replace('(', '').replace(')', '')
 
     tr = re.sub('-', ' ', tr)  # replace hyphens by space, e.g. "narrow-minded" -> "narrow minded", so we can match individual words
     tr = tr.strip()
