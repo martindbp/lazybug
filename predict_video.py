@@ -1411,6 +1411,18 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                     season.get('ocr_params', None),
                     episode.get('ocr_params', None),
                 ])
+
+                # Also allow defining "global" parameters outside of ocr_params, directly in the episode/season/show:
+                for param_name in ['start_time', 'caption_top', 'caption_bottom', 'caption_left', 'caption_right', 'refine_bounding_rect']:
+                    val = (
+                        episode.get(param_name, None) or
+                        season.get(param_name, None) or
+                        show_data.get(param_name, None)
+                    )
+                    if val is not None:
+                        for _p in episode_ocr_params:
+                            _p[param_name] = val
+
                 ocr_params.append(episode_ocr_params)
 
         out = []
