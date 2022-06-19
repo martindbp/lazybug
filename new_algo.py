@@ -127,10 +127,10 @@ def evaluate_configuration(config, translations, score_params):
                 if entry[-2] is not None:
                     max_freq = max(max_freq, entry[-2])
 
-            information = 10 if max_freq == -float('inf') else -np.log(max(10e-8, max_freq))
-            total_hz_information += max(0, information - torch.abs(score_params['hz_min_information']))
+            information = -np.log(max(10e-8, max_freq))
+            total_hz_information += max(0, information - torch.abs(score_params['hz_min_information'])) * torch.abs(score_params['hz_information_factor'])
 
-        final_score += pow(max(0, (total_hz_information - torch.abs(score_params['hz_offset_information']))), 2) * torch.abs(score_params['hz_max_information'])
+        final_score += pow(total_hz_information, 2)
 
         if option == 'noop':  # no more score increase if there is no match for word
             continue
@@ -139,7 +139,7 @@ def evaluate_configuration(config, translations, score_params):
         option_translation_length = sum([len(tr) for tr in option_translation])
 
         matches = option[2]
-        option_information_ratio = torch.abs(score_params['option_information_ratio_factor']) * (pow(match_information_ratio(option), 2) - 0.5)
+        option_information_ratio = score_params['option_information_ratio_factor'] * (pow(match_information_ratio(option), 2) - 0.5)
 
         for tr, translation_idx, start_idx, match_type in matches:
             if tr == 'noop':
@@ -376,7 +376,7 @@ def optimize_segmentation_pinyin_and_translations(hz, translations, score_params
             print(''.join([words[idx] for idx in options if idx != 'noop']))
             breakpoint()
     
-    print('Num segmentations', len(segmentations))
+    #print('Num segmentations', len(segmentations))
     #
     # Generate all possible configurations of segmentation PLUS matched translation options
     #
@@ -397,9 +397,9 @@ def optimize_segmentation_pinyin_and_translations(hz, translations, score_params
         else:
             break
 
-    print('Num configurations', len(configurations))
+    #print('Num configurations', len(configurations))
     e = evaluate_configs(configurations, translations, score_params)
-    print('done')
+    #print('done')
     return e
 
 
@@ -454,13 +454,15 @@ PYTORCH_SCORE_PARAMS = {
     'information_factor': create_value_tensor(1/2),
     'option_information_ratio_factor': create_value_tensor(3),
     'hz_min_information': create_value_tensor(4),
-    'hz_max_information': create_value_tensor(1/2),
-    'hz_offset_information': create_value_tensor(0),
+    'hz_information_factor': create_value_tensor(0.8),
+    #'hz_offset_information': create_value_tensor(0),
 }
 
 
 def forward():
     loss = 0
+    scores = []
+    num_incorrect = 0
     for hz, *translations, correct_seg, wrong_seg in examples:
         correct_configs = list(get_segmentation_configurations(correct_seg.split(' '), translations))
         wrong_configs = list(get_segmentation_configurations(wrong_seg.split(' '), translations))
@@ -468,11 +470,29 @@ def forward():
         _, _, correct_score, _ = evaluate_configs(correct_configs, translations, PYTORCH_SCORE_PARAMS)
         _, _, wrong_score, _ = evaluate_configs(wrong_configs, translations, PYTORCH_SCORE_PARAMS)
         assert isinstance(correct_score, torch.Tensor) and isinstance(wrong_score,  torch.Tensor)
+        scores.append((correct_score, wrong_score))
+        if correct_score < wrong_score:
+            num_incorrect += 1
+
+    incorrect_factor = (len(examples) - num_incorrect) / num_incorrect
+    print('incorrect_factor', incorrect_factor)
+
+    for correct_score, wrong_score in scores:
 
         #loss += -torch.log(torch.sigmoid((correct_score - wrong_score)))
         item_loss = (wrong_score - correct_score) # + 0.1 * torch.sqrt(torch.pow(wrong_score, 2) + torch.pow(correct_score, 2))
         if item_loss > 0:
-            item_loss = torch.pow(item_loss, 2)
+            item_loss_pow = torch.log(1 + item_loss) # incorrect_factor * item_loss
+            print('adding loss for incorrect', item_loss.item(), '->', item_loss_pow.item())
+            loss += item_loss_pow
+        else:
+            #add_loss = -torch.log(1 -item_loss)
+            #print('for correct', item_loss.item(), '->', add_loss.item())
+            #loss += add_loss
+            pass
+
+        #else:
+            #print('not adding loss', item_loss)
 #
         #loss += -torch.pow(wrong_score, 2) + torch.pow(correct_score, 2) - torch.abs(wrong_score) - torch.abs(correct_score)
         #if wrong_score > correct_score:
@@ -490,7 +510,7 @@ def forward():
     loss += w_regularization
     loss.backward()
     print('Loss', loss)
-    return loss
+    return loss, num_incorrect
 
 ORIG = dict(PYTORCH_SCORE_PARAMS)
 for key in ORIG:
@@ -498,16 +518,17 @@ for key in ORIG:
 
 
 def evaluate(score_params):
-    for hz, *translations, correct_seg, wrong_seg in examples:
-        correct_configs = list(get_segmentation_configurations(correct_seg.split(' '), translations))
-        wrong_configs = list(get_segmentation_configurations(wrong_seg.split(' '), translations))
+    num_correct = 0
+    #for hz, *translations, correct_seg, wrong_seg in examples:
+        #correct_configs = list(get_segmentation_configurations(correct_seg.split(' '), translations))
+        #wrong_configs = list(get_segmentation_configurations(wrong_seg.split(' '), translations))
 
-        _, _, correct_score_before, _ = evaluate_configs(correct_configs, translations, ORIG)
-        _, _, wrong_score_before, _ = evaluate_configs(wrong_configs, translations, ORIG)
+        #_, _, correct_score_before, _ = evaluate_configs(correct_configs, translations, ORIG)
+        #_, _, wrong_score_before, _ = evaluate_configs(wrong_configs, translations, ORIG)
 
-        _, _, correct_score, _ = evaluate_configs(correct_configs, translations, score_params)
-        _, _, wrong_score, _ = evaluate_configs(wrong_configs, translations, score_params)
-        print(wrong_score_before, '->', wrong_score, '\t\t', correct_score_before, '->', correct_score)
+        #_, _, correct_score, _ = evaluate_configs(correct_configs, translations, score_params)
+        #_, _, wrong_score, _ = evaluate_configs(wrong_configs, translations, score_params)
+        #print(wrong_score_before, '->', wrong_score, '\t\t', correct_score_before, '->', correct_score)
 
     for hz, *translations, correct_seg, wrong_seg in examples:
         scores, configs, max_score, max_config = optimize_segmentation_pinyin_and_translations(
@@ -515,28 +536,32 @@ def evaluate(score_params):
         )
         max_config_str = ' '.join(max_config[0])
         if max_config_str == correct_seg:
-            print('CORRECT', max_score.item(), max_config_str)
+            #print('CORRECT', max_score.item(), max_config_str)
+            num_correct += 1
         else:
             print('INCORRECT', max_score.item(), max_config_str, 'should be', correct_seg)
 
-        max_wrong_score = -float('inf')
-        max_wrong_config = None
-        for score, config in zip(scores, configs):
-            if ' '.join(config[0]) != correct_seg and score > max_wrong_score:
-                max_wrong_score = score
-                max_wrong_config = config
+        #max_wrong_score = -float('inf')
+        #max_wrong_config = None
+        #for score, config in zip(scores, configs):
+            #if ' '.join(config[0]) != correct_seg and score > max_wrong_score:
+                #max_wrong_score = score
+                #max_wrong_config = config
 
-        print('Highest score wrong config:', max_wrong_score.item(), max_wrong_config)
+        #print('Highest score wrong config:', max_wrong_score.item(), max_wrong_config)
+
+    print('Accuracy:', num_correct / len(examples))
 
 
 def train():
     adam = Adam(list(PYTORCH_SCORE_PARAMS.values()), lr=0.03)
 
     best_loss = float('inf')
+    best_num_incorrect = float('inf')
     for t in range(50):
-        loss = forward()
-        if loss < best_loss:
-            best_loss = loss
+        loss, num_incorrect = forward()
+        if num_incorrect < best_num_incorrect:
+            best_num_incorrect = num_incorrect
             best_params = dict(PYTORCH_SCORE_PARAMS)
             print('Best params', best_params)
             for key in best_params:
