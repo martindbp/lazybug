@@ -73,11 +73,38 @@ export default {
             sortable: true
           },
           {
+            name: 'type',
+            required: true,
+            label: 'Type',
+            align: 'left',
+            field: row => row.type || '-',
+            format: val => `${val}`,
+            sortable: true
+          },
+          {
             name: 'year',
             required: true,
             label: 'Year',
             align: 'left',
             field: row => row.year || '-',
+            format: val => `${val}`,
+            sortable: true
+          },
+          {
+            name: 'genres',
+            required: true,
+            label: 'Genres',
+            align: 'left',
+            field: row => row.genres || '-',
+            format: val => `${val}`,
+            sortable: true
+          },
+          {
+            name: 'synopsis',
+            required: true,
+            label: 'Synopsis',
+            align: 'left',
+            field: row => row.synopsis || '-',
             format: val => `${val}`,
             sortable: true
           },
