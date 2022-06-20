@@ -15,6 +15,7 @@ import numpy as np
 import mxnet as mx
 from cnocr import CnOcr
 from cnocr.fit.ctc_metrics import CtcMetrics
+from hanziconv import HanziConv
 import torch
 from torch.nn import functional as F
 import webvtt
@@ -94,7 +95,7 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def _join_predictions(results, alphabet):
+def _join_predictions(results, alphabet, convert_to_simplified=True):
     if len(results) == 0:
         return None, '', 0, np.array([]), np.array([])
     else:
@@ -125,6 +126,22 @@ def _join_predictions(results, alphabet):
 
         indices = np.concatenate([x[3] for x in results_with_spaces])
         probs = np.concatenate([x[4] for x in results_with_spaces], axis=0)
+
+        if convert_to_simplified:
+            # We convert any traditional chars to simplified in text, update the vocab indices, and the probs
+            text = HanziConv.toSimplified(text)
+            for i, c in enumerate(text):
+                simp_idx = alphabet.index(c)
+                indices[i] = simp_idx
+
+            # We set prob(simplified(char)) = prob(char) + prob(simplified(char)) for all chars in the alphabet, and set prob(char) to 0
+            for i in range(probs.shape[0]):
+                for c in alphabet:
+                    c_simp = HanziConv.toSimplified(c)
+                    if c_simp != c and c_simp in alphabet:
+                        probs[i][alphabet.index(c_simp)] += probs[i][alphabet.index(c)]
+                        probs[i][alphabet.index(c)] = 0
+
         return [rect, text, mean_confidence_score, indices, probs]
 
 
@@ -213,6 +230,7 @@ def ocr_for_single_lines_probs(ocr, alphabet, segmentation, img, smooth_distribu
         result = _join_predictions(results, alphabet)
 
     box, text, confidence, prob_indices, prob_distributions = result
+    """
     if confidence < 0.6 and len(img) > 0:
         results = ocr.readtext(img)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
         result = _join_predictions(results, alphabet)
@@ -223,6 +241,7 @@ def ocr_for_single_lines_probs(ocr, alphabet, segmentation, img, smooth_distribu
         #cv2.waitKey()
         if img_confidence > confidence:
             box, text, confidence, prob_indices, prob_distributions = result
+    """
 
     if smooth_distributions:
         # Smooth out OCR distribution a bit, because it tends to be over confident
@@ -348,7 +367,13 @@ def apply_BERT_prior(line, alphabet, context='', multiply=True):
             new_char = alphabet[updated_max]
             if len(filter_text_hanzi(new_char)) == 0:
                 return  # never change to a non-hanzi character
-            print(f'{old_char} --> {new_char}:  {char_prob}')
+
+            old_char_trad = HanziConv.toTraditional(old_char)
+            new_char_trad = HanziConv.toTraditional(new_char)
+            if old_char_trad != old_char or new_char_trad != new_char:
+                print(f'{old_char} ({old_char_trad}) --> {new_char} ({new_char_trad}):  {char_prob}')
+            else:
+                print(f'{old_char} --> {new_char}:  {char_prob}')
             line.text = line.text[:char_i] + new_char + line.text[char_i+1:]
 
         line.prob_distributions[char_i] = updated_distribution
@@ -619,6 +644,7 @@ def replace_or_add_line(
     do_save_caption_data=True,
     filter_out_too_many_low_prob_chars=True,
     caption_type='hanzi',
+    use_bert_prior=True,
     force_add=False,
 ):
     last_line = caption_lines[-1] if len(caption_lines) > 0 else None
@@ -706,7 +732,7 @@ def replace_or_add_line(
         # Now that we have definitely moved on to a new line, we apply the BERT prior to the previous one,
         if len(caption_lines) > 0:
             last_line = caption_lines[-1]
-            if caption_type == 'hanzi':
+            if caption_type == 'hanzi' and use_bert_prior:
                 apply_BERT_prior(last_line, alphabet)
             #elif caption_type == 'english':
                 #apply_english_corrections(last_line)
@@ -801,6 +827,7 @@ def predict_video_captions(
     do_save_caption_data=True,
     caption_type='hanzi',
     ocr_engine='cnocr',
+    use_bert_prior=True,
     conditional_captions=None,
     refine_bounding_rect=False,
 ):
@@ -991,6 +1018,7 @@ def predict_video_captions(
                     do_save_caption_data,
                     filter_out_too_many_low_prob_chars,
                     caption_type,
+                    use_bert_prior=use_bert_prior,
                     force_add=conditional_captions is not None,
                 )
                 #if (line.t0 == 0 or line.t1 == 0) and line.text != '':
@@ -1413,7 +1441,11 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
                 ])
 
                 # Also allow defining "global" parameters outside of ocr_params, directly in the episode/season/show:
-                for param_name in ['start_time', 'caption_top', 'caption_bottom', 'caption_left', 'caption_right', 'refine_bounding_rect']:
+                OCR_PARAMS = [
+                    'start_time', 'caption_top', 'caption_bottom', 'caption_left',
+                    'caption_right', 'refine_bounding_rect', 'ocr_engine', 'use_bert_prior'
+                ]
+                for param_name in OCR_PARAMS:
                     val = (
                         episode.get(param_name, None) or
                         season.get(param_name, None) or
@@ -1553,6 +1585,7 @@ def process_video_captions(
                 filter_out_too_many_low_prob_chars=param.get('filter_out_too_many_low_prob_chars', True),
                 caption_type=param['type'],
                 ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
+                use_bert_prior=param.get('use_bert_prior', False),
                 conditional_captions=conditional_captions,
                 refine_bounding_rect=param.get('refine_bounding_rect', False),
                 height_buffer_px=param.get('height_buffer_px', 0),
