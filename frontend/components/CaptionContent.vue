@@ -3,8 +3,10 @@
         <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
                 <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
-                    <span class="cardcontent">PY</span>
+                    <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="$store.state.options.pin.py" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
+                    <span v-else class="cardcontent">PY</span>
+
                     <ContentContextMenu
                         type="py"
                         :pin="showPinRow('py')"
@@ -31,8 +33,10 @@
             </tr>
             <tr class="centerrow">
                 <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
-                    <span class="cardcontent">HZ</span>
+                    <span v-if="! $store.state.options.pin.hz" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="$store.state.options.pin.hz" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
+                    <span v-else class="cardcontent">HZ</span>
+
                     <ContentContextMenu
                         type="hz"
                         :pin="showPinRow('hz')"
@@ -72,8 +76,9 @@
             </tr>
             <tr class="bottomrow">
                 <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
-                    <span class="cardcontent">TR</span>
+                    <span v-if="! $store.state.options.pin.tr" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="$store.state.options.pin.tr" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
+                    <span v-else class="cardcontent">TR</span>
                     <ContentContextMenu
                         type="tr"
                         :pin="showPinRow('tr')"
@@ -103,8 +108,9 @@
         <table class="contenttable" style="margin-top: -15px" v-if="data !== null">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')">
-                    <span class="iconcard peek" v-html="eyecon"></span>
-                    <span class="cardcontent">EN</span>
+                    <span v-if="! $store.state.options.pin.translation" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="$store.state.options.pin.translation" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
+                    <span v-else class="cardcontent">EN</span>
                     <ContentContextMenu
                         type="translation"
                         :pin="showPinRow('translation')"
