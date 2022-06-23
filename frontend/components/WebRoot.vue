@@ -5,7 +5,7 @@
           :columns="columns"
           :pagination="pagination"
           :loading="isLoading"
-          row-key="name-en"
+          row-key="name"
         >
             <template v-slot:header-cell="props">
                 <q-th :props="props">
@@ -14,6 +14,11 @@
                         <q-badge class="clickablebadge" @click.stop.prevent="removeFilter(...filter)" v-for="filter in columnFilters[props.col.name]" :color="mapToColor(filter[1], filter[2])">{{filter[2]}}</q-badge>
                     </span>
                 </q-th>
+            </template>
+            <template v-slot:body-cell-name="props">
+                <q-td :props="props">
+                    <a :href="youtubeURL(props.row)">{{ props.value }}</a>
+                </q-td>
             </template>
             <template v-slot:body-cell-difficulty="props">
                 <q-td :props="props">
@@ -70,12 +75,11 @@ export default {
         },
         columns: [
           {
-            name: 'name-en',
+            name: 'name',
             required: true,
             label: 'Name',
             align: 'left',
-            field: row => row.name.en ? `${row.name.en}` : row.name,
-            format: val => `${val}`,
+            field: row => row.name.en ? `${row.name.hz} | ${row.name.en}` : row.name,
             sortable: true
           },
           {
@@ -187,6 +191,19 @@ export default {
         },
     },
     methods: {
+        youtubeURL: function(row) {
+            const playlist = row.seasons[0].youtube_playlist;
+            const captionId = row.seasons[0].episodes[0].id;
+            const parts = captionId.split('-');
+            const id = parts.slice(1).join('-');
+
+            if ([null, undefined].includes(playlist)) {
+                return `https://youtube.com/watch?v=${id}`;
+            }
+            else {
+                return `https://youtube.com/watch?v=${id}&list=${playlist}`;
+            }
+        },
         mapDifficultyToColor: function(difficulty) {
             if (difficulty < 4) return 'green';
             else if (difficulty < 7) return 'orange';
