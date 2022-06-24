@@ -75,6 +75,10 @@ ifndef CLOUDFLARE_ZONE_ID
 	$(error CLOUDFLARE_ZONE_ID is undefined)
 endif
 
+.PHONY: pull-raw-captions
+pull-raw-captions:
+	b2 sync b2://zimu-private/caption_data/raw_captions data/remote/private/caption_data/raw_captions --skipNewer
+
 .PHONY: purge-cloudflare-public
 purge-cloudflare-public: check-cloudflare-env
 	cat synced.txt | sed -E 's/upload //' | xargs -I{}  curl -X POST "https://api.cloudflare.com/client/v4/zones/$$CLOUDFLARE_ZONE_ID/purge_cache" \
