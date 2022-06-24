@@ -54,9 +54,9 @@ push-public:
 push-private:
 	b2 sync data/remote/private b2://zimu-private --skipNewer
 
-.PHONY: push-private-essentials
-push-private-essentials:
-	b2 sync data/remote/private b2://zimu-private --excludeRegex '.*caption_data.*' --skipNewer
+.PHONY: push-raw-captions
+push-raw-captions:
+	b2 sync data/remote/private/caption_data/raw_captions b2://zimu-private/caption_data/raw_captions --skipNewer
 
 .PHONY: pull-public
 pull-public:
