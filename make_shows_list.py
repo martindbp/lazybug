@@ -127,35 +127,6 @@ def get_show_stats(video_ids):
                 prob = word_probs.get(hz, 0.01*min_prob)
                 information = -np.log(prob)
                 sum_information += information
-                if show_name == 'xiaozhupeiqi':
-                    print(hz, information)
-
-                """
-                hzs = []
-                if hz in CEDICT.v:
-                    hzs.append(hz)
-                else:
-                    hzs = list(hz)
-
-                for w in hzs:
-                    if w not in CEDICT.v:
-                        continue
-
-                    max_freq = -float('inf')
-                    for entry in CEDICT.v[w][1]:
-                        if entry[-2] is not None:
-                            max_freq = max(max_freq, entry[-2])
-
-                    if max_freq == -float('inf') or max_freq == 0:
-                        max_freq = 10e-12
-
-                    information = -np.log(max_freq)
-                    if information > max_line_information:
-                        max_line_information = information
-                        max_line_word = w
-                """
-
-            #sum_information += max_line_information
 
             if i < len(data['lines']) - 1:
                 next_line = data['lines'][i+1]
