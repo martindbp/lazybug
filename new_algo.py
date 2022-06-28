@@ -440,6 +440,8 @@ examples = [
     ('不用紧张小姑娘.', 'Take it easy, little girl.', "Don't be nervous, young lady.", '不用 紧张 小 姑娘 .', '不 用 紧张 小 姑娘 .'),
     ('来回多方便?', "Isn't it convenient?", 'How convenient is it to go back and forth?', '来回 多 方便 ?', '来回 多 方 便 ?'),
     ('还一直都是劳动模范.', 'He was always a model worker.', 'He was also always a model worker.', '还 一直 都 是 劳动模范 .', '还 一直 都 是 劳动 模范 .'),
+    ("这眼看着天就热了", "It's getting hot now.", "It's going to get hot.", "这 眼看 着 天 就 热 了", "这 眼看着 天 就 热 了"),
+
 ]
 
 def create_value_tensor(val):
