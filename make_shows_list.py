@@ -132,8 +132,11 @@ def get_show_stats(video_ids):
                 next_line = data['lines'][i+1]
                 next_line_t0 = next_line[1][0]
                 t1 = min(t1 + 5, next_line_t0)
-
-            sum_time += t1-t0
+                if t0 == 0 and i != 0:
+                    #breakpoint()
+                    continue
+            diff = t1-t0
+            sum_time += diff
 
     if sum_time == 0:
         return None, None, None
