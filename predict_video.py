@@ -1321,11 +1321,11 @@ def fix_fade(captions):
     last_line = None
     new_lines = []
     for line in captions:
-        if last_line is None or line.t0 - last_line.t1 > 0.01 or line.text == '' or last_line.text == '':
+        if last_line is None or line.t0 - last_line.t1 > 0.03 or line.text == '' or last_line.text == '':
             # Not back-to-back
             last_line = line
             new_lines.append(line)
-            print('Appending line', line)
+            print('1. Appending line', line)
             continue
 
         with open(f'data/remote/private/caption_data/char_probability_distributions/{last_line.data_hash}.pickle', 'rb') as f:
@@ -1334,10 +1334,16 @@ def fix_fade(captions):
         with open(f'data/remote/private/caption_data/char_probability_distributions/{line.data_hash}.pickle', 'rb') as f:
             line_prob_distributions = pickle.load(f)
 
+        last_line_prob_chars = [set([c for c, _ in last_line_prob_distributions[i]]) for i in range(len(last_line_prob_distributions))]
+        line_prob_chars = [set([c for c, _ in line_prob_distributions[i]]) for i in range(len(line_prob_distributions))]
+
         def _subst_cost(s1, s2, i, j):
             if s1 == ' ':
                 # We have a very low penalty for substituting a space, since there are often spurious spaces in the OCR
                 return 0.01
+
+            if s1 in line_prob_chars[j] or s2 in last_line_prob_chars[i]:
+                return 0
 
             return 0 if s1 == s2 else 1
 
@@ -1357,7 +1363,7 @@ def fix_fade(captions):
             new_lines[-1] = line
             print('Replacing with', line)
         else:
-            print('Appending line', line)
+            print('2. Appending line', line)
             new_lines.append(line)
 
         last_line = line
