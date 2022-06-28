@@ -94,4 +94,8 @@ export default {
     padding: 2px;
 }
 
+.nonhanzi .contextmenu {
+    display: none;
+}
+
 </style>
