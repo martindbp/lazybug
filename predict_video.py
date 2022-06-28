@@ -1345,11 +1345,13 @@ def fix_fade(captions):
             if s1 in line_prob_chars[j] or s2 in last_line_prob_chars[i]:
                 return 0
 
+            if len(filter_text_hanzi(s1)) == 0 or len(filter_text_hanzi(s2)) == 0:
+                return 0
+
             return 0 if s1 == s2 else 1
 
         dist, ops = weighted_levenshtein(last_line.text, line.text, _subst_cost, return_ops=True)
-        mean_dist = dist / min(len(line.text), len(last_line.text))
-        print(line.text, last_line.text, mean_dist)
+        mean_dist = dist / max(len(line.text), len(last_line.text))
         if (mean_dist <= 0.5 or last_line.text == line.text) and (line.t1-line.t0 < 0.1 or last_line.t1-last_line.t0 < 0.1):
             longest_line = line if line.t1 - line.t0 > last_line.t1 - last_line.t0 else last_line
             line = CaptionLine(
@@ -1361,7 +1363,7 @@ def fix_fade(captions):
                 conditional_caption_idx=longest_line.conditional_caption_idx
             )
             new_lines[-1] = line
-            print('Replacing with', line)
+            print('Replacing ', new_lines[-1].text, 'with', line.text)
         else:
             print('2. Appending line', line)
             new_lines.append(line)
