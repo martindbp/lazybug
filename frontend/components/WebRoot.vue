@@ -186,7 +186,6 @@ export default {
             label: 'Free',
             align: 'left',
             field: row => row.requires_payment === true ? false : true,
-            format: val => `${val}`,
             sortable: true
           },
         ],
