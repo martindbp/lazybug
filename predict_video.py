@@ -1196,7 +1196,8 @@ def convert_vtt_to_caption_format(translations_path, params=None, video_length=N
             # Fix overlapping captions
             last_t1 = timestamp_to_seconds(translations[i-1].end)
             if last_t1 > t0:
-                t0 = last_t1
+                lines[i-1][2] = t0
+
         lines.append([text, t0, t1, None, None, None, None])
 
     data = {
