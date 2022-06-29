@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-md" style="display: inline-block; width: 50%; left: 25%; position: absolute; min-width: 500px;">
+    <div class="q-pa-md" style="display: inline-block;">
         <q-table
           :rows="rows"
           :columns="columns"
@@ -8,9 +8,12 @@
           row-key="name"
         >
             <template v-slot:top>
-                Learn Chinese the lazy way, by watching TV!<br>
-                <q-btn color="deep-orange" label="Install Chrome Extension" />
-                <br> Then find inspiration below
+                <img src="images/128.png" width="256" />
+                <div style="text-align: left; margin-left: 100px">
+                    Learn Chinese the lazy way, by watching TV!<br><br>
+                    <q-btn color="deep-orange" label="Install Chrome Extension" />
+                    <br><br> Then find inspiration below
+                </div>
             </template>
             <template v-slot:header-cell="props">
                 <q-th :props="props">
@@ -290,5 +293,9 @@ export default {
     margin-left: 2px;
     margin-bottom: 2px;
     cursor: pointer;
+}
+
+#webroot {
+    text-align: center;
 }
 </style>
