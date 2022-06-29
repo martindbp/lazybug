@@ -72,7 +72,18 @@
                 </q-tr>
                 <q-tr v-if="props.expand" v-show="props.expand" :props="props">
                     <q-td colspan="100%">
-                        <div v-html="rowYoutubeEmbedCode(props.row)" />
+                        <div style="display: inline-block; vertical-align: top" v-html="rowYoutubeEmbedCode(props.row)" />
+                        <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
+                            <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
+                            <div
+                                v-else
+                                v-for="(season, i) in props.row.seasons"
+                            >
+                                <span>{{ props.row.seasons.length === 1 ? 'Episodes' : season.name || `Season ${i+1}` }}:</span>
+                                <br>
+                                <span style="margin-left: 3px;" v-for="(episode, j) in season.episodes"><a :href="youtubeURL(props.row, i, j)" > {{ j + 1 }} </a></span>
+                            </div>
+                        </div>
                     </q-td>
                 </q-tr>
             </template>
@@ -223,9 +234,11 @@ export default {
             const id = parts.slice(1).join('-');
             return getYoutubeEmbedCode(id);
         },
-        youtubeURL: function(row) {
-            const playlist = row.seasons[0].youtube_playlist;
-            const captionId = row.seasons[0].episodes[0].id;
+        youtubeURL: function(row, seasonIdx=null, episodeIdx=null) {
+            seasonIdx = seasonIdx || 0;
+            episodeIdx = episodeIdx || 0;
+            const playlist = row.seasons[seasonIdx].youtube_playlist;
+            const captionId = row.seasons[seasonIdx].episodes[episodeIdx].id;
             const parts = captionId.split('-');
             const id = parts.slice(1).join('-');
 
