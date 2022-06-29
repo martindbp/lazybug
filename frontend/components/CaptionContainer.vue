@@ -19,15 +19,17 @@
             <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
-            Video has <i>{{ translationType }}</i> sentence translations
-            <br/><br/>
+            <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
+            <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
+            <br/>
             <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
             <br/><br/>
             <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null">
-            Video has <i>{{ translationType }}</i> sentence translations
-            <br/><br/>
+            <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
+            <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
+            <br/>
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
             <br/><br/>
             <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
@@ -61,7 +63,6 @@ export default {
         'AVElement',
         'isLoading',
         'isLikelyAnAd',
-        'translationType',
         'pauseDuration',
     ],
     components: {CaptionContent, CaptionMenu},
@@ -70,6 +71,11 @@ export default {
         showData: null,
         fadeOut: false,
     }},
+    computed: {
+        showInfo: function() {
+            return getShowInfo(this.$store);
+        }
+    },
     updated: function() {
         const self = this;
         this.$nextTick(function () {

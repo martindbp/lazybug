@@ -6,7 +6,6 @@
             :style="{ fontSize: captionFontSize+'px' }"
             v-bind:isLoading="isLoading"
             v-bind:isLikelyAnAd="isLikelyAnAd"
-            v-bind:translationType="translationType"
             v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
@@ -71,7 +70,7 @@ export default {
             prevCaption: null,
             currCaption: null,
             nextCaption: null,
-            translationType: null, // human vs. machine
+            translationSource: null, // human vs. machine
             pauseDuration: null,
             keyboardListener: null,
         };
@@ -476,11 +475,6 @@ export default {
             const data = this.$store.state.captionData;
             if (data !== null && data.lines.length > 0) {
                 return captionArrayToDict(data.lines[0], this.$store.state.captionData);
-            }
-        },
-        translationType: function() {
-            if (this.firstCaption) {
-                return this.firstCaption.translations.length > 2 ? 'human' : 'machine';
             }
         },
         isLoading: function() {
