@@ -92,7 +92,7 @@
 </template>
 
 <script>
-var roundToScale = function(n,scale) {
+var roundToScale = function(n, scale) {
     return parseFloat((Math.round(n / scale) * scale).toFixed(1));
 };
 
@@ -115,7 +115,7 @@ export default {
             required: true,
             label: 'Difficulty',
             align: 'left',
-            field: row => roundToScale(10*(row.difficulty || row.difficulty_manual), 0.1),
+            field: row => roundToScale(10*(row.difficulty !== undefined ? row.difficulty : row.difficulty_manual), 0.1),
             format: val => `${val}`,
             sortable: true
           },
@@ -185,7 +185,7 @@ export default {
             required: true,
             label: 'Free',
             align: 'left',
-            field: row => [false, undefined].includes(row.requires_payment) ? true : false,
+            field: row => row.requires_payment === true ? false : true,
             format: val => `${val}`,
             sortable: true
           },
