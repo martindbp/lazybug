@@ -75,7 +75,7 @@
                             var byteArray = new Uint8Array(arrayBuffer);
                             var result = CryptoJS.MD5(byteArrayToWordArray(byteArray)).toString();
                             // Send an event to the browser extension
-                            const event = new CustomEvent('zimuviewlocal', { detail: result });
+                            const event = new CustomEvent('lazybugviewlocal', { detail: result });
                             window.dispatchEvent(event);
                         }
                     };

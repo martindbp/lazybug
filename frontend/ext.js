@@ -1,6 +1,6 @@
 var captionRoot = document.createElement('div');
-captionRoot.setAttribute('id', 'zimuroot');
-captionRoot.setAttribute('class', 'zimu');
+captionRoot.setAttribute('id', 'lazybugroot');
+captionRoot.setAttribute('class', 'lazybug');
 
 document.body.appendChild(captionRoot);
 
@@ -13,10 +13,10 @@ new MutationObserver((mutations) => {
         for(let node of mutation.addedNodes) {
             if (node.nodeType !== 1) continue;
             if (node.classList.contains('q-dialog')) {
-                node.parentNode.classList.add('zimuquasardialog');
+                node.parentNode.classList.add('lazybugquasardialog');
             }
             if (node.classList.contains('q-dialog') || node.id === 'q-notify' || node.id === 'q-loading-bar') {
-                node.classList.add('zimu');
+                node.classList.add('lazybug');
                 break;
             }
         }
@@ -25,6 +25,6 @@ new MutationObserver((mutations) => {
 
 app.use(store)
 app.use(Quasar)
-app.mount('#zimuroot')
+app.mount('#lazybugroot')
 
 Quasar.Dark.set(true);

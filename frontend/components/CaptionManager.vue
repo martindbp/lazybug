@@ -277,7 +277,7 @@ export default {
         setObserversAndHandlers: function() {
             const self = this;
             window.addEventListener('load', this.updateCaptionPositionBlurFontSize);
-            window.addEventListener('zimuviewlocal', function(event) {
+            window.addEventListener('lazybugviewlocal', function(event) {
                 self.localVideoHash = event.detail;
             });
             document.addEventListener('fullscreenchange', this.fullscreenChangeListener);

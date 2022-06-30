@@ -57,7 +57,7 @@ const PERSONAL_DB_VERSIONS = {
 };
 
 function initPersonalDb(untilVersion = null) {
-    const personalDb = new Dexie('zimuai-personal');
+    const personalDb = new Dexie('lazybug-personal');
     applyDbVersions(personalDb, PERSONAL_DB_VERSIONS, null, untilVersion);
     return personalDb;
 }
@@ -77,7 +77,7 @@ function applyDbVersions(db, dbVersions, fromVersion = null, untilVersion = null
 }
 
 function initCacheDb() {
-    const cacheDb = new Dexie('zimuai-cache');
+    const cacheDb = new Dexie('lazybug-cache');
     cacheDb.version(1).stores({
         network: 'id',
     });

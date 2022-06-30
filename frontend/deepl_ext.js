@@ -1,4 +1,4 @@
-if (ZIMUDEVMODE) {
+if (DEVMODE) {
     let translationInProgress = false;
     let lastTranslationTime = null;
     let nextWaitTime = 0;

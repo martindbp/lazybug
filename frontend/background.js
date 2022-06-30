@@ -249,7 +249,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         sendResponse();
     }
     else if (message.type === 'fetchVersionedResource') {
-        backgroundFetchVersionedResource('zimu-public', message.filename, function (data, hash) {
+        backgroundFetchVersionedResource('lazybug-public', message.filename, function (data, hash) {
             sendResponse({data: data, hash: hash});
         }, function(error) {
             console.log('ERROR');
@@ -258,7 +258,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'fetchResource') {
-        backgroundFetchResource('zimu-public', message.filename, function (data) {
+        backgroundFetchResource('lazybug-public', message.filename, function (data) {
             sendResponse({data: data});
         }, function(error) {
             console.log('ERROR');
@@ -267,7 +267,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getCaptions') {
-        backgroundFetchVersionedResource('zimu-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
+        backgroundFetchVersionedResource('lazybug-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
             sendResponse({data: data, hash: hash});
         }, function(response) {
             sendResponse('error');

@@ -271,8 +271,8 @@ export default {
     },
     methods: {
         clickClose: function(event) {
-            // Remove the "zimuquasardialog" class from the dialog parent, otherwise there's some flickering
-            document.querySelector('.zimuquasardialog').classList.remove('zimuquasardialog');
+            // Remove the "lazybugquasardialog" class from the dialog parent, otherwise there's some flickering
+            document.querySelector('.lazybugquasardialog').classList.remove('lazybugquasardialog');
             this.show = false;
             this.$store.commit('setOptionsHighlightSection', null);
         },
@@ -322,7 +322,7 @@ export default {
 </script>
 <style>
 
-.zimuquasardialog {
+.lazybugquasardialog {
     z-index: 9999;
     position: absolute;
     left: 0;

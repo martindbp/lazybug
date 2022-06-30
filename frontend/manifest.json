@@ -1,12 +1,12 @@
 {
-    "name": "zimu.ai",
+    "name": "Lazybug",
     "version": "3.0",
     "description": "",
     "permissions": [
         "unlimitedStorage"
     ],
     "host_permissions": [
-        "*://cdn.zimu.ai/*",
+        "*://cdn.lazybug.ai/*",
         "http://localhost/*"
     ],
     "background": {
@@ -38,7 +38,7 @@
             ],
             "run_at": "document_end",
             "css": [
-                "zimu_quasar.css",
+                "lazybug_quasar.css",
                 "google.css",
                 "CaptionManager.css"
              ],

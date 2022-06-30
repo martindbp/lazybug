@@ -47,28 +47,28 @@ pre-public-sync:
 .PHONY: push-public
 push-public:
 	touch synced.txt
-	b2 sync --noProgress data/remote/public b2://zimu-public --skipNewer | tee synced.txt
+	b2 sync --noProgress data/remote/public b2://lazybug-public --skipNewer | tee synced.txt
 	make purge-cloudflare-public
 
 .PHONY: push-private
 push-private:
-	b2 sync data/remote/private b2://zimu-private --skipNewer
+	b2 sync data/remote/private b2://lazybug-private --skipNewer
 
 .PHONY: push-raw-captions
 push-raw-captions:
-	b2 sync data/remote/private/caption_data/raw_captions b2://zimu-private/caption_data/raw_captions --skipNewer
+	b2 sync data/remote/private/caption_data/raw_captions b2://lazybug-private/caption_data/raw_captions --skipNewer
 
 .PHONY: pull-public
 pull-public:
-	b2 sync b2://zimu-public data/remote/public --skipNewer
+	b2 sync b2://lazybug-public data/remote/public --skipNewer
 
 .PHONY: pull-private
 pull-private:
-	b2 sync b2://zimu-private data/remote/private --skipNewer
+	b2 sync b2://lazybug-private data/remote/private --skipNewer
 
 .PHONY: pull-private-essentials
 pull-private-essentials:
-	b2 sync b2://zimu-private data/remote/private --skipNewer --excludeRegex '.*caption_data.*'
+	b2 sync b2://lazybug-private data/remote/private --skipNewer --excludeRegex '.*caption_data.*'
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID
@@ -77,7 +77,7 @@ endif
 
 .PHONY: pull-raw-captions
 pull-raw-captions:
-	b2 sync b2://zimu-private/caption_data/raw_captions data/remote/private/caption_data/raw_captions --skipNewer
+	b2 sync b2://lazybug-private/caption_data/raw_captions data/remote/private/caption_data/raw_captions --skipNewer
 
 .PHONY: purge-cloudflare-public
 purge-cloudflare-public: check-cloudflare-env
@@ -86,7 +86,7 @@ purge-cloudflare-public: check-cloudflare-env
      -H "X-Auth-Key: $$CLOUDFLARE_AUTH_KEY" \
      -H "Content-Type: application/json" \
      -H "Origin: chrome-extension://ackcmdammmejmpannblpninboapjkcgm" \
-     --data '{"files":["https://cdn.zimu.ai/file/zimu-public/{}"]}'
+     --data '{"files":["https://cdn.lazybug.ai/file/lazybug-public/{}"]}'
 	echo "Synced" && cat synced.txt && rm synced.txt
 
 .PHONY: pinyin-classifiers
@@ -229,7 +229,7 @@ frontend-copy:
 
 .PHONY: release
 release:
-	sed -i -E 's/ZIMUDEVMODE = true/ZIMUDEVMODE = false/g' frontend/dist/*.js
+	sed -i -E 's/DEVMODE = true/DEVMODE = false/g' frontend/dist/*.js
 	python make_release_manifest.py frontend/manifest.json > frontend/dist/manifest.json
 	rm frontend/dist/deepl_ext.js
 	rm frontend/dist/devtools.js
@@ -238,9 +238,9 @@ release:
 
 .PHONY: css
 css:
-	sass frontend/css/zimu_quasar.sass frontend/dist/zimu_quasar.css
-	sed -i -E 's/\.zimu (body|html|:root)/\1/g' frontend/dist/zimu_quasar.css
-	sed -i -E 's/rem;/em;/g' frontend/dist/zimu_quasar.css
+	sass frontend/css/lazybug_quasar.sass frontend/dist/lazybug_quasar.css
+	sed -i -E 's/\.lazybug (body|html|:root)/\1/g' frontend/dist/lazybug_quasar.css
+	sed -i -E 's/rem;/em;/g' frontend/dist/lazybug_quasar.css
 
 .PHONY: hsk-words
 hsk-words:

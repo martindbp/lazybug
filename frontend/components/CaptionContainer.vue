@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{zimucaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused}">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused}">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -145,7 +145,7 @@ export default {
     padding-right: 100px;
 }
 
-.zimucaptiondiv {
+.lazybugcaptiondiv {
     color: white;
     background-color: rgba(0, 0, 0, 0.75);
     text-align: left;
@@ -155,7 +155,7 @@ export default {
     filter: drop-shadow(rgb(25, 25, 25) 3px 3px 5px);
 }
 
-.zimucaptiondiv.paused,
+.lazybugcaptiondiv.paused,
 .paused .captionmenu{
     background-color: rgba(0, 0, 0, 1.0);
     transition: background-color 300ms linear;

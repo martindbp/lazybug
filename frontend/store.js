@@ -330,8 +330,8 @@ function addBadge($img, videoList) {
 
     $img.style.position = 'relative';
     const badge = document.createElement('img');
-    badge.classList.add('zimubadge');
-    badge.src = CDN_URL + 'zimu-public/images/64.png';
+    badge.classList.add('lazybugbadge');
+    badge.src = CDN_URL + 'lazybug-public/images/64.png';
     badge.style.filter = 'drop-shadow(5px 5px 5px black)';
     badge.style.width = badge.style.height = '28px';
     badge.style.position = 'absolute';
@@ -341,7 +341,7 @@ function addBadge($img, videoList) {
 }
 
 function initializeThumbnailBadges(videoList) {
-    for (const $img of document.querySelectorAll('#thumbnail img:not(.zimubadge)')) {
+    for (const $img of document.querySelectorAll('#thumbnail img:not(.lazybugbadge)')) {
         addBadge($img, videoList);
     }
 
@@ -352,18 +352,18 @@ function initializeThumbnailBadges(videoList) {
                 case 'childList':
                     for (let node of mutation.addedNodes) {
                         if (node.nodeType !== 1) continue;
-                        if (node.tagName === 'IMG' && !node.classList.contains('zimubadge') && node.closest('#thumbnail')) {
+                        if (node.tagName === 'IMG' && !node.classList.contains('lazybugbadge') && node.closest('#thumbnail')) {
                             addBadge(node, videoList);
                         }
                         else if (node.id === 'thumbnail') {
-                            addBadge(node.querySelector('img:not(.zimubadge)'), videoList);
+                            addBadge(node.querySelector('img:not(.lazybugbadge)'), videoList);
                         }
                     }
                     break;
                 case 'attributes':
                     if (mutation.target.id === 'thumbnail' && mutation.attributeName === 'href' && mutation.oldValue !== null) {
-                        const $img = mutation.target.querySelector('img:not(.zimubadge)');
-                        for (const $badgeImg of mutation.target.querySelectorAll('img.zimubadge')) {
+                        const $img = mutation.target.querySelector('img:not(.lazybugbadge)');
+                        for (const $badgeImg of mutation.target.querySelectorAll('img.lazybugbadge')) {
                             $badgeImg.remove();
                         }
                         addBadge($img, videoList);

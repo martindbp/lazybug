@@ -31,7 +31,7 @@ export default {
     },
     data: function() { return {
         extensionToggle: window.localStorage.getItem('extensionToggle') === 'true',
-        dev: ZIMUDEVMODE,
+        dev: DEVMODE,
         showList: null,
         recent: null,
     }},

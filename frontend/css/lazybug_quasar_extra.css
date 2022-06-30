@@ -1,17 +1,17 @@
-.zimu {
+.lazybug {
   all: initial;
 }
 
-zimu::before,
-zimu::after,
-zimu *::before,
-zimu *::after {
+lazybug::before,
+lazybug::after,
+lazybug *::before,
+lazybug *::after {
   all: unset;
 }
 
 
 /*
-#zimuroot {
+#lazybugroot {
   box-sizing: border-box;
   overflow-y: scroll;
   -webkit-text-size-adjust: 100%;
