@@ -226,6 +226,8 @@ frontend-copy:
 	cp frontend/deps/* frontend/dist/
 	cp frontend/css/* frontend/dist/
 	cp -r frontend/images frontend/dist/
+	cp -r frontend data/remote/public/frontend
+	cp -r frontend/web.html data/remote/public/frontend/index.html
 
 .PHONY: release
 release:
