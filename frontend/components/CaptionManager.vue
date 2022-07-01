@@ -464,7 +464,7 @@ export default {
     },
     computed: {
         isLikelyAnAd: function() {
-            if (this.videoDuration === NaN || this.$store.state.captionData === null) return false;
+            if ([null, undefined, 0, NaN].includes(this.videoDuration) || this.$store.state.captionData === null) return false;
 
             const captionDuration = this.$store.state.captionData.video_length;
             const isAd = Math.abs(this.videoDuration - captionDuration) > 0.5;
