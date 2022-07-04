@@ -8,7 +8,7 @@
           row-key="name"
         >
             <template v-slot:top>
-                <img src="images/lazybug_sanstext.svg" width="512" />
+                <img src="images/lazybug_sanstext.svg" width="400" />
                 <div style="text-align: left; margin-left: 50px">
                     Learn Chinese the lazy way, by watching TV!<br><br>
                     1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
