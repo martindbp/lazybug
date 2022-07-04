@@ -331,7 +331,7 @@ function addBadge($img, videoList) {
     $img.style.position = 'relative';
     const badge = document.createElement('img');
     badge.classList.add('lazybugbadge');
-    badge.src = CDN_URL + 'lazybug-public/images/64.png';
+    badge.src = CDN_URL + 'lazybug-public/images/64_lazybug.png';
     badge.style.filter = 'drop-shadow(5px 5px 5px black)';
     badge.style.width = badge.style.height = '28px';
     badge.style.position = 'absolute';
