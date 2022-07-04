@@ -8,11 +8,13 @@
           row-key="name"
         >
             <template v-slot:top>
-                <img src="images/128.png" width="256" />
-                <div style="text-align: left; margin-left: 100px">
+                <img src="images/lazybug_sanstext.svg" width="512" />
+                <div style="text-align: left; margin-left: 50px">
                     Learn Chinese the lazy way, by watching TV!<br><br>
-                    <q-btn color="deep-orange" label="Install Chrome Extension" />
-                    <br><br> Then find inspiration below
+                    1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
+                    2. Find inspiration below<br>
+                    3. Enjoy Chinese TV with interactive and adaptive subtitles!<br>
+                    4. Learn some tips and tricks
                 </div>
             </template>
             <template v-slot:header-cell="props">
@@ -67,7 +69,9 @@
                         {{ props.cols[8].value }}
                     </q-td>
                     <q-td key="free" :props="props" style="white-space: normal; max-width: 200px;">
-                        {{ props.cols[9].value ? 'free' : 'paid' }}
+                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[9].value)"  :color="mapToColor('free', props.cols[9].value)">
+                            {{ props.cols[9].value ? 'free' : 'paid' }}
+                        </q-badge>
                     </q-td>
                 </q-tr>
                 <q-tr v-if="props.expand" v-show="props.expand" :props="props">
@@ -185,7 +189,7 @@ export default {
             required: true,
             label: 'Free',
             align: 'left',
-            field: row => row.requires_payment === true ? false : true,
+            field: row => row.free,
             sortable: true
           },
         ],
@@ -279,14 +283,19 @@ export default {
                 else if (val === 'movie') return 'red';
                 else return 'green';
             }
+            else if (type === 'free') {
+                return val ? 'green' : 'red';
+            }
         },
         addFilter: function(column, rowProp, value) {
+            this.removeFilter(column, rowProp, value);
             if (this.filters === null) {
                 this.filters = [];
             }
             this.filters.push([column, rowProp, value]);
         },
         removeFilter: function(column, rowProp, value) {
+            if (this.filters === null) return;
             this.filters = this.filters.filter(filter => {
                 if (filter[0] === column && filter[1] === rowProp && filter[2] === value) return false;
                 return true;

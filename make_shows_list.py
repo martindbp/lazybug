@@ -166,6 +166,9 @@ for filename in glob.glob('data/remote/public/shows/*.json'):
                 print(f'ERROR: {required} not in show data for {show_name}')
                 sys.exit(1)
 
+        if 'free' not in show:
+            show['free'] = True
+
         # Calculate show difficulty
         video_ids = []
         for season in show['seasons']:

@@ -1,22 +1,28 @@
 <template>
     <div id="popupcontainer">
-        <div style="position: relative; text-align: right">
-            <q-toggle
-                 style="position: fixed; left: 0;"
-                 v-model="extensionToggle"
-                 color="green"
-            />
-            <q-btn-dropdown color="primary" label="Go to">
-                <q-list>
-                    <q-item v-for="video in recent" clickable @click="clickRecent(video)">
-                        <q-item-section>
-                            <q-item-label> {{ videoLabel(video) }} </q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </q-btn-dropdown>
+        <div style="text-align: left">
+            <div>
+                <img src="images/128.png" width="64" style="vertical-align: middle; margin: 10px" />
+                <q-toggle
+                     v-model="extensionToggle"
+                     color="green"
+                     style="vertical-align: middle"
+                />
+                <q-btn-dropdown color="primary" label="Go">
+                    <q-list>
+                        <q-item v-for="video in recent" clickable @click="clickRecent(video)">
+                            <q-item-section>
+                                <q-item-label> {{ videoLabel(video) }} </q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-btn-dropdown>
+            </div>
+            <div style="margin-top: 10px; text-align: center">
+                <q-btn label="Dashboard" color="secondary" @click="dashboard" style="margin-right: 5px"/>
+                <q-btn label="Browse" color="primary" @click="browse" />
+            </div>
         </div>
-        <q-btn flat label="Dashboard" @click="dashboard" />
         <div v-if="dev">
             <q-btn flat label="Measure caption" @click="measureCaption" />
             <q-btn flat label="Print playlist" @click="printPlaylist" />
@@ -80,6 +86,11 @@ export default {
                 url: "dashboard.html",
             });
         },
+        browse: function() {
+            chrome.tabs.create({
+                url: "https://lazybug.ai",
+            });
+        },
         measureCaption: function() {
             chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
                 tabs.forEach(tab => {
@@ -127,7 +138,7 @@ export default {
 }
 
 #popuproot {
-    width: 200px;
+    width: 230px;
     min-height: 250px;
 }
 
