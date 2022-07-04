@@ -143,7 +143,7 @@ def get_show_stats(video_ids):
 
     return sum_information / sum_time, num_processed, num_total
 
-required_data = ['year', 'type', 'genres', 'synopsis', 'douban', 'caption_source', 'translation_source']
+required_data = ['year', 'type', 'genres', 'synopsis', 'douban', 'caption_source', 'translation_source', 'date_added']
 
 released_shows = {}
 unreleased = []
