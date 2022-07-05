@@ -1,5 +1,15 @@
 <template>
     <div class="q-pa-md" style="display: inline-block;">
+        <div style="text-align: left; margin-left: -50px; margin-bottom: 25px;">
+            <img src="images/lazybug_sanstext.svg" width="400" style="vertical-align: middle;" />
+            <div style="display: inline-block; margin-left: 50px; vertical-align: middle;">
+                Learn Chinese the lazy way, by watching TV!<br><br>
+                1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
+                2. Find inspiration below (some shows have subtitles extracted by OCR)<br>
+                3. Enjoy Chinese TV with interactive and adaptive subtitles!<br>
+                4. Learn some tips and tricks
+            </div>
+        </div>
         <q-table
           :rows="rows"
           :columns="columns"
@@ -7,16 +17,6 @@
           :loading="isLoading"
           row-key="name"
         >
-            <template v-slot:top>
-                <img src="images/lazybug_sanstext.svg" width="400" />
-                <div style="text-align: left; margin-left: 50px">
-                    Learn Chinese the lazy way, by watching TV!<br><br>
-                    1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
-                    2. Find inspiration below<br>
-                    3. Enjoy Chinese TV with interactive and adaptive subtitles!<br>
-                    4. Learn some tips and tricks
-                </div>
-            </template>
             <template v-slot:header-cell="props">
                 <q-th :props="props">
                     {{ props.col.label }}
