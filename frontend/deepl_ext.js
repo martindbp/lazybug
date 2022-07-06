@@ -47,4 +47,9 @@ if (DEVMODE) {
 
         pollTranslate();
     }, 1000);
+
+    // When there's a javascript error on deepl.com, we reload the page
+    window.onerror = function(message, source, lineno, colno, error) {
+        location.reload();
+    };
 }
