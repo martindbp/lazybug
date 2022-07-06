@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-md" style="display: inline-block;">
         <div style="text-align: left; margin-left: -50px; margin-bottom: 25px;">
-            <img src="images/lazybug_sanstext.svg" width="400" style="vertical-align: middle;" />
+            <img src="images/lazybug_sanstext.svg" width="400" style="vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
             <div style="display: inline-block; margin-left: 50px; vertical-align: middle;">
                 Learn Chinese the lazy way, by watching TV!<br><br>
                 1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
