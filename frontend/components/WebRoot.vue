@@ -1,98 +1,152 @@
 <template>
-    <div class="q-pa-md" style="display: inline-block;">
-        <div style="text-align: left; margin-left: -50px; margin-bottom: 25px;">
-            <img src="images/lazybug_sanstext.svg" width="400" style="vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
-            <div style="display: inline-block; margin-left: 50px; vertical-align: middle;">
-                Learn Chinese the lazy way, by watching TV!<br><br>
-                1. <q-btn size="sm" color="deep-orange" label="Install Chrome Extension" /><br>
-                2. Find inspiration below (some shows have subtitles extracted by OCR)<br>
-                3. Enjoy Chinese TV with interactive and adaptive subtitles!<br>
-                4. Learn some tips and tricks
-            </div>
-        </div>
-        <q-table
-          :rows="rows"
-          :columns="columns"
-          :pagination="pagination"
-          :loading="isLoading"
-          row-key="name"
-        >
-            <template v-slot:header-cell="props">
-                <q-th :props="props">
-                    {{ props.col.label }}
-                    <span v-if="columnFilters[props.col.name] !== undefined">
-                        <q-badge class="clickablebadge" @click.stop.prevent="removeFilter(...filter)" v-for="filter in columnFilters[props.col.name]" :color="mapToColor(filter[1], filter[2])">{{filter[2]}}</q-badge>
-                    </span>
-                </q-th>
-            </template>
-            <template v-slot:body="props">
-                <q-tr :props="props" @click="props.expand = !props.expand" :style="{ cursor: 'pointer' }" >
-                    <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                        {{ props.cols[0].value }}
-                    </q-td>
-                    <q-td key="difficulty" :props="props">
-                        <q-badge :color="mapDifficultyToColor(props.cols[1].value)">
-                            {{ props.cols[1].value }}
-                        </q-badge>
-                    </q-td>
-                    <q-td key="douban" :props="props">
-                        <span v-if="props.cols[2].value === 'N/A'">N/A</span>
-                        <q-badge v-else :color="mapDoubanToColor(props.cols[2].value)">
-                            {{ props.cols[2].value }}
-                        </q-badge>
-                    </q-td>
-                    <q-td key="type" :props="props" style="white-space: normal; max-width: 200px;">
-                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('type', 'type', props.cols[3].value)" :color="mapToColor('type', props.cols[3].value)">
-                            {{ props.cols[3].value }}
-                        </q-badge>
-                    </q-td>
-                    <q-td key="year" :props="props" style="white-space: normal; max-width: 200px;">
-                        {{ props.cols[4].value }}
-                    </q-td>
-                    <q-td key="genres" :props="props" style="white-space: normal; max-width: 200px;">
-                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', 'genres', genre)" v-for="genre in props.cols[5].value" :color="mapToColor('genres', genre)">
-                            {{ genre }}
-                        </q-badge>
-                    </q-td>
-                    <q-td key="synopsis" :props="props" style="white-space: normal; max-width: 200px;">
-                        {{ props.cols[6].value }}
-                    </q-td>
-                    <q-td key="sources" :props="props" style="white-space: normal; max-width: 200px;">
-                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[7].value[0])" :color="mapToColor('caption_source', props.cols[7].value[0])">
-                            {{ props.cols[7].value[0] }}
-                        </q-badge>
-                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[7].value[1])" :color="mapToColor('translation_source', props.cols[7].value[1])">
-                            {{ props.cols[7].value[1] }}
-                        </q-badge>
-                    </q-td>
-                    <q-td key="num_processed" :props="props" style="white-space: normal; max-width: 200px;">
-                        {{ props.cols[8].value }}
-                    </q-td>
-                    <q-td key="free" :props="props" style="white-space: normal; max-width: 200px;">
-                        <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[9].value)"  :color="mapToColor('free', props.cols[9].value)">
-                            {{ props.cols[9].value ? 'free' : 'paid' }}
-                        </q-badge>
-                    </q-td>
-                </q-tr>
-                <q-tr v-if="props.expand" v-show="props.expand" :props="props">
-                    <q-td colspan="100%">
-                        <div style="display: inline-block; vertical-align: top" v-html="rowYoutubeEmbedCode(props.row)" />
-                        <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
-                            <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
-                            <div
-                                v-else
-                                v-for="(season, i) in props.row.seasons"
-                            >
-                                <span>{{ props.row.seasons.length === 1 ? 'Episodes' : season.name || `Season ${i+1}` }}:</span>
-                                <br>
-                                <span style="margin-left: 3px;" v-for="(episode, j) in season.episodes"><a :href="youtubeURL(props.row, i, j)" > {{ j + 1 }} </a></span>
+    <q-layout view="lHh Lpr lff" container class="shadow-2 rounded-borders">
+      <q-header elevated class="bg-yellow-6 text-grey-10">
+        <q-toolbar>
+          <q-toolbar-title>Lazybug</q-toolbar-title>
+          <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+        </q-toolbar>
+      </q-header>
+
+      <q-drawer
+        v-model="drawer"
+        show-if-above
+        :width="200"
+        :breakpoint="400"
+        style="text-align: left;"
+      >
+        <q-scroll-area style="border-right: 1px solid #ddd">
+          <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
+          <q-list padding>
+            <q-item active clickable v-ripple>
+              <q-item-section avatar>
+                <q-icon name="list" />
+              </q-item-section>
+
+              <q-item-section>
+                Videos
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <q-icon name="star" />
+              </q-item-section>
+
+              <q-item-section>
+                Star
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <q-icon name="settings" />
+              </q-item-section>
+
+              <q-item-section>
+                Settings
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <q-icon name="help" />
+              </q-item-section>
+
+              <q-item-section>
+                Help
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
+      </q-drawer>
+
+      <q-page-container>
+        <q-page padding>
+            <q-table
+              :rows="rows"
+              :columns="columns"
+              :pagination="pagination"
+              :loading="isLoading"
+              row-key="name"
+            >
+                <template v-slot:header-cell="props">
+                    <q-th :props="props">
+                        {{ props.col.label }}
+                        <span v-if="columnFilters[props.col.name] !== undefined">
+                            <q-badge class="clickablebadge" @click.stop.prevent="removeFilter(...filter)" v-for="filter in columnFilters[props.col.name]" :color="mapToColor(filter[1], filter[2])">{{filter[2]}}</q-badge>
+                        </span>
+                    </q-th>
+                </template>
+                <template v-slot:body="props">
+                    <q-tr :props="props" @click="props.expand = !props.expand" :style="{ cursor: 'pointer' }" >
+                        <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                            {{ props.cols[0].value }}
+                        </q-td>
+                        <q-td key="difficulty" :props="props">
+                            <q-badge :color="mapDifficultyToColor(props.cols[1].value)">
+                                {{ props.cols[1].value }}
+                            </q-badge>
+                        </q-td>
+                        <q-td key="douban" :props="props">
+                            <span v-if="props.cols[2].value === 'N/A'">N/A</span>
+                            <q-badge v-else :color="mapDoubanToColor(props.cols[2].value)">
+                                {{ props.cols[2].value }}
+                            </q-badge>
+                        </q-td>
+                        <q-td key="type" :props="props" style="white-space: normal; max-width: 200px;">
+                            <q-badge class="clickablebadge" @click.stop.prevent="addFilter('type', 'type', props.cols[3].value)" :color="mapToColor('type', props.cols[3].value)">
+                                {{ props.cols[3].value }}
+                            </q-badge>
+                        </q-td>
+                        <q-td key="year" :props="props" style="white-space: normal; max-width: 200px;">
+                            {{ props.cols[4].value }}
+                        </q-td>
+                        <q-td key="genres" :props="props" style="white-space: normal; max-width: 200px;">
+                            <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', 'genres', genre)" v-for="genre in props.cols[5].value" :color="mapToColor('genres', genre)">
+                                {{ genre }}
+                            </q-badge>
+                        </q-td>
+                        <q-td key="synopsis" :props="props" style="white-space: normal; max-width: 200px;">
+                            {{ props.cols[6].value }}
+                        </q-td>
+                        <q-td key="sources" :props="props" style="white-space: normal; max-width: 200px;">
+                            <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[7].value[0])" :color="mapToColor('caption_source', props.cols[7].value[0])">
+                                {{ props.cols[7].value[0] }}
+                            </q-badge>
+                            <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[7].value[1])" :color="mapToColor('translation_source', props.cols[7].value[1])">
+                                {{ props.cols[7].value[1] }}
+                            </q-badge>
+                        </q-td>
+                        <q-td key="num_processed" :props="props" style="white-space: normal; max-width: 200px;">
+                            {{ props.cols[8].value }}
+                        </q-td>
+                        <q-td key="free" :props="props" style="white-space: normal; max-width: 200px;">
+                            <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[9].value)"  :color="mapToColor('free', props.cols[9].value)">
+                                {{ props.cols[9].value ? 'free' : 'paid' }}
+                            </q-badge>
+                        </q-td>
+                    </q-tr>
+                    <q-tr v-if="props.expand" v-show="props.expand" :props="props">
+                        <q-td colspan="100%">
+                            <div style="display: inline-block; vertical-align: top" v-html="rowYoutubeEmbedCode(props.row)" />
+                            <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
+                                <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
+                                <div
+                                    v-else
+                                    v-for="(season, i) in props.row.seasons"
+                                >
+                                    <span>{{ props.row.seasons.length === 1 ? 'Episodes' : season.name || `Season ${i+1}` }}:</span>
+                                    <br>
+                                    <span style="margin-left: 3px;" v-for="(episode, j) in season.episodes"><a :href="youtubeURL(props.row, i, j)" > {{ j + 1 }} </a></span>
+                                </div>
                             </div>
-                        </div>
-                    </q-td>
-                </q-tr>
-            </template>
-        </q-table>
-    </div>
+                        </q-td>
+                    </q-tr>
+                </template>
+            </q-table>
+        </q-page>
+      </q-page-container>
+    </q-layout>
 </template>
 
 <script>
