@@ -473,6 +473,13 @@ export default {
                     }
                 }
             }
+
+            // Peek full translation
+            if (this.$store.state.options.pin.translation) {
+                this.$store.commit('setPeekState', {'type': 'translation'});
+                this.$store.commit('setPeekState', {'type': 'translation', 'auto': true});
+                this.appendSessionLog([getEvent('peek', 'translation')]);
+            }
         },
         applyPinyinComponents: function() {
             // If user hides ni3hao3, we should hide ni3 and hao3 separately, but not other way around.
