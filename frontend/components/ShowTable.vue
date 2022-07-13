@@ -5,7 +5,7 @@
       :pagination="pagination"
       :loading="isLoading"
       row-key="name"
-      style="display: inline-block; margin-top: 50px"
+      style="display: inline-block; margin-top: 50px;"
     >
         <template v-slot:header-cell="props">
             <q-th :props="props">

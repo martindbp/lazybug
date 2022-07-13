@@ -10,7 +10,7 @@
         <q-scroll-area style="border-right: 1px solid #ddd">
           <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
           <q-list padding>
-            <q-item active clickable v-ripple>
+            <q-item :active="page === 'videos'" clickable @click="page = 'videos'" v-ripple>
               <q-item-section avatar>
                 <q-icon name="list" />
               </q-item-section>
@@ -20,7 +20,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item :active="page === 'star'" clickable @click="page = 'star'" v-ripple>
               <q-item-section avatar>
                 <q-icon name="star" />
               </q-item-section>
@@ -30,7 +30,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item :active="page === 'settings'" clickable @click="page = 'settings'" v-ripple>
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -40,7 +40,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item :active="page === 'help'" clickable @click="page = 'help'" v-ripple>
               <q-item-section avatar>
                 <q-icon name="help" />
               </q-item-section>
@@ -55,7 +55,8 @@
 
       <q-page-container>
         <q-page padding>
-            <ShowTable />
+            <ShowTable v-if="page === 'videos'" />
+            <StarTable v-if="page === 'star'" />
         </q-page>
       </q-page-container>
     </q-layout>
@@ -63,10 +64,15 @@
 
 <script>
 import ShowTable from './ShowTable.vue'
+import StarTable from './StarTable.vue'
 
 export default {
+    data: function() { return {
+        page: 'videos',
+    }},
     components: {
         ShowTable,
+        StarTable,
     },
 };
 </script>
