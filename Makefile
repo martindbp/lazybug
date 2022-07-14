@@ -195,13 +195,6 @@ frontend-popup:
 	make frontend-copy
 
 
-.PHONY: frontend-dashboard
-frontend-dashboard:
-	vue-cli-service build frontend/components/DashboardRoot.vue --target lib --dest frontend/dist_components/dashboardroot
-	cp frontend/dist_components/dashboardroot/*.umd.js frontend/dist/
-	-cp frontend/dist_components/dashboardroot/*.css frontend/dist/
-	make frontend-copy
-
 .PHONY: frontend-copy
 frontend-clean:
 	- rm -r frontend/dist
@@ -215,7 +208,6 @@ frontend-clean:
 frontend:
 	make frontend-caption
 	make frontend-popup
-	make frontend-dashboard
 	make frontend-web
 
 .PHONY: frontend-copy
@@ -227,10 +219,12 @@ frontend-copy:
 	cp frontend/css/* frontend/dist/
 	cp -r frontend/images frontend/dist/
 	-cp -r frontend/dist/* ../lazybug-web/
+	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
+	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
 
 .PHONY: release
 release:
-	sed -i -E 's/DEVMODE = true/DEVMODE = false/g' frontend/dist/*.js
+	sed -i -E "s/DEVMODE = true/DEVMODE = false/g" frontend/dist/*.js
 	python make_release_manifest.py frontend/manifest.json > frontend/dist/manifest.json
 	rm frontend/dist/deepl_ext.js
 	rm frontend/dist/devtools.js
@@ -240,8 +234,8 @@ release:
 .PHONY: css
 css:
 	sass frontend/css/lazybug_quasar.sass frontend/dist/lazybug_quasar.css
-	sed -i -E 's/\.lazybug (body|html|:root)/\1/g' frontend/dist/lazybug_quasar.css
-	sed -i -E 's/rem;/em;/g' frontend/dist/lazybug_quasar.css
+	sed -i -E "s/\.lazybug (body|html|:root)/\1/g" frontend/dist/lazybug_quasar.css
+	sed -i -E "s/rem;/em;/g" frontend/dist/lazybug_quasar.css
 
 .PHONY: hsk-words
 hsk-words:
