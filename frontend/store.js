@@ -17,7 +17,7 @@ function syncOptions(state) {
 
 function getShowInfo(store, state = null) {
     if (state === null) state = store.state;
-    if (state.captionData === null || state.showList === null) return null;
+    if ([null, undefined].includes(state.captionData) || [null, undefined].includes(state.showList)) return null;
 
     return state.showList[state.captionData.show_name];
 }
@@ -128,9 +128,11 @@ const store = new Vuex.Store({
         },
         setVideoList(state, val) {
             state.videoList = new Set(val);
-            const newThumbnailObserver = initializeThumbnailBadges(state.videoList);
-            if (state.thumbnailObserver) state.thumbnailObserver.disconnect();
-            state.thumbnailObserver = newThumbnailObserver;
+            if (BROWSER_EXTENSION) {
+                const newThumbnailObserver = initializeThumbnailBadges(state.videoList);
+                if (state.thumbnailObserver) state.thumbnailObserver.disconnect();
+                state.thumbnailObserver = newThumbnailObserver;
+            }
         },
         setShowList(state, val) {
             state.showList = val;
@@ -302,19 +304,29 @@ else {
     ];
 }
 
-for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
-    fetchVersionedResource(filename, function (data) {
-        if (data === 'error') {
-            store.commit('setResourceFetchError', errorName);
-        }
-        else {
-            store.commit('resetResourceFetchError', errorName);
-            store.commit(mutation, data);
-        }
-    });
+function fetchInitialResources() {
+    for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
+        fetchVersionedResource(filename, function (data) {
+            if (data === 'error') {
+                store.commit('setResourceFetchError', errorName);
+            }
+            else {
+                store.commit('resetResourceFetchError', errorName);
+                store.commit(mutation, data);
+            }
+        });
+    }
+
+    fetchPersonalDataToStore(store);
 }
 
-fetchPersonalDataToStore(store);
+if (BROWSER_EXTENSION) {
+    // We have to wait for the iframe to load before we can fetch stuff from it
+    lazybugIframe.addEventListener('load', fetchInitialResources);
+}
+else {
+    fetchInitialResources();
+}
 
 function addBadge($img, videoList) {
     if ($img === null) return;

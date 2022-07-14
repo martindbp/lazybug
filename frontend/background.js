@@ -268,7 +268,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     }
     else if (message.type === 'getCaptions') {
         backgroundFetchVersionedResource('lazybug-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
-            sendResponse({data: data, hash: hash});
+            sendResponse({data: {data: data, hash: hash}});
         }, function(response) {
             sendResponse('error');
         });
@@ -449,6 +449,14 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     return true;
 }
 
-if (BROWSER_EXTENSION) {
-    chrome.runtime.onMessage.addListener(backgroundMessageHandler);
+if (window.parent != window) {
+    // We're inside an iframe, listen to messages from the parent
+    window.addEventListener("message", message => {
+        backgroundMessageHandler(message.data.message, null, function(response) {
+            window.parent.postMessage({
+                data: response,
+                requestId: message.data.requestId,
+            }, '*');
+        });
+    });
 }

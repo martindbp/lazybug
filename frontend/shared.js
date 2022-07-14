@@ -4,6 +4,18 @@ if (BROWSER_EXTENSION) VERSION = chrome.runtime.getManifest().version;
 const CDN_URL = "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;
+const SESSION_ID = uuidv4();
+let nextRequestId = 1;
+const requestCallbacks = {}; // map between SESSION_ID+request_id to a callback handler
+
+let lazybugIframe = null;
+
+if (BROWSER_EXTENSION) {
+    lazybugIframe = document.createElement('iframe');
+    lazybugIframe.src = 'https://lazybug.ai';
+    lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
+    document.body.appendChild(lazybugIframe);
+}
 
 const events = [
     'EVENT_SHOW_CAPTION_IDX',
@@ -43,6 +55,12 @@ for (let i = 0; i < events.length; i++) {
     reverseEventsMap[i] = events[i];
 }
 
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
 function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
 }
@@ -62,11 +80,37 @@ function sendMessageToBackground(message, callback) {
     }
 
     if (BROWSER_EXTENSION) {
-        chrome.runtime.sendMessage(message, responseHandler);
+        const requestId = `${SESSION_ID}-${nextRequestId}`;
+
+        // Need to do this to make sure object is cloneable
+        const data = JSON.parse(JSON.stringify({
+            message: message,
+            requestId: requestId,
+        }));
+        lazybugIframe.contentWindow.postMessage(data, '*');
+        requestCallbacks[requestId] = responseHandler;
+        nextRequestId += 1;
     }
     else {
         backgroundMessageHandler(message, null, responseHandler);
     }
+}
+
+if (BROWSER_EXTENSION) {
+    // Listen for messages from the lazybug iframe
+    window.addEventListener("message", message => {
+        if (message.data.requestId === undefined) return;
+
+        let callback = requestCallbacks[message.data.requestId];
+        callback(message.data.data);
+        delete requestCallbacks[message.data.requestId];
+    });
+}
+
+function fetchCaptions(captionId, callback) {
+    sendMessageToBackground({type: 'getCaptions',  'data': {
+        'captionId': captionId,
+    }}, callback);
 }
 
 function fetchResource(filename, callback) {

@@ -70,6 +70,8 @@ export default {
     data: function() { return {
         page: 'videos',
     }},
+    mounted: function() {
+    },
     components: {
         ShowTable,
         StarTable,

@@ -237,9 +237,7 @@ export default {
             this.$store.commit('setCaptionDataAndHash', {data: null, hash: 'fetching'});
 
             const self = this;
-            chrome.runtime.sendMessage({'type': 'getCaptions', 'data': {
-                'captionId': self.captionId,
-            }}, function onResponse(message) {
+            fetchCaptions(self.captionId, function (message) {
                 if (message === 'error') {
                     self.$store.commit('setResourceFetchError', 'caption data');
                     self.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
@@ -248,7 +246,6 @@ export default {
                 self.$store.commit('resetResourceFetchError', 'caption data');
                 if (self.$store.state.captionHash === message.hash) return true;
 
-                console.log(message);
                 self.$store.commit('setCaptionDataAndHash', message);
                 // Append the initial pinned peek values
                 for (const type of ['py', 'hz', 'tr', 'translation']) {
