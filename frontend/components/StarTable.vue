@@ -1,5 +1,5 @@
 <template>
-    <div style="display: inline-block; margin-top: 50px;">
+    <div style="display: inline-block; margin-top: 50px; margin-left: 50px; min-width: 500px;">
         <q-table
             title="Starred"
             :rows="rows"

@@ -57,6 +57,7 @@
         <q-page padding>
             <ShowTable v-if="page === 'videos'" />
             <StarTable v-if="page === 'star'" />
+            <Settings v-if="page === 'settings'" />
         </q-page>
       </q-page-container>
     </q-layout>
@@ -65,6 +66,7 @@
 <script>
 import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
+import Settings from './Settings.vue'
 
 export default {
     data: function() { return {
@@ -75,12 +77,13 @@ export default {
     components: {
         ShowTable,
         StarTable,
+        Settings,
     },
 };
 </script>
 
 <style>
 #webroot {
-    text-align: center;
+    /*text-align: center;*/
 }
 </style>

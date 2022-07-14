@@ -12,7 +12,7 @@ let lazybugIframe = null;
 
 if (BROWSER_EXTENSION) {
     lazybugIframe = document.createElement('iframe');
-    lazybugIframe.src = 'https://lazybug.ai';
+    lazybugIframe.src = 'https://lazybug.ai/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
     document.body.appendChild(lazybugIframe);
 }
