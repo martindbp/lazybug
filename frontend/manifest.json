@@ -3,7 +3,6 @@
     "version": "3.0",
     "description": "",
     "permissions": [
-        "unlimitedStorage"
     ],
     "host_permissions": [
         "*://cdn.lazybug.ai/*",
