@@ -481,6 +481,11 @@ function getWordData(data, translationIdx, captionIdx) {
     return wordData;
 }
 
+function videoIdFromCaptionId(captionId) {
+    const parts = captionId.split('-');
+    return parts.slice(1).join('-');
+}
+
 const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 function captionToAnkiCloze(wordData, hiddenStates, captionIdx, type, i, captionId = null, captionHash = null, t0 = null, t1 = null, escape = false) {
     let html = `<table id="${captionId} hash="${captionHash} idx="${captionIdx}" type="${type}" i="${i}">\n`;

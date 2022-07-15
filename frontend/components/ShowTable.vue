@@ -66,7 +66,7 @@
             </q-tr>
             <q-tr v-if="props.expand" v-show="props.expand" :props="props">
                 <q-td colspan="100%">
-                    <div style="display: inline-block; vertical-align: top" v-html="rowYoutubeEmbedCode(props.row)" />
+                    <EmbeddedCaptionVideo :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
                     <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
                         <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
                         <div
@@ -85,11 +85,16 @@
 </template>
 
 <script>
+import EmbeddedCaptionVideo from './EmbeddedCaptionVideo.vue'
+
 var roundToScale = function(n, scale) {
     return parseFloat((Math.round(n / scale) * scale).toFixed(1));
 };
 
 export default {
+    components: {
+        EmbeddedCaptionVideo,
+    },
     data: function() { return {
         pagination: {
             rowsPerPage: 25,
@@ -220,19 +225,15 @@ export default {
         },
     },
     methods: {
-        rowYoutubeEmbedCode: function(row) {
-            const captionId = row.seasons[0].episodes[0].id;
-            const parts = captionId.split('-');
-            const id = parts.slice(1).join('-');
-            return getYoutubeEmbedCode(id);
+        rowCaptionId: function(row) {
+            return row.seasons[0].episodes[0].id;
         },
         youtubeURL: function(row, seasonIdx=null, episodeIdx=null) {
             seasonIdx = seasonIdx || 0;
             episodeIdx = episodeIdx || 0;
             const playlist = row.seasons[seasonIdx].youtube_playlist;
             const captionId = row.seasons[seasonIdx].episodes[episodeIdx].id;
-            const parts = captionId.split('-');
-            const id = parts.slice(1).join('-');
+            const id = videoIdFromCaptionId(captionId);
 
             if ([null, undefined].includes(playlist)) {
                 return `https://youtube.com/watch?v=${id}`;

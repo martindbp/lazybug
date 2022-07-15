@@ -30,6 +30,7 @@ const store = new Vuex.Store({
         captionData: null,
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
         resourceFetchErrors: [],
+        youtubeAPIReady: false,
         showList: null,
         thumbnailObserver: null,
         videoList: null,
@@ -117,6 +118,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setYoutubeAPIReady(state) {
+            state.youtubeAPIReady = true;
+        },
         switchTranslation(state) {
             state.options.displayTranslation = (state.options.displayTranslation + 1) % 2;
         },
