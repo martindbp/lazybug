@@ -182,9 +182,9 @@ frontend-web:
 
 .PHONY: frontend-caption
 frontend-caption:
-	vue-cli-service build frontend/components/CaptionManager.vue --target lib --dest frontend/dist_components/captionmanager
-	cp frontend/dist_components/captionmanager/*.umd.js frontend/dist/
-	-cp frontend/dist_components/captionmanager/*.css frontend/dist/
+	vue-cli-service build frontend/components/ExtensionCaption.vue --target lib --dest frontend/dist_components/extensioncaption
+	cp frontend/dist_components/extensioncaption/*.umd.js frontend/dist/
+	-cp frontend/dist_components/extensioncaption/*.css frontend/dist/
 	make frontend-copy
 
 .PHONY: frontend-popup
@@ -193,7 +193,6 @@ frontend-popup:
 	cp frontend/dist_components/popuproot/*.umd.js frontend/dist/
 	-cp frontend/dist_components/popuproot/*.css frontend/dist/
 	make frontend-copy
-
 
 .PHONY: frontend-copy
 frontend-clean:

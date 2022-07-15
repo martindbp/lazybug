@@ -1,5 +1,5 @@
 <template>
-    <div v-if="captionId && AVElement && $store.state.options.extensionToggle">
+    <div>
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
@@ -51,14 +51,10 @@ export default {
         CaptionBlur,
         OptionsDialog,
     },
+    props: ['AVElement', 'captionId', 'videoDuration'],
     data: function() {
         return {
-            AVElementSelector: '#primary video, #player-theater-container video',
-            url: window.location.href,
-            localVideoHash: null,
             currTime: -1000.5,
-            AVElement: null,
-            videoDuration: null, // keep track of changes to it (could be ads)
             resizeObserver: null,
             mutationObserver: null,
             paused: null,
@@ -77,10 +73,6 @@ export default {
     },
     mounted: function(){
         this.setUpdateInterval();
-        this.AVElement = document.querySelector(this.AVElementSelector);
-        if (this.AVElement) {
-            this.videoDuration = this.AVElement.duration;
-        }
         this.setObserversAndHandlers();
     },
     beforeDestroy: function() {
@@ -94,11 +86,6 @@ export default {
     beforeUpdate: function() {
         if ([null, undefined].includes(this.$refs.captionroot) || [null, undefined].includes(this.$refs.captionroot.$el)) return;
 
-        let currMinHeight = this.$refs.captionroot.$el.style.minHeight;
-        if (currMinHeight === '') currMinHeight = 0;
-        else {
-            currMinHeight = parseInt(currMinHeight); // NOTE: works for e.g. '10px', the 'px' is ignored
-        }
         if (this.currCaption === null && this.minHeight === null) {
             // Since we're changing to an empty caption from a non-empty one, we transfer the min height to the empty one,
             // so it doesn't collapse
@@ -121,6 +108,14 @@ export default {
         });
     },
     watch: {
+        captionId: {
+            immediate: true,
+            handler: function() {
+                this.$store.commit('setCaptionId', this.captionId);
+                this.fetchCaptionMaybe();
+                lastCaptionIdxGlobal = 0;
+            }
+        },
         AVElement: {
             immediate: true, 
             handler: function(newValue) {
@@ -145,20 +140,6 @@ export default {
 
                 this.resizeObserver = new ResizeObserver(this.updateCaptionPositionBlurFontSize)
                 this.resizeObserver.observe(newValue);
-            }
-        },
-        captionId: {
-            immediate: true,
-            handler: function() {
-                this.$store.commit('setCaptionId', this.captionId);
-                this.fetchCaptionMaybe();
-                lastCaptionIdxGlobal = 0;
-            }
-        },
-        videoId: {
-            immediate: true,
-            handler: function() {
-                this.$store.commit('setVideoId', this.videoId);
             }
         },
         '$store.state.videoList': {
@@ -274,13 +255,9 @@ export default {
         setObserversAndHandlers: function() {
             const self = this;
             window.addEventListener('load', this.updateCaptionPositionBlurFontSize);
-            window.addEventListener('lazybugviewlocal', function(event) {
-                self.localVideoHash = event.detail;
-            });
             document.addEventListener('fullscreenchange', this.fullscreenChangeListener);
 
             // Update the caption position on any changes to the page (except to the caption itself), since there is no way to
-            // observe position changes of the video element.
             this.mutationObserver = new MutationObserver((mutations) => {
                 let update = false;
                 for(let mutation of mutations) {
@@ -295,42 +272,8 @@ export default {
                 if (update) {
                     self.updateCaptionPositionBlurFontSize();
                 }
-
-                // The URL and video may change without reloading page, e.g. Youtube is an SPA
-                if (window.location.href !== self.url) {  // may help with performance to check before assigning?
-                    self.url = window.location.href;
-                }
-
-                // If a video element has been added, we update the reference
-                if (self.AVElement == null) {
-                    for (let mutation of mutations) {
-                        for (let node of mutation.addedNodes) {
-                            if (node.nodeType !== 1) continue;
-                            if (node.matches(self.AVElementSelector)) {
-                                self.AVElement = node;
-                                break;
-                            }
-                            else if (node.querySelector(self.AVElementSelector)) {
-                                self.AVElement = node.querySelector(self.AVElementSelector);
-                                break;
-                            }
-                        }
-                        for (let node of mutation.removedNodes) {
-                            if (node == self.AVElement) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                else {
-                    self.videoDuration = self.AVElement.duration; // in case video changed (ad)
-                }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});
-
-            document.addEventListener('DOMContentLoaded', () => {
-                self.AVElement = document.querySelector(self.AVElementSelector);
-            });
 
             this.keyboardListener = window.addEventListener("keydown", function(event) {
                 if (self.pauseDuration !== null) {
@@ -488,28 +431,6 @@ export default {
         options: function() { return this.$store.state.options; },
         captionOffset: function() { return this.$store.state.captionOffset; },
         captionFontScale: function() { return this.$store.state.captionFontScale; },
-        videoId: function() {
-            if (this.url !== null) {
-                const id = getYoutubeIdFromURL(this.url); // eslint-disable-line
-                return id;
-            }
-            return null;
-        },
-        captionId: function() {
-            let captionId = null;
-            if (this.localVideoHash !== null) {
-                captionId = 'local-' + this.localVideoHash;
-            }
-
-            if (this.videoId !== null) {
-                captionId = 'youtube-' + this.videoId;
-            }
-            if (this.$store.state.videoList === null || ! this.$store.state.videoList.has(captionId)) {
-                return null;
-            }
-
-            return captionId;
-        },
         videoFrameSize: function() {
             if (this.$store.state.captionData === null) return null;
             return this.$store.state.captionData['frame_size'];

@@ -5,7 +5,7 @@ captionRoot.setAttribute('class', 'lazybug');
 document.body.appendChild(captionRoot);
 
 const app = Vue.createApp({
-    render: h => Vue.h(CaptionManager),
+    render: h => Vue.h(ExtensionCaption),
 })
 
 new MutationObserver((mutations) => {
