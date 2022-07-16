@@ -3,7 +3,7 @@
         v-if="captionId && AVElement && $store.state.options.extensionToggle"
         v-bind:captionId="captionId"
         v-bind:AVElement="AVElement"
-        v-bind:videoDuration="videoDuration"
+        v-bind:videoDuration="$store.state.videoDuration"
         v-bind:videoAPI="videoAPI"
     />
 </template>
@@ -21,7 +21,6 @@ export default {
             AVElement: null,
             url: window.location.href,
             localVideoHash: null,
-            videoDuration: null, // keep track of changes to it (could be ads)
             mutationObserver: null,
             videoAPI: {
                 getCurrentTime: this.getCurrentTime,
@@ -36,7 +35,7 @@ export default {
     mounted: function(){
         this.AVElement = document.querySelector(this.AVElementSelector);
         if (this.AVElement) {
-            this.videoDuration = this.AVElement.duration;
+            this.$store.commit('setVideoDuration', this.AVElement.duration);
         }
         this.setObserversAndHandlers();
     },
@@ -104,7 +103,8 @@ export default {
                     }
                 }
                 else {
-                    self.videoDuration = self.AVElement.duration; // in case video changed (ad)
+                    // in case video changed (ad)
+                    self.$store.commit('setVideoDuration', this.AVElement.duration);
                 }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});

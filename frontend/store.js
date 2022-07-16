@@ -1,3 +1,4 @@
+const DEFAULT_FONT_SIZE = 24;
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
     prev: 'ArrowLeft',
@@ -26,6 +27,9 @@ const store = new Vuex.Store({
     state: {
         captionId: null,
         videoId: null,
+        AVElement: null,
+        videoAPI: null,
+        videoDuration: null,
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
@@ -39,6 +43,7 @@ const store = new Vuex.Store({
         SIMPLE_CHARS: null,
         states: Vue.ref({}),
         captionFontScale: 0.5,
+        captionFontSize: 24,
         captionOffset: [0, 0],
         isMovingCaption: false,
         peekStates: Vue.ref({
@@ -118,6 +123,15 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setVideoAPI(state, api) {
+            state.videoAPI = api;
+        },
+        setAVElement(state, el) {
+            state.AVElement = el;
+        },
+        setVideoDuration(state, duration) {
+            state.videoDuration = duration;
+        },
         setYoutubeAPIReady(state) {
             state.youtubeAPIReady = true;
         },
@@ -189,9 +203,11 @@ const store = new Vuex.Store({
         },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
+            state.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * state.captionFontScale);
         },
         decreaseCaptionFontScale(state) {
             state.captionFontScale = Math.max(state.captionFontScale - 0.1, 0.3);
+            state.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * state.captionFontScale);
         },
         setCaptionOffset(state, offset) {
             state.captionOffset = offset;

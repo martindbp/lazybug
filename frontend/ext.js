@@ -1,6 +1,6 @@
 var captionRoot = document.createElement('div');
-captionRoot.setAttribute('id', 'lazybugroot');
-captionRoot.setAttribute('class', 'lazybug');
+captionRoot.setAttribute('id', 'extroot');
+captionRoot.setAttribute('class', 'lazybugcaption');
 
 document.body.appendChild(captionRoot);
 
@@ -16,7 +16,7 @@ new MutationObserver((mutations) => {
                 node.parentNode.classList.add('lazybugquasardialog');
             }
             if (node.classList.contains('q-dialog') || node.id === 'q-notify' || node.id === 'q-loading-bar') {
-                node.classList.add('lazybug');
+                node.classList.add('lazybugcaption');
                 break;
             }
         }
@@ -25,6 +25,6 @@ new MutationObserver((mutations) => {
 
 app.use(store)
 app.use(Quasar)
-app.mount('#lazybugroot')
+app.mount('#extroot')
 
 Quasar.Dark.set(true);

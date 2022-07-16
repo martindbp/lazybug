@@ -66,7 +66,7 @@
             </q-tr>
             <q-tr v-if="props.expand" v-show="props.expand" :props="props">
                 <q-td colspan="100%">
-                    <EmbeddedCaptionVideo :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
+                    <EmbeddedVideo :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
                     <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
                         <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
                         <div
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import EmbeddedCaptionVideo from './EmbeddedCaptionVideo.vue'
+import EmbeddedVideo from './EmbeddedVideo.vue'
 
 var roundToScale = function(n, scale) {
     return parseFloat((Math.round(n / scale) * scale).toFixed(1));
@@ -93,7 +93,7 @@ var roundToScale = function(n, scale) {
 
 export default {
     components: {
-        EmbeddedCaptionVideo,
+        EmbeddedVideo,
     },
     data: function() { return {
         pagination: {

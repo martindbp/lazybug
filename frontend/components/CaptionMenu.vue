@@ -213,7 +213,7 @@ export default {
     transition-delay: 0ms;
 }
 
-.captionmenu .svgbutton {
+#extroot .captionmenu .svgbutton {
     top: -5px; /* WHYYYY? */
 }
 </style>

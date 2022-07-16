@@ -3,7 +3,7 @@
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
-            :style="{ fontSize: captionFontSize+'px' }"
+            :style="{ fontSize: $store.state.captionFontSize+'px !important' }"
             v-bind:isLoading="isLoading"
             v-bind:isLikelyAnAd="isLikelyAnAd"
             v-bind:currentCaptionIdx="currentCaptionIdx"
@@ -38,7 +38,6 @@ import CaptionContainer from './CaptionContainer.vue'
 import CaptionBlur from './CaptionBlur.vue'
 import OptionsDialog from './OptionsDialog.vue'
 
-const DEFAULT_FONT_SIZE = 24;
 const DEFAULT_WIDTH = 916;
 const CAPTION_END_BUFFER_TIME = 1;
 
@@ -77,7 +76,7 @@ export default {
     },
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);
-        window.removeEventListener('load', this.updateCaptionPositionBlurFontSize);
+        window.removeEventListener('load', this.updateCaptionPositionBlur);
         window.removeEventListener('keydown', this.keyboardListener);
         document.removeEventListener('fullscreenchange', this.fullscreenChangeListener);
         if (this.mutationObserver !== null) this.mutationObserver.disconnect();
@@ -97,7 +96,7 @@ export default {
         // New text may have changed the size of the caption, so need to update the position
         const self = this;
         this.$nextTick(function () {
-            self.updateCaptionPositionBlurFontSize();
+            self.updateCaptionPositionBlur();
             if (! [null, undefined].includes(self.$refs.captionroot) && ! [null, undefined].includes(self.$refs.captionroot.$el)) {
                 self.$refs.captionroot.$el.style.minHeight = self.minHeight === null ? '0px' : self.minHeight + 'px';
 
@@ -138,7 +137,7 @@ export default {
                 });
                 newValue.addEventListener('seeked', this.onSeeked);
 
-                this.resizeObserver = new ResizeObserver(this.updateCaptionPositionBlurFontSize)
+                this.resizeObserver = new ResizeObserver(this.updateCaptionPositionBlur)
                 this.resizeObserver.observe(newValue);
             }
         },
@@ -149,10 +148,10 @@ export default {
             }
         },
         captionOffset: function() {
-            this.updateCaptionPositionBlurFontSize();
+            this.updateCaptionPositionBlur();
         },
         captionFontScale: function() {
-            this.updateCaptionPositionBlurFontSize();
+            this.updateCaptionPositionBlur();
         },
         currentCaptionIdx: function(newIdx, oldIdx) {
             if (newIdx === oldIdx) return;
@@ -254,7 +253,7 @@ export default {
         },
         setObserversAndHandlers: function() {
             const self = this;
-            window.addEventListener('load', this.updateCaptionPositionBlurFontSize);
+            window.addEventListener('load', this.updateCaptionPositionBlur);
             document.addEventListener('fullscreenchange', this.fullscreenChangeListener);
 
             // Update the caption position on any changes to the page (except to the caption itself), since there is no way to
@@ -270,7 +269,7 @@ export default {
                     if (update) break;
                 }
                 if (update) {
-                    self.updateCaptionPositionBlurFontSize();
+                    self.updateCaptionPositionBlur();
                 }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});
@@ -287,7 +286,7 @@ export default {
         fullscreenChangeListener: function() {
             // If we go full screen and caption component is outside div element, it would not be visible, so reset position
             this.$store.commit('setCaptionOffset', [0, 0]);
-            this.updateCaptionPositionBlurFontSize();
+            this.updateCaptionPositionBlur();
         },
         setUpdateInterval: function() {
             const self = this;
@@ -340,7 +339,7 @@ export default {
                 self.seeked = false;
             }, 10);
         },
-        updateCaptionPositionBlurFontSize: function() {
+        updateCaptionPositionBlur: function() {
             if ([null, undefined].includes(this.AVElement) || [null, undefined].includes(this.$refs.captionroot)) return;
             var videoRect = this.AVElement.getBoundingClientRect();
             // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
@@ -349,13 +348,6 @@ export default {
             if (this.$refs.blurroot) {
                 this.$refs.blurroot.updateBlurStyle();
             }
-
-            // We scale the font size with the width of the video element and the font scale selected by the user.
-            // At width=DEFAULT_WIDTH and fontScale=0.5 we want fontSize=DEFAULT_FONT_SIZE
-            //this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale * (this.AVElement.getBoundingClientRect().width / DEFAULT_WIDTH));
-
-            // Actually, scaling is not working well, let's just keep it constant
-            this.captionFontSize = Math.round(2 * DEFAULT_FONT_SIZE * this.captionFontScale);
         },
         getCurrentCaptionIdx: function(withTimingOffset) {
             const captionData = this.$store.state.captionData;
@@ -407,7 +399,8 @@ export default {
             if ([null, undefined, 0, NaN].includes(this.videoDuration) || this.$store.state.captionData === null) return false;
 
             const captionDuration = this.$store.state.captionData.video_length;
-            const isAd = Math.abs(this.videoDuration - captionDuration) > 0.5;
+            // Youtube iFrame API has a duration resolution of 1s
+            const isAd = Math.abs(this.videoDuration - captionDuration) > 1.1;
             console.log('Is ad:', isAd);
             return isAd;
         },

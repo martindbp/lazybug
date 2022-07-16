@@ -1,64 +1,48 @@
 <template>
-    <div class="dark" v-if="$store.state.youtubeAPIReady">
-        <div id="player" />
-        <div id="lazybugroot" class="lazybug"> <!-- to mimic the browser extension mount -->
-            <Caption
-                v-if="captionId"
-                v-bind:captionId="captionId"
-                v-bind:AVElement="AVElement"
-                v-bind:videoDuration="videoDuration"
-                v-bind:videoAPI="videoAPI"
-            />
-        </div>
-    </div>
+    <div ref="player" :id="playerID" />
 </template>
 
 <script>
-import Caption from './Caption.vue'
-
-let player = null; // the Youtube iframe API player singleton
 
 export default {
-    components: {
-        Caption,
-    },
     props: ['captionId'],
     data: function() {
         return {
+            playerID: uuidv4(),
             player: null,
             playerReady: false,
         };
     },
-    computed: {
-        videoId: function() {
-            return videoIdFromCaptionId(this.captionId);
-        },
-        videoAPI: function() {
-            return  {
-                getCurrentTime: this.getCurrentTime,
-                setCurrentTime: this.setCurrentTime,
-                getDuration: this.getDuration,
-                play: this.play,
-                pause: this.pause,
-                isPaused: this.isPaused,
-            }
-        },
-    },
     mounted: function(){
         const self = this;
-        this.player = new YT.Player('player', {
+        this.player = new YT.Player(this.playerID, {
             height: '390',
             width: '640',
-            videoId: this.videoId,
+            videoId: videoIdFromCaptionId(this.captionId),
             playerVars: {
                 'playsinline': 1,
                 'rel': 0,
             },
             events: {
-                'onReady': function() { self.playerReady = true; },
+                'onReady': function() {
+                    self.playerReady = true;
+                    self.$store.commit('setAVElement', self.$refs.player);
+                    self.$store.commit('setCaptionOffset', [500, 500]);
+                    self.$store.commit('setVideoDuration', self.getDuration());
+                },
                 'onStateChange': this.onPlayerStateChange
             }
         });
+        const videoAPI =  {
+            getCurrentTime: this.getCurrentTime,
+            setCurrentTime: this.setCurrentTime,
+            getDuration: this.getDuration,
+            play: this.play,
+            pause: this.pause,
+            isPaused: this.isPaused,
+        };
+        this.$store.commit('setCaptionId', this.captionId);
+        this.$store.commit('setVideoAPI', videoAPI);
     },
     methods: {
         getCurrentTime: function() {

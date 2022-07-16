@@ -146,10 +146,10 @@ export default {
 }
 
 .lazybugcaptiondiv {
-    color: white;
+    color: white !important;
     background-color: rgba(0, 0, 0, 0.75);
     text-align: left;
-    font-size: 18px;
+    font-size: 18px !important;
     padding: 0px;
     min-width: 7em;
     filter: drop-shadow(rgb(25, 25, 25) 3px 3px 5px);

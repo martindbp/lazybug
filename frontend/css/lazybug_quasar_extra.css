@@ -11,7 +11,7 @@ lazybug *::after {
 
 
 /*
-#lazybugroot {
+#extroot {
   box-sizing: border-box;
   overflow-y: scroll;
   -webkit-text-size-adjust: 100%;

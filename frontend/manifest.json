@@ -34,7 +34,7 @@
             ],
             "run_at": "document_end",
             "css": [
-                "lazybug_quasar.css",
+                "lazybugcaption_quasar.css",
                 "google.css",
                 "ExtensionCaption.css"
              ],

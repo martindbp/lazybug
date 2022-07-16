@@ -232,9 +232,9 @@ release:
 
 .PHONY: css
 css:
-	sass frontend/css/lazybug_quasar.sass frontend/dist/lazybug_quasar.css
-	sed -i -E "s/\.lazybug (body|html|:root)/\1/g" frontend/dist/lazybug_quasar.css
-	sed -i -E "s/rem;/em;/g" frontend/dist/lazybug_quasar.css
+	sass frontend/css/lazybugcaption_quasar.sass frontend/dist/lazybugcaption_quasar.css
+	sed -i -E "s/\.lazybugcaption (body|html|:root)/\1/g" frontend/dist/lazybugcaption_quasar.css
+	sed -i -E "s/rem;/em;/g" frontend/dist/lazybugcaption_quasar.css
 
 .PHONY: hsk-words
 hsk-words:

@@ -1,6 +1,6 @@
 <template>
     <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
-        <table class="contenttable" ref="wordcontent">
+        <table class="contenttable" ref="wordcontent" :style="{ fontSize: $store.state.captionFontSize+'px !important' }">
             <tr class="toprow">
                 <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')">
                     <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
@@ -105,7 +105,7 @@
             </tr>
         </table>
         <br/>
-        <table class="contenttable" style="margin-top: -15px" v-if="data !== null">
+        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.5em' }" v-if="data !== null">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')">
                     <span v-if="! $store.state.options.pin.translation" class="iconcard peek" v-html="eyecon"></span>
@@ -135,7 +135,7 @@
                         {{ translation }}
                         <q-badge v-if="starredStates.translation" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
-                    <span style="position: absolute; left: 50%" v-if="hiddenAndNotPeeking.translation" v-html="eyecon"></span>
+                    <span class="iconcard peek" v-if="hiddenAndNotPeeking.translation" v-html="eyecon"></span>
                     <ContentContextMenu
                         type="translation"
                         :star="! starredStates.translation"
@@ -648,6 +648,8 @@ export default {
 }
 
 .contenttable {
+    color: white;
+    font-size: 24px;
     display: inline-block;
     text-align: center;
     table-layout: fixed;
@@ -761,7 +763,8 @@ export default {
     padding: 2px;
 }
 
-.captioncard:hover:not(.nonhanzi) .iconcard {
+.captioncard:hover:not(.nonhanzi) .iconcard,
+.captioncard.fulltranslation .iconcard {
     cursor: pointer;
     visibility: visible;
 }
