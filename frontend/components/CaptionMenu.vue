@@ -24,7 +24,7 @@ import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
     mixins: [mixin],
-    props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'AVElement'],
+    props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'videoAPI'],
     components: {
         SvgButton,
         DictionaryDialog,
@@ -139,38 +139,40 @@ export default {
         prev: function(event) {
             if (this.prevCaption === null) return;
 
-            if (event === 'keyboard' && Math.abs(this.AVElement.currentTime - this.prevCaption.t0) > 20) {
-                this.AVElement.currentTime = this.AVElement.currentTime - 5;
+            const currentTime = this.videoAPI.getCurrentTime();
+            if (event === 'keyboard' && Math.abs(currentTime - this.prevCaption.t0) > 20) {
+                this.videoAPI.setCurrentTime(currentTime - 5);
             }
             else {
-                this.AVElement.currentTime = this.prevCaption.t0 + 1e-3;
+                this.videoAPI.setCurrentTime(this.prevCaption.t0 + 1e-3);
             }
-            this.AVElement.play();
+            this.videoAPI.play();
             this.$emit('seeked');
         },
         replay: function(event) {
             const goToCaption = this.data !== null ? this.data : this.prevCaption;
             if (goToCaption === null) return;
 
-            this.AVElement.currentTime = goToCaption.t0 + 1e-3;
-            this.AVElement.play();
+            this.videoAPI.setCurrentTime(goToCaption.t0 + 1e-3);
+            this.videoAPI.play();
             this.$emit('seeked');
             this.appendSessionLog([eventsMap['EVENT_REPLAY_CAPTION']]);
         },
         playPause: function(event) {
-            if (this.paused) this.AVElement.play();
-            else this.AVElement.pause();
+            if (this.paused) this.videoAPI.play();
+            else this.videoAPI.pause();
         },
         next: function(event) {
             if (this.nextCaption === null) return;
 
-            if (event === 'keyboard' && Math.abs(this.AVElement.currentTime - this.nextCaption.t0) > 20) {
-                this.AVElement.currentTime = this.AVElement.currentTime + 5;
+            const currentTime = this.videoAPI.getCurrentTime();
+            if (event === 'keyboard' && Math.abs(currentTime - this.nextCaption.t0) > 20) {
+                this.videoAPI.setCurrentTime(currentTime + 5);
             }
             else {
-                this.AVElement.currentTime = this.nextCaption.t0 + 1e-3;
+                this.videoAPI.setCurrentTime(this.nextCaption.t0 + 1e-3);
             }
-            this.AVElement.play();
+            this.videoAPI.play();
             this.$emit('seeked');
         },
         peekAll: function() {

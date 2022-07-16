@@ -1,10 +1,10 @@
 <template>
     <Caption
         v-if="captionId && AVElement && $store.state.options.extensionToggle"
-        embedded="false"
         v-bind:captionId="captionId"
         v-bind:AVElement="AVElement"
         v-bind:videoDuration="videoDuration"
+        v-bind:videoAPI="videoAPI"
     />
 </template>
 
@@ -23,6 +23,14 @@ export default {
             localVideoHash: null,
             videoDuration: null, // keep track of changes to it (could be ads)
             mutationObserver: null,
+            videoAPI: {
+                getCurrentTime: this.getCurrentTime,
+                setCurrentTime: this.setCurrentTime,
+                getDuration: this.getDuration,
+                play: this.play,
+                pause: this.pause,
+                isPaused: this.isPaused,
+            },
         };
     },
     mounted: function(){
@@ -36,6 +44,30 @@ export default {
         if (this.mutationObserver !== null) this.mutationObserver.disconnect();
     },
     methods: {
+        getCurrentTime: function() {
+            if (! this.AVElement) return 0;
+            return this.AVElement.currentTime;
+        },
+        setCurrentTime: function(t) {
+            if (! this.AVElement) return;
+            this.AVElement.currentTime = t;
+        },
+        getDuration: function() {
+            if (! this.AVElement) return 0;
+            return this.AVElement.duration;
+        },
+        play: function() {
+            if (! this.AVElement) return;
+            this.AVElement.play();
+        },
+        pause: function() {
+            if (! this.AVElement) return;
+            this.AVElement.pause();
+        },
+        isPaused: function() {
+            if (! this.AVElement) return;
+            return this.AVElement.paused;
+        },
         setObserversAndHandlers: function() {
             const self = this;
             window.addEventListener('lazybugviewlocal', function(event) {
@@ -107,10 +139,10 @@ export default {
             if (this.videoId !== null) {
                 captionId = 'youtube-' + this.videoId;
             }
-            /*
+
             if (this.$store.state.videoList === null || ! this.$store.state.videoList.has(captionId)) {
                 return null;
-                }*/
+            }
 
             console.log('Setting captionId to', captionId);
             return captionId;

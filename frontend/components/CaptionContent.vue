@@ -165,7 +165,7 @@ export default {
         currTime: { default: null },
         fadeOut: { default: false },
         currentCaptionIdx: { default: null },
-        AVElement: { default: null },
+        videoAPI: { default: null },
     },
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
@@ -281,7 +281,7 @@ export default {
             this.appendSessionLog([getEvent('peek_row', type)]);
         },
         clickRowContextMenu(action, type) {
-            this.AVElement.pause();
+            this.videoAPI.pause();
 
             if (action === 'copy') {
                 if (type === 'translation') {
@@ -309,7 +309,7 @@ export default {
             }
         },
         clickContextMenu(action, type, i) {
-            this.AVElement.pause();
+            this.videoAPI.pause();
             if (action === 'star') {
                 let content = '';
                 if (type === 'translation') content = this.wordData.translation;
@@ -386,7 +386,7 @@ export default {
             };
         },
         click: function(type, i = null) {
-            this.AVElement.pause();
+            this.videoAPI.pause();
             if (type === 'translation') {
                 if (this.hiddenAndNotPeeking[type] === true) {
                     this.$store.commit('setPeekState', {'type': type, 'i': i});

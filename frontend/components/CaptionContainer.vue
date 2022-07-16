@@ -41,7 +41,7 @@
             v-bind:fadeOut="fadeOut"
             v-bind:currTime="currTime"
             v-bind:currentCaptionIdx="currentCaptionIdx"
-            v-bind:AVElement="AVElement"
+            v-bind:videoAPI="videoAPI"
         />
         <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>
     </div>
@@ -60,7 +60,7 @@ export default {
         'nextCaption',
         'currTime',
         'paused',
-        'AVElement',
+        'videoAPI',
         'isLoading',
         'isLikelyAnAd',
         'pauseDuration',
@@ -98,13 +98,13 @@ export default {
             this.fadeOut = this.showData !== null && (this.currTime > this.showData.t1 + CAPTION_FADEOUT_TIME || this.currTime < this.showData.t0); // eslint-disable-line
         },
         clickFirst: function() {
-            this.AVElement.currentTime = this.firstCaption.t0 + 1e-3;
-            this.AVElement.play();
+            this.videoAPI.setCurrentTime(this.firstCaption.t0 + 1e-3);
+            this.videoAPI.play();
             this.$emit('seeked');
         },
         clickNext: function() {
-            this.AVElement.currentTime = this.nextCaption.t0 + 1e-3;
-            this.AVElement.play();
+            this.videoAPI.setCurrentTime(this.nextCaption.t0 + 1e-3);
+            this.videoAPI.play();
             this.$emit('seeked');
         },
     },

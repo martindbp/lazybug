@@ -13,7 +13,7 @@
             v-bind:nextCaption="nextCaption"
             v-bind:currTime="currTime"
             v-bind:paused="paused"
-            v-bind:AVElement="AVElement"
+            v-bind:videoAPI="videoAPI"
             v-bind:pauseDuration="pauseDuration"
             v-on:seeked="seekedFromMenu = true"
             v-on:mouseOver="pauseDuration = null"
@@ -51,7 +51,7 @@ export default {
         CaptionBlur,
         OptionsDialog,
     },
-    props: ['AVElement', 'captionId', 'videoDuration'],
+    props: ['AVElement', 'captionId', 'videoDuration', 'videoAPI'],
     data: function() {
         return {
             currTime: -1000.5,
@@ -293,7 +293,7 @@ export default {
             const self = this;
             self.currentTimeInterval = setInterval(() => {
                 if (self.AVElement === null || self.$store.state.captionData == null) return;
-                const newTime = self.AVElement.currentTime;
+                const newTime = self.videoAPI.getCurrentTime();
                 if (self.paused && self.automaticallyPausedThisCaption && ! self.seeked && ! self.seekedFromMenu) {
                     return;
                 }
@@ -319,17 +319,17 @@ export default {
 
                 if (self.options.autoPause === 'basic' && canPause) {
                     self.automaticallyPausedThisCaption = true;
-                    self.AVElement.pause();
+                    self.videoAPI.pause();
                 }
                 else if (self.options.autoPause === 'WPS' && canPause && wordsPerSecond > self.options.WPSThreshold) {
                     self.automaticallyPausedThisCaption = true;
-                    self.AVElement.pause();
+                    self.videoAPI.pause();
                     const c = self.currCaption || self.prevCaption;
                     self.pauseDuration = c.alignments.length / self.options.WPSThreshold - (newTime - c.t0);
                     console.log('PAUSING FOR', self.pauseDuration);
                     setTimeout(function() {
                         if (self.pauseDuration !== null) {
-                            self.AVElement.play(); // resume
+                            self.videoAPI.play(); // resume
                             self.pauseDuration = null;
                         }
                     }, self.pauseDuration * 1000);
