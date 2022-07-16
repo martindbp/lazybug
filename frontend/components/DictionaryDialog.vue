@@ -1,6 +1,6 @@
 <template>
-    <q-dialog v-model="show" dark>
-        <q-card style="width: 600px" class="q-px-sm q-pb-md">
+    <q-dialog seamless v-model="show" dark class="fixdialogheight">
+        <q-card dark style="width: 600px" class="q-px-sm q-pb-md">
             <q-card-section align="center">
                 <div class="text-h4" :style="{ color: '#E8E8E8' }">
                     <span
@@ -28,7 +28,7 @@
                     <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
                         <span v-for="(py, i) in item.pysDiacriticals" :style="{ color: COLORS[parseInt(item.pys[i].slice(-1))] }">
                             {{ py }}
-                        </span>: {{ item.translations.join(' ‧ ') }}</div>
+                        </span>: {{ item.translations.join(' | ') }}</div>
                     <q-separator color="orange" />
                 </div>
                 <div v-if="dictEntries.length > 0"><br/>Source <a href="https://cc-cedict.org/wiki/">(CC-EDICT)</a></div>

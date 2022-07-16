@@ -17,10 +17,8 @@ export default {
         Caption,
     },
     mounted: function() {
-        console.log('MOUNTED');
     },
     updated: function() {
-        console.log('UPDATED');
     },
 };
 </script>

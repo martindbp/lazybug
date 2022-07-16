@@ -1,20 +1,21 @@
 <template>
-    <q-dialog v-model="show" dark ref="optionmodal">
-        <q-card class="q-px-sm q-pb-md" style="min-height: 500px">
+    <q-dialog seamless v-model="show" dark ref="optionmodal" class="fixdialogheight">
+        <q-card dark class="q-px-sm q-pb-md" style="min-height: 500px">
             <q-tabs
               v-model="tab"
               dense
+              dark
               class="text-white shadow-2"
             >
-                <q-tab name="subtitle" label="Subtitle" />
-                <q-tab name="knowledge" label="Knowledge" />
-                <q-tab name="keyboard" label="Keyboard" />
-                <q-tab name="other" label="Other" />
+                <q-tab dark name="subtitle" label="Subtitle" />
+                <q-tab dark name="knowledge" label="Knowledge" />
+                <q-tab dark name="keyboard" label="Keyboard" />
+                <q-tab dark name="other" label="Other" />
             </q-tabs>
 
-            <q-tab-panels v-model="tab">
+            <q-tab-panels dark v-model="tab">
                 <q-tab-panel name="knowledge" style="width: 400px">
-                    <q-card>
+                    <q-card dark>
                         Select the HSK level for the words you want to hide automatically
                         <q-item dense>
                             <q-item-section>
@@ -33,7 +34,7 @@
                         </q-item>
                     </q-card>
 
-                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
+                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
                         Pin pinyin at HSK level or above
                         <q-item dense>
                             <q-item-section>
@@ -52,7 +53,7 @@
                         </q-item>
                     </q-card>
 
-                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
+                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
                         Pin hanzi at HSK level or above
                         <q-item dense>
                             <q-item-section>
@@ -71,7 +72,7 @@
                         </q-item>
                     </q-card>
 
-                    <q-card :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
+                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
                         Pin word translations at HSK level or above
                         <q-item dense>
                             <q-item-section>
@@ -333,6 +334,14 @@ export default {
 
 .q-card.highlight {
     border: 2px solid red;
+}
+
+.fixdialogheight .q-panel {
+    height: auto !important;
+}
+
+.fixdialogheight .q-panel > div {
+    height: auto !important;
 }
 
 </style>

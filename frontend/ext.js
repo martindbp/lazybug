@@ -26,5 +26,3 @@ new MutationObserver((mutations) => {
 app.use(store)
 app.use(Quasar)
 app.mount('#extroot')
-
-Quasar.Dark.set(true);

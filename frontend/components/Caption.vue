@@ -442,7 +442,7 @@ export default {
 
 #captionroot {
     position:absolute;
-    z-index: 9998;
+    z-index: 6000;
 }
 
 </style>

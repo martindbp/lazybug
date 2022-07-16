@@ -66,7 +66,7 @@
                 </q-list>
             </q-btn-dropdown>
         </div>
-        <q-dialog class="anki" v-model="showExportModal" persistent>
+        <q-dialog class="fixdialogheight" v-model="showExportModal" persistent>
             <q-card>
                 <q-tabs
                    v-model="ankiCardTab"
@@ -534,11 +534,4 @@ export default {
 </script>
 
 <style>
-.anki .q-panel {
-    height: auto !important;
-}
-
-.anki .q-panel > div {
-    height: auto !important;
-}
 </style>
