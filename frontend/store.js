@@ -291,22 +291,13 @@ if (BROWSER_EXTENSION) {
     });
 }
 
-let FETCH_PUBLIC_RESOURCES = null;
-
-if (BROWSER_EXTENSION) {
-    FETCH_PUBLIC_RESOURCES = [
-        ['public_cedict.json', 'dictionary', 'setDict'],
-        ['hsk_words.json', 'HSK word list', 'setHskWords'],
-        ['video_list.json', 'video list', 'setVideoList'],
-        ['show_list_full.json', 'show list', 'setShowList'],
-        ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
-    ];
-}
-else {
-    FETCH_PUBLIC_RESOURCES = [
-        ['show_list_full.json', 'show list', 'setShowList'],
-    ];
-}
+const FETCH_PUBLIC_RESOURCES = [
+    ['public_cedict.json', 'dictionary', 'setDict'],
+    ['hsk_words.json', 'HSK word list', 'setHskWords'],
+    ['video_list.json', 'video list', 'setVideoList'],
+    ['show_list_full.json', 'show list', 'setShowList'],
+    ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
+];
 
 function fetchInitialResources() {
     for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {

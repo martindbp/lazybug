@@ -1,18 +1,22 @@
 <template>
-    <div v-if="$store.state.youtubeAPIReady">
+    <div class="dark" v-if="$store.state.youtubeAPIReady">
         <div id="player" />
-        <Caption
-            v-if="captionId"
-            v-bind:captionId="captionId"
-            v-bind:AVElement="AVElement"
-            v-bind:videoDuration="videoDuration"
-            v-bind:videoAPI="videoAPI"
-        />
+        <div id="lazybugroot" class="lazybug"> <!-- to mimic the browser extension mount -->
+            <Caption
+                v-if="captionId"
+                v-bind:captionId="captionId"
+                v-bind:AVElement="AVElement"
+                v-bind:videoDuration="videoDuration"
+                v-bind:videoAPI="videoAPI"
+            />
+        </div>
     </div>
 </template>
 
 <script>
 import Caption from './Caption.vue'
+
+let player = null; // the Youtube iframe API player singleton
 
 export default {
     components: {
@@ -22,6 +26,7 @@ export default {
     data: function() {
         return {
             player: null,
+            playerReady: false,
         };
     },
     computed: {
@@ -40,6 +45,7 @@ export default {
         },
     },
     mounted: function(){
+        const self = this;
         this.player = new YT.Player('player', {
             height: '390',
             width: '640',
@@ -49,33 +55,38 @@ export default {
                 'rel': 0,
             },
             events: {
-                //'onReady': onPlayerReady,
+                'onReady': function() { self.playerReady = true; },
                 'onStateChange': this.onPlayerStateChange
             }
         });
     },
-    beforeDestroy: function() {
-    },
     methods: {
         getCurrentTime: function() {
+            if (! this.playerReady) return 0;
             return this.player.getCurrentTime();
         },
         setCurrentTime: function(t) {
+            if (! this.playerReady) return;
             this.player.seekTo(t, true); // allowSeekAhead
         },
         getDuration: function() {
+            if (! this.playerReady) return 0;
             return this.player.getDuration();
         },
         play: function() {
+            if (! this.playerReady) return;
             this.player.playVideo();
         },
         pause: function() {
+            if (! this.playerReady) return;
             this.player.pauseVideo();
         },
         isPaused: function() {
+            if (! this.playerReady) return false;
             return this.player.getPlayerState() === 2;
         },
         onPlayerStateChange: function(event) {
+            if ([null, undefined].includes(this.AVElement)) return;
             if (event.data === YT.PlayerState.PLAYING) {
                 this.AVElement.dispatchEvent(new Event('play'));
             }

@@ -208,7 +208,7 @@ export default {
     },
     methods: {
         fetchCaptionMaybe: function() {
-            if (this.captionId === null || [null, undefined].includes(chrome.runtime)) {
+            if (this.captionId === null) {
                 this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
                 return;
             }
@@ -341,7 +341,7 @@ export default {
             }, 10);
         },
         updateCaptionPositionBlurFontSize: function() {
-            if (this.AVElement === null || [null, undefined].includes(this.$refs.captionroot)) return;
+            if ([null, undefined].includes(this.AVElement) || [null, undefined].includes(this.$refs.captionroot)) return;
             var videoRect = this.AVElement.getBoundingClientRect();
             // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
             this.$refs.captionroot.$el.style.left = ((videoRect.left+window.scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';

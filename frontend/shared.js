@@ -89,6 +89,7 @@ function sendMessageToBackground(message, callback) {
         nextRequestId += 1;
     }
     else {
+        message = JSON.parse(JSON.stringify(message));
         backgroundMessageHandler(message, null, responseHandler);
     }
 }

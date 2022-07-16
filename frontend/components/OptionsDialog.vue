@@ -272,7 +272,10 @@ export default {
     methods: {
         clickClose: function(event) {
             // Remove the "lazybugquasardialog" class from the dialog parent, otherwise there's some flickering
-            document.querySelector('.lazybugquasardialog').classList.remove('lazybugquasardialog');
+            let dialog = document.querySelector('.lazybugquasardialog');
+            if (dialog) {
+                dialog.classList.remove('lazybugquasardialog');
+            }
             this.show = false;
             this.$store.commit('setOptionsHighlightSection', null);
         },
