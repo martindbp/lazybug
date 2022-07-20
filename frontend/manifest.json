@@ -2,8 +2,9 @@
     "name": "Lazybug",
     "version": "3.0",
     "description": "",
-    "permissions": [
-    ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "host_permissions": [
         "*://cdn.lazybug.ai/*",
         "http://localhost/*"

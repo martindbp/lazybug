@@ -18,4 +18,7 @@ with open(manifest_file, 'r') as f:
     devtools_idx = data['content_scripts'][0]['js'].index('devtools.js')
     del data['content_scripts'][0]['js'][devtools_idx]
 
+    # Background worker is only used for deepl
+    del data['background']
+
     print(json.dumps(data))
