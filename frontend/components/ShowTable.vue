@@ -18,7 +18,13 @@
         <template v-slot:body="props">
             <q-tr :props="props" @click="props.expand = !props.expand" :style="{ cursor: 'pointer' }" >
                 <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                    {{ props.cols[0].value }}
+                    <span v-if="props.cols[0].value.en">
+                        {{ props.cols[0].value.hz }}<br>
+                        {{ props.cols[0].value.en }}
+                    </span>
+                    <span v-else>
+                        {{ props.cols[0].value }}
+                    </span>
                 </q-td>
                 <q-td key="difficulty" :props="props">
                     <q-badge :color="mapDifficultyToColor(props.cols[1].value)">
@@ -51,6 +57,7 @@
                     <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[7].value[0])" :color="mapToColor('caption_source', props.cols[7].value[0])">
                         {{ props.cols[7].value[0] }}
                     </q-badge>
+                    <br>
                     <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[7].value[1])" :color="mapToColor('translation_source', props.cols[7].value[1])">
                         {{ props.cols[7].value[1] }}
                     </q-badge>
@@ -105,7 +112,7 @@ export default {
             required: true,
             label: 'Name',
             align: 'left',
-            field: row => row.name.en ? `${row.name.hz} | ${row.name.en}` : row.name,
+            field: row => row.name,
             sortable: true
           },
           {
@@ -120,7 +127,7 @@ export default {
           {
             name: 'douban',
             required: true,
-            label: 'Douban score',
+            label: 'Douban',
             align: 'left',
             field: row => row.douban || 'N/A',
             format: val => `${val}`,
@@ -172,7 +179,7 @@ export default {
           {
             name: 'num_processed',
             required: true,
-            label: 'Episodes/Videos',
+            label: '#',
             align: 'left',
             field: row => row.num_processed || '-',
             format: val => `${val}`,

@@ -62,8 +62,6 @@
             </q-page>
           </q-page-container>
         </q-layout>
-
-        <EmbeddedCaption />
     </div>
 </template>
 
@@ -71,7 +69,6 @@
 import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
 import Settings from './Settings.vue'
-import EmbeddedCaption from './EmbeddedCaption.vue'
 
 export default {
     data: function() { return {
@@ -83,7 +80,6 @@ export default {
         ShowTable,
         StarTable,
         Settings,
-        EmbeddedCaption,
     },
 };
 </script>

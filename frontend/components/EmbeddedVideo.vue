@@ -1,11 +1,18 @@
 <template>
-    <div ref="player" :id="playerID" />
+    <div>
+        <div ref="player" :id="playerID" />
+        <EmbeddedCaption />
+    </div>
 </template>
 
 <script>
+import EmbeddedCaption from './EmbeddedCaption.vue'
 
 export default {
     props: ['captionId'],
+    components: {
+        EmbeddedCaption,
+    },
     data: function() {
         return {
             playerID: uuidv4(),
@@ -16,8 +23,8 @@ export default {
     mounted: function(){
         const self = this;
         this.player = new YT.Player(this.playerID, {
-            height: '390',
-            width: '640',
+            width: '2024',
+            height: '512',
             videoId: videoIdFromCaptionId(this.captionId),
             playerVars: {
                 'playsinline': 1,
@@ -26,8 +33,9 @@ export default {
             events: {
                 'onReady': function() {
                     self.playerReady = true;
-                    self.$store.commit('setAVElement', self.$refs.player);
-                    self.$store.commit('setCaptionOffset', [500, 500]);
+                    let $el = document.getElementById(self.playerID);
+                    self.$store.commit('setAVElement', $el);
+                    //self.$store.commit('setCaptionOffset', [500, 500]);
                     self.$store.commit('setVideoDuration', self.getDuration());
                 },
                 'onStateChange': this.onPlayerStateChange
@@ -75,7 +83,7 @@ export default {
                 this.AVElement.dispatchEvent(new Event('play'));
             }
             else if (event.data === YT.PlayerState.PAUSED) {
-                this.AVElement.dispatchEvent(new Event('stop'));
+                this.AVElement.dispatchEvent(new Event('pause'));
             }
         },
     },

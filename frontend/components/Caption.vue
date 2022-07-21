@@ -443,6 +443,14 @@ export default {
 #captionroot {
     position:absolute;
     z-index: 6000;
+    font-size: 24px !important;
+    padding: 0 !important;
 }
+
+#captionroot td {
+    font-size: 24px;
+    /*padding: 0 !important;*/
+}
+
 
 </style>

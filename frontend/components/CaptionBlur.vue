@@ -62,6 +62,12 @@ export default {
             if (rects.length === 0) return null;
             return rectsUnion(rects);
         },
+        realAspectRatio: function() {
+            if (this.$store.state.captionData === null) return null;
+
+            const [height, width] = this.$store.state.captionData['frame_size'];
+            return width / height;
+        },
     },
     watch: {
         currRect: {
@@ -86,15 +92,44 @@ export default {
                 this.AVElement === null ||
                 this.currRect === null) return;
 
-            var videoRect = this.AVElement.getBoundingClientRect();
-            var videoParentRect = this.AVElement.parentNode.getBoundingClientRect();
+            let videoRect = this.AVElement.getBoundingClientRect();
+            let videoAspectRatio = videoRect.width / videoRect.height;
+            let videoParent = this.AVElement.closest('.html5-video-player')
+            let videoParentRect = videoParent ? videoParent.getBoundingClientRect() : null;
+            let parentAspectRatio = videoParent ? videoParentRect.width / videoParentRect.height : null;
+            let offsetX = 0;
+            let offsetY = 0;
+            let subtractX = 0;
+            let subtractY = 0;
+            let videoWidth = videoRect.width;
+            let videoHeight = videoRect.height;
+            if (videoParent && parentAspectRatio !== videoAspectRatio) {
+                // We're on youtube.com and we have black bars
+                offsetX = videoRect.left - videoParentRect.left;
+                offsetY = videoRect.top - videoParentRect.top;
+            }
+            else if (videoAspectRatio !== this.realAspectRatio) {
+                // Video is in iframe with different aspect ratio than underlying video
+                if (this.realAspectRatio < videoAspectRatio) {
+                    // We have black bars on sides
+                    videoWidth = this.realAspectRatio * videoRect.height;
+                    offsetX = (videoRect.width - videoWidth) / 2; // add the width of the black bar
+                    subtractX = 2 * offsetX;
+                }
+                else {
+                    // We have black bars on top/bottom
+                    videoHeight = videoRect.width / this.realAspectRatio;
+                    offsetY = (videoRect.height - videoHeight) / 2; // add the height of the black bar
+                    subtractY = 2 * offsetY;
+                }
+            }
             let xMin, xMax, yMin, yMax;
             [xMin, xMax, yMin, yMax] = this.currRect;
             // Blur more the wider the video element is (for both side padding, normal padding and num blur pixels)
-            const blurSidePadding = Math.ceil((videoRect.width / DEFAULT_WIDTH) * this.blurSidePadding);
+            const blurSidePadding = Math.ceil((videoWidth / DEFAULT_WIDTH) * this.blurSidePadding);
             xMin -= blurSidePadding;
             xMax += blurSidePadding;
-            for (var i = 0; i < this.$el.children.length; i++) {
+            for (let i = 0; i < this.$el.children.length; i++) {
                 const blurDiv = this.$el.children[i];
                 const padding = Math.ceil(1.0 * i * this.blurPadding); // increase the padding for each div
                 const xMinDiv = xMin - padding;
@@ -103,12 +138,10 @@ export default {
                 const yMaxDiv = yMax + padding;
                 let divWidth = xMaxDiv - xMinDiv;
                 let divHeight = yMaxDiv - yMinDiv;
-                let parentOffsetX = videoRect.left - videoParentRect.left;
-                let parentOffsetY = videoRect.top - videoParentRect.top;
-                blurDiv.style.top = parentOffsetY + (videoRect.height * yMinDiv / this.videoFrameSize[0]) + 'px';
-                blurDiv.style.left = parentOffsetX + (videoRect.width * xMinDiv / this.videoFrameSize[1]) + 'px';
-                blurDiv.style.height = (videoRect.height * divHeight / this.videoFrameSize[0]) + 'px';
-                blurDiv.style.width = (videoRect.width * divWidth / this.videoFrameSize[1]) + 'px';
+                blurDiv.style.top = offsetY + (videoHeight * yMinDiv / this.videoFrameSize[0]) + 'px';
+                blurDiv.style.left = offsetX + (videoWidth * xMinDiv / this.videoFrameSize[1]) + 'px';
+                blurDiv.style.height = ((videoRect.height - subtractY) * divHeight / this.videoFrameSize[0]) + 'px';
+                blurDiv.style.width = ((videoRect.width - subtractX) * divWidth / this.videoFrameSize[1]) + 'px';
                 const blurPixels = Math.pow(2, this.numBlurLayers - i - 1);
                 blurDiv.style.backdropFilter = `blur(${blurPixels}px)`;
             }
