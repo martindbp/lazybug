@@ -9,7 +9,7 @@
 import EmbeddedCaption from './EmbeddedCaption.vue'
 
 export default {
-    props: ['captionId'],
+    props: ['captionId', 'width', 'height'],
     components: {
         EmbeddedCaption,
     },
@@ -23,8 +23,8 @@ export default {
     mounted: function(){
         const self = this;
         this.player = new YT.Player(this.playerID, {
-            width: '2024',
-            height: '512',
+            width: this.width,
+            height: this.height,
             videoId: videoIdFromCaptionId(this.captionId),
             playerVars: {
                 'playsinline': 1,
@@ -35,7 +35,6 @@ export default {
                     self.playerReady = true;
                     let $el = document.getElementById(self.playerID);
                     self.$store.commit('setAVElement', $el);
-                    //self.$store.commit('setCaptionOffset', [500, 500]);
                     self.$store.commit('setVideoDuration', self.getDuration());
                 },
                 'onStateChange': this.onPlayerStateChange

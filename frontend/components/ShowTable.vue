@@ -73,7 +73,7 @@
             </q-tr>
             <q-tr v-if="props.expand" v-show="props.expand" :props="props">
                 <q-td colspan="100%">
-                    <EmbeddedVideo :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
+                    <EmbeddedVideo width="560" height="340" :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
                     <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
                         <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
                         <div
