@@ -43,6 +43,19 @@ const CAPTION_END_BUFFER_TIME = 1;
 
 let lastCaptionIdxGlobal = 0;
 
+function getClosestParentScroll($el, axis) {
+    let variable = axis === 'y' ? 'scrollTop' : 'scrollLeft';
+    while ($el && $el[variable] === 0) {
+        $el = $el.parentElement;
+    }
+
+    if ($el) {
+        return $el[variable];
+    }
+
+    return axis === 'y' ? window.scrollY : window.scrollX;
+}
+
 export default {
     mixins: [mixin],
     components: {
@@ -88,7 +101,7 @@ export default {
         if (this.currCaption === null && this.minHeight === null) {
             // Since we're changing to an empty caption from a non-empty one, we transfer the min height to the empty one,
             // so it doesn't collapse
-            var rect = this.$refs.captionroot.$el.getBoundingClientRect();
+            let rect = this.$refs.captionroot.$el.getBoundingClientRect();
             this.minHeight = rect.height;
         }
     },
@@ -341,10 +354,11 @@ export default {
         },
         updateCaptionPositionBlur: function() {
             if ([null, undefined].includes(this.AVElement) || [null, undefined].includes(this.$refs.captionroot)) return;
-            var videoRect = this.AVElement.getBoundingClientRect();
-            // var captionRect = this.$refs.captionroot.$el.getBoundingClientRect();
-            this.$refs.captionroot.$el.style.left = ((videoRect.left+window.scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
-            this.$refs.captionroot.$el.style.top = (0.8 * (videoRect.bottom+window.scrollY) + this.captionOffset[1]) + 'px';
+            let videoRect = this.AVElement.getBoundingClientRect();
+            let scrollY = getClosestParentScroll(this.$refs.captionroot.$el, 'y');
+            let scrollX = getClosestParentScroll(this.$refs.captionroot.$el, 'x');
+            this.$refs.captionroot.$el.style.left = ((videoRect.left+scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
+            this.$refs.captionroot.$el.style.top = (0.8 * (videoRect.bottom+scrollY) + this.captionOffset[1]) + 'px';
             if (this.$refs.blurroot) {
                 this.$refs.blurroot.updateBlurStyle();
             }
@@ -361,7 +375,7 @@ export default {
                 lastCaptionIdxGlobal = 0;
             }
 
-            for (var i = lastCaptionIdxGlobal; i < lines.length; i++) {
+            for (let i = lastCaptionIdxGlobal; i < lines.length; i++) {
                 let caption = captionArrayToDict(lines[i], captionData);
                 let captionT0 = caption.t0 + (withTimingOffset ? caption.timingOffset : 0)
                 let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], captionData) : null;
