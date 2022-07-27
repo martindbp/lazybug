@@ -447,10 +447,4 @@ export default {
     padding: 0 !important;
 }
 
-#captionroot td {
-    font-size: 24px;
-    /*padding: 0 !important;*/
-}
-
-
 </style>

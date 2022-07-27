@@ -1,8 +1,8 @@
 <template>
     <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
-        <table class="contenttable" ref="wordcontent" :style="{ fontSize: $store.state.captionFontSize+'px !important' }">
+        <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
-                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')">
+                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" :style="tdStyle" >
                     <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.py" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">PY</span>
@@ -21,6 +21,7 @@
                     @click.stop.prevent="click('py', i)"
                     v-for="(py, i) in wordData.py"
                     :key="i"
+                    :style="tdStyle"
                 >
                     <span
                         class="cardcontent"
@@ -32,7 +33,7 @@
                 </td>
             </tr>
             <tr class="centerrow">
-                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')">
+                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')" :style="tdStyle">
                     <span v-if="! $store.state.options.pin.hz" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.hz" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">HZ</span>
@@ -51,6 +52,7 @@
                     @click.stop.prevent="click('hz', i)"
                     v-for="(hz, i) in wordData.hz"
                     :key="i"
+                    :style="tdStyle"
                 >
                     <span
                         class="cardcontent"
@@ -75,7 +77,7 @@
                 </td>
             </tr>
             <tr class="bottomrow">
-                <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')">
+                <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')" :style="tdStyle">
                     <span v-if="! $store.state.options.pin.tr" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.tr" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">TR</span>
@@ -92,6 +94,7 @@
                     @click.stop.prevent="click('tr', i)"
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
+                    :style="tdStyle"
                 >
                     <span
                         class="cardcontent"
@@ -107,7 +110,8 @@
         <br/>
         <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.5em' }" v-if="data !== null">
             <tr>
-                <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')">
+                <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
+                    
                     <span v-if="! $store.state.options.pin.translation" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.translation" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">EN</span>
@@ -130,6 +134,7 @@
                         placeholder: hiddenAndNotPeeking.translation,
                         showborder: data !== null,
                     }"
+                    :style="tdStyle"
                 >
                     <span class="cardcontent" :style="{ opacity: hiddenAndNotPeeking['translation'] ? 0 : 1 }">
                         {{ translation }}
@@ -176,6 +181,12 @@ export default {
         autoPeeked: null,
     }},
     computed: {
+        tdStyle: function() {
+            return {
+                fontSize: this.$store.state.captionFontSize+'px !important',
+                padding: 0,
+            };
+        },
         wordStats: function() {
             const stats = [];
             for (var i = 0; i < this.wordData.hz.length; i++) {
@@ -626,6 +637,7 @@ export default {
 </script>
 
 <style>
+
 .peekrow {
     width: 1.5em;
     margin-right: 3em;
@@ -657,11 +669,11 @@ export default {
     font-family: sans-serif;
 }
 
-.toprow td:not(:first-child) {
+.toprow td:not(:first-child) span {
     font-size: 1em;
 }
 
-.centerrow td:not(:first-child) {
+.centerrow td:not(:first-child) span {
     font-size: 1.25em;
     line-height: 1.25em;
 }
@@ -670,7 +682,7 @@ export default {
     vertical-align: bottom;
 }
 
-.bottomrow td:not(:first-child) {
+.bottomrow td:not(:first-child) span {
     font-size: 0.8em;
 }
 
