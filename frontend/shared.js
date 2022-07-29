@@ -612,6 +612,10 @@ function getShowSeasonEpisodeName(showInfo, captionId) {
         showName = showInfo.name;
         const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, captionId);
         if (seasonIdx !== null) {
+            const number = showInfo.seasons[seasonIdx].number;
+            if (number !== null) { // if explicit number is available, use that
+                seasonIdx = number - 1;
+            }
             seasonName = showInfo.seasons[seasonIdx].name;
             if (! seasonName) {
                 seasonName = showInfo.seasons.length > 1 ? `S${pad(seasonIdx + 1, 2)}` : null;
