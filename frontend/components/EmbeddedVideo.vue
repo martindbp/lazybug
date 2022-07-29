@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div class="iframecontainer">
+        <div v-if="$store.state.isMovingCaption" class="dragsurface" />
         <div ref="player" :id="playerID" />
         <EmbeddedCaption />
     </div>
@@ -31,12 +32,7 @@ export default {
                 'rel': 0,
             },
             events: {
-                'onReady': function() {
-                    self.playerReady = true;
-                    let $el = document.getElementById(self.playerID);
-                    self.$store.commit('setAVElement', $el);
-                    self.$store.commit('setVideoDuration', self.getDuration());
-                },
+                'onReady': self.onReady,
                 'onStateChange': this.onPlayerStateChange
             }
         });
@@ -52,6 +48,12 @@ export default {
         this.$store.commit('setVideoAPI', videoAPI);
     },
     methods: {
+        onReady: function() {
+            this.playerReady = true;
+            let $el = document.getElementById(this.playerID);
+            this.$store.commit('setAVElement', $el);
+            this.$store.commit('setVideoDuration', this.getDuration());
+        },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
             return this.player.getCurrentTime();
@@ -90,4 +92,21 @@ export default {
 </script>
 
 <style>
+.iframecontainer {
+    position: relative;
+}
+
+.iframecontainer > iframe {
+    z-index: 0;
+}
+
+.dragsurface {
+    z-index: 98;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+}
 </style>

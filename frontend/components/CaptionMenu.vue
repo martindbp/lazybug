@@ -30,7 +30,6 @@ export default {
         DictionaryDialog,
     },
     data: function() { return {
-        dragging: false,
         dragStart: null,
         origCaptionOffset: null,
         isPrevMouseOver: false,
@@ -108,26 +107,24 @@ export default {
             }
         },
         moveMouseDown: function(event) {
-            this.dragging = true;
+            this.$store.commit('setIsMovingCaption', true);
             this.dragStart = [event.clientX, event.clientY];
             this.origCaptionOffset = this.captionOffset;
-            this.$store.commit('setIsMovingCaption', true);
             window.addEventListener("mouseup", this.moveMouseUp);
             window.addEventListener("mousemove", this.mouseMove);
         },
         moveMouseUp: function(event) {
-            if (! this.dragging) return;
+            if (! this.$store.state.isMovingCaption) return;
             event.stopPropagation();
             event.preventDefault();
-            this.dragging = false;
+            this.$store.commit('setIsMovingCaption', false);
             this.dragStart = [null, null];
             this.origCaptionOffset = [null, null];
-            this.$store.commit('setIsMovingCaption', false);
             window.removeEventListener("mouseup", this.moveMouseUp);
             window.removeEventListener("mousemove", this.mouseMove);
         },
         mouseMove: function(event) {
-            if (! this.dragging) return;
+            if (! this.$store.state.isMovingCaption) return;
             event.stopPropagation();
             event.preventDefault();
             const coords = [
