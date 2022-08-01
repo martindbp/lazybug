@@ -221,25 +221,31 @@ export default {
     methods: {
         fetchCaptionMaybe: function() {
             if (this.captionId === null) {
-                this.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
+                this.$store.commit('setCaptionIdDataHash', {id: null, data: null, hash: null});
                 return;
             }
             if (this.$store.state.captionHash === 'fetching') return;
+            if (this.$store.state.fetchedCaptionId === this.captionId) return;
 
             this.$store.commit('resetResourceFetchError', 'caption data');
-            this.$store.commit('setCaptionDataAndHash', {data: null, hash: 'fetching'});
+            this.$store.commit('setCaptionIdDataHash', {id: null, data: null, hash: 'fetching'});
 
             const self = this;
-            fetchCaptions(self.captionId, function (message) {
+            const captionId = self.captionId;
+            fetchCaptions(captionId, function (message) {
+                if (self.$store.state.fetchedCaptionId === self.captionId) return true;
+
                 if (message === 'error') {
                     self.$store.commit('setResourceFetchError', 'caption data');
-                    self.$store.commit('setCaptionDataAndHash', {data: null, hash: null});
+                    self.$store.commit('setCaptionIdDataHash', {id: null, data: null, hash: null});
                     return false;
                 }
                 self.$store.commit('resetResourceFetchError', 'caption data');
                 if (self.$store.state.captionHash === message.hash) return true;
 
-                self.$store.commit('setCaptionDataAndHash', message);
+                message.id = captionId;
+
+                self.$store.commit('setCaptionIdDataHash', message);
                 // Append the initial pinned peek values
                 for (const type of ['py', 'hz', 'tr', 'translation']) {
                     if (self.$store.state.options.pin[type] === true) {

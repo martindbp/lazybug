@@ -33,6 +33,7 @@ const store = new Vuex.Store({
         sessionTime: null,
         captionData: null,
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
+        fetchedCaptionId: null,
         resourceFetchErrors: [],
         youtubeAPIReady: false,
         showList: null,
@@ -73,6 +74,8 @@ const store = new Vuex.Store({
         showDictionary: false,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
+        webPage: 'videos',
+        webWatching: null,
         options: Vue.ref({
             extensionToggle: true,
             autoPause: false,
@@ -123,6 +126,12 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setWebPage(state, page) {
+            state.webPage = page;
+        },
+        setWebWatching(state, showVideo) {
+            state.webWatching = showVideo;
+        },
         setVideoAPI(state, api) {
             state.videoAPI = api;
         },
@@ -179,9 +188,10 @@ const store = new Vuex.Store({
             state.sessionTime = Date.now();
             if ([null, undefined].includes(val)) return;
         },
-        setCaptionDataAndHash(state, val) {
+        setCaptionIdDataHash(state, val) {
             state.captionData = val.data;
             state.captionHash = val.hash;
+            state.fetchedCaptionId = val.id;
         },
         setShowOptions(state, val) {
             state.showOptions = val;

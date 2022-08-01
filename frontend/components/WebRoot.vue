@@ -11,6 +11,16 @@
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
+                <q-item v-if="$store.state.webWatching" :active="page === 'watch'" clickable @click="page = 'watch'" v-ripple>
+                  <q-item-section avatar>
+                    <q-icon name="tv" />
+                  </q-item-section>
+
+                  <q-item-section>
+                    Watch
+                  </q-item-section>
+                </q-item>
+
                 <q-item :active="page === 'videos'" clickable @click="page = 'videos'" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="list" />
@@ -56,6 +66,7 @@
 
           <q-page-container>
             <q-page padding>
+                <WatchPage v-if="page === 'watch'" />
                 <ShowTable v-if="page === 'videos'" />
                 <StarTable v-if="page === 'star'" />
                 <Settings v-if="page === 'settings'" />
@@ -69,18 +80,21 @@
 import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
 import Settings from './Settings.vue'
+import WatchPage from './WatchPage.vue'
 
 export default {
-    data: function() { return {
-        page: 'videos',
-    }},
-    mounted: function() {
-    },
     components: {
         ShowTable,
         StarTable,
         Settings,
+        WatchPage,
     },
+    computed: {
+        page: {
+            get: function() { return this.$store.state.webPage; },
+            set: function(val) { this.$store.commit('setWebPage', val); },
+        },
+    }
 };
 </script>
 

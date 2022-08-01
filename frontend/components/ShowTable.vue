@@ -16,7 +16,7 @@
             </q-th>
         </template>
         <template v-slot:body="props">
-            <q-tr :props="props" @click="props.expand = !props.expand" :style="{ cursor: 'pointer' }" >
+            <q-tr :props="props" @click="setWatching(props)" :style="{ cursor: 'pointer' }" >
                 <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                     <span v-if="props.cols[0].value.en">
                         {{ props.cols[0].value.hz }}<br>
@@ -69,22 +69,6 @@
                     <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[9].value)"  :color="mapToColor('free', props.cols[9].value)">
                         {{ props.cols[9].value ? 'free' : 'paid' }}
                     </q-badge>
-                </q-td>
-            </q-tr>
-            <q-tr v-if="props.expand" v-show="props.expand" :props="props">
-                <q-td colspan="100%">
-                    <EmbeddedVideo width="560" height="340" :captionId="rowCaptionId(props.row)" style="display: inline-block; vertical-align: top" />
-                    <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
-                        <div v-if="props.row.type === 'movie'"><a :href="youtubeURL(props.row, 0, 0)">Go</a></div>
-                        <div
-                            v-else
-                            v-for="(season, i) in props.row.seasons"
-                        >
-                            <span>{{ props.row.seasons.length === 1 ? 'Episodes' : season.name || `Season ${i+1}` }}:</span>
-                            <br>
-                            <span style="margin-left: 3px;" v-for="(episode, j) in season.episodes"><a :href="youtubeURL(props.row, i, j)" > {{ j + 1 }} </a></span>
-                        </div>
-                    </div>
                 </q-td>
             </q-tr>
         </template>
@@ -232,23 +216,6 @@ export default {
         },
     },
     methods: {
-        rowCaptionId: function(row) {
-            return row.seasons[0].episodes[0].id;
-        },
-        youtubeURL: function(row, seasonIdx=null, episodeIdx=null) {
-            seasonIdx = seasonIdx || 0;
-            episodeIdx = episodeIdx || 0;
-            const playlist = row.seasons[seasonIdx].youtube_playlist;
-            const captionId = row.seasons[seasonIdx].episodes[episodeIdx].id;
-            const id = videoIdFromCaptionId(captionId);
-
-            if ([null, undefined].includes(playlist)) {
-                return `https://youtube.com/watch?v=${id}`;
-            }
-            else {
-                return `https://youtube.com/watch?v=${id}&list=${playlist}`;
-            }
-        },
         mapDifficultyToColor: function(difficulty) {
             if (difficulty < 4) return 'green';
             else if (difficulty < 7) return 'orange';
@@ -301,7 +268,11 @@ export default {
         },
         clearFilters: function() {
             this.filters = null;
-        }
+        },
+        setWatching: function(props) {
+            this.$store.commit('setWebWatching', props.row);
+            this.$store.commit('setWebPage', 'watch');
+        },
     }
 };
 </script>
