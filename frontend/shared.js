@@ -610,20 +610,21 @@ function getShowSeasonEpisodeName(showInfo, captionId) {
     let episodeName = null;
     if (showInfo) {
         showName = showInfo.name;
-        const [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, captionId);
+        let [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, captionId);
         if (seasonIdx !== null) {
-            const number = showInfo.seasons[seasonIdx].number;
+            const season = showInfo.seasons[seasonIdx];
+            const number = season.number;
             if (number !== null) { // if explicit number is available, use that
                 seasonIdx = number - 1;
             }
-            seasonName = showInfo.seasons[seasonIdx].name;
+            seasonName = season.name;
             if (! seasonName) {
                 seasonName = showInfo.seasons.length > 1 ? `S${pad(seasonIdx + 1, 2)}` : null;
             }
 
-            episodeName = showInfo.seasons[seasonIdx].episodes[episodeIdx].name;
+            episodeName = season.episodes[episodeIdx].name;
             if (! episodeName) {
-                episodeName = showInfo.seasons[seasonIdx].episodes.length > 1 ? `E${pad(episodeIdx + 1)}`: null;
+                episodeName = season.episodes.length > 1 ? `E${pad(episodeIdx + 1)}`: null;
             }
         }
     }
