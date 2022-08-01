@@ -130,6 +130,7 @@ export default {
 
 <style>
 .initialcontent {
+    width: 580px;
     text-align: center;
     padding-top: 25px;
     padding-bottom: 25px;
