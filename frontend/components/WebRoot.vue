@@ -66,7 +66,7 @@
 
           <q-page-container>
             <q-page padding>
-                <WatchPage v-if="page === 'watch'" />
+                <WatchPage v-show="page === 'watch'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-if="page === 'videos'" />
                 <StarTable v-if="page === 'star'" />
                 <Settings v-if="page === 'settings'" />
