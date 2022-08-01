@@ -79,12 +79,12 @@ export default {
             return this.player.getPlayerState() === 2;
         },
         onPlayerStateChange: function(event) {
-            if ([null, undefined].includes(this.AVElement)) return;
+            if ([null, undefined].includes(this.$store.state.AVElement)) return;
             if (event.data === YT.PlayerState.PLAYING) {
-                this.AVElement.dispatchEvent(new Event('play'));
+                this.$store.state.AVElement.dispatchEvent(new Event('play'));
             }
             else if (event.data === YT.PlayerState.PAUSED) {
-                this.AVElement.dispatchEvent(new Event('pause'));
+                this.$store.state.AVElement.dispatchEvent(new Event('pause'));
             }
         },
     },
