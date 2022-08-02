@@ -22,33 +22,52 @@ export default {
         };
     },
     mounted: function(){
-        const self = this;
-        this.player = new YT.Player(this.playerID, {
-            width: this.width,
-            height: this.height,
-            videoId: videoIdFromCaptionId(this.captionId),
-            playerVars: {
-                'playsinline': 1,
-                'rel': 0,
-                'autoplay': 1,
-            },
-            events: {
-                'onReady': self.onReady,
-                'onStateChange': this.onPlayerStateChange
-            }
-        });
-        const videoAPI =  {
-            getCurrentTime: this.getCurrentTime,
-            setCurrentTime: this.setCurrentTime,
-            getDuration: this.getDuration,
-            play: this.play,
-            pause: this.pause,
-            isPaused: this.isPaused,
-        };
-        this.$store.commit('setCaptionId', this.captionId);
-        this.$store.commit('setVideoAPI', videoAPI);
+        this.initYoutube();
+    },
+    beforeUnmount: function() {
+        this.destroyYoutube();
+    },
+    watch: {
+        captionId: function() {
+            this.destroyYoutube();
+            this.initYoutube();
+        },
     },
     methods: {
+        destroyYoutube: function() {
+            if (this.player) {
+                this.player.destroy();
+                this.player = null;
+                this.playerReady = false;
+            }
+        },
+        initYoutube: function() {
+            const self = this;
+            this.player = new YT.Player(this.playerID, {
+                width: this.width,
+                height: this.height,
+                videoId: videoIdFromCaptionId(this.captionId),
+                playerVars: {
+                    'playsinline': 1,
+                    'rel': 0,
+                    'autoplay': 1,
+                },
+                events: {
+                    'onReady': self.onReady,
+                    'onStateChange': this.onPlayerStateChange
+                }
+            });
+            const videoAPI =  {
+                getCurrentTime: this.getCurrentTime,
+                setCurrentTime: this.setCurrentTime,
+                getDuration: this.getDuration,
+                play: this.play,
+                pause: this.pause,
+                isPaused: this.isPaused,
+            };
+            this.$store.commit('setCaptionId', this.captionId);
+            this.$store.commit('setVideoAPI', videoAPI);
+        },
         onReady: function() {
             this.playerReady = true;
             let $el = document.getElementById(this.playerID);
