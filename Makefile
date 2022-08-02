@@ -217,7 +217,7 @@ frontend-copy:
 	cp frontend/deps/* frontend/dist/
 	cp frontend/css/* frontend/dist/
 	cp -r frontend/images frontend/dist/
-	-cp -r frontend/dist/* ../lazybug-web/
+	-cp -r frontend/dist/* ../lazyweb/
 	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
 

@@ -83,7 +83,7 @@ export default {
             keyboardListener: null,
         };
     },
-    mounted: function(){
+    mounted: function() {
         this.setUpdateInterval();
         this.setObserversAndHandlers();
     },

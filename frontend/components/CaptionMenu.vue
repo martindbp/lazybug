@@ -68,6 +68,9 @@ export default {
             if (shortcut === 'peek') {
                 self.peekAll();
             }
+            else if (shortcut === 'pausePlay') {
+                self.playPause();
+            }
             else if (shortcut === 'next') {
                 self.next('keyboard');
             }

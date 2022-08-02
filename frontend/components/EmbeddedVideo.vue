@@ -30,6 +30,7 @@ export default {
             playerVars: {
                 'playsinline': 1,
                 'rel': 0,
+                'autoplay': 1,
             },
             events: {
                 'onReady': self.onReady,

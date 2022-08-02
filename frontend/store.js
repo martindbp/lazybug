@@ -9,6 +9,7 @@ const DEFAULT_SHORTCUTS = {
     peekPy: 'KeyY',
     peekHz: 'KeyH',
     peekTr: 'KeyN',
+    pausePlay: 'Space', // already a shortcut, but is applied outside the video in Web
 }
 
 

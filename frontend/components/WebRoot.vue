@@ -4,9 +4,11 @@
           <q-drawer
             v-model="drawer"
             show-if-above
+            bordered
             :width="200"
             :breakpoint="400"
             style="text-align: left;"
+            class="bg-grey-3"
           >
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
@@ -65,7 +67,7 @@
           </q-drawer>
 
           <q-page-container>
-            <q-page padding>
+            <q-page :padding="page !== 'watch'">
                 <WatchPage v-show="page === 'watch'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-if="page === 'videos'" />
                 <StarTable v-if="page === 'star'" />

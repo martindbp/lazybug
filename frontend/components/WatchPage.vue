@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <EmbeddedVideo width="560" height="340" :captionId="firstCaptionId" style="display: inline-block; vertical-align: top" />
+    <div v-if="data">
+        <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="firstCaptionId" />
         <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
             <div v-if="data.type === 'movie'"><a :href="youtubeURL(0, 0)">Go</a></div>
             <div
@@ -22,16 +22,43 @@ export default {
     components: {
         EmbeddedVideo,
     },
+    data: function() { return {
+        videoHeight: 0,
+    }},
     computed: {
         data: function() {
             return this.$store.state.webWatching;
         },
         firstCaptionId: function() {
+            if ([null, undefined].includes(this.data)) return null;
             return this.data.seasons[0].episodes[0].id;
         },
     },
+    watch: {
+        data: function() {
+            this.updateVideoHeight();
+        },
+    },
+    mounted: function() {
+        this.updateVideoHeight();
+    },
+    updated: function() {
+        this.updateVideoHeight();
+    },
     methods: {
+        updateVideoHeight: function() {
+            if (
+                [null, undefined].includes(this.data) ||
+                [null, undefined].includes(this.$refs.video)
+            ) {
+                return;
+            }
+            //const width = this.$refs.video.width;
+            //const [frameHeight, frameWidth] = this.data.frame_size;
+            //this.videoHeight = (width / frameWidth) * frameHeight;
+        },
         youtubeURL: function(seasonIdx=null, episodeIdx=null) {
+            if ([null, undefined].includes(this.data)) return null;
             seasonIdx = seasonIdx || 0;
             episodeIdx = episodeIdx || 0;
             const playlist = this.data.seasons[seasonIdx].youtube_playlist;
