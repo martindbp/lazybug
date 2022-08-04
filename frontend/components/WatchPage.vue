@@ -1,6 +1,6 @@
 <template>
     <div v-if="data">
-        <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="firstCaptionId" />
+        <EmbeddedVideo ref="video" width="100%" height="80%" :captionId="firstCaptionId" />
         <div style="display: inline-block; vertical-align: top; max-width: 800px; white-space: normal; word-break: break-all; margin: 30px;">
             <div v-if="data.type === 'movie'"><a :href="youtubeURL(0, 0)">Go</a></div>
             <div
@@ -8,7 +8,6 @@
                 v-for="(season, i) in data.seasons"
             >
                 <span>{{ data.seasons.length === 1 ? 'Episodes' : season.name || `Season ${i+1}` }}:</span>
-                <br>
                 <span style="margin-left: 3px;" v-for="(episode, j) in season.episodes"><a :href="youtubeURL(i, j)" > {{ j + 1 }} </a></span>
             </div>
         </div>
