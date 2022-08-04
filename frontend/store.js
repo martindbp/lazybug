@@ -76,7 +76,9 @@ const store = new Vuex.Store({
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
         webPage: 'videos',
-        webWatching: null,
+        watchingShowInfo: null,
+        watchingSeason: null,
+        watchingEpisode: null,
         options: Vue.ref({
             extensionToggle: true,
             autoPause: false,
@@ -130,8 +132,14 @@ const store = new Vuex.Store({
         setWebPage(state, page) {
             state.webPage = page;
         },
-        setWebWatching(state, showVideo) {
-            state.webWatching = showVideo;
+        setWatchingShowInfo(state, showInfo) {
+            state.watchingShowInfo = showInfo;
+        },
+        setWatchingSeason(state, season) {
+            state.watchingSeason = season;
+        },
+        setWatchingEpisode(state, episode) {
+            state.watchingEpisode = episode;
         },
         setVideoAPI(state, api) {
             state.videoAPI = api;

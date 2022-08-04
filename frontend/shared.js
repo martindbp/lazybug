@@ -606,30 +606,41 @@ function openDashboard() {
 
 function getShowSeasonEpisodeName(showInfo, captionId) {
     let showName = null;
-    let seasonName = null;
-    let episodeName = null;
     if (showInfo) {
         showName = showInfo.name;
         let [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, captionId);
         if (seasonIdx !== null) {
-            const season = showInfo.seasons[seasonIdx];
-            const number = season.number;
-            if (number !== null) { // if explicit number is available, use that
-                seasonIdx = number - 1;
-            }
-            seasonName = season.name;
-            if (! seasonName) {
-                seasonName = showInfo.seasons.length > 1 ? `S${pad(seasonIdx + 1, 2)}` : null;
-            }
-
-            episodeName = season.episodes[episodeIdx].name;
-            if (! episodeName) {
-                episodeName = season.episodes.length > 1 ? `E${pad(episodeIdx + 1)}`: null;
-            }
+            const seasonName = getSeasonName(showInfo, seasonIdx);
+            const episodeName = getEpisodeName(showInfo, seasonIdx, episodeIdx);
+            return [showName, seasonName, episodeName];
         }
     }
 
-    return [showName, seasonName, episodeName];
+    return [showName, null, null];
+}
+
+function getSeasonName(showInfo, seasonIdx) {
+    const season = showInfo.seasons[seasonIdx];
+    const number = season.number;
+    if (! [null, undefined].includes(number)) { // if explicit number is available, use that
+        seasonIdx = number - 1;
+    }
+    seasonName = season.name;
+    if (! seasonName) {
+        seasonName = `S${pad(seasonIdx + 1, 2)}`;
+    }
+
+    return seasonName;
+}
+
+function getEpisodeName(showInfo, seasonIdx, episodeIdx) {
+    const season = showInfo.seasons[seasonIdx];
+    episodeName = season.episodes[episodeIdx].name;
+    if (! episodeName) {
+        episodeName = `E${pad(episodeIdx + 1, 2)}`;
+    }
+
+    return episodeName;
 }
 
 function resolveShowName(showName) {

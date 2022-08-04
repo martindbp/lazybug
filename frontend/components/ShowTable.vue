@@ -270,7 +270,9 @@ export default {
             this.filters = null;
         },
         setWatching: function(props) {
-            this.$store.commit('setWebWatching', props.row);
+            this.$store.commit('setWatchingShowInfo', props.row);
+            this.$store.commit('setWatchingSeason', 0);
+            this.$store.commit('setWatchingEpisode', 0);
             this.$store.commit('setWebPage', 'watch');
         },
     }
