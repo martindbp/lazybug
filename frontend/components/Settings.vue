@@ -1,9 +1,9 @@
 <template>
-    <div class="q-pa-md" style="width: 50%; margin-left: 50px; margin-top: 50px min-width: 500px;">
+    <div class="q-pa-md" style="width: 50%; margin-left: 50px; margin-top: 50px; min-width: 500px;">
         <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
         <br>
         <br>
-        <q-btn color="deep-orange" label="Clear database" @click="clearPersonalData" :disabled="clickedClearPersonalData" />
+        <q-btn color="deep-orange" label="Clear database" @click="confirmClearPersonalData = true" :disabled="clickedClearPersonalData" />
         <br>
         (Will permanently delete personal data)
         <br>
@@ -13,6 +13,18 @@
         <br>
         <q-btn color="blue" label="Restore database from backup" @click="importDb" />
 
+        <q-dialog v-model="confirmClearPersonalData" persistent>
+            <q-card>
+                <q-card-section class="row items-center">
+                    <span class="q-ml-sm">Are you sure? This will delete your local data permanently.</span>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn flat label="Delete" color="red" v-close-popup @click="clearPersonalData" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </div>
 </template>
 
@@ -23,6 +35,7 @@ export default {
     mixins: [mixin],
     data: function() { return {
         clickedClearCache: false,
+        confirmClearPersonalData: false,
         clickedClearPersonalData: false,
     }},
     watch: {

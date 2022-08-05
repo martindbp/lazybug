@@ -39,7 +39,7 @@
                   </q-item-section>
 
                   <q-item-section>
-                    Star
+                    Starred
                   </q-item-section>
                 </q-item>
 

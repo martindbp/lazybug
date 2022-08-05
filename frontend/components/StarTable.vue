@@ -447,7 +447,6 @@ export default {
                     if (eventId === null) continue;
                     const eventData = session.eventData[i];
                     const eventName = reverseEventsMap[eventId];
-                    console.log(eventId, eventName);
                     if (eventName.startsWith("EVENT_STAR")) {
                         eventData[1].showName = resolveShowName(session.showName);
                         eventData[1].seasonName = session.seasonName;
