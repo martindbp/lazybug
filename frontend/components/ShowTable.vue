@@ -16,7 +16,7 @@
             </q-th>
         </template>
         <template v-slot:body="props">
-            <q-tr :props="props" @click="setWatching(props)" :style="{ cursor: 'pointer' }" >
+            <q-tr :props="props" @click="setPlaying(props)" :style="{ cursor: 'pointer' }" >
                 <q-tooltip delay="200" anchor="top left" self="top right" style="background: rgba(0,0,0,0)">
                     <img width="100" :src="thumbnailUrl(props.row)" />
                 </q-tooltip>
@@ -276,11 +276,11 @@ export default {
         clearFilters: function() {
             this.filters = null;
         },
-        setWatching: function(props) {
-            this.$store.commit('setWatchingShowInfo', props.row);
-            this.$store.commit('setWatchingSeason', 0);
-            this.$store.commit('setWatchingEpisode', 0);
-            this.$store.commit('setWebPage', 'watch');
+        setPlaying: function(props) {
+            this.$store.commit('setPlayingShowInfo', props.row);
+            this.$store.commit('setPlayingSeason', 0);
+            this.$store.commit('setPlayingEpisode', 0);
+            this.$store.commit('setWebPage', 'player');
         },
     }
 };

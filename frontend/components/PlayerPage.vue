@@ -1,5 +1,5 @@
 <template>
-    <div ref="watchpage" v-if="showInfo" style="position: relative">
+    <div ref="playerpage" v-if="showInfo" style="position: relative">
         <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="captionId" />
         <div v-if="showInfo.type !== 'movie'" style="position: absolute; left: 5px; top: 185px;">
             <div style="margin-bottom: 15px">
@@ -26,9 +26,6 @@
                 </q-fab>
             </div>
         </div>
-        <q-page-sticky position="bottom-center" :offset="[0, -3]">
-            <q-btn fab icon="keyboard_arrow_up" color="primary" glossy />
-        </q-page-sticky>
     </div>
 </template>
 
@@ -44,15 +41,15 @@ export default {
     }},
     computed: {
         showInfo: function() {
-            return this.$store.state.watchingShowInfo;
+            return this.$store.state.playerShowInfo;
         },
         season: {
-            get: function() { return this.$store.state.watchingSeason; },
-            set: function(val) { this.$store.commit('setWatchingSeason', val); },
+            get: function() { return this.$store.state.playingSeason; },
+            set: function(val) { this.$store.commit('setPlayingSeason', val); },
         },
         episode: {
-            get: function() { return this.$store.state.watchingEpisode; },
-            set: function(val) { this.$store.commit('setWatchingEpisode', val); },
+            get: function() { return this.$store.state.playingEpisode; },
+            set: function(val) { this.$store.commit('setPlayingEpisode', val); },
         },
         captionId: function() {
             if ([null, undefined].includes(this.showInfo)) return null;
@@ -68,7 +65,7 @@ export default {
         this.updateVideoHeight();
     },
     updated: function() {
-        if (this.$refs.watchpage && this.$refs.watchpage.style.display === 'none') {
+        if (this.$refs.playerpage && this.$refs.playerpage.style.display === 'none') {
             // If we navigated away from watch page, we should pause the video
             this.$refs.video.pause();
         }

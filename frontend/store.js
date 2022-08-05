@@ -75,10 +75,10 @@ const store = new Vuex.Store({
         showDictionary: false,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
-        webPage: 'videos',
-        watchingShowInfo: null,
-        watchingSeason: null,
-        watchingEpisode: null,
+        webPage: 'content',
+        playerShowInfo: null,
+        playingSeason: null,
+        playingEpisode: null,
         options: Vue.ref({
             extensionToggle: true,
             autoPause: false,
@@ -132,14 +132,14 @@ const store = new Vuex.Store({
         setWebPage(state, page) {
             state.webPage = page;
         },
-        setWatchingShowInfo(state, showInfo) {
-            state.watchingShowInfo = showInfo;
+        setPlayingShowInfo(state, showInfo) {
+            state.playerShowInfo = showInfo;
         },
-        setWatchingSeason(state, season) {
-            state.watchingSeason = season;
+        setPlayingSeason(state, season) {
+            state.playingSeason = season;
         },
-        setWatchingEpisode(state, episode) {
-            state.watchingEpisode = episode;
+        setPlayingEpisode(state, episode) {
+            state.playingEpisode = episode;
         },
         setVideoAPI(state, api) {
             state.videoAPI = api;

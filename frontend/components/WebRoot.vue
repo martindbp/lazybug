@@ -13,23 +13,23 @@
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
-                <q-item v-if="$store.state.watchingShowInfo" :active="page === 'watch'" clickable @click="page = 'watch'" v-ripple>
+                <q-item v-if="$store.state.playerShowInfo" :active="page === 'player'" clickable @click="page = 'player'" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="tv" />
                   </q-item-section>
 
                   <q-item-section>
-                    Watch
+                    Player
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'videos'" clickable @click="page = 'videos'" v-ripple>
+                <q-item :active="page === 'content'" clickable @click="page = 'content'" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="list" />
                   </q-item-section>
 
                   <q-item-section>
-                    Videos
+                    Content
                   </q-item-section>
                 </q-item>
 
@@ -67,9 +67,9 @@
           </q-drawer>
 
           <q-page-container>
-            <q-page :padding="page !== 'watch'">
-                <WatchPage v-show="page === 'watch'" /> <!-- use v-show to keep alive video iframe -->
-                <ShowTable v-if="page === 'videos'" />
+            <q-page :padding="page !== 'player'">
+                <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
+                <ShowTable v-if="page === 'content'" />
                 <StarTable v-if="page === 'star'" />
                 <Settings v-if="page === 'settings'" />
             </q-page>
@@ -82,14 +82,14 @@
 import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
 import Settings from './Settings.vue'
-import WatchPage from './WatchPage.vue'
+import PlayerPage from './PlayerPage.vue'
 
 export default {
     components: {
         ShowTable,
         StarTable,
         Settings,
-        WatchPage,
+        PlayerPage,
     },
     computed: {
         page: {
