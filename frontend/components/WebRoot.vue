@@ -13,7 +13,7 @@
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
-                <q-item v-if="$store.state.webWatching" :active="page === 'watch'" clickable @click="page = 'watch'" v-ripple>
+                <q-item v-if="$store.state.watchingShowInfo" :active="page === 'watch'" clickable @click="page = 'watch'" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="tv" />
                   </q-item-section>
