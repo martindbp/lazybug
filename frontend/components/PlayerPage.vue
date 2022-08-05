@@ -4,25 +4,39 @@
         <div v-if="showInfo.type !== 'movie'" style="position: absolute; left: 5px; top: 185px;">
             <div style="margin-bottom: 15px">
                 <q-fab
+                    ref="seasonselector"
                     :label="getSeasonName(season)"
                     color="blue"
                     icon="keyboard_arrow_right"
                     direction="right"
                     padding="xs"
                 >
-                    <q-fab-action v-for="(s, i) in showInfo.seasons" color="blue" :label="getSeasonName(i)" @click="season = i" />
+                    <q-fab-action
+                        v-for="(s, i) in showInfo.seasons"
+                        color="blue"
+                        :label="getSeasonName(i)"
+                        @click.stop.prevent="season = i; $refs.episodeselector.show()"
+                    />
                 </q-fab>
             </div>
             <div>
                 <q-fab
-                    class="videoselector"
+                    ref="episodeselector"
+                    class="episodeselector"
                     :label="getEpisodeName(episode)"
-                    color="deep-orange"
+                    color="green"
                     icon="keyboard_arrow_right"
+                    @click="$refs.seasonselector.hide()"
                     direction="right"
                     padding="xs"
                 >
-                    <q-fab-action color="deep-orange" paddings="xs" v-for="(e, i) in showInfo.seasons[season].episodes" :label="i+1" @click="episode = i" />
+                    <q-fab-action
+                        v-for="(e, i) in showInfo.seasons[season].episodes"
+                        :color="e.processed ? 'green' : 'red'"
+                        paddings="xs"
+                        :label="i+1"
+                        @click.stop.prevent="episode = i;"
+                    />
                 </q-fab>
             </div>
         </div>
@@ -38,6 +52,8 @@ export default {
     },
     data: function() { return {
         videoHeight: 0,
+        clickEventListener: null,
+        hidden: false,
     }},
     computed: {
         showInfo: function() {
@@ -62,12 +78,25 @@ export default {
         },
     },
     mounted: function() {
+        const self = this;
         this.updateVideoHeight();
+        this.clickEventListener = document.addEventListener('click', function(evt) {
+            if (self.hidden || evt.target.closest('.q-fab')) return;
+            self.$refs.seasonselector.hide();
+            self.$refs.episodeselector.hide();
+        });
+    },
+    unmounted: function() {
+        document.removeEventListener(this.clickEventListener);
+        this.clickEventListener = null;
     },
     updated: function() {
-        if (this.$refs.playerpage && this.$refs.playerpage.style.display === 'none') {
-            // If we navigated away from watch page, we should pause the video
-            this.$refs.video.pause();
+        if (this.$refs.playerpage) {
+            this.hidden = this.$refs.playerpage.style.display === 'none';
+            if (this.hidden) {
+                // If we navigated away from watch page, we should pause the video
+                this.$refs.video.pause();
+            }
         }
         this.updateVideoHeight();
     },
@@ -109,13 +138,13 @@ export default {
 </script>
 
 <style>
-.videoselector .q-fab__actions {
+.episodeselector .q-fab__actions {
     flex-wrap: wrap !important;
     justify-content: left !important;
     min-width: 700px;
 }
 
-.videoselector .q-fab__actions .q-btn {
+.episodeselector .q-fab__actions .q-btn {
     font-size: 10px !important;
 }
 

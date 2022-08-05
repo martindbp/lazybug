@@ -17,8 +17,8 @@
         </template>
         <template v-slot:body="props">
             <q-tr :props="props" @click="setPlaying(props)" :style="{ cursor: 'pointer' }" >
-                <q-tooltip delay="200" anchor="top left" self="top right" style="background: rgba(0,0,0,0)">
-                    <img width="100" :src="thumbnailUrl(props.row)" />
+                <q-tooltip delay="200" anchor="top left" self="top right" :offset="[0, 10]" style="background: rgba(0,0,0,0)">
+                    <img width="100" :src="thumbnailURL(props.row)" />
                 </q-tooltip>
                 <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                     <span v-if="props.cols[0].value.en">
@@ -219,7 +219,7 @@ export default {
         },
     },
     methods: {
-        thumbnailUrl: function(showInfo) {
+        thumbnailURL: function(showInfo) {
             const videoId = videoIdFromCaptionId(showInfo.seasons[0].episodes[0].id);
             return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
         },
