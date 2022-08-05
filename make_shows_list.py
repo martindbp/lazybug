@@ -96,7 +96,8 @@ def get_show_stats(video_ids):
     for vid in video_ids:
         hash_file = f'data/remote/public/subtitles/{vid}.hash'
         num_total += 1
-        if not os.path.exists(hash_file):
+        processed = os.path.exists(hash_file)
+        if not processed:
             #print(hash_file, 'does not exist, skipping')
             continue
 
@@ -181,6 +182,12 @@ for filename in glob.glob('data/remote/public/shows/*.json'):
             print(show_name, 'score:', score)
             scores.append(score)
             show['difficulty'] = score
+
+        # Add processed flags for all episodes
+        for season in show['seasons']:
+            for episode in season['episodes']:
+                processed = os.path.exists(f'data/remote/public/subtitles/{episode["id"]}.hash')
+                episode['processed'] = processed
 
         released_shows[show_name] = show
 
