@@ -2,10 +2,11 @@
     <div class="q-pa-md" style="width: 50%; margin-left: 50px; margin-top: 50px; min-width: 500px;">
         <q-btn color="secondary" label="Clear cache" @click="clearCache" :disabled="clickedClearCache" />
         <br>
+        (This clears cached video captions, show list and other non-personal data)
         <br>
         <q-btn color="deep-orange" label="Clear database" @click="confirmClearPersonalData = true" :disabled="clickedClearPersonalData" />
         <br>
-        (Will permanently delete personal data)
+        (Permanently deletes personal data)
         <br>
         <br>
         <q-btn color="green" label="Download database backup" @click="exportDb" />

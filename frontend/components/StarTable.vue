@@ -47,26 +47,24 @@
               <q-btn icon="chevron_left" color="grey-8" round dense flat :disable="isFirstPage" @click="prevPage" />
               <q-btn icon="chevron_right" color="grey-8" round dense flat :disable="isLastPage" @click="nextPage" />
               <q-btn icon="last_page" color="grey-8" round dense flat :disable="isLastPage" @click="lastPage" />
+              <q-btn-dropdown :disabled="selected.length === 0" color="primary" label="Export" style="margin-left: 5px; margin-right: 5px">
+                  <q-list>
+                      <q-item clickable v-close-popup @click="showExportModal = true">
+                          <q-item-section>
+                              <q-item-label>Anki CSV</q-item-label>
+                          </q-item-section>
+                      </q-item>
+                      <q-item clickable v-close-popup @click="exportPleco">
+                          <q-item-section>
+                              <q-item-label>Pleco (word list)</q-item-label>
+                          </q-item-section>
+                      </q-item>
+                  </q-list>
+              </q-btn-dropdown>
               {{ getSelectedString() }}
           </template>
         </q-table>
-        <div class="q-mt-md">
-            <q-btn-dropdown :disabled="selected.length === 0" color="primary" label="Export">
-                <q-list>
-                    <q-item clickable v-close-popup @click="showExportModal = true">
-                        <q-item-section>
-                            <q-item-label>Anki CSV</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="exportPleco">
-                        <q-item-section>
-                            <q-item-label>Pleco (word list)</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </q-btn-dropdown>
-        </div>
-        <q-dialog class="fixdialogheight" v-model="showExportModal" persistent>
+        <q-dialog class="fixdialogheight" v-model="showExportModal" seamless>
             <q-card>
                 <q-tabs
                    v-model="ankiCardTab"

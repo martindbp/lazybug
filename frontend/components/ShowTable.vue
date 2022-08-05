@@ -18,7 +18,7 @@
         </template>
         <template v-slot:body="props">
             <q-tr :props="props" @click="setPlaying(props)" :style="{ cursor: 'pointer' }" >
-                <q-tooltip delay="200" anchor="top left" self="top right" :offset="[0, 10]" style="background: rgba(0,0,0,0)">
+                <q-tooltip delay="200" anchor="top left" self="top right" :offset="[0, 20]" style="background: rgba(0,0,0,0)">
                     <img width="100" :src="thumbnailURL(props.row)" />
                 </q-tooltip>
                 <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
