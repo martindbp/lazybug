@@ -446,9 +446,18 @@ export default {
                     const eventData = session.eventData[i];
                     const eventName = reverseEventsMap[eventId];
                     if (eventName.startsWith("EVENT_STAR")) {
-                        eventData[1].showName = resolveShowName(session.showName);
-                        eventData[1].seasonName = session.seasonName;
-                        eventData[1].episodeName = session.episodeName;
+                        if (session.showName) {
+                            // Old data has showName/seasonName/episodeName
+                            eventData[1].showName = resolveShowName(session.showName);
+                            eventData[1].seasonName = session.seasonName;
+                            eventData[1].episodeName = session.episodeName;
+                        }
+                        else {
+                            const showInfo = this.$store.showList[session.showId];
+                            eventData[1].showName = resolveShowName(showInfo.name);
+                            eventData[1].seasonName = getSeasonName(showInfo, session.seasonIdx);
+                            eventData[1].episodeName = getEpisodeName(showInfo, session.episodeIdx);
+                        }
 
                         let type = null;
                         if (eventName.endsWith('PY')) {

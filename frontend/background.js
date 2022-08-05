@@ -387,28 +387,33 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             sendResponse('error');
         });
     }
-    else if (message.type === 'getRecent') {
+    else if (message.type === 'getViewingHistory') {
         let seen = new Set();
+        message.offset = message.offset || 0;
 
         personalDb.log
         .reverse()
         .sortBy('sessionTime')
         .then(function(data) {
-            const videos = [];
+            let videos = [];
             for (const session of data) {
                 if (seen.has(session.captionId)) continue;
-                if (session.showName === null) continue;
+                if ([null, undefined].includes(session.showId)) continue;
 
                 videos.push({
                     captionId: session.captionId,
-                    showName: session.showName,
-                    seasonName: session.seasonName,
-                    episodeName: session.episodeName
+                    showId: session.showId,
+                    seasonIdx: session.seasonIdx,
+                    episodeIdx: session.episodeIdx,
                 });
 
                 seen.add(session.captionId);
-                if (videos.length > 10) break;
+                if (
+                    message.limit &&
+                    videos.length > message.offset + message.limit
+                ) break;
             }
+            videos = videos.slice(message.offset);
             sendResponse({data: videos});
         })
         .catch(function(error) {

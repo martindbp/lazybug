@@ -33,6 +33,16 @@
                   </q-item-section>
                 </q-item>
 
+                <q-item :active="page === 'history'" clickable @click="page = 'history'" v-ripple>
+                  <q-item-section avatar>
+                    <q-icon name="history" />
+                  </q-item-section>
+
+                  <q-item-section>
+                    History
+                  </q-item-section>
+                </q-item>
+
                 <q-item :active="page === 'star'" clickable @click="page = 'star'" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="star" />
@@ -70,6 +80,7 @@
             <q-page :padding="page !== 'player'">
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-if="page === 'content'" />
+                <HistoryPage v-if="page === 'history'" />
                 <StarTable v-if="page === 'star'" />
                 <Settings v-if="page === 'settings'" />
             </q-page>
@@ -83,6 +94,7 @@ import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
 import Settings from './Settings.vue'
 import PlayerPage from './PlayerPage.vue'
+import HistoryPage from './HistoryPage.vue'
 
 export default {
     components: {
@@ -90,6 +102,7 @@ export default {
         StarTable,
         Settings,
         PlayerPage,
+        HistoryPage,
     },
     computed: {
         page: {

@@ -313,7 +313,7 @@ export default {
                 srtOut += '\n\n';
             }
 
-            let [showName, seasonName, episodeName] = getShowSeasonEpisodeName(getShowInfo(this.$store), this.$store.state.captionId);
+            let [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(this.$store), this.$store.state.captionId);
             let name = `${showName.hz || showName}`;
             if (seasonName) name += `-${seasonName}`;
             name += `-${episodeName}`;

@@ -60,7 +60,7 @@ export default {
             }
         });
 
-        getRecent(function(data) {
+        getViewingHistory(0, 10, function(data) {
             const videos = [];
             self.recent = data;
             self.recent.push({ captionId: 'random' });

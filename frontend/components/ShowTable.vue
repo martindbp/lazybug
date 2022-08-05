@@ -93,16 +93,12 @@
 </template>
 
 <script>
-import EmbeddedVideo from './EmbeddedVideo.vue'
 
 var roundToScale = function(n, scale) {
     return parseFloat((Math.round(n / scale) * scale).toFixed(1));
 };
 
 export default {
-    components: {
-        EmbeddedVideo,
-    },
     data: function() { return {
         nonEmbeddableVideo: null,
         showNonEmbeddableModal: false,
@@ -249,8 +245,7 @@ export default {
             this.showNonEmbeddableModal = false;
         },
         thumbnailURL: function(showInfo) {
-            const videoId = videoIdFromCaptionId(showInfo.seasons[0].episodes[0].id);
-            return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
+            return youtubeThumbnailURL(showInfo.seasons[0].episodes[0].id);
         },
         mapDifficultyToColor: function(difficulty) {
             if (difficulty < 4) return 'green';

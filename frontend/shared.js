@@ -164,7 +164,8 @@ function fetchPersonalDataToStore(store) {
 }
 
 function appendSessionLog(state, data) {
-    const [showName, seasonName, episodeName] = getShowSeasonEpisodeName(getShowInfo(null, state), state.captionId);
+    const showId = state.captionData.show_name;
+    const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(null, state), state.captionId);
     console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data, showName, seasonName, episodeName);
     sendMessageToBackground({
         type: 'appendSessionLog',
@@ -172,9 +173,9 @@ function appendSessionLog(state, data) {
             captionId: state.captionId,
             captionHash: state.captionHash,
             sessionTime: state.sessionTime,
-            showName: showName,
-            seasonName: seasonName,
-            episodeName: episodeName,
+            showId: showId,
+            seasonIdx: seasonIdx,
+            episodeIdx: episodeIdx,
         },
         data: data,
     });
@@ -188,9 +189,11 @@ function getLog(offset, limit, callback) {
     }, callback);
 }
 
-function getRecent(callback) {
+function getViewingHistory(offset, limit, callback) {
     return sendMessageToBackground({
-        type: 'getRecent',
+        type: 'getViewingHistory',
+        offset: offset,
+        limit: limit,
     }, callback);
 }
 
@@ -605,7 +608,7 @@ function openDashboard() {
     sendMessageToBackground({type: 'openDashboard'});
 }
 
-function getShowSeasonEpisodeName(showInfo, captionId) {
+function getShowSeasonEpisode(showInfo, captionId) {
     let showName = null;
     if (showInfo) {
         showName = showInfo.name;
@@ -613,11 +616,11 @@ function getShowSeasonEpisodeName(showInfo, captionId) {
         if (seasonIdx !== null) {
             const seasonName = getSeasonName(showInfo, seasonIdx);
             const episodeName = getEpisodeName(showInfo, seasonIdx, episodeIdx);
-            return [showName, seasonName, episodeName];
+            return [showName, seasonIdx, seasonName, episodeIdx, episodeName];
         }
     }
 
-    return [showName, null, null];
+    return [showName, null, null, null, null];
 }
 
 function getSeasonName(showInfo, seasonIdx) {
@@ -671,6 +674,11 @@ function srtTimestamp(t) {
     let secondsString = seconds.toFixed(3);
     if (seconds < 10) secondsString = '0' + secondsString;
     return `${pad(hours, 2)}:${pad(minutes, 2)}:${secondsString}`.replace('.', ',');
+}
+
+function youtubeThumbnailURL(captionId) {
+    const videoId = videoIdFromCaptionId(captionId);
+    return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
 // SVG icons from css.gg
