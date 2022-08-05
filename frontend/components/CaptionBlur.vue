@@ -78,7 +78,7 @@ export default {
         }
     },
     mounted: function() {
-        if (this.AVElement === null) return;
+        if (!this.AVElement || !this.AVElement.parentNode) return;
         // Transfer it to the video element
         this.AVElement.parentNode.appendChild(this.$el);
     },

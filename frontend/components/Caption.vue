@@ -86,6 +86,7 @@ export default {
     mounted: function() {
         this.setUpdateInterval();
         this.setObserversAndHandlers();
+        this.updateCaptionPositionBlur();
     },
     beforeDestroy: function() {
         clearInterval(this.currentTimeInterval);

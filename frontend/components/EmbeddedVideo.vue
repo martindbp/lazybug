@@ -1,8 +1,9 @@
 <template>
     <div class="iframecontainer">
+        <div v-show="!playerReady" class="videoloading" />
         <div v-if="$store.state.isMovingCaption" class="dragsurface" />
         <div ref="player" :id="playerID" />
-        <EmbeddedCaption />
+        <EmbeddedCaption v-show="playerReady" />
     </div>
 </template>
 
@@ -69,10 +70,14 @@ export default {
             this.$store.commit('setVideoAPI', videoAPI);
         },
         onReady: function() {
-            this.playerReady = true;
             let $el = document.getElementById(this.playerID);
             this.$store.commit('setAVElement', $el);
             this.$store.commit('setVideoDuration', this.getDuration());
+            const self = this;
+            // Wait a bit before setting playerReady to remove flickering because iframe hasn't fully rendered yet
+            setTimeout(function() {
+                self.playerReady = true;
+            }, 100);
         },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
@@ -128,5 +133,15 @@ export default {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0);
+}
+
+.videoloading {
+    z-index: 98;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
 }
 </style>
