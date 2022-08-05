@@ -82,8 +82,8 @@ export default {
         this.updateVideoHeight();
         this.clickEventListener = document.addEventListener('click', function(evt) {
             if (self.hidden || evt.target.closest('.q-fab')) return;
-            self.$refs.seasonselector.hide();
-            self.$refs.episodeselector.hide();
+            if (self.$refs.seasonselector) self.$refs.seasonselector.hide();
+            if (self.$refs.episodeselector) self.$refs.episodeselector.hide();
         });
     },
     unmounted: function() {

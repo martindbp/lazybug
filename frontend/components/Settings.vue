@@ -13,7 +13,7 @@
         <br>
         <q-btn color="blue" label="Restore database from backup" @click="importDb" />
 
-        <q-dialog v-model="confirmClearPersonalData" persistent>
+        <q-dialog seamless v-model="confirmClearPersonalData">
             <q-card>
                 <q-card-section class="row items-center">
                     <span class="q-ml-sm">Are you sure? This will delete your local data permanently.</span>

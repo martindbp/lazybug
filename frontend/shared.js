@@ -556,7 +556,8 @@ function captionToAnkiCloze(wordData, hiddenStates, captionIdx, type, i, caption
     }
     html += `<br><hr><br><div>{{c1::${wordData.translation}}}</div>`;
     if (captionId !== null) {
-        const [site, id] = captionId.split('-');
+        const parts = captionId.split('-');
+        const id = parts.slice(1).join('-');
         const embedding = getYoutubeEmbedCode(id, t0, t1, true);
         html += `<br><hr><button onClick="addEmbedding(event)">Play</button>`;
         html += '<script>';
