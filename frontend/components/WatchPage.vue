@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showInfo" style="position: relative">
+    <div ref="watchpage" v-if="showInfo" style="position: relative">
         <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="captionId" />
         <div v-if="showInfo.type !== 'movie'" style="position: absolute; left: 5px; top: 185px;">
             <div style="margin-bottom: 15px">
@@ -68,6 +68,10 @@ export default {
         this.updateVideoHeight();
     },
     updated: function() {
+        if (this.$refs.watchpage && this.$refs.watchpage.style.display === 'none') {
+            // If we navigated away from watch page, we should pause the video
+            this.$refs.video.pause();
+        }
         this.updateVideoHeight();
     },
     methods: {
