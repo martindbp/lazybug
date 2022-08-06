@@ -194,6 +194,7 @@ function getViewingHistory(offset, limit, callback) {
         type: 'getViewingHistory',
         offset: offset,
         limit: limit,
+        dedupeLast: true,
     }, callback);
 }
 

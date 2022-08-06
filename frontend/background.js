@@ -388,7 +388,14 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getViewingHistory') {
+        // message parameters:
+        // offset
+        // limit
+        // dedupeGobal: AABAAB -> AB
+        // dedupeLast: AABAAB -> ABAB
+
         let seen = new Set();
+        let lastCaptionId = null;
         message.offset = message.offset || 0;
 
         personalDb.log
@@ -397,7 +404,8 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         .then(function(data) {
             let videos = [];
             for (const session of data) {
-                if (seen.has(session.captionId)) continue;
+                if (message.dedupeGlobal && seen.has(session.captionId)) continue;
+                if (message.dedupeLast && session.captionId === lastCaptionId) continue;
                 if ([null, undefined].includes(session.showId)) continue;
 
                 videos.push({
@@ -408,6 +416,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                 });
 
                 seen.add(session.captionId);
+                lastCaptionId = session.captionId;
                 if (
                     message.limit &&
                     videos.length > message.offset + message.limit
