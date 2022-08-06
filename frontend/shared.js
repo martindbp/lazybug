@@ -605,10 +605,6 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
-function openDashboard() {
-    sendMessageToBackground({type: 'openDashboard'});
-}
-
 function getShowSeasonEpisode(showInfo, captionId) {
     let showName = null;
     if (showInfo) {

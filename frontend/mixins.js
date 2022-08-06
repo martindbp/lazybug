@@ -16,7 +16,7 @@ const mixin = {
         setPlaying: function(showInfo, seasonIdx = 0, episodeIdx = 0) {
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
-                this.$store.commit('setShowNonEmbeddableModal', true);
+                this.$store.commit('setShowNonEmbeddableDialog', true);
                 return;
             }
             this.$store.commit('setPlayingShowInfo', showInfo);
@@ -38,7 +38,7 @@ const mixin = {
             this.$store.commit('setNonEmbeddableVideoSelected', null);
             this.$store.commit('setPlayingSeason', null);
             this.$store.commit('setPlayingEpisode', null);
-            this.$store.commit('setShowNonEmbeddableModal', false);
+            this.$store.commit('setShowNonEmbeddableDialog', false);
         },
         sm2tr(text, optionsOverride = true) {
             if (this.$store.state.DICT === null) return null;

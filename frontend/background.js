@@ -452,13 +452,6 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     else if (message.type === 'translation') {
         fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse());
     }
-    else if (message.type === 'openDashboard') {
-        if (BROWSER_EXTENSION) {
-            chrome.tabs.create({
-              url: "dashboard.html",
-            });
-        }
-    }
 
     return true;
 }

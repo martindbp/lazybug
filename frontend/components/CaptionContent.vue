@@ -108,7 +108,7 @@
             </tr>
         </table>
         <br/>
-        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.5em' }" v-if="data !== null">
+        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.2em' }" v-if="data !== null">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
                     
@@ -330,11 +330,12 @@ export default {
 
                 this.applyState(type, i, StateStarred, StateStarred);
 
+                const self = this;
                 this.$q.notify({
                     type: 'positive',
                     message: `"${content}" starred`,
                     actions: [
-                        { label: 'Open in Dashboard', color: 'white', handler: openDashboard }
+                        { label: 'Open starred', color: 'white', handler: function() { self.$store.commit('setWebPage', 'star'); } }
                     ]
                 });
             }
@@ -669,13 +670,20 @@ export default {
     font-family: sans-serif;
 }
 
+.contenttable tr {
+    line-height: 1.5em;
+}
+
 .toprow td:not(:first-child) span {
     font-size: 1em;
 }
 
+.centerrow td:not(:first-child) {
+    line-height: 1.25em;
+}
+
 .centerrow td:not(:first-child) span {
     font-size: 1.25em;
-    line-height: 1.25em;
 }
 
 .centerrow {

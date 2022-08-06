@@ -66,7 +66,7 @@ export default {
     font-size: 0;
     padding: 5px;
     border-radius: 3px;
-    line-height: 1em;
+    line-height: 0;
     visibility: hidden;
     opacity: 0;
     transition: 0.20s;
@@ -75,6 +75,16 @@ export default {
 
 .contexticon svg {
     background-color: rgb(50, 50, 50);
+}
+
+.contexticon svg {
+    width: 22px; /* WHYYY??? */
+    height: 22px;
+}
+
+#extroot .contexticon svg {
+    width: 18px;
+    height: 18px;
 }
 
 .contexticon:hover {

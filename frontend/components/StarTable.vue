@@ -49,7 +49,7 @@
               <q-btn icon="last_page" color="grey-8" round dense flat :disable="isLastPage" @click="lastPage" />
               <q-btn-dropdown :disabled="selected.length === 0" color="primary" label="Export" style="margin-left: 5px; margin-right: 5px">
                   <q-list>
-                      <q-item clickable v-close-popup @click="showExportModal = true">
+                      <q-item clickable v-close-popup @click="showExportDialog = true">
                           <q-item-section>
                               <q-item-label>Anki CSV</q-item-label>
                           </q-item-section>
@@ -64,7 +64,7 @@
               {{ getSelectedString() }}
           </template>
         </q-table>
-        <q-dialog class="fixdialogheight" v-model="showExportModal" seamless>
+        <q-dialog class="fixdialogheight" v-model="showExportDialog" seamless>
             <q-card>
                 <q-tabs
                    v-model="ankiCardTab"
@@ -156,7 +156,7 @@ export default {
         loading: true,
         tab: Vue.ref('history'),
         ankiCardTab: Vue.ref('basic'),
-        showExportModal: false,
+        showExportDialog: false,
         editAnkiCards: false,
         ankiCardsEditText: '',
         ankiCardsBasic: [
@@ -453,10 +453,10 @@ export default {
                             eventData[1].episodeName = session.episodeName;
                         }
                         else {
-                            const showInfo = this.$store.showList[session.showId];
+                            const showInfo = this.$store.state.showList[session.showId];
                             eventData[1].showName = resolveShowName(showInfo.name);
                             eventData[1].seasonName = getSeasonName(showInfo, session.seasonIdx);
-                            eventData[1].episodeName = getEpisodeName(showInfo, session.episodeIdx);
+                            eventData[1].episodeName = getEpisodeName(showInfo, session.seasonIdx, session.episodeIdx);
                         }
 
                         let type = null;
