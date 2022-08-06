@@ -86,6 +86,19 @@
             </q-page>
           </q-page-container>
         </q-layout>
+
+        <q-dialog seamless v-model="showNonEmbeddableModal">
+            <q-card>
+                <q-card-section class="row items-center">
+                    <span class="q-ml-sm">This show can't be embedded in this web app</span>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn flat label="Go to Youtube" color="green" v-close-popup @click="goYoutube" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </div>
 </template>
 
@@ -97,6 +110,7 @@ import PlayerPage from './PlayerPage.vue'
 import HistoryPage from './HistoryPage.vue'
 
 export default {
+    mixins: [mixin],
     components: {
         ShowTable,
         StarTable,
@@ -108,6 +122,10 @@ export default {
         page: {
             get: function() { return this.$store.state.webPage; },
             set: function(val) { this.$store.commit('setWebPage', val); },
+        },
+        showNonEmbeddableModal: {
+            get: function() { return this.$store.state.showNonEmbeddableModal; },
+            set: function(val) { this.$store.commit('setShowNonEmbeddableModal', val); },
         },
     }
 };

@@ -8,7 +8,7 @@
       style="display: inline-block; margin-top: 50px; margin-left: 50px"
     >
         <template v-slot:body="props">
-            <q-tr :props="props" >
+            <q-tr :props="props" @click="clickVideo(props)" style="cursor: pointer;">
                 <q-td key="video" :props="props" >
                     <img width="100" :src="thumbnailURL(props.cols[0].value)" />
                 </q-td>
@@ -23,6 +23,7 @@
 <script>
 
 export default {
+    mixins: [mixin],
     data: function() { return {
         isLoading: true,
         rows: [],
@@ -52,10 +53,10 @@ export default {
         getViewingHistory(0, null, function(data) {
             for (const row of data) {
                 const showId = row.showId;
-                const showInfo = self.$store.state.showList[showId];
-                const showName = resolveShowName(showInfo.name);
-                const seasonName = getSeasonName(showInfo, row.seasonIdx);
-                const episodeName = getEpisodeName(showInfo, row.seasonIdx, row.episodeIdx);
+                row.showInfo = self.$store.state.showList[showId];
+                const showName = resolveShowName(row.showInfo.name);
+                const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
+                const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
                 row.name = `${showName} - ${seasonName} ${episodeName}`;
             }
             self.rows = data;
@@ -65,6 +66,9 @@ export default {
     methods: {
         thumbnailURL: function(captionId) {
             return youtubeThumbnailURL(captionId);
+        },
+        clickVideo: function(props) {
+            this.setPlaying(props.row.showInfo);
         },
     }
 };

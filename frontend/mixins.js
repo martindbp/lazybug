@@ -13,6 +13,31 @@ function combinations(options, accumulatorArray, currCombination = [], currIdx =
 
 const mixin = {
     methods: {
+        setPlaying: function(showInfo) {
+            if (showInfo.embeddable === false) {
+                this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
+                this.$store.commit('setShowNonEmbeddableModal', true);
+                return;
+            }
+            this.$store.commit('setPlayingShowInfo', showInfo);
+            this.$store.commit('setPlayingSeason', 0);
+            this.$store.commit('setPlayingEpisode', 0);
+            this.$store.commit('setWebPage', 'player');
+        },
+        goYoutube: function() {
+            const showInfo = this.$store.state.nonEmbeddableVideoSelected;
+            const captionId = showInfo.seasons[0].episodes[0].id;
+            const parts = captionId.split('-');
+            const id = parts.slice(1).join('-');
+            const list = showInfo.seasons[0].youtube_playlist;
+            let url = `https://youtube.com/watch?v=${id}`;
+            if (list) {
+                url += `&list=${list}`;
+            }
+            window.open(url, '_blank').focus();
+            this.$store.commit('setNonEmbeddableVideoSelected', null);
+            this.$store.commit('setShowNonEmbeddableModal', false);
+        },
         sm2tr(text, optionsOverride = true) {
             if (this.$store.state.DICT === null) return null;
             if (optionsOverride && this.$store.state.options.characterSet == 'sm') return text;
@@ -128,4 +153,3 @@ const mixin = {
         },
     },
 };
-

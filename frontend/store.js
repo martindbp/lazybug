@@ -48,6 +48,8 @@ const store = new Vuex.Store({
         captionFontSize: 24,
         captionOffset: [0, 0],
         isMovingCaption: false,
+        nonEmbeddableVideoSelected: null,
+        showNonEmbeddableModal: false,
         peekStates: Vue.ref({
             py: [],
             hz: [],
@@ -129,6 +131,12 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setNonEmbeddableVideoSelected(state, val) {
+            state.nonEmbeddableVideoSelected = val;
+        },
+        setShowNonEmbeddableModal(state, val) {
+            state.showNonEmbeddableModal = val;
+        },
         setWebPage(state, page) {
             state.webPage = page;
         },

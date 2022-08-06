@@ -17,8 +17,8 @@
             </q-th>
         </template>
         <template v-slot:body="props">
-            <q-tr :props="props" @click="setPlaying(props)" :style="{ cursor: 'pointer' }" >
-                <q-tooltip delay="200" anchor="top left" self="top right" :offset="[0, 20]" style="background: rgba(0,0,0,0)">
+            <q-tr :props="props" @click="setPlaying(props.row)" style="cursor: pointer;" >
+                <q-tooltip delay="200" anchor="top left" self="top right" :offset="[-10, 9]" style="background: rgba(0,0,0,0)">
                     <img width="100" :src="thumbnailURL(props.row)" />
                 </q-tooltip>
                 <q-td key="name" :props="props" class="text-subtitle1" style="max-width: 350px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
@@ -77,18 +77,6 @@
             </q-tr>
         </template>
     </q-table>
-    <q-dialog seamless v-model="showNonEmbeddableModal">
-        <q-card>
-            <q-card-section class="row items-center">
-                <span class="q-ml-sm">This show can't be embedded in this web app</span>
-            </q-card-section>
-
-            <q-card-actions align="right">
-                <q-btn flat label="Cancel" color="primary" v-close-popup />
-                <q-btn flat label="Go to Youtube" color="green" v-close-popup @click="goYoutube" />
-            </q-card-actions>
-        </q-card>
-    </q-dialog>
     </div>
 </template>
 
@@ -99,9 +87,8 @@ var roundToScale = function(n, scale) {
 };
 
 export default {
+    mixins: [mixin],
     data: function() { return {
-        nonEmbeddableVideo: null,
-        showNonEmbeddableModal: false,
         pagination: {
             rowsPerPage: 25,
         },
@@ -231,19 +218,6 @@ export default {
         },
     },
     methods: {
-        goYoutube: function() {
-            const captionId = this.nonEmbeddableVideo.seasons[0].episodes[0].id
-            const parts = captionId.split('-');
-            const id = parts.slice(1).join('-');
-            const list = this.nonEmbeddableVideo.seasons[0].youtube_playlist;
-            let url = `https://youtube.com/watch?v=${id}`;
-            if (list) {
-                url += `&list=${list}`;
-            }
-            window.open(url, '_blank').focus();
-            this.nonEmbeddableVideo = null;
-            this.showNonEmbeddableModal = false;
-        },
         thumbnailURL: function(showInfo) {
             return youtubeThumbnailURL(showInfo.seasons[0].episodes[0].id);
         },
@@ -299,17 +273,6 @@ export default {
         },
         clearFilters: function() {
             this.filters = null;
-        },
-        setPlaying: function(props) {
-            if (props.row.embeddable === false) {
-                this.showNonEmbeddableModal = true;
-                this.nonEmbeddableVideo = props.row;
-                return;
-            }
-            this.$store.commit('setPlayingShowInfo', props.row);
-            this.$store.commit('setPlayingSeason', 0);
-            this.$store.commit('setPlayingEpisode', 0);
-            this.$store.commit('setWebPage', 'player');
         },
     }
 };
