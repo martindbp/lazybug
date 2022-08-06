@@ -203,6 +203,7 @@ export default {
             ["prev", "Previous"],
             ["replay", "Replay"],
             ["dictionary", "Dictionary"],
+            ["pausePlay", "Pause/Play"],
             ["peek", "Peek"],
             ["peekFullTr", "Peek Full Translation"],
             ["peekPy", "Peek Pinyin Row"],

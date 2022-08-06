@@ -3,7 +3,7 @@
         <div v-show="!playerReady" class="videoloading" />
         <div v-if="$store.state.isMovingCaption" class="dragsurface" />
         <div ref="player" :id="playerID" />
-        <EmbeddedCaption v-show="playerReady" />
+        <EmbeddedCaption ref="embeddedcaption" v-show="playerReady" />
     </div>
 </template>
 
@@ -20,13 +20,23 @@ export default {
             playerID: uuidv4(),
             player: null,
             playerReady: false,
+            focusInterval: null,
         };
     },
     mounted: function(){
         this.initYoutube();
+        const self = this;
+        // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
+        this.focusInterval = setInterval(function() {
+            if (document.activeElement.tagName === 'IFRAME') {
+                focus(self.$refs.embeddedcaption);
+            }
+        }, 100);
     },
     beforeUnmount: function() {
         this.destroyYoutube();
+        clearInterval(this.focusInterval);
+        this.focusInterval = null;
     },
     watch: {
         captionId: function() {

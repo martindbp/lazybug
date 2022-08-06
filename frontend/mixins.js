@@ -13,20 +13,20 @@ function combinations(options, accumulatorArray, currCombination = [], currIdx =
 
 const mixin = {
     methods: {
-        setPlaying: function(showInfo) {
+        setPlaying: function(showInfo, seasonIdx = 0, episodeIdx = 0) {
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
                 this.$store.commit('setShowNonEmbeddableModal', true);
                 return;
             }
             this.$store.commit('setPlayingShowInfo', showInfo);
-            this.$store.commit('setPlayingSeason', 0);
-            this.$store.commit('setPlayingEpisode', 0);
+            this.$store.commit('setPlayingSeason', seasonIdx);
+            this.$store.commit('setPlayingEpisode', episodeIdx);
             this.$store.commit('setWebPage', 'player');
         },
         goYoutube: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
-            const captionId = showInfo.seasons[0].episodes[0].id;
+            const captionId = showInfo.seasons[this.playingSeason].episodes[this.playingEpisode].id;
             const parts = captionId.split('-');
             const id = parts.slice(1).join('-');
             const list = showInfo.seasons[0].youtube_playlist;
@@ -36,6 +36,8 @@ const mixin = {
             }
             window.open(url, '_blank').focus();
             this.$store.commit('setNonEmbeddableVideoSelected', null);
+            this.$store.commit('setPlayingSeason', null);
+            this.$store.commit('setPlayingEpisode', null);
             this.$store.commit('setShowNonEmbeddableModal', false);
         },
         sm2tr(text, optionsOverride = true) {

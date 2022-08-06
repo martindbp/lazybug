@@ -72,7 +72,9 @@
                     Help
                   </q-item-section>
                 </q-item>
+                <q-btn color="primary" label="Account" style="margin: 20px;" @click="$store.commit('setShowAccountDialog', true)" />
               </q-list>
+
             </q-scroll-area>
           </q-drawer>
 
@@ -87,7 +89,7 @@
           </q-page-container>
         </q-layout>
 
-        <q-dialog seamless v-model="showNonEmbeddableModal">
+        <q-dialog seamless v-model="showNonEmbeddableDialog">
             <q-card>
                 <q-card-section class="row items-center">
                     <span class="q-ml-sm">This show can't be embedded in this web app</span>
@@ -99,6 +101,7 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
+        <AccountDialog />
     </div>
 </template>
 
@@ -108,6 +111,7 @@ import StarTable from './StarTable.vue'
 import Settings from './Settings.vue'
 import PlayerPage from './PlayerPage.vue'
 import HistoryPage from './HistoryPage.vue'
+import AccountDialog from './AccountDialog.vue'
 
 export default {
     mixins: [mixin],
@@ -117,15 +121,16 @@ export default {
         Settings,
         PlayerPage,
         HistoryPage,
+        AccountDialog,
     },
     computed: {
         page: {
             get: function() { return this.$store.state.webPage; },
             set: function(val) { this.$store.commit('setWebPage', val); },
         },
-        showNonEmbeddableModal: {
-            get: function() { return this.$store.state.showNonEmbeddableModal; },
-            set: function(val) { this.$store.commit('setShowNonEmbeddableModal', val); },
+        showNonEmbeddableDialog: {
+            get: function() { return this.$store.state.showNonEmbeddableDialog; },
+            set: function(val) { this.$store.commit('setShowNonEmbeddableDialog', val); },
         },
     }
 };

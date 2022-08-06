@@ -49,7 +49,7 @@ const store = new Vuex.Store({
         captionOffset: [0, 0],
         isMovingCaption: false,
         nonEmbeddableVideoSelected: null,
-        showNonEmbeddableModal: false,
+        showNonEmbeddableDialog: false,
         peekStates: Vue.ref({
             py: [],
             hz: [],
@@ -73,6 +73,7 @@ const store = new Vuex.Store({
             }
         }),
         showOptions: false,
+        showAccountDialog: false,
         optionsHighlightSection: null,
         showDictionary: false,
         showDictionaryRange: [-1, -1],
@@ -134,8 +135,8 @@ const store = new Vuex.Store({
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
         },
-        setShowNonEmbeddableModal(state, val) {
-            state.showNonEmbeddableModal = val;
+        setShowNonEmbeddableDialog(state, val) {
+            state.showNonEmbeddableDialog = val;
         },
         setWebPage(state, page) {
             state.webPage = page;
@@ -212,6 +213,9 @@ const store = new Vuex.Store({
         },
         setShowOptions(state, val) {
             state.showOptions = val;
+        },
+        setShowAccountDialog(state, val) {
+            state.showAccountDialog = val;
         },
         setShowDictionary(state, val) {
             if (! [null, undefined].includes(val.val)) state.showDictionary = val.val;

@@ -68,7 +68,7 @@ export default {
             return youtubeThumbnailURL(captionId);
         },
         clickVideo: function(props) {
-            this.setPlaying(props.row.showInfo);
+            this.setPlaying(props.row.showInfo, props.row.seasonIdx, props.row.episodeIdx);
         },
     }
 };

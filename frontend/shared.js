@@ -682,6 +682,15 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
+function syncPersonalDatabase(uploadURL, data) {
+    fetch(url, {method: "PUT", body: data}).then(
+        res => console.log(res),
+    ).catch((error) => {
+        console.log(error);
+        throw error;
+    });
+}
+
 // SVG icons from css.gg
 const ICON_SVG = {
     'play-track-next': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none"><path d="M6 17L14 12L6 7V17Z" fill="currentColor"/><path d="M18 7H15V12V17H18V7Z" fill="currentColor"/></svg>',
