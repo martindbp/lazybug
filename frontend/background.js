@@ -456,14 +456,16 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     return true;
 }
 
-if (window.parent != window) {
-    // We're inside an iframe, listen to messages from the parent
-    window.addEventListener("message", message => {
-        backgroundMessageHandler(message.data.message, null, function(response) {
-            window.parent.postMessage({
-                data: response,
-                requestId: message.data.requestId,
-            }, '*');
+if (! BROWSER_EXTENSION) {
+    if (window.parent != window) {
+        // We're inside an iframe, listen to messages from the parent
+        window.addEventListener("message", message => {
+            backgroundMessageHandler(message.data.message, null, function(response) {
+                window.parent.postMessage({
+                    data: response,
+                    requestId: message.data.requestId,
+                }, '*');
+            });
         });
-    });
+    }
 }
