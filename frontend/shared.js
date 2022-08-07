@@ -7,7 +7,7 @@ const requestCallbacks = {}; // map between SESSION_ID+request_id to a callback 
 
 let lazybugIframe = null;
 
-if (BROWSER_EXTENSION) {
+if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe = document.createElement('iframe');
     lazybugIframe.src = 'https://lazybug.ai/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
@@ -76,7 +76,8 @@ function sendMessageToBackground(message, callback) {
         return true;
     }
 
-    if (BROWSER_EXTENSION) {
+    if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
+        // Send to iframe
         const requestId = `${SESSION_ID}-${nextRequestId}`;
 
         // Need to do this to make sure object is cloneable
@@ -89,12 +90,13 @@ function sendMessageToBackground(message, callback) {
         nextRequestId += 1;
     }
     else {
+        // Call directly
         message = JSON.parse(JSON.stringify(message));
         backgroundMessageHandler(message, null, responseHandler);
     }
 }
 
-if (BROWSER_EXTENSION) {
+if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     // Listen for messages from the lazybug iframe
     window.addEventListener("message", message => {
         if (message.data.requestId === undefined) return;

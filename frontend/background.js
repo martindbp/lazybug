@@ -1,5 +1,6 @@
 try {
     importScripts('vars_ext.js');
+    BACKGROUND_SCRIPT = true; // set this so that shared.js doesn't try to create iframe
     importScripts('shared.js');
     importScripts('db.js');
 } catch (e) {
@@ -191,9 +192,6 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
                     console.log('Fetching', folder, filename, fetchHash);
                     return fetch(CDN_URL + `${folder}/${filename}-${fetchHash}.${ext}`, {cache: 'no-cache'})
                         .then(function(response) {
-                            if (BROWSER_EXTENSION) {
-                                chrome.action.setBadgeText({text:''});
-                            }
                             if (!response.ok) {
                                 failCallback(response);
                                 return null;
@@ -456,7 +454,17 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     return true;
 }
 
-if (! BROWSER_EXTENSION) {
+if (BROWSER_EXTENSION) {
+    // Only for deepl now. We don't run the background.js for the normal extension stuff
+    chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+        backgroundMessageHandler(message, null, function(response) {
+            sendResponse(response);
+            return true;
+        });
+        return true;
+    });
+}
+else {
     if (window.parent != window) {
         // We're inside an iframe, listen to messages from the parent
         window.addEventListener("message", message => {
