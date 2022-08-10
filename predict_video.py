@@ -891,7 +891,7 @@ def predict_video_captions(
 
                 line = predict_line(ocr_fn, crop, frame_time, font_height, height_buffer_px=height_buffer_px)
                 print(line.text)
-                if len(filter_text_hanzi(line.text)) > 1 and line.bounding_rect is not None:
+                if (len(filter_text_hanzi(line.text)) > 1 or len(line.text) > 5) and line.bounding_rect is not None:
                     sum_log_prob += line.logprob
                     bounding_rects.append(line.bounding_rect)
 
