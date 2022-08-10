@@ -1,32 +1,14 @@
 from fastapi import Depends, FastAPI
-#from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://0.0.0.0:8000",
-    "http://0.0.0.0",
-]
+app = FastAPI()
 
-middleware = [
-    Middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=['*'],
-        allow_headers=['*']
-    )
-]
-
-app = FastAPI(middleware=middleware)
-
+app.mount("/static", StaticFiles(directory="frontend/dist"), name="static")
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
@@ -62,5 +44,3 @@ async def authenticated_route(user: User = Depends(current_active_user)):
 async def on_startup():
     # Not needed if you setup a migration system like Alembic
     await create_db_and_tables()
-
-
