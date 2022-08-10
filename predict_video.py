@@ -1042,7 +1042,7 @@ def predict_video_captions(
 @task(serializer=json)
 def update_conditional_captions(caption_lines, conditional_captions, action):
     assert 'type' in action
-    assert 'join' in action
+    assert ('join' in action) or action['type'] == 'replace'
 
     # We update the original conditional captions and return those instead
     for cond_line in conditional_captions['lines']:
@@ -1069,6 +1069,8 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
                     cond_line[0] = line[0]
                 else:
                     cond_line[0] = cond_line[0] + action['join'] + line[0]
+            elif action['type'] == 'replace':
+                    cond_line[0] = line[0]
 
             # Take the bounding rect union
             cond_rect = list(cond_line[3])
