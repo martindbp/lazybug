@@ -247,3 +247,6 @@ simple-chars:
 	SIMPLE_CHARS_HASH=$$(md5sum data/git/simple_chars.json | cut -d " " -f1) ; \
 	echo $$SIMPLE_CHARS_HASH > data/remote/public/simple_chars.hash ; \
 	cp data/git/simple_chars.json "data/remote/public/simple_chars-$$SIMPLE_CHARS_HASH.json"
+
+run-server:
+	python backend/main.py
