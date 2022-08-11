@@ -48,20 +48,31 @@ export default {
             },
         ],
     }},
-    mounted: function() {
-        const self = this;
-        getViewingHistory(0, null, function(data) {
-            for (const row of data) {
-                const showId = row.showId;
-                row.showInfo = self.$store.state.showList[showId];
-                const showName = resolveShowName(row.showInfo.name);
-                const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
-                const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
-                row.name = `${showName} - ${seasonName} ${episodeName}`;
-            }
-            self.rows = data;
-            self.isLoading = false;
-        });
+    computed: {
+        showList: function() {
+            return this.$store.state.showList;
+        },
+    },
+    watch: {
+        showList: {
+            immediate: true,
+            handler: function(newData) {
+                if (! newData) return;
+                const self = this;
+                getViewingHistory(0, null, function(data) {
+                    for (const row of data) {
+                        const showId = row.showId;
+                        row.showInfo = self.$store.state.showList[showId];
+                        const showName = resolveShowName(row.showInfo.name);
+                        const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
+                        const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
+                        row.name = `${showName} - ${seasonName} ${episodeName}`;
+                    }
+                    self.rows = data;
+                    self.isLoading = false;
+                });
+            },
+        },
     },
     methods: {
         thumbnailURL: function(captionId) {
