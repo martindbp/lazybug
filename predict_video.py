@@ -1070,7 +1070,7 @@ def update_conditional_captions(caption_lines, conditional_captions, action):
                 else:
                     cond_line[0] = cond_line[0] + action['join'] + line[0]
             elif action['type'] == 'replace':
-                    cond_line[0] = line[0]
+                cond_line[0] = line[0]
 
             # Take the bounding rect union
             cond_rect = list(cond_line[3])
