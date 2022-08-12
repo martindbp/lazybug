@@ -680,12 +680,67 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
-function syncPersonalDatabase(uploadURL, data) {
-    fetch(url, {method: "PUT", body: data}).then(
-        res => console.log(res),
-    ).catch((error) => {
-        console.log(error);
-        throw error;
+function syncPersonalDatabase(uploadURL, data, callback) {
+    fetch(url, {method: "PUT", body: data}).then(function() {
+        callback();
+    }).catch((error) => {
+        callback(error);
+    });
+}
+
+function login(username, password, callback) {
+    fetch('/auth/jwt/login', {
+        method: 'POST',
+        headers:{
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            'username': username,
+            'password': password
+        })
+    }).then(function(res) {
+        return res.json();
+    }).then((res) => {
+        if (res.detail) callback(null, res);
+        else callback(res, null)
+    }).catch((error) => {
+        callback(null, error);
+    });
+}
+
+function register(username, password, callback) {
+    fetch('/auth/register', {
+        method: 'POST',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'email': username,
+            'password': password
+        })
+    }).then(function(res) {
+        if (res.ok) callback();
+        else return res.json();
+    }).then((error) => {
+        if (error) callback(error);
+    }).catch((error) => {
+        callback(error);
+    });
+}
+
+function getSignedUploadLink(accessToken, callback) {
+    fetch('/signed-upload-link', {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }),
+    }).then(function(res) {
+        return res.json();
+    }).then((res) => {
+        callback(res)
+    }).catch((error) => {
+        callback(error);
     });
 }
 

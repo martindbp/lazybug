@@ -12,22 +12,24 @@
 
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="login">
+                    Please enter your email and password:
                     <q-input v-model="email" filled type="email" hint="Email" />
                     <br>
                     <q-input v-model="password" filled type="password" hint="Password" />
-                    <div v-if="error">{{ error }}</div>
+                    <div class="accounterror" v-if="error">{{ error }}</div>
                 </q-tab-panel>
                 <q-tab-panel name="register">
+                    Please enter desired email and password:
                     <q-input v-model="email" filled type="email" hint="Email" />
                     <br>
                     <q-input v-model="password" filled type="password" hint="Password" />
-                    <div v-if="error">{{ error }}</div>
+                    <div class="accounterror" v-if="error">{{ error }}</div>
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
                 <q-btn flat label="Close" v-close-popup></q-btn>
-                <q-btn v-if="tab === 'login'" flat color="primary" v-close-popup label="Login" @click="clickLogin"></q-btn>
-                <q-btn v-else flat color="primary" v-close-popup label="Register" @click="clickRegister"></q-btn>
+                <q-btn v-if="tab === 'login'" :loading="loading" flat color="primary" label="Login" @click="clickLogin"></q-btn>
+                <q-btn v-else :loading="loading" flat color="primary" label="Register" @click="clickRegister"></q-btn>
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -45,31 +47,51 @@ export default {
     }},
     computed: {
         show: {
-            get: function() { return this.$store.state.showAccountDialog; },
+            get: function() { return this.$store.state.showAccountDialog !== false; },
             set: function(val) { this.$store.commit('setShowAccountDialog', val); },
         },
+        showAccountDialog: {
+            get: function() { return this.$store.state.showAccountDialog; },
+        },
+    },
+    watch: {
+        showAccountDialog: function() {
+            if (this.show !== false) {
+                this.tab = this.$store.state.showAccountDialog;
+            }
+        }
     },
     methods: {
         clickLogin: function() {
             this.loading = true;
             const self = this;
-            fetch('http://localhost/auth/jwt/login', {
-                method: 'POST',
-                headers:{
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    'username': this.email,
-                    'password': this.password,
-                })
-            }).then(function(res) {
+
+            login(this.email, this.password, function(res, error) {
                 self.loading = false;
-            }).catch((error) => {
-                self.loading = false;
-                self.error = error;
+                if (error) {
+                    self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
+                }
+                else if (res) {
+                    self.$store.commit('setAccessToken', res.access_token);
+                    self.show = false;
+                    self.password = '';
+                }
             });
         },
         clickRegister: function() {
+            this.loading = true;
+            const self = this;
+
+            register(this.email, this.password, function(error) {
+                self.loading = false;
+                if (error) {
+                    self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
+                }
+                else {
+                    self.show = false;
+                    self.password = '';
+                }
+            });
         },
     },
 }
@@ -83,5 +105,10 @@ export default {
 .fixdialogheight .q-panel > div {
     height: 300px !important;
     width: 400px;
+}
+
+.accounterror {
+    margin-top: 10px;
+    color: red;
 }
 </style>

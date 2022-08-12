@@ -72,7 +72,17 @@
                     Help
                   </q-item-section>
                 </q-item>
-                <q-btn color="primary" label="Account" style="margin: 20px;" @click="$store.commit('setShowAccountDialog', true)" />
+                <div v-if="$store.state.accessToken" style="margin: 20px">
+                    <q-btn color="red" label="Logout" @click="$store.commit('setAccessToken', null)" />
+                </div>
+                <div v-else style="margin: 20px">
+                    <q-btn color="primary" label="Register" @click="$store.commit('setShowAccountDialog', 'register')" />
+                    <q-btn flat color="primary" label="Login"  @click="$store.commit('setShowAccountDialog', 'login')"/>
+                </div>
+                <div v-if="$store.state.accessToken" style="margin: 20px">
+                    <q-btn label="get upload link" @click="uploadLink" />
+                </div>
+
               </q-list>
 
             </q-scroll-area>
@@ -132,6 +142,13 @@ export default {
             get: function() { return this.$store.state.showNonEmbeddableDialog; },
             set: function(val) { this.$store.commit('setShowNonEmbeddableDialog', val); },
         },
+    },
+    methods: {
+        uploadLink: function() {
+            getSignedUploadLink(this.$store.state.accessToken, function(url) {
+                alert(url);
+            });
+        }
     }
 };
 </script>

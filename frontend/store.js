@@ -26,6 +26,7 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
+        accessToken: null,
         captionId: null,
         videoId: null,
         AVElement: null,
@@ -73,7 +74,7 @@ const store = new Vuex.Store({
             }
         }),
         showOptions: false,
-        showAccountDialog: false,
+        showAccountDialog: false, // false, 'register' or 'login'
         optionsHighlightSection: null,
         showDictionary: false,
         showDictionaryRange: [-1, -1],
@@ -132,6 +133,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setAccessToken(state, val) {
+            state.accessToken = val;
+        },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
         },
