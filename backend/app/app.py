@@ -4,6 +4,7 @@ from botocore.config import Config
 
 from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
@@ -37,6 +38,11 @@ app.include_router(
     prefix="/users",
     tags=["users"],
 )
+
+
+@app.get("/")
+async def read_index():
+    return FileResponse('frontend/dist/index.html')
 
 
 @app.get("/authenticated-route")

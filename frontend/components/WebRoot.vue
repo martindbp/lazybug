@@ -11,7 +11,7 @@
             class="bg-grey-3"
           >
             <q-scroll-area style="border-right: 1px solid #ddd">
-              <q-img src="images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
+              <q-img src="/static/images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
                 <q-item v-if="$store.state.playerShowInfo" :active="page === 'player'" clickable @click="page = 'player'" v-ripple>
                   <q-item-section avatar>
