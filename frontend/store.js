@@ -26,7 +26,8 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
-        accessToken: null,
+        accessToken: localStorage.getItem('accessToken'),
+        accountEmail: localStorage.getItem('accountEmail'),
         captionId: null,
         videoId: null,
         AVElement: null,
@@ -133,8 +134,17 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
-        setAccessToken(state, val) {
-            state.accessToken = val;
+        setLogin(state, val) {
+            state.accessToken = val.accessToken;
+            state.accountEmail = val.email;
+            localStorage.setItem('accessToken', val.accessToken);
+            localStorage.setItem('accountEmail', val.email);
+        },
+        setLogout(state) {
+            state.accessToken = null;
+            state.accountEmail = null;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('accountEmail');
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;

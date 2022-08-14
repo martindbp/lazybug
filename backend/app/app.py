@@ -70,7 +70,16 @@ b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 async def get_signed_upload_link(user: User = Depends(current_active_user)):
     url = b2.meta.client.generate_presigned_url(
         ClientMethod='put_object',
-        Params={'Bucket': 'lazybug-accounts', 'Key': user.email},
+        Params={'Bucket': 'lazybug-accounts', 'Key': f'{user.email}.json'},
+        ExpiresIn=1000
+    )
+    return url
+
+@app.get("/signed-download-link")
+async def get_signed_download_link(user: User = Depends(current_active_user)):
+    url = b2.meta.client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={'Bucket': 'lazybug-accounts', 'Key': f'{user.email}.json'},
         ExpiresIn=1000
     )
     return url

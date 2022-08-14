@@ -72,7 +72,7 @@ export default {
                     self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
                 }
                 else if (res) {
-                    self.$store.commit('setAccessToken', res.access_token);
+                    self.$store.commit('setLogin', {accessToken: res.access_token, email: self.email });
                     self.show = false;
                     self.password = '';
                 }

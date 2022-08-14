@@ -680,11 +680,21 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
-function syncPersonalDatabase(uploadURL, data, callback) {
-    fetch(url, {method: "PUT", body: data}).then(function() {
+function uploadData(uploadURL, data, callback) {
+    fetch(uploadURL, {method: "PUT", body: data}).then(function() {
         callback();
     }).catch((error) => {
         callback(error);
+    });
+}
+
+function downloadData(downloadURL, callback) {
+    fetch(downloadURL, {method: "GET"}).then((res) => {
+        return res.json();
+    }).then((data) => {
+        callback(data)
+    }).catch((error) => {
+        callback(null, error);
     });
 }
 
@@ -728,8 +738,8 @@ function register(username, password, callback) {
     });
 }
 
-function getSignedUploadLink(accessToken, callback) {
-    fetch('/signed-upload-link', {
+function getSignedLink(accessToken, type, callback) {
+    fetch(`/signed-${type}-link`, {
         method: 'GET',
         headers: new Headers({
             'Authorization': 'Bearer ' + accessToken,

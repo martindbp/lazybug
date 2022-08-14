@@ -73,14 +73,15 @@
                   </q-item-section>
                 </q-item>
                 <div v-if="$store.state.accessToken" style="margin: 20px">
-                    <q-btn color="red" label="Logout" @click="$store.commit('setAccessToken', null)" />
+                    <q-btn color="red" label="Logout" @click="$store.commit('setLogout')" />
                 </div>
                 <div v-else style="margin: 20px">
                     <q-btn color="primary" label="Register" @click="$store.commit('setShowAccountDialog', 'register')" />
                     <q-btn flat color="primary" label="Login"  @click="$store.commit('setShowAccountDialog', 'login')"/>
                 </div>
                 <div v-if="$store.state.accessToken" style="margin: 20px">
-                    <q-btn label="get upload link" @click="uploadLink" />
+                    <q-btn label="Upload database" @click="uploadDatabase" />
+                    <q-btn label="Download database" @click="downloadDatabase" />
                 </div>
 
               </q-list>
@@ -144,11 +145,23 @@ export default {
         },
     },
     methods: {
-        uploadLink: function() {
-            getSignedUploadLink(this.$store.state.accessToken, function(url) {
-                alert(url);
+        uploadDatabase: function() {
+            getSignedLink(this.$store.state.accessToken, 'upload', function(url) {
+                exportDatabaseJson(function(data) {
+                    uploadData(url, JSON.stringify(data), function(error) {
+                        if (error) alert(error);
+                    });
+                });
             });
-        }
+        },
+        downloadDatabase: function() {
+            getSignedLink(this.$store.state.accessToken, 'download', function(url) {
+                downloadData(url, function(data, error) {
+                    if (error) alert(error);
+                    console.log(data);
+                });
+            });
+        },
     }
 };
 </script>
