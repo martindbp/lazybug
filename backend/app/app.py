@@ -14,6 +14,9 @@ from app.users import auth_backend, current_active_user, fastapi_users
 ENDPOINT = os.getenv('B2_ENDPOINT')
 KEY_ID = os.getenv('B2_KEY_ID')
 APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
+if ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None:
+    print('ERROR: B2 secrets not set')
+    exit(1)
 
 def get_b2_resource(endpoint, key_id, application_key):
     b2 = boto3.resource(
