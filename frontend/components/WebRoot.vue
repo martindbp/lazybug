@@ -74,6 +74,7 @@
                 </q-item>
                 <div v-if="$store.state.accessToken" style="margin: 20px">
                     <q-btn color="red" label="Logout" @click="$store.commit('setLogout')" />
+                    <div class="email">{{ $store.state.accountEmail }}</div>
                 </div>
                 <div v-else style="margin: 20px">
                     <q-btn color="primary" label="Register" @click="$store.commit('setShowAccountDialog', 'register')" />
@@ -108,7 +109,7 @@
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
-                    <q-btn flat label="Go to Youtube" color="green" v-close-popup @click="goYoutube" />
+                    <q-btn flat label="Go to Youtube (new tab)" color="green" v-close-popup @click="goYoutube" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -167,7 +168,10 @@ export default {
 </script>
 
 <style>
-#webroot {
-    /*text-align: center;*/
+.email {
+    width: 150px;
+    text-overflow: ellipsis;
+    overflow:hidden;
+    white-space:nowrap;
 }
 </style>
