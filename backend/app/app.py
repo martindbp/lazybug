@@ -1,3 +1,4 @@
+import os
 import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
@@ -10,6 +11,21 @@ from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 
+ENDPOINT = os.getenv('B2_ENDPOINT')
+KEY_ID = os.getenv('B2_KEY_ID')
+APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
+
+def get_b2_resource(endpoint, key_id, application_key):
+    b2 = boto3.resource(
+        service_name='s3',
+        endpoint_url=endpoint,     # Backblaze endpoint
+        aws_access_key_id=key_id,  # Backblaze keyID
+        aws_secret_access_key=application_key, # Backblaze applicationKey
+        config=Config(signature_version='s3v4')
+    )
+    return b2
+
+b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 
 app = FastAPI()
 
@@ -55,22 +71,6 @@ async def on_startup():
     # Not needed if you setup a migration system like Alembic
     await create_db_and_tables()
 
-
-ENDPOINT=''
-KEY_ID=''
-APPLICATION_KEY=''
-
-def get_b2_resource(endpoint, key_id, application_key):
-    b2 = boto3.resource(
-        service_name='s3',
-        endpoint_url=endpoint,     # Backblaze endpoint
-        aws_access_key_id=key_id,  # Backblaze keyID
-        aws_secret_access_key=application_key, # Backblaze applicationKey
-        config=Config(signature_version='s3v4')
-    )
-    return b2
-
-b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 
 @app.get("/signed-upload-link")
 async def get_signed_upload_link(user: User = Depends(current_active_user)):
