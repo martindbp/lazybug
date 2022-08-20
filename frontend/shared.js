@@ -191,6 +191,12 @@ function getLog(offset, limit, callback) {
     }, callback);
 }
 
+function isPersonalDbEmpty(callback) {
+    return sendMessageToBackground({
+        type: 'isPersonalDbEmpty',
+    }, callback);
+}
+
 function getViewingHistory(offset, limit, callback) {
     return sendMessageToBackground({
         type: 'getViewingHistory',
@@ -680,8 +686,14 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
-function uploadData(uploadURL, data, callback) {
-    fetch(uploadURL, {method: "PUT", body: data}).then(function() {
+function uploadData(uploadUrl, data, date, callback) {
+    fetch(uploadUrl, {
+        method: "PUT",
+        body: data,
+        headers: {
+            'Date': date
+        }
+    }).then(function(res) {
         callback();
     }).catch((error) => {
         callback(error);
@@ -738,8 +750,8 @@ function register(username, password, callback) {
     });
 }
 
-function getSignedLink(accessToken, type, callback) {
-    fetch(`/signed-${type}-link`, {
+function getSignedUploadLink(accessToken, size, callback) {
+    fetch(`/signed-upload-link/${size}`, {
         method: 'GET',
         headers: new Headers({
             'Authorization': 'Bearer ' + accessToken,
@@ -748,9 +760,41 @@ function getSignedLink(accessToken, type, callback) {
     }).then(function(res) {
         return res.json();
     }).then((res) => {
-        callback(res)
+        callback(res, null)
     }).catch((error) => {
-        callback(error);
+        callback(null, error);
+    });
+}
+
+function getSignedDownloadLink(accessToken, callback) {
+    fetch(`/signed-download-link`, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }),
+    }).then(function(res) {
+        return res.json();
+    }).then((res) => {
+        callback(res, null)
+    }).catch((error) => {
+        callback(null, error);
+    });
+}
+
+function getDatabaseLastModifiedDate(accessToken, callback) {
+    fetch(`/database-last-modified-date`, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }),
+    }).then(function(res) {
+        return res.json();
+    }).then((res) => {
+        callback(res, null);
+    }).catch((error) => {
+        callback(null, error);
     });
 }
 

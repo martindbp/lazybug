@@ -1,0 +1,145 @@
+<template>
+    <div class="q-pa-md" style="width: 50%; margin-left: 25px; margin-top: 25px;">
+        <div class="q-pa-md row items-start q-gutter-md">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Account</div>
+                    <div v-if="$store.state.accountEmail" class="text-subtitle2">{{ $store.state.accountEmail }}</div>
+                </q-card-section>
+
+                <q-separator />
+
+                <q-card-actions vertical v-if="$store.state.accessToken">
+                    <q-btn color="green" flat @click="showModalAndSync">Sync To Cloud</q-btn>
+                    <q-btn color="red" flat @click="$store.commit('setLogout')">Logout</q-btn>
+                </q-card-actions>
+                <q-card-actions v-else>
+                    <q-btn color="primary" flat @click="$store.commit('setShowAccountDialog', 'register')">Register</q-btn>
+                    <q-btn flat @click="$store.commit('setShowAccountDialog', 'login')">Login</q-btn>
+                </q-card-actions>
+            </q-card>
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Backup or Restore</div>
+                    <div class="text-subtitle2">Download data file or restore from file</div>
+                </q-card-section>
+
+                <q-separator />
+
+                <q-card-actions vertical>
+                    <q-btn color="green" flat @click="exportDb">Download</q-btn>
+                    <q-btn flat @click="importDb">Restore from File</q-btn>
+                </q-card-actions>
+            </q-card>
+
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Clear Local Data</div>
+                </q-card-section>
+
+                <q-separator />
+
+                <q-card-actions vertical>
+                    <q-btn color="orange" flat @click="clearCache" :disabled="clickedClearCache" >Clear Cache</q-btn>
+                    <q-btn color="red" flat @click="confirmClearPersonalData = true" :disabled="clickedClearPersonalData">Clear Personal Data</q-btn>
+                </q-card-actions>
+            </q-card>
+        </div>
+        <q-dialog seamless v-model="confirmClearPersonalData">
+            <q-card>
+                <q-card-section class="row items-center">
+                    <span class="q-ml-sm">Are you sure? This will delete your local data permanently.</span>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn flat label="Delete" color="red" v-close-popup @click="clearPersonalData" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+        <q-dialog seamless v-model="showSyncDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Syncing Data</div>
+                </q-card-section>
+                <q-linear-progress v-if="$store.state.isSyncing" indeterminate color="secondary" class="q-mt-sm" />
+                <q-linear-progress v-else value="1.0" color="green" class="q-mt-sm" />
+                <q-card-section>
+                    <div :key="message" v-for="message in $store.state.syncProgress">
+                        * {{ message }}
+                    </div>
+                </q-card-section>
+
+                <q-card-section color="red" v-if="$store.state.syncError">
+                    Something went wrong: {{ $store.state.syncError }}
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn v-if="! $store.state.isSyncing || $store.state.syncError" flat label="OK" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+    </div>
+</template>
+
+<script>
+export default {
+    mixins: [mixin],
+    data: function() { return {
+        showSyncDialog: false,
+        clickedClearCache: false,
+        confirmClearPersonalData: false,
+        clickedClearPersonalData: false,
+    }},
+    watch: {
+    },
+    methods: {
+        clearCache: function() {
+            clearCache();
+            this.clickedClearCache = true;
+        },
+        clearPersonalData: function() {
+            const self = this;
+            clearPersonalData(function() {
+                self.clickedClearPersonalData = true;
+            });
+        },
+        exportDb: function() {
+            exportDatabaseJson(function(data) {
+                const filename = `database-v${VERSION}-${(new Date(Date.now())).toISOString().split('T')[0]}.json`;
+                download(filename, JSON.stringify(data));
+            });
+        },
+        importDb: function() {
+            var fileChooser = document.createElement("input");
+            fileChooser.style.display = 'none';
+            fileChooser.type = 'file';
+
+            fileChooser.addEventListener('change', function (evt) {
+                var f = evt.target.files[0];
+                if(f) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        const data = JSON.parse(e.target.result);
+                        importDatabaseJson(data, function(error) {
+                            if (! [null, undefined].includes(error)) {
+                                alert('Something went wrong: ' + error);
+                            }
+                            else {
+                                alert('Successfully imported database');
+                            }
+                       });
+                    }
+                    reader.readAsText(f);
+                }
+            });
+
+            document.body.appendChild(fileChooser);
+            fileChooser.click();
+        }
+    },
+};
+</script>
+
+<style>
+</style>

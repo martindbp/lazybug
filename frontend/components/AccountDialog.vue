@@ -75,8 +75,32 @@ export default {
                     self.$store.commit('setLogin', {accessToken: res.access_token, email: self.email });
                     self.show = false;
                     self.password = '';
+                    isPersonalDbEmpty(function(isEmpty) {
+                        if (!isEmpty) {
+                            $q.dialog({
+                                title: 'Confirm',
+                                message: 'There is already data in your local database. What would you like to do?',
+                                cancel: true,
+                                persistent: true,
+                                options: {
+                                    type: 'radio',
+                                    model: 'opt1',
+                                    // inline: true
+                                    items: [
+                                        { label: 'Use cloud version', value: 'cloud', color: 'secondary' },
+                                        { label: 'Merge cloud with local version', value: 'merge' },
+                                    ]
+                                },
+                            }).onOk((data) => {
+                                self.showModalAndSync(true);
+                            }).onCancel(() => {
+                                self.$store.commit('setLogout');
+                            });
+                        }
+                    });
                 }
             });
+
         },
         clickRegister: function() {
             this.loading = true;

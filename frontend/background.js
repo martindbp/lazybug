@@ -371,6 +371,9 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             return null;
         });
     }
+    else if (message.type === 'isPersonalDbEmpty') {
+        sendResponse({data: personalDb.log.count() > 0});
+    }
     else if (message.type === 'getLog') {
         // NOTE: this paging filters using index in DB, but sorts in memory, see https://dexie.org/docs/Collection/Collection.offset()#a-better-paging-approach for potential fix
         personalDb.log

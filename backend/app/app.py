@@ -3,7 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
@@ -11,9 +11,13 @@ from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 
+ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
+ACCOUNTS_BUCKET = 'lazybug-accounts'
 ENDPOINT = os.getenv('B2_ENDPOINT')
-KEY_ID = os.getenv('B2_KEY_ID')
+KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
 APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
+
+
 if ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None:
     print('ERROR: B2 secrets not set')
     exit(1)
@@ -75,20 +79,43 @@ async def on_startup():
     await create_db_and_tables()
 
 
-@app.get("/signed-upload-link")
-async def get_signed_upload_link(user: User = Depends(current_active_user)):
+def get_account_file(user):
+    return f'{user.email}.json'
+
+
+@app.get("/signed-upload-link/{size}")
+async def get_signed_upload_link(size:int, user: User = Depends(current_active_user)):
+    if size > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
+        raise HTTPException(status_code=400, detail=f'Payload too large, > {ACCOUNT_FILE_SIZE_LIMIT_BYTES/10e6} Mb')
+
     url = b2.meta.client.generate_presigned_url(
         ClientMethod='put_object',
-        Params={'Bucket': 'lazybug-accounts', 'Key': f'{user.email}.json'},
-        ExpiresIn=1000
+        Params={'Bucket': ACCOUNTS_BUCKET, 'Key': get_account_file(user)},
+        ExpiresIn=120
     )
+
     return url
+
 
 @app.get("/signed-download-link")
 async def get_signed_download_link(user: User = Depends(current_active_user)):
+    key = f'{user.email}.json'
     url = b2.meta.client.generate_presigned_url(
         ClientMethod='get_object',
-        Params={'Bucket': 'lazybug-accounts', 'Key': f'{user.email}.json'},
-        ExpiresIn=1000
+        Params={'Bucket': 'lazybug-accounts', 'Key': key},
+        ExpiresIn=120
     )
     return url
+
+
+@app.get("/database-last-modified-date")
+async def get_database_last_modified_date(user: User = Depends(current_active_user)):
+    account_file = get_account_file(user)
+    response = b2.meta.client.head_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
+    if response['ContentLength'] > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
+        # User used the signed upload link to upload a too large file, so we delete it and raise 404
+        print(f'{user.email} account file too large ({response["ContentLength"] / 10e6} Mb), deleting')
+        b2.meta.client.delete_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
+        raise HTTPException(status_code=404, detail=f'File does not exist')
+
+    return response["LastModified"]

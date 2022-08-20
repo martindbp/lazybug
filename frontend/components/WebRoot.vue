@@ -53,37 +53,15 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'settings'" clickable @click="page = 'settings'" v-ripple>
+                <q-item :active="page === 'account'" clickable @click="page = 'account'" v-ripple>
                   <q-item-section avatar>
-                    <q-icon name="settings" />
+                    <q-icon name="account_circle" />
                   </q-item-section>
 
                   <q-item-section>
-                    Settings
+                    Account
                   </q-item-section>
                 </q-item>
-
-                <q-item :active="page === 'help'" clickable @click="page = 'help'" v-ripple>
-                  <q-item-section avatar>
-                    <q-icon name="help" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    Help
-                  </q-item-section>
-                </q-item>
-                <div v-if="$store.state.accessToken" style="margin: 20px">
-                    <q-btn color="red" label="Logout" @click="$store.commit('setLogout')" />
-                    <div class="email">{{ $store.state.accountEmail }}</div>
-                </div>
-                <div v-else style="margin: 20px">
-                    <q-btn color="primary" label="Register" @click="$store.commit('setShowAccountDialog', 'register')" />
-                    <q-btn flat color="primary" label="Login"  @click="$store.commit('setShowAccountDialog', 'login')"/>
-                </div>
-                <div v-if="$store.state.accessToken" style="margin: 20px">
-                    <q-btn label="Upload database" @click="uploadDatabase" />
-                    <q-btn label="Download database" @click="downloadDatabase" />
-                </div>
 
               </q-list>
 
@@ -96,7 +74,7 @@
                 <ShowTable v-if="page === 'content'" />
                 <HistoryPage v-if="page === 'history'" />
                 <StarTable v-if="page === 'star'" />
-                <Settings v-if="page === 'settings'" />
+                <AccountPage v-if="page === 'account'" />
             </q-page>
           </q-page-container>
         </q-layout>
@@ -114,23 +92,25 @@
             </q-card>
         </q-dialog>
         <AccountDialog />
+        <SyncDialog />
     </div>
 </template>
 
 <script>
 import ShowTable from './ShowTable.vue'
 import StarTable from './StarTable.vue'
-import Settings from './Settings.vue'
+import AccountPage from './AccountPage.vue'
 import PlayerPage from './PlayerPage.vue'
 import HistoryPage from './HistoryPage.vue'
 import AccountDialog from './AccountDialog.vue'
+import SyncDialog from './SyncDialog.vue'
 
 export default {
     mixins: [mixin],
     components: {
         ShowTable,
         StarTable,
-        Settings,
+        AccountPage,
         PlayerPage,
         HistoryPage,
         AccountDialog,
@@ -145,33 +125,8 @@ export default {
             set: function(val) { this.$store.commit('setShowNonEmbeddableDialog', val); },
         },
     },
-    methods: {
-        uploadDatabase: function() {
-            getSignedLink(this.$store.state.accessToken, 'upload', function(url) {
-                exportDatabaseJson(function(data) {
-                    uploadData(url, JSON.stringify(data), function(error) {
-                        if (error) alert(error);
-                    });
-                });
-            });
-        },
-        downloadDatabase: function() {
-            getSignedLink(this.$store.state.accessToken, 'download', function(url) {
-                downloadData(url, function(data, error) {
-                    if (error) alert(error);
-                    console.log(data);
-                });
-            });
-        },
-    }
 };
 </script>
 
 <style>
-.email {
-    width: 150px;
-    text-overflow: ellipsis;
-    overflow:hidden;
-    white-space:nowrap;
-}
 </style>

@@ -84,6 +84,11 @@ const store = new Vuex.Store({
         playerShowInfo: null,
         playingSeason: null,
         playingEpisode: null,
+        showSyncDialog: false,
+        lastSyncDate: localStorage.getItem('lastSyncDate'),
+        isSyncing: false,
+        syncProgress: [],
+        syncError: null,
         options: Vue.ref({
             extensionToggle: true,
             autoPause: false,
@@ -134,6 +139,25 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setShowSyncDialog(state, val) {
+            state.showSyncDialog = val;
+        },
+        setIsSyncing(state, val) {
+            state.isSyncing = val;
+        },
+        setSyncError(state, val) {
+            state.syncError = val;
+        },
+        setLastSyncDate(state, val) {
+            state.lastSyncDate = val;
+            localStorage.setItem('lastSyncDate', val);
+        },
+        addSyncProgress(state, val) {
+            state.syncProgress.push(val);
+        },
+        setSyncProgress(state, val) {
+            state.syncProgress = val;
+        },
         setLogin(state, val) {
             state.accessToken = val.accessToken;
             state.accountEmail = val.email;
