@@ -75,16 +75,16 @@ const mixin = {
             this.$store.commit('setSyncProgress', ['Checking server data modified date']);
             this.$store.commit('setSyncError', null);
             this.$store.commit('setIsSyncing', true);
-            getDatabaseLastModifiedDate(accessToken, function(date, error) {
+            getDatabaseLastModifiedDate(accessToken, function(serverLastSyncDateString, error) {
                 if (error) {
                     self.$store.commit('setSyncError', error);
                     self.$store.commit('setIsSyncing', false);
                     callback(error);
                     return;
                 }
-                self.$store.commit('addSyncProgress', `Modified ${date}`);
-                date = Date.parse(date);
-                if (date > lastSyncDate || (date !== null && lastSyncDate === null)) {
+                self.$store.commit('addSyncProgress', `Modified ${serverLastSyncDateString}`);
+                const serverLastSyncDate = Date.parse(serverLastSyncDateString);
+                if (serverLastSyncDate > lastSyncDate || (serverLastSyncDate !== null && lastSyncDate === null)) {
                     // Server version is newer, download, merge and upload
                     self.$store.commit('addSyncProgress', 'Server version is newer');
                     self.downloadDatabase(function(remoteData, error) {
@@ -93,8 +93,15 @@ const mixin = {
                             self.$store.commit('setIsSyncing', false);
                             return callback(error);
                         }
+                        if (! self.$store.state.needSync) {
+                            self.$store.commit('addSyncProgress', 'No new local data to merge');
+                            self.$store.commit('setIsSyncing', false);
+                            self.$store.commit('setLastSyncDate', serverLastSyncDateString);
+                            return;
+                        }
+
                         // Get local database json
-                        self.$store.commit('addSyncProgress', 'Exporting local database');
+                        self.$store.commit('addSyncProgress', 'Local database has new data, exporting');
                         exportDatabaseJson(function(localData) {
                             // Merge
                             self.$store.commit('addSyncProgress', 'Merging local and remote database');
@@ -116,15 +123,16 @@ const mixin = {
 
                     });
                 }
-                else if (date === lastSyncDate) {
+                else if (serverLastSyncDate === lastSyncDate && ! self.$store.state.needSync) {
                     // The server version is the same as local, don't upload
-                    self.$store.commit('addSyncProgress', 'Server version is is same as local data, not uploading');
+                    self.$store.commit('addSyncProgress', 'Server version is is same as local data and no local changes, not uploading');
                     self.$store.commit('setIsSyncing', false);
                 }
                 else {
-                    // Server version is older or same as previously synced (or doesn't exist), so just upload
+                    // Server version is older or same as previously synced (or doesn't exist), 
+                    // or we have new local changes, so just upload
                     self.$store.commit('addSyncProgress', 'Server version is older, uploading our local data');
-                    exportUploadDatabase(function(error) {
+                    self.exportUploadDatabase(function(error) {
                         if (error) {
                             self.$store.commit('setSyncError', error);
                             self.$store.commit('setIsSyncing', false);
@@ -192,7 +200,7 @@ const mixin = {
             return trText;
         },
         appendSessionLog(data) {
-            appendSessionLog(this.$store.state, data);
+            appendSessionLog(this.$store, data);
         },
         createSession() {
             createSession(this.$store.state);

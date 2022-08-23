@@ -1,23 +1,25 @@
 <template>
-    <q-table
-      :rows="rows"
-      :columns="columns"
-      :pagination="pagination"
-      :loading="isLoading"
-      row-key="name"
-      style="display: inline-block; margin-top: 50px; margin-left: 50px"
-    >
-        <template v-slot:body="props">
-            <q-tr :props="props" @click="clickVideo(props)" style="cursor: pointer;">
-                <q-td key="video" :props="props" >
-                    <img width="100" :src="thumbnailURL(props.cols[0].value)" />
-                </q-td>
-                <q-td key="name" :props="props">
-                    {{ props.cols[1].value }}
-                </q-td>
-            </q-tr>
-        </template>
-    </q-table>
+    <div>
+        <q-table
+          :rows="rows"
+          :columns="columns"
+          :pagination="pagination"
+          :loading="isLoading"
+          row-key="name"
+          style="display: inline-block; margin-top: 50px; margin-left: 50px"
+        >
+            <template v-slot:body="props">
+                <q-tr :props="props" @click="clickVideo(props)" style="cursor: pointer;">
+                    <q-td key="video" :props="props" >
+                        <img width="100" :src="thumbnailURL(props.cols[0].value)" />
+                    </q-td>
+                    <q-td key="name" :props="props">
+                        {{ props.cols[1].value }}
+                    </q-td>
+                </q-tr>
+            </template>
+        </q-table>
+    </div>
 </template>
 
 <script>

@@ -165,22 +165,23 @@ function fetchPersonalDataToStore(store) {
     });
 }
 
-function appendSessionLog(state, data) {
-    const showId = state.captionData.show_name;
-    const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(null, state), state.captionId);
-    console.log('Append log', state.captionId, state.captionHash, state.sessionTime, data, showName, seasonName, episodeName);
+function appendSessionLog($store, data) {
+    const showId = $store.state.captionData.show_name;
+    const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(null, $store.state), $store.state.captionId);
+    console.log('Append log', $store.state.captionId, $store.state.captionHash, $store.state.sessionTime, data, showName, seasonName, episodeName);
     sendMessageToBackground({
         type: 'appendSessionLog',
         sessionData: {
-            captionId: state.captionId,
-            captionHash: state.captionHash,
-            sessionTime: state.sessionTime,
+            captionId: $store.state.captionId,
+            captionHash: $store.state.captionHash,
+            sessionTime: $store.state.sessionTime,
             showId: showId,
             seasonIdx: seasonIdx,
             episodeIdx: episodeIdx,
         },
         data: data,
     });
+    $store.commit('setNeedSync', true);
 }
 
 function getLog(offset, limit, callback) {

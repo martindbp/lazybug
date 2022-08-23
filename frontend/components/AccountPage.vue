@@ -10,7 +10,7 @@
                 <q-separator />
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
-                    <q-btn color="green" flat @click="showModalAndSync">Sync To Cloud</q-btn>
+                    <q-btn color="green" flat @click="showModalAndSync">Sync Cloud</q-btn>
                     <q-btn color="red" flat @click="$store.commit('setLogout')">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
@@ -57,28 +57,6 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <q-dialog seamless v-model="showSyncDialog">
-            <q-card>
-                <q-card-section>
-                    <div class="text-h6">Syncing Data</div>
-                </q-card-section>
-                <q-linear-progress v-if="$store.state.isSyncing" indeterminate color="secondary" class="q-mt-sm" />
-                <q-linear-progress v-else value="1.0" color="green" class="q-mt-sm" />
-                <q-card-section>
-                    <div :key="message" v-for="message in $store.state.syncProgress">
-                        * {{ message }}
-                    </div>
-                </q-card-section>
-
-                <q-card-section color="red" v-if="$store.state.syncError">
-                    Something went wrong: {{ $store.state.syncError }}
-                </q-card-section>
-
-                <q-card-actions align="right">
-                    <q-btn v-if="! $store.state.isSyncing || $store.state.syncError" flat label="OK" color="primary" v-close-popup />
-                </q-card-actions>
-            </q-card>
-        </q-dialog>
     </div>
 </template>
 
@@ -86,13 +64,10 @@
 export default {
     mixins: [mixin],
     data: function() { return {
-        showSyncDialog: false,
         clickedClearCache: false,
         confirmClearPersonalData: false,
         clickedClearPersonalData: false,
     }},
-    watch: {
-    },
     methods: {
         clearCache: function() {
             clearCache();

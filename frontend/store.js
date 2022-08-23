@@ -86,6 +86,7 @@ const store = new Vuex.Store({
         playingEpisode: null,
         showSyncDialog: false,
         lastSyncDate: localStorage.getItem('lastSyncDate'),
+        needSync: localStorage.getItem('needSync'),
         isSyncing: false,
         syncProgress: [],
         syncError: null,
@@ -139,6 +140,10 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setNeedSync(state, val) {
+            state.needSync = val;
+            localStorage.setItem('needSync', val);
+        },
         setShowSyncDialog(state, val) {
             state.showSyncDialog = val;
         },
@@ -150,6 +155,8 @@ const store = new Vuex.Store({
         },
         setLastSyncDate(state, val) {
             state.lastSyncDate = val;
+            state.needSync = false;
+            localStorage.setItem('needSync', false);
             localStorage.setItem('lastSyncDate', val);
         },
         addSyncProgress(state, val) {
@@ -326,7 +333,7 @@ const store = new Vuex.Store({
         setBlur(state, val) {
             state.options.blurCaptions = val;
             syncOptions(state);
-            appendSessionLog(state, [eventsMap['EVENT_BLUR'], val]);
+            appendSessionLog(this, [eventsMap['EVENT_BLUR'], val]);
         },
         setOptions(state, options) {
             state.options = options;

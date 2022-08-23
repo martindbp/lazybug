@@ -7,13 +7,18 @@
             <q-linear-progress v-if="$store.state.isSyncing" indeterminate color="secondary" class="q-mt-sm" />
             <q-linear-progress v-else value="1.0" color="green" class="q-mt-sm" />
             <q-card-section>
-                <div :key="message" v-for="message in $store.state.syncProgress">
-                    * {{ message }}
-                </div>
+                <q-scroll-area style="height: 200px; width: 400px; max-width: 400px">
+                    <div :key="message" v-for="message in $store.state.syncProgress">
+                        * {{ message }}
+                    </div>
+                </q-scroll-area>
             </q-card-section>
 
-            <q-card-section color="red" v-if="$store.state.syncError">
+            <q-card-section class="text-h6 text-red text-center" v-if="$store.state.syncError">
                 Something went wrong: {{ $store.state.syncError }}
+            </q-card-section>
+            <q-card-section class="text-h6 text-green text-center" v-else-if="! $store.state.isSyncing">
+                DONE
             </q-card-section>
 
             <q-card-actions align="right">

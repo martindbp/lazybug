@@ -63,7 +63,11 @@
                   </q-item-section>
                 </q-item>
 
+                <q-item v-if="$store.state.accessToken && $store.state.needSync">
+                    <q-btn color="green" flat @click="showModalAndSync">Sync Changes</q-btn>
+                </q-item>
               </q-list>
+
 
             </q-scroll-area>
           </q-drawer>
@@ -71,10 +75,10 @@
           <q-page-container>
             <q-page :padding="page !== 'player'">
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
-                <ShowTable v-if="page === 'content'" />
-                <HistoryPage v-if="page === 'history'" />
-                <StarTable v-if="page === 'star'" />
-                <AccountPage v-if="page === 'account'" />
+                <ShowTable v-show="page === 'content'" />
+                <HistoryPage v-show="page === 'history'" />
+                <StarTable v-show="page === 'star'" />
+                <AccountPage v-show="page === 'account'" />
             </q-page>
           </q-page-container>
         </q-layout>
@@ -114,6 +118,7 @@ export default {
         PlayerPage,
         HistoryPage,
         AccountDialog,
+        SyncDialog,
     },
     computed: {
         page: {
