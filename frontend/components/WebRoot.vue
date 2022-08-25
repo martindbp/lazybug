@@ -13,7 +13,7 @@
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="/static/images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
-                <q-item v-if="$store.state.playerShowInfo" :active="page === 'player'" clickable @click="page = 'player'" v-ripple>
+                <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="$store.commit('setPage', 'player')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="tv" />
                   </q-item-section>
@@ -23,7 +23,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'content'" clickable @click="page = 'content'" v-ripple>
+                <q-item :active="page === 'content'" clickable @click="$store.commit('setPage', 'content')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="list" />
                   </q-item-section>
@@ -33,7 +33,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'history'" clickable @click="page = 'history'" v-ripple>
+                <q-item :active="page === 'history'" clickable @click="$store.commit('setPage', 'history')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="history" />
                   </q-item-section>
@@ -43,7 +43,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'star'" clickable @click="page = 'star'" v-ripple>
+                <q-item :active="page === 'star'" clickable @click="$store.commit('setPage', 'star')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="star" />
                   </q-item-section>
@@ -53,7 +53,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'account'" clickable @click="page = 'account'" v-ripple>
+                <q-item :active="page === 'account'" clickable @click="$store.commit('setPage', 'account')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="account_circle" />
                   </q-item-section>
@@ -122,8 +122,8 @@ export default {
     },
     computed: {
         page: {
-            get: function() { return this.$store.state.webPage; },
-            set: function(val) { this.$store.commit('setWebPage', val); },
+            get: function() { return this.$store.state.page; },
+            set: function(val) { this.$store.commit('setPage', val); },
         },
         showNonEmbeddableDialog: {
             get: function() { return this.$store.state.showNonEmbeddableDialog; },

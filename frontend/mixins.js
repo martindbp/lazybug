@@ -144,16 +144,17 @@ const mixin = {
                 }
             });
         },
-        setPlaying: function(showInfo, seasonIdx = 0, episodeIdx = 0) {
+        setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
+            const showInfo = this.$store.state.showList[showId];
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
                 this.$store.commit('setShowNonEmbeddableDialog', true);
                 return;
             }
-            this.$store.commit('setPlayingShowInfo', showInfo);
+            this.$store.commit('setPlayingShowId', showId);
             this.$store.commit('setPlayingSeason', seasonIdx);
             this.$store.commit('setPlayingEpisode', episodeIdx);
-            this.$store.commit('setWebPage', 'player');
+            this.$store.commit('setPage', 'player');
         },
         goYoutube: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;

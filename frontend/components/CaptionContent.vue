@@ -335,7 +335,7 @@ export default {
                     type: 'positive',
                     message: `"${content}" starred`,
                     actions: [
-                        { label: 'Open starred', color: 'white', handler: function() { self.$store.commit('setWebPage', 'star'); } }
+                        { label: 'Open starred', color: 'white', handler: function() { self.$store.commit('setPage', 'star'); } }
                     ]
                 });
             }

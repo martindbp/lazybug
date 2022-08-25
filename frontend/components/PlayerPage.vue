@@ -57,7 +57,8 @@ export default {
     }},
     computed: {
         showInfo: function() {
-            return this.$store.state.playerShowInfo;
+            if (this.$store.state.showList === null || this.$store.state.playingShowId === null) return null;
+            return this.$store.state.showList[this.$store.state.playingShowId];
         },
         season: {
             get: function() { return this.$store.state.playingSeason; },

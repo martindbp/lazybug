@@ -80,8 +80,8 @@ const store = new Vuex.Store({
         showDictionary: false,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
-        webPage: 'content',
-        playerShowInfo: null,
+        page: 'content',
+        playingShowId: null,
         playingSeason: null,
         playingEpisode: null,
         showSyncDialog: false,
@@ -183,11 +183,8 @@ const store = new Vuex.Store({
         setShowNonEmbeddableDialog(state, val) {
             state.showNonEmbeddableDialog = val;
         },
-        setWebPage(state, page) {
-            state.webPage = page;
-        },
-        setPlayingShowInfo(state, showInfo) {
-            state.playerShowInfo = showInfo;
+        setPlayingShowId(state, val) {
+            state.playingShowId = val;
         },
         setPlayingSeason(state, season) {
             state.playingSeason = season;
@@ -225,6 +222,10 @@ const store = new Vuex.Store({
             }
         },
         setShowList(state, val) {
+            // Add the showId to each show value
+            for (const key of Object.keys(val)) {
+                val[key].showId = key;
+            }
             state.showList = val;
         },
         setSimpleCharsList(state, val) {
@@ -369,6 +370,28 @@ const store = new Vuex.Store({
             state.options.anki.clozeIncludeHint = val;
             syncOptions(state);
         },
+        setPage(state, val) {
+            let url = '/' + val;
+            if (val === 'player') {
+                url += `/${state.playingShowId}/${state.playingSeason}/${state.playingEpisode}`;
+            }
+            window.history.pushState(null, '', url);
+            state.page = val;
+        },
+        setLocation(state, val) {
+            const parts = val.pathname.split('/');
+            if (parts[1] === '') state.page = 'content'; // default
+            else state.page = parts[1];
+
+            if (parts[1] === 'player' && parts.length === 5) {
+                const showId = parts[2];
+                const seasonIdx = parseInt(parts[3]);
+                const episodeIdx = parseInt(parts[4]);
+                state.playingShowId = showId;
+                state.playingSeason = seasonIdx;
+                state.playingEpisode = episodeIdx;
+            }
+        },
     },
 });
 
@@ -413,6 +436,11 @@ if (BROWSER_EXTENSION) {
 }
 else {
     fetchInitialResources();
+
+    store.commit('setLocation', document.location); // initial
+    window.onpopstate = (event) => {
+        store.commit('setLocation', document.location);
+    }
 }
 
 function addBadge($img, videoList) {
