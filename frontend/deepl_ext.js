@@ -14,7 +14,7 @@ if (DEVMODE) {
                 translationInProgress = false;
                 return false;
             }
-            console.log('Got text', message.data);
+            console.log('Got text', message.data.slice(0, 100));
             inputTextArea.value = message.data;
             inputTextArea.dispatchEvent(new Event('input', { 'bubbles': true, 'cancelable': true }));
             lastTranslationTime = Date.now();
@@ -27,10 +27,13 @@ if (DEVMODE) {
                     outputTextArea.value !== originalValue &&
                     outputTextArea.value.split('\n').length === message.data.split('\n').length
                 ) {
-                    console.log('Got translation', outputTextArea.value);
+                    console.log('Got translation', outputTextArea.value.slice(0, 100));
                     translationInProgress = false;
                     clearInterval(interval);
                     chrome.runtime.sendMessage({'type': 'translation', 'data': outputTextArea.value});
+                }
+                else {
+                    console.log('output textarea value did not change');
                 }
             }, 500);
             return true;

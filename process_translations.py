@@ -133,7 +133,7 @@ def _get_translations(all_lines, automated=True):
                 self.end_headers()
                 raise KeyboardInterrupt
 
-        httpd = HTTPServer(('localhost', 8000), DeeplRequestHandler)
+        httpd = HTTPServer(('localhost', 8001), DeeplRequestHandler)
 
         try:
             httpd.serve_forever()

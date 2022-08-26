@@ -10,6 +10,7 @@ try {
 let personalDb = initPersonalDb();
 let cacheDb = initCacheDb();
 const CACHE_HASHES_DURATION_S = 60*60;
+const TRANSLATION_URL = 'http://localhost:8001';
 
 function clearIndexedDb() {
     personalDb.delete();
@@ -355,7 +356,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     }
     else if (message.type === 'poll') {
         console.log('Polling');
-        fetch('http://localhost:8000').then(function(response) {
+        fetch(TRANSLATION_URL).then(function(response) {
             if (!response.ok) {
                 console.log('No server running');
                 sendResponse();
@@ -451,7 +452,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'translation') {
-        fetch('http://localhost:8000', { method: 'POST', body: message.data }).then(() => sendResponse());
+        fetch(TRANSLATION_URL, { method: 'POST', body: message.data }).then(() => sendResponse());
     }
 
     return true;
