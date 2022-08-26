@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-md" style="width: 50%; margin-left: 25px; margin-top: 25px;">
+    <div class="q-pa-md" style="margin-left: 25px; margin-top: 25px;">
         <div class="q-pa-md row items-start q-gutter-md">
             <q-card>
                 <q-card-section>
