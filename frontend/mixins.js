@@ -103,22 +103,108 @@ const mixin = {
                         // Get local database json
                         self.$store.commit('addSyncProgress', 'Local database has new data, exporting');
                         exportDatabaseJson(function(localData) {
-                            // Merge
                             self.$store.commit('addSyncProgress', 'Merging local and remote database');
 
-                            self.$store.commit('addSyncProgress', 'Uploading merged database');
+                            // Merge
+                            const localLogIdx = localData.data.tables.map((table) => table.name).indexOf('log');
+                            const remoteLogIdx = remoteData.data.tables.map((table) => table.name).indexOf('log');
+
+                            // Concat and sort log sessions
+                            const sessions = {};
+                            const numLocalSessions = localData.data.data[localLogIdx].rows.length;
+                            localData.data.data[localLogIdx].rows.forEach((row) => sessions[row.sessionTime] = row);
+                            remoteData.data.data[remoteLogIdx].rows.forEach((row) => sessions[row.sessionTime] = row);
+                            localData.data.data[localLogIdx].rows = Object.values(sessions).sort((a, b) => a.sessionTime - b.sessionTime);
+                            const numLocalSessionsAfterMerge = localData.data.data[localLogIdx].rows.length;
+                            self.$store.commit('addSyncProgress', `Added ${numLocalSessionsAfterMerge - numLocalSessions} sessions from remote`);
+
+                            // For other (like options) take those with newest timestamp
+                            const localOtherIdx = localData.data.tables.map((table) => table.name).indexOf('other');
+                            const remoteOtherIdx = remoteData.data.tables.map((table) => table.name).indexOf('other');
+                            const localOther = localData.data.data[localOtherIdx].rows;
+                            const remoteOther = localData.data.data[remoteOtherIdx].rows;
+                            const other = {};
+                            localData.data.data[localOtherIdx].rows.forEach((row) => other[row.id] = row);
+                            remoteData.data.data[remoteOtherIdx].rows.forEach((row) => {
+                                if (other[row.id] && row.timestamp < other[row.id].timestamp) {
+                                    self.$store.commit('addSyncProgress', `Kept more recent local data for other ${row.id} data`);
+                                    return; // keep local
+                                }
+                                self.$store.commit('addSyncProgress', `Kept more recent remote data for other ${row.id} data`);
+                                other[row.id] = row;
+                            });
+
+                            localData.data.data[localOtherIdx].rows = Object.values(other);
+
+                            // For states, we need to merge based on explicit references/implicit count
+                            const localStatesIdx = localData.data.tables.map((table) => table.name).indexOf('states');
+                            const remoteStatesIdx = remoteData.data.tables.map((table) => table.name).indexOf('states');
+                            const localStatesDict = {};
+                            for (const localItem of localData.data.data[localStatesIdx].rows) {
+                                localStatesDict[localItem.id] = localItem;
+                            }
+
+                            let mergedStates = 0;
+                            let remoteOnlyStates = 0;
+                            for (let remoteItem of remoteData.data.data[remoteStatesIdx].rows) {
+                                if (localStatesDict[remoteItem.id]) {
+                                    const key = remoteItem.id
+                                    const localItem = localStatesDict[key];
+                                    // Merge the two rows
+                                    const remoteExplicit = remoteItem.value[2];
+                                    const localExplicit = localItem.value[2];
+                                    if (localExplicit && remoteExplicit) {
+                                        // Use newest
+                                        const useItem = localItem.timestamp > remoteItem.timestamp ? localItem : remoteItem;
+                                        localStatesDict[key].value[0] = useItem.value[0];
+                                        localStatesDict[key].value[1] = useItem.value[1];
+                                    }
+                                    else if (localExplicit) {
+                                        // Use local values
+                                        for (let i = 0; i < 3; i++) localStatesDict[key].value[i] = localItem.value[i];
+                                    }
+                                    else if (remoteExplicit) {
+                                        // Use remote values
+                                        for (let i = 0; i < 3; i++) localStatesDict[key].value[i] = remoteItem.value[i];
+                                    }
+                                    else {
+                                        // Neither is explicit, so take max
+                                        for (let i = 0; i < 2; i++) {
+                                            localStatesDict[key].value[i] = Math.max(remoteItem.value[i], localItem.value[i]);
+                                        }
+                                    }
+
+                                    mergedStates++;
+                                }
+                                else {
+                                    localStatesDict[remoteItem.id] = remoteItem; // just assign since local doesn't have it
+                                    remoteOnlyStates++;
+                                }
+                            }
+                            self.$store.commit('addSyncProgress', `Merged ${mergedStates} states, added ${remoteOnlyStates} new states from remote`);
+                            self.$store.commit('addSyncProgress', 'Merge done, importing merged database');
 
                             // Upload
-                            const data = JSON.stringify(localData);
-                            self.getLinkAndUploadData(data, function(error) {
+                            importDatabaseJson(localData, function(error) {
                                 if (error) {
                                     self.$store.commit('setSyncError', error);
                                     self.$store.commit('setIsSyncing', false);
                                     return callback(error);
                                 }
 
-                                self.$store.commit('setIsSyncing', false);
+                                self.$store.commit('addSyncProgress', 'Uploading merged database');
+                                const data = JSON.stringify(localData);
+                                self.getLinkAndUploadData(data, function(error) {
+                                    if (error) {
+                                        self.$store.commit('setSyncError', error);
+                                        self.$store.commit('setIsSyncing', false);
+                                        return callback(error);
+                                    }
+
+                                    self.$store.commit('setIsSyncing', false);
+                                });
                             });
+
                         });
 
                     });

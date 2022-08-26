@@ -14,10 +14,13 @@
                 </q-scroll-area>
             </q-card-section>
 
-            <q-card-section class="text-h6 text-red text-center" v-if="$store.state.syncError">
+            <q-card-section class="text-h7 text-red text-center" v-if="$store.state.syncError">
                 Something went wrong: {{ $store.state.syncError }}
             </q-card-section>
-            <q-card-section class="text-h6 text-green text-center" v-else-if="! $store.state.isSyncing">
+            <q-card-section class="text-h7 text-center" v-else-if="$store.state.isSyncing">
+                Processing...
+            </q-card-section>
+            <q-card-section class="text-h7 text-green text-center" v-else>
                 DONE
             </q-card-section>
 
