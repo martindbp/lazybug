@@ -113,4 +113,4 @@ async def get_database_last_modified_date(user: User = Depends(current_active_us
 
 @app.get("/{rest_of_path:path}")
 async def read_index():
-    return FileResponse('frontend/dist/index.html')
+    return FileResponse('frontend/lazyweb/index.html')
