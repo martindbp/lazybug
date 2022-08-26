@@ -1,3 +1,6 @@
 [submodule "modules/easyocr"]
 	path = modules/easyocr
 	url = git@github.com:martindbp/EasyOCR.git
+[submodule "frontend/lazyweb"]
+	path = frontend/lazyweb
+	url = git@github.com:martindbp/lazyweb.git

@@ -194,7 +194,7 @@ frontend-popup:
 	-cp frontend/dist_components/popuproot/*.css frontend/dist/
 	make frontend-copy
 
-.PHONY: frontend-copy
+.PHONY: frontend-clean
 frontend-clean:
 	- rm -r frontend/dist
 	- rm -r frontend/dist_components
@@ -217,7 +217,7 @@ frontend-copy:
 	cp frontend/deps/* frontend/dist/
 	cp frontend/css/* frontend/dist/
 	cp -r frontend/images frontend/dist/
-	-cp -r frontend/dist/* ../lazyweb/
+	-cp -r frontend/dist/* frontend/lazyweb/
 	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
 

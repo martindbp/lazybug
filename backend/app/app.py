@@ -36,7 +36,7 @@ b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="frontend/dist"), name="static")
+app.mount("/static", StaticFiles(directory="frontend/lazyweb"), name="static")
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
