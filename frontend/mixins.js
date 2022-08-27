@@ -83,8 +83,8 @@ const mixin = {
                     return;
                 }
                 self.$store.commit('addSyncProgress', `Modified ${serverLastSyncDateString}`);
-                const serverLastSyncDate = Date.parse(serverLastSyncDateString);
-                if (serverLastSyncDate > lastSyncDate || (serverLastSyncDate !== null && lastSyncDate === null)) {
+                const serverLastSyncDate = serverLastSyncDateString === null ? null : Date.parse(serverLastSyncDateString);
+                if (serverLastSyncDate !== null && (serverLastSyncDate > lastSyncDate || lastSyncDate === null)) {
                     // Server version is newer, download, merge and upload
                     self.$store.commit('addSyncProgress', 'Server version is newer');
                     self.downloadDatabase(function(remoteData, error) {
@@ -181,6 +181,7 @@ const mixin = {
                                     remoteOnlyStates++;
                                 }
                             }
+                            localData.data.data[localStatesIdx].rows = Object.values(localStatesDict);
                             self.$store.commit('addSyncProgress', `Merged ${mergedStates} states, added ${remoteOnlyStates} new states from remote`);
                             self.$store.commit('addSyncProgress', 'Merge done, importing merged database');
 
@@ -209,7 +210,7 @@ const mixin = {
 
                     });
                 }
-                else if (serverLastSyncDate === lastSyncDate && ! self.$store.state.needSync) {
+                else if (serverLastSyncDate !== null && serverLastSyncDate === lastSyncDate && ! self.$store.state.needSync) {
                     // The server version is the same as local, don't upload
                     self.$store.commit('addSyncProgress', 'Server version is is same as local data and no local changes, not uploading');
                     self.$store.commit('setIsSyncing', false);
