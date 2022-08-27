@@ -101,7 +101,12 @@ async def get_signed_download_link(user: User = Depends(current_active_user)):
 @app.get("/api/database-last-modified-date")
 async def get_database_last_modified_date(user: User = Depends(current_active_user)):
     account_file = get_account_file(user)
-    response = b2.meta.client.head_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
+    try:
+        response = b2.meta.client.head_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
+    except ClientError:
+        # No such account file yet
+        return None
+
     if response['ContentLength'] > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
         # User used the signed upload link to upload a too large file, so we delete it and raise 404
         print(f'{user.email} account file too large ({response["ContentLength"] / 10e6} Mb), deleting')
