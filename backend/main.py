@@ -6,7 +6,7 @@ port = int(port)
 
 ssl_keyfile = None
 ssl_certfile = None
-if port == 80:
+if port == 443:
     # Need to link to ssl files
     ssl_keyfile = 'privkey.pem'
     ssl_certfile = 'fullchain.pem'
