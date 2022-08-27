@@ -712,7 +712,7 @@ function downloadData(downloadURL, callback) {
 }
 
 function login(username, password, callback) {
-    fetch('/auth/jwt/login', {
+    fetch('/api/auth/jwt/login', {
         method: 'POST',
         headers:{
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -732,7 +732,7 @@ function login(username, password, callback) {
 }
 
 function register(username, password, callback) {
-    fetch('/auth/register', {
+    fetch('/api/auth/register', {
         method: 'POST',
         headers:{
           'Content-Type': 'application/json'
@@ -752,7 +752,7 @@ function register(username, password, callback) {
 }
 
 function getSignedUploadLink(accessToken, size, callback) {
-    fetch(`/signed-upload-link/${size}`, {
+    fetch(`/api/signed-upload-link/${size}`, {
         method: 'GET',
         headers: new Headers({
             'Authorization': 'Bearer ' + accessToken,
@@ -768,7 +768,7 @@ function getSignedUploadLink(accessToken, size, callback) {
 }
 
 function getSignedDownloadLink(accessToken, callback) {
-    fetch(`/signed-download-link`, {
+    fetch(`/api/signed-download-link`, {
         method: 'GET',
         headers: new Headers({
             'Authorization': 'Bearer ' + accessToken,
@@ -784,7 +784,7 @@ function getSignedDownloadLink(accessToken, callback) {
 }
 
 function getDatabaseLastModifiedDate(accessToken, callback) {
-    fetch(`/database-last-modified-date`, {
+    fetch(`/api/database-last-modified-date`, {
         method: 'GET',
         headers: new Headers({
             'Authorization': 'Bearer ' + accessToken,

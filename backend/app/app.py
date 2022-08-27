@@ -43,22 +43,22 @@ app.include_router(
 )
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_reset_password_router(),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_verify_router(UserRead),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
+    prefix="/api/users",
     tags=["users"],
 )
 
@@ -73,7 +73,7 @@ def get_account_file(user):
     return f'{user.email}.json'
 
 
-@app.get("/signed-upload-link/{size}")
+@app.get("/api/signed-upload-link/{size}")
 async def get_signed_upload_link(size:int, user: User = Depends(current_active_user)):
     if size > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
         raise HTTPException(status_code=400, detail=f'Payload too large, > {ACCOUNT_FILE_SIZE_LIMIT_BYTES/10e6} Mb')
@@ -87,7 +87,7 @@ async def get_signed_upload_link(size:int, user: User = Depends(current_active_u
     return url
 
 
-@app.get("/signed-download-link")
+@app.get("/api/signed-download-link")
 async def get_signed_download_link(user: User = Depends(current_active_user)):
     key = f'{user.email}.json'
     url = b2.meta.client.generate_presigned_url(
@@ -98,7 +98,7 @@ async def get_signed_download_link(user: User = Depends(current_active_user)):
     return url
 
 
-@app.get("/database-last-modified-date")
+@app.get("/api/database-last-modified-date")
 async def get_database_last_modified_date(user: User = Depends(current_active_user)):
     account_file = get_account_file(user)
     response = b2.meta.client.head_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
