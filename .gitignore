@@ -4,6 +4,7 @@ node_modules
 __pycache__
 .merkl
 frontend/dist/
+frontend/lazyweb/
 frontend/dist_components/
 data/remote
 data/local
