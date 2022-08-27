@@ -252,4 +252,4 @@ run-server:
 	python backend/main.py
 
 run-server-prod:
-	sudo --preserve env python backend/main.py 80 &
+	sudo --preserve-env nohup python backend/main.py 80 &
