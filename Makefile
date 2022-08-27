@@ -253,3 +253,17 @@ run-server:
 
 run-server-prod:
 	sudo --preserve-env nohup python backend/main.py 443 &
+
+.PHONY: purge-lazyweb-cache
+purge-lazyweb-cache: check-cloudflare-env
+	ls modules/lazyweb | xargs -I{}  curl -X POST "https://api.cloudflare.com/client/v4/zones/$$CLOUDFLARE_ZONE_ID/purge_cache" \
+     -H "X-Auth-Email: $$CLOUDFLARE_EMAIL" \
+     -H "X-Auth-Key: $$CLOUDFLARE_AUTH_KEY" \
+     -H "Content-Type: application/json" \
+     -H "Origin: chrome-extension://ackcmdammmejmpannblpninboapjkcgm" \
+     --data '{"files":["https://lazybug.ai/static/{}"]}'
+
+.PHONY: deploy-frontend
+deploy-frontend:
+	cd frontend/lazyweb && git add . && gc -m "B" && git push
+	make purge-lazyweb-cache
