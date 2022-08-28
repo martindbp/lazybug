@@ -39,7 +39,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="frontend/lazyweb"), name="static")
 
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+    fastapi_users.get_auth_router(auth_backend), prefix="/api/auth/jwt", tags=["auth"]
 )
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
