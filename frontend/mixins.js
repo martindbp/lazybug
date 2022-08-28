@@ -13,13 +13,17 @@ function combinations(options, accumulatorArray, currCombination = [], currIdx =
 
 const mixin = {
     methods: {
-        showModalAndSync: function(closeAfterDone = false) {
+        showModalAndSync: function(closeAfterDone = false, callback = null) {
             this.$store.commit('setShowSyncDialog', true);
             const self = this;
             this.syncDatabase(function(error) {
                 if (! error && closeAfterDone) {
-                    self.$store.commit('setShowSyncDialog', false);
+                    // Close after some delay
+                    setTimeout(function() {
+                        self.$store.commit('setShowSyncDialog', false);
+                    }, 500);
                 }
+                if (callback) callback(error);
             });
         },
         exportUploadDatabase: function(callback) {
@@ -97,7 +101,7 @@ const mixin = {
                             self.$store.commit('addSyncProgress', 'No new local data to merge');
                             self.$store.commit('setIsSyncing', false);
                             self.$store.commit('setLastSyncDate', serverLastSyncDateString);
-                            return;
+                            return callback();
                         }
 
                         // Get local database json
@@ -186,7 +190,7 @@ const mixin = {
                             self.$store.commit('addSyncProgress', 'Merge done, importing merged database');
 
                             // Upload
-                            importDatabaseJson(localData, function(error) {
+                            importDatabaseJson(localData, self.$store, function(error) {
                                 if (error) {
                                     self.$store.commit('setSyncError', error);
                                     self.$store.commit('setIsSyncing', false);
@@ -203,6 +207,7 @@ const mixin = {
                                     }
 
                                     self.$store.commit('setIsSyncing', false);
+                                    return callback();
                                 });
                             });
 
@@ -214,6 +219,7 @@ const mixin = {
                     // The server version is the same as local, don't upload
                     self.$store.commit('addSyncProgress', 'Server version is is same as local data and no local changes, not uploading');
                     self.$store.commit('setIsSyncing', false);
+                    return callback();
                 }
                 else {
                     // Server version is older or same as previously synced (or doesn't exist), 
@@ -227,6 +233,7 @@ const mixin = {
                         }
 
                         self.$store.commit('setIsSyncing', false);
+                        return callback();
                     });
                 }
             });

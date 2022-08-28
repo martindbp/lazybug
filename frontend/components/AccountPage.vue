@@ -11,11 +11,11 @@
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync">Sync Cloud</q-btn>
-                    <q-btn color="red" flat @click="$store.commit('setLogout')">Logout</q-btn>
+                    <q-btn color="red" flat @click="logout">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
-                    <q-btn color="primary" flat @click="$store.commit('setShowAccountDialog', 'register')">Register</q-btn>
-                    <q-btn flat @click="$store.commit('setShowAccountDialog', 'login')">Login</q-btn>
+                    <q-btn color="primary" flat @click="register">Register</q-btn>
+                    <q-btn flat @click="login">Login</q-btn>
                 </q-card-actions>
             </q-card>
             <q-card>
@@ -73,6 +73,46 @@ export default {
             clearCache();
             this.clickedClearCache = true;
         },
+        clearDataThenCall(confirmCallback) {
+            const self = this;
+            isPersonalDbEmpty(function(isEmpty) {
+                if (isEmpty) {
+                    confirmCallback(true);
+                }
+                else {
+                    self.$q.dialog({
+                        title: 'Confirm',
+                        message: 'There is local data changes that will be overwritten, continue?',
+                        cancel: true,
+                    }).onOk(() => {
+                        clearPersonalData(function() {
+                            confirmCallback(true);
+                        });
+                    }).onCancel(() => {
+                        confirmCallback(false);
+                    });
+                }
+            });
+        },
+        register: function() {
+            this.$store.commit('setShowAccountDialog', 'register');
+        },
+        login: function() {
+            const self = this;
+            this.clearDataThenCall(function(confirm) {
+                if (confirm) {
+                    self.$store.commit('setShowAccountDialog', 'login');
+                }
+            });
+        },
+        logout: function() {
+            const self = this;
+            this.showModalAndSync(true, function(error) {
+                clearPersonalData(function() {
+                    self.$store.commit('setLogout');
+                });
+            });
+        },
         clearPersonalData: function() {
             const self = this;
             clearPersonalData(function() {
@@ -90,13 +130,14 @@ export default {
             fileChooser.style.display = 'none';
             fileChooser.type = 'file';
 
+            const self = this;
             fileChooser.addEventListener('change', function (evt) {
                 var f = evt.target.files[0];
                 if(f) {
                     var reader = new FileReader();
                     reader.onload = function(e) {
                         const data = JSON.parse(e.target.result);
-                        importDatabaseJson(data, function(error) {
+                        importDatabaseJson(data, self.$store, function(error) {
                             if (! [null, undefined].includes(error)) {
                                 alert('Something went wrong: ' + error);
                             }

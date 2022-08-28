@@ -37,6 +37,7 @@
 
 <script>
 export default {
+    mixins: [mixin],
     components: { },
     data: function() { return {
         tab: Vue.ref('login'),
@@ -70,34 +71,13 @@ export default {
                 self.loading = false;
                 if (error) {
                     self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
+                    if (self.error === 'LOGIN_BAD_CREDENTIALS') self.error = 'Email or password was incorrect';
                 }
                 else if (res) {
                     self.$store.commit('setLogin', {accessToken: res.access_token, email: self.email });
                     self.show = false;
                     self.password = '';
-                    isPersonalDbEmpty(function(isEmpty) {
-                        if (!isEmpty) {
-                            $q.dialog({
-                                title: 'Confirm',
-                                message: 'There is already data in your local database. What would you like to do?',
-                                cancel: true,
-                                persistent: true,
-                                options: {
-                                    type: 'radio',
-                                    model: 'opt1',
-                                    // inline: true
-                                    items: [
-                                        { label: 'Use cloud version', value: 'cloud', color: 'secondary' },
-                                        { label: 'Merge cloud with local version', value: 'merge' },
-                                    ]
-                                },
-                            }).onOk((data) => {
-                                self.showModalAndSync(true);
-                            }).onCancel(() => {
-                                self.$store.commit('setLogout');
-                            });
-                        }
-                    });
+                    self.showModalAndSync(true);
                 }
             });
 
@@ -112,8 +92,7 @@ export default {
                     self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
                 }
                 else {
-                    self.show = false;
-                    self.password = '';
+                    self.clickLogin();
                 }
             });
         },

@@ -141,8 +141,15 @@ function exportDatabaseJson(callback) {
     sendMessageToBackground({type: 'exportDatabaseJson'}, callback);
 }
 
-function importDatabaseJson(data, callback) {
-    sendMessageToBackground({type: 'importDatabaseJson', data: data}, callback);
+function importDatabaseJson(data, store, callback) {
+    sendMessageToBackground({type: 'importDatabaseJson', data: data}, function(error) {
+        if (error) callback(error);
+        else {
+            fetchPersonalDataToStore(store);
+            store.commit('setNeedSync', true);
+            callback();
+        }
+    });
 }
 
 function fetchPersonalDataToStore(store) {
