@@ -14,7 +14,7 @@
             </q-tabs>
 
             <q-tab-panels dark v-model="tab">
-                <q-tab-panel name="knowledge" style="width: 400px">
+                <q-tab-panel class="no-scroll" name="knowledge" style="width: 400px">
                     <q-card dark>
                         Select the HSK level for the words you want to hide automatically
                         <q-item dense>
@@ -91,7 +91,7 @@
                         </q-item>
                     </q-card>
                 </q-tab-panel>
-                <q-tab-panel name="subtitle" style="width: 400px">
+                <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
                     <q-item-label header>Chinese characters</q-item-label>
                     <q-btn-toggle
                         push
@@ -146,7 +146,7 @@
                     </div>
                     -->
                 </q-tab-panel>
-                <q-tab-panel name="keyboard" style="width: 400px">
+                <q-tab-panel class="no-scroll" name="keyboard" style="width: 400px">
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="keyboardShortcutsToggle" label="Toggle Keyboard Shortcuts"></q-checkbox>
                     </div>
@@ -168,7 +168,7 @@
                     <br>
                     <q-btn color="secondary" label="Reset To Default" @click="resetShortcuts" />
                 </q-tab-panel>
-                <q-tab-panel name="other" style="width: 400px">
+                <q-tab-panel class="no-scroll" name="other" style="width: 400px">
                     <div class="q-gutter-sm">
                         <q-btn
                             style="margin-top: 10px; width: 80%"
