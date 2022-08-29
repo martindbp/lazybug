@@ -1,14 +1,21 @@
 import os
+import re
 import sys
 import glob
+import subprocess
 from collections import defaultdict
 from wrapped_json import json
 from scipy import optimize
 import numpy as np
-from han import CEDICT
+from han import CEDICT, make_cedict
 from merkl import task, FileRef, Eval, pipeline
 
 REQUIRED_FIELDS = ['year', 'type', 'genres', 'synopsis', 'douban', 'caption_source', 'translation_source', 'date_added']
+
+# These bloom filter parameters are derived from 15k items with 1.0E-4 prob of false positive
+# Source: https://hur.st/bloomfilter/?n=15000&p=1.0E-4&m=&k=
+BLOOM_FILTER_N = 287552
+BLOOM_FILTER_K = 13
 
 
 def get_video_data(vid):
@@ -75,20 +82,6 @@ def calc_word_probs():
 
 @task
 def get_show_stats(subtitle_paths, word_probs, min_prob):
-    hsk_levels = {}
-    with open('data/git/hsk_words.json', 'r') as f:
-        hsk = json.load(f)
-        for lvl, words in enumerate(hsk):
-            for word in words:
-                hsk_levels[word] = lvl + 1
-
-    seen_words = set()
-    new_words_per_hour = []
-    new_weighted_words_per_hour = []
-    last_t = []
-    t_offset = 0
-    BUCKET_SIZE = 60*60 # quarter hour
-    num_total = 0
     sum_information = 0
     sum_time = 0
     for subtitle_file in subtitle_paths:
@@ -120,7 +113,6 @@ def get_show_stats(subtitle_paths, word_probs, min_prob):
                 next_line_t0 = next_line[1][0]
                 t1 = min(t1 + 5, next_line_t0)
                 if t0 == 0 and i != 0:
-                    #breakpoint()
                     continue
             diff = t1-t0
             sum_time += diff
@@ -131,8 +123,156 @@ def get_show_stats(subtitle_paths, word_probs, min_prob):
     return sum_information / sum_time
 
 
+@task
+def get_sum_information(words, word_probs, min_prob):
+    sum_information = 0
+    for hz in words:
+        prob = word_probs.get(hz, 0.01*min_prob)
+        information = -np.log(prob)
+        sum_information += information
+
+    return sum_information
+
+
+@task
+def get_words_and_stats(subtitle_paths):
+    sum_time = 0
+    words = []
+    for subtitle_file in subtitle_paths:
+        with open(subtitle_file) as f:
+            data = json.load(f)
+
+        for i, line in enumerate(data['lines']):
+            t0 = line[1][0]
+            t1 = line[2][-1]
+            alignments = line[8]
+            max_line_information = 0
+            max_line_word = None
+            for word in alignments:
+                hz = word[2]
+                tr = word[-1]
+                if len(word[-1]) == 0:
+                    continue
+
+                is_name = word[-1][0].isupper() and tr !='I' and tr != "I'm" and tr != "OK"
+                if is_name:
+                    continue
+
+                words.append(hz)
+
+            if i < len(data['lines']) - 1:
+                next_line = data['lines'][i+1]
+                next_line_t0 = next_line[1][0]
+                t1 = min(t1 + 5, next_line_t0)
+                if t0 == 0 and i != 0:
+                    continue
+            diff = t1-t0
+            sum_time += diff
+
+    return words, sum_time
+
+
+CHINESE_NUMBERS_REGEX = '^[一二三四五六七八九十百千万个]+$'
+
+@task
+def get_bloom_filter(words, n, k, cedict, simple_chars):
+
+    # Dedupe words
+    words = list(set(words))
+
+    # 1. Split compounds not in cedict
+    # 2. Split words that are simple compounds
+    new_words = set()
+    for word in words:
+        word = word.replace(' ', '')  # I've seen words with spaces
+
+        if word in cedict or len(word) == 1:
+            new_words.add(word)
+            continue
+
+        # Then check if it breaks down into components that are in cedict, or simple chars, or numbers
+        max_length_squared = 0
+        max_split = None
+        for split_i in range(1, len(word)):
+            pre, post = word[:split_i], word[split_i:]
+            pre_is_number = re.match(CHINESE_NUMBERS_REGEX, pre)
+            post_is_number = re.match(CHINESE_NUMBERS_REGEX, post)
+            pre_is_simple = pre in simple_chars['pre'] or pre in simple_chars['pre_post']
+            post_is_simple = post in simple_chars['post'] or post in simple_chars['pre_post']
+            pre_ok = pre in cedict or pre_is_number or pre_is_simple
+            post_ok = post in cedict or post_is_number or post_is_simple
+
+            # We give extra weight to finding long numbers to fix this case:
+            # '十五号' being split into 十 and 五号 because the latter is in cedict
+            length_squared = len(pre) ** 2 + len(post) ** 2
+            if pre_is_number:
+                length_squared += len(pre)
+            elif post_is_number:
+                length_squared += len(post)
+
+            if length_squared > max_length_squared and pre_ok and post_ok:
+                max_length_squared = length_squared
+                max_split = [pre, post]
+                # Split numbers into individual chars
+                if pre_is_number:
+                    max_split = [*list(pre), post]
+                elif post_is_number:
+                    max_split = [pre, *list(post)]
+
+        # Check simple middle
+        for middle_i in range(1, len(word)-1):
+            middle_char = word[middle_i]
+            if middle_char not in simple_chars['middle']:
+                continue
+            pre, post = word[:middle_i], word[middle_i+1:]
+            length_squared = len(pre) ** 2 + len(post) ** 2 + 1
+            ok = pre + post in cedict
+            if length_squared > max_length_squared and ok:
+                max_length_squared = length_squared
+                max_split = (pre, middle_char, post)
+
+        if max_split is not None:
+            for w in max_split:
+                new_words.add(w)
+            print(f'Splitting {word} -> {max_split}')
+        else:
+            new_words.add(word)
+
+    words = list(new_words)
+
+    words_file = FileRef()
+    with open(words_file, 'w') as f:
+        f.write('\n'.join(words))
+
+    bloom_file = FileRef()
+
+    command = ["node", "generate_bloom_filter.js", words_file, bloom_file, str(n), str(k)]
+    print(' '.join(command))
+    proc = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    for line in proc.stdout:
+        sys.stdout.write(line.decode('utf-8'))
+
+    text_widths = []
+    with open(bloom_file, 'r') as f:
+        bloom = f.read()
+
+    os.remove(words_file)
+    os.remove(bloom_file)
+    return bloom
+
+
 def make_shows_list():
     word_probs, min_prob = calc_word_probs()
+    cedict = make_cedict()
+    with open('data/remote/public/simple_chars.hash', 'r') as f:
+        simple_chars_hash = f.read().strip()
+    with open(f'data/remote/public/simple_chars-{simple_chars_hash}.json', 'r') as f:
+        simple_chars = json.load(f)
 
     released_shows = {}
     unreleased = []
@@ -178,12 +318,23 @@ def make_shows_list():
                     subtitle_file = f'data/remote/public/subtitles/{vid}-{hash}.json'
                     subtitle_paths.append(FileRef(subtitle_file))
 
-            score = get_show_stats(subtitle_paths, word_probs, min_prob).eval()
+            words, sum_time = get_words_and_stats(subtitle_paths)
+            sum_time = sum_time.eval()
+
+            score = get_sum_information(words, word_probs, min_prob).eval() / sum_time if sum_time != 0 else None
             if score is not None:
                 show['num_processed'] = f'{num_processed}/{num_total}'
                 print(show_name, 'score:', score)
                 scores.append(score)
                 show['difficulty'] = score
+
+            show['bloom'] = get_bloom_filter(
+                words,
+                n=BLOOM_FILTER_N,
+                k=BLOOM_FILTER_K,
+                cedict=cedict,
+                simple_chars=simple_chars
+            ).eval()
 
             # Add processed flags for all episodes
             for season in show['seasons']:
