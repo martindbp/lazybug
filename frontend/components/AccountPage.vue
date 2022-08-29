@@ -10,7 +10,7 @@
                 <q-separator />
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
-                    <q-btn color="green" flat @click="showModalAndSync">Sync Cloud</q-btn>
+                    <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
                     <q-btn color="red" flat @click="logout">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
