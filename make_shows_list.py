@@ -6,7 +6,9 @@ from wrapped_json import json
 from scipy import optimize
 import numpy as np
 from han import CEDICT
-from merkl import task, FileRef, Eval
+from merkl import task, FileRef, Eval, pipeline
+
+REQUIRED_FIELDS = ['year', 'type', 'genres', 'synopsis', 'douban', 'caption_source', 'translation_source', 'date_added']
 
 
 def get_video_data(vid):
@@ -71,11 +73,8 @@ def calc_word_probs():
     return word_probs, min_prob
 
 
-with Eval():
-    word_probs, min_prob = calc_word_probs()
-
-
-def get_show_stats(video_ids):
+@task
+def get_show_stats(subtitle_paths, word_probs, min_prob):
     hsk_levels = {}
     with open('data/git/hsk_words.json', 'r') as f:
         hsk = json.load(f)
@@ -89,24 +88,11 @@ def get_show_stats(video_ids):
     last_t = []
     t_offset = 0
     BUCKET_SIZE = 60*60 # quarter hour
-    num_processed = 0
     num_total = 0
     sum_information = 0
     sum_time = 0
-    for vid in video_ids:
-        hash_file = f'data/remote/public/subtitles/{vid}.hash'
-        num_total += 1
-        processed = os.path.exists(hash_file)
-        if not processed:
-            #print(hash_file, 'does not exist, skipping')
-            continue
-
-        num_processed += 1
-
-        with open(f'data/remote/public/subtitles/{vid}.hash') as f:
-            hash = f.read().strip()
-
-        with open(f'data/remote/public/subtitles/{vid}-{hash}.json') as f:
+    for subtitle_file in subtitle_paths:
+        with open(subtitle_file) as f:
             data = json.load(f)
 
         for i, line in enumerate(data['lines']):
@@ -140,75 +126,91 @@ def get_show_stats(video_ids):
             sum_time += diff
 
     if sum_time == 0:
-        return None, None, None
+        return None
 
-    return sum_information / sum_time, num_processed, num_total
+    return sum_information / sum_time
 
-required_data = ['year', 'type', 'genres', 'synopsis', 'douban', 'caption_source', 'translation_source', 'date_added']
 
-released_shows = {}
-unreleased = []
-scores = []
-for filename in glob.glob('data/remote/public/shows/*.json'):
-    with open(filename, 'r') as f:
-        show_name = filename.split('/')[-1].split('.')[0]
-        print('Processing', show_name)
-        show = json.load(f)
-        if not show.get('released', False):
-            unreleased.append(show_name)
-            continue
+def make_shows_list():
+    word_probs, min_prob = calc_word_probs()
 
-        if not show['name'] or (isinstance(show['name'], dict) and (not show['name']['hz'] or not show['name']['py'] or not show['name']['en'])):
-            print('ERROR No name for show:', show_name)
-            sys.exit(1)
+    released_shows = {}
+    unreleased = []
+    scores = []
+    for filename in glob.glob('data/remote/public/shows/*.json'):
+        with open(filename, 'r') as f:
+            show_name = filename.split('/')[-1].split('.')[0]
+            print('Processing', show_name)
+            show = json.load(f)
+            if not show.get('released', False):
+                unreleased.append(show_name)
+                continue
 
-        for required in required_data:
-            if required not in show:
-                print(f'ERROR: {required} not in show data for {show_name}')
+            if not show['name'] or (isinstance(show['name'], dict) and (not show['name']['hz'] or not show['name']['py'] or not show['name']['en'])):
+                print('ERROR No name for show:', show_name)
                 sys.exit(1)
 
-        if 'free' not in show:
-            show['free'] = True
+            for required in REQUIRED_FIELDS:
+                if required not in show:
+                    print(f'ERROR: {required} not in show data for {show_name}')
+                    sys.exit(1)
 
-        # Calculate show difficulty
-        video_ids = []
-        for season in show['seasons']:
-            for episode in season['episodes']:
-                video_ids.append(episode['id'])
+            if 'free' not in show:
+                show['free'] = True
 
-        score, num_processed, num_total = get_show_stats(video_ids)
-        if score is not None:
-            show['num_processed'] = f'{num_processed}/{num_total}'
-            print(show_name, 'score:', score)
-            scores.append(score)
-            show['difficulty'] = score
+            # Calculate show difficulty
+            subtitle_paths = []
+            num_total, num_processed = 0, 0
+            for season in show['seasons']:
+                for episode in season['episodes']:
+                    vid = episode['id']
 
-        # Add processed flags for all episodes
-        for season in show['seasons']:
-            for episode in season['episodes']:
-                processed = os.path.exists(f'data/remote/public/subtitles/{episode["id"]}.hash')
-                episode['processed'] = processed
+                    hash_file = f'data/remote/public/subtitles/{vid}.hash'
+                    num_total += 1
+                    processed = os.path.exists(hash_file)
+                    if not processed:
+                        continue
 
-        released_shows[show_name] = show
+                    with open(hash_file) as f:
+                        hash = f.read().strip()
 
-scores = np.array(scores)
-mean_scores = scores.mean()
-std_scores = scores.std()
+                    num_processed += 1
+                    subtitle_file = f'data/remote/public/subtitles/{vid}-{hash}.json'
+                    subtitle_paths.append(FileRef(subtitle_file))
 
-# Normalize the difficulty scores
-for name, show in released_shows.items():
-    if 'difficulty' not in show:
-        if 'difficulty_manual' not in show:
-            print('ERROR', name, 'has no difficulty score, need to set difficulty_manual')
-            sys.exit(1)
-        continue
-    score = (min(max(-2, (show['difficulty'] - mean_scores) / 4), 2) + 2) / 4
-    show['difficulty']  = score
-    print(name, show['difficulty'])
+            score = get_show_stats(subtitle_paths, word_probs, min_prob).eval()
+            if score is not None:
+                show['num_processed'] = f'{num_processed}/{num_total}'
+                print(show_name, 'score:', score)
+                scores.append(score)
+                show['difficulty'] = score
 
-with open('data/remote/public/show_list_full.json', 'w') as f:
-    json.dump(released_shows, f)
+            # Add processed flags for all episodes
+            for season in show['seasons']:
+                for episode in season['episodes']:
+                    processed = os.path.exists(f'data/remote/public/subtitles/{episode["id"]}.hash')
+                    episode['processed'] = processed
 
-print('Unreleased shows:')
-for show in unreleased:
-    print(show)
+            released_shows[show_name] = show
+
+    scores = np.array(scores)
+    mean_scores = scores.mean()
+    std_scores = scores.std()
+
+    # Normalize the difficulty scores
+    for name, show in released_shows.items():
+        if 'difficulty' not in show:
+            if 'difficulty_manual' not in show:
+                print('ERROR', name, 'has no difficulty score, need to set difficulty_manual')
+                sys.exit(1)
+            continue
+        score = (min(max(-2, (show['difficulty'] - mean_scores) / 4), 2) + 2) / 4
+        show['difficulty']  = score
+        print(name, show['difficulty'])
+
+    with open('data/remote/public/show_list_full.json', 'w') as f:
+        json.dump(released_shows, f)
+
+    print('Unreleased shows:')
+    for show in unreleased:
+        print(show)

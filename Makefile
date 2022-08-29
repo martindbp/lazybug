@@ -136,7 +136,7 @@ video-list:
 
 .PHONY: show-list-full
 show-list-full:
-	python make_shows_list.py
+	merkl -v run make_shows_list.make_shows_list
 	LIST_HASH=$$(md5sum data/remote/public/show_list_full.json | cut -d " " -f1) ; \
 	echo $$LIST_HASH > data/remote/public/show_list_full.hash ; \
 	mv data/remote/public/show_list_full.json "data/remote/public/show_list_full-$$LIST_HASH.json"
