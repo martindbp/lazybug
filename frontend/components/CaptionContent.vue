@@ -258,7 +258,7 @@ export default {
                 if (newData !== oldData) {
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     this.applyLvlStates();
-                    this.applyPinyinComponents();
+                    this.applyComponents();
                     this.applyCompoundWordsNotInDict();
                     this.applySimpleCompounds();
                 }
@@ -493,8 +493,8 @@ export default {
                 this.appendSessionLog([getEvent('peek', 'translation')]);
             }
         },
-        applyPinyinComponents: function() {
-            // If user hides ni3hao3, we should hide ni3 and hao3 separately, but not other way around.
+        applyComponents: function() {
+            // If user hides 你好, we should hide 你 and 好 separately, but not other way around.
 
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
@@ -519,7 +519,7 @@ export default {
                         if (hzSub === hz) continue;
                         if (d[hzSub] === undefined) continue;
 
-                        console.log('applyPinyinComponents: ', 'py', hzSub, pysSub);
+                        console.log('applyComponents: ', 'word', hzSub, pysSub);
                         applyState(d, k, 'word', hzSub, pysSub, tr, this.wordData.translation, StateHidden, StateHidden, false, true);
                     }
                 }
@@ -573,6 +573,8 @@ export default {
             }
         },
         applySimpleCompounds: function() {
+            // IMPORTANT: any changes here will have to be reflected in make_shows_list.py
+
             if (this.$store.state.SIMPLE_CHARS === null) return;
             // Where there is a main component, and an additional "simple" character like 了
             // For example, 地上, 拿不着, 这样的, 不服气, 知道了, middle chars: 离不开, 想不到

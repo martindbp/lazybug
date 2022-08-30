@@ -1,3 +1,5 @@
+const BLOOM_FILTER_N = 287552;
+const BLOOM_FILTER_K = 13;
 const DEFAULT_FONT_SIZE = 24;
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
@@ -40,12 +42,14 @@ const store = new Vuex.Store({
         resourceFetchErrors: [],
         youtubeAPIReady: false,
         showList: null,
+        showBloomFilters: null,
         thumbnailObserver: null,
         videoList: null,
         DICT: null,
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
         states: Vue.ref({}),
+        bloomFilter: null,
         captionFontScale: 0.5,
         captionFontSize: 24,
         captionOffset: [0, 0],
@@ -230,6 +234,7 @@ const store = new Vuex.Store({
         },
         setSimpleCharsList(state, val) {
             state.SIMPLE_CHARS = val;
+            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
@@ -277,6 +282,15 @@ const store = new Vuex.Store({
         },
         setStates(state, states) {
             state.states = states;
+            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+        },
+        setBloomFilters(state, filters) {
+            for (const key of Object.keys(filters.shows)) {
+                const bloom = new BloomFilter(BLOOM_FILTER_N, BLOOM_FILTER_K);
+                bloom.fromHexString(filters.shows[key]);
+                filters.shows[key] = bloom;
+            }
+            state.showBloomFilters = filters;
         },
         increaseCaptionFontScale(state) {
             state.captionFontScale = Math.min(state.captionFontScale + 0.1, 1.0);
@@ -343,6 +357,9 @@ const store = new Vuex.Store({
         setOption(state, option) {
             state.options[option.key] = option.value;
             syncOptions(state);
+            if (option.key === 'hideWordsLevel') {
+                state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+            }
         },
         setDeepOption(state, option) {
             state.options[option.key][option.key2] = option.value;
@@ -350,9 +367,11 @@ const store = new Vuex.Store({
         },
         setDict(state, dict) {
             state.DICT = dict;
+            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setHskWords(state, words) {
             state.HSK_WORDS = words;
+            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setAnkiAdvancedCards(state, val) {
             state.options.anki.advancedCards = val;
@@ -411,6 +430,7 @@ const FETCH_PUBLIC_RESOURCES = [
     ['hsk_words.json', 'HSK word list', 'setHskWords'],
     ['video_list.json', 'video list', 'setVideoList'],
     ['show_list_full.json', 'show list', 'setShowList'],
+    ['bloom_filters.json', 'show bloom filters', 'setBloomFilters'],
     ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
 ];
 

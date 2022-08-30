@@ -90,6 +90,12 @@
     return newFilter;
   };
 
+  BloomFilter.prototype.fromHexString = function(string) {
+    const uint8 = new Uint8Array(string.match(/../g).map(h=>parseInt(h, 16)));
+    const int32 = new Int32Array(uint8.buffer);
+    this.buckets = int32;
+  };
+
   // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
   function popcnt(v) {
     v -= (v >> 1) & 0x55555555;

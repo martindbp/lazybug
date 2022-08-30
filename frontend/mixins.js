@@ -341,6 +341,15 @@ const mixin = {
         },
     },
     computed: {
+        showPersonalDifficultyScores: function() {
+            const personalFilter = this.$store.state.bloomFilter;
+            const showBloomFilters = this.$store.state.showBloomFilters;
+            if (personalFilter === null || showBloomFilters === null) return null;
+            for (const key of Object.keys(showBloomFilters.shows)) {
+                const bloom = showBloomFilters.shows[key];
+                console.log(key, personalFilter.size(), bloom.size(), bloom.intersectionCount(personalFilter));
+            }
+        },
         hideWordsLevelStates: function() {
             return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
         },

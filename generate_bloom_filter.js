@@ -11,7 +11,8 @@ for (const word of words) {
     filter.add(word);
 }
 
-const buf = Buffer.from(new Uint8Array(filter.buckets));
+const uint8 = new Uint8Array(filter.buckets.buffer);
+const buf = Buffer.from(uint8);
 const hex = buf.toString('hex');
 
 fs.writeFile(outPath, hex, function (err, data) {

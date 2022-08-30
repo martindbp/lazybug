@@ -185,6 +185,7 @@ export default {
     computed: {
         rows: function() {
             if (this.$store.state.showList === null) return [];
+            console.log(this.showPersonalDifficultyScores);
             let rows = Object.values(this.$store.state.showList).filter((show) => show.released);
             let filters = this.filters;
             if (filters !== null) {

@@ -806,6 +806,43 @@ function getDatabaseLastModifiedDate(accessToken, callback) {
     });
 }
 
+
+function createBloomFilter(state, n, k) {
+    const bloom = new BloomFilter(n, k);
+    if (state.SIMPLE_CHARS === null || state.HSK_WORDS === null || state.DICT === null) return null;
+    let allWords = state.SIMPLE_CHARS.pre.concat(state.SIMPLE_CHARS.post).concat(state.SIMPLE_CHARS.pre_post).concat(state.SIMPLE_CHARS.middle);
+
+    for (let level = 1; level <= state.options.hideWordsLevel; level++) {
+        for (const word of state.HSK_WORDS[level-1]) allWords.push(word);
+    }
+
+    for (const key of Object.keys(state.states)) {
+        const [type, hz] = key.split('-');
+        if (type !== 'word') continue;
+        allWords.push(hz);
+    }
+
+    // Find all subwords or characters that are in the dictionary and add them
+    const allComponentWords = [];
+    for (const hz of allWords) {
+        for (let w = 5; w >= 1; w--) {
+            for (let startIdx = 0; startIdx < hz.length-w+1; startIdx++) {
+                const endIdx = startIdx + w;
+                const hzSub = hz.substring(startIdx, endIdx);
+                if (state.DICT[hzSub]) {
+                    console.log(hzSub);
+                    allComponentWords.push(hzSub);
+                }
+            }
+        }
+    }
+
+    allWords = allWords.concat(allComponentWords); 
+    for (const word of allWords) bloom.add(word);
+
+    return bloom;
+}
+
 // SVG icons from css.gg
 const ICON_SVG = {
     'play-track-next': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none"><path d="M6 17L14 12L6 7V17Z" fill="currentColor"/><path d="M18 7H15V12V17H18V7Z" fill="currentColor"/></svg>',

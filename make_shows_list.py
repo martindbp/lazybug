@@ -174,7 +174,7 @@ def get_words_and_stats(subtitle_paths):
 
 CHINESE_NUMBERS_REGEX = '^[一二三四五六七八九十百千万个]+$'
 
-@task
+@task(deps=[FileRef('generate_bloom_filter.js')])
 def get_bloom_filter(words, n, k, cedict, simple_chars):
 
     # Dedupe words
@@ -275,6 +275,7 @@ def make_shows_list():
         simple_chars = json.load(f)
 
     released_shows = {}
+    bloom_filters = {'shows': {}, 'n': BLOOM_FILTER_N, 'k': BLOOM_FILTER_K}
     unreleased = []
     scores = []
     for filename in glob.glob('data/remote/public/shows/*.json'):
@@ -328,7 +329,7 @@ def make_shows_list():
                 scores.append(score)
                 show['difficulty'] = score
 
-            show['bloom'] = get_bloom_filter(
+            bloom_filters['shows'][show_name] = get_bloom_filter(
                 words,
                 n=BLOOM_FILTER_N,
                 k=BLOOM_FILTER_K,
@@ -361,6 +362,9 @@ def make_shows_list():
 
     with open('data/remote/public/show_list_full.json', 'w') as f:
         json.dump(released_shows, f)
+
+    with open('data/remote/public/bloom_filters.json', 'w') as f:
+        json.dump(bloom_filters, f)
 
     print('Unreleased shows:')
     for show in unreleased:

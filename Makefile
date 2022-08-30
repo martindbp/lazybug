@@ -140,6 +140,9 @@ show-list-full:
 	LIST_HASH=$$(md5sum data/remote/public/show_list_full.json | cut -d " " -f1) ; \
 	echo $$LIST_HASH > data/remote/public/show_list_full.hash ; \
 	mv data/remote/public/show_list_full.json "data/remote/public/show_list_full-$$LIST_HASH.json"
+	BLOOM_HASH=$$(md5sum data/remote/public/bloom_filters.json | cut -d " " -f1) ; \
+	echo $$BLOOM_HASH > data/remote/public/bloom_filters.hash ; \
+	mv data/remote/public/bloom_filters.json "data/remote/public/bloom_filters-$$BLOOM_HASH.json"
 
 .PHONY: show-list
 show-list:
