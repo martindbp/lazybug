@@ -136,8 +136,11 @@ def get_sum_information(words, word_probs, min_prob):
 
 @task
 def get_words_and_stats(subtitle_paths):
-    sum_time = 0
+    sum_line_time = 0
+    sum_video_time = 0
+    num_lines = 0
     words = []
+    hours = 0
     for subtitle_file in subtitle_paths:
         with open(subtitle_file) as f:
             data = json.load(f)
@@ -167,9 +170,16 @@ def get_words_and_stats(subtitle_paths):
                 if t0 == 0 and i != 0:
                     continue
             diff = t1-t0
-            sum_time += diff
+            sum_line_time += diff
 
-    return words, sum_time
+        try:
+            num_lines += len(data['lines'])
+            sum_video_time += data['lines'][-1][1][0]
+        except:
+            print(subtitle_file, 'has no lines')
+            pass
+
+    return words, sum_line_time, sum_video_time, num_lines
 
 
 CHINESE_NUMBERS_REGEX = '^[一二三四五六七八九十百千万个]+$'
@@ -319,17 +329,24 @@ def make_shows_list():
                     subtitle_file = f'data/remote/public/subtitles/{vid}-{hash}.json'
                     subtitle_paths.append(FileRef(subtitle_file))
 
-            words, sum_time = get_words_and_stats(subtitle_paths)
-            sum_time = sum_time.eval()
+            words, sum_line_time, sum_video_time, num_lines = get_words_and_stats(subtitle_paths)
+            sum_line_time = sum_line_time.eval()
+            sum_video_time = sum_video_time.eval()
+            num_lines = num_lines.eval()
 
-            score = get_sum_information(words, word_probs, min_prob).eval() / sum_time if sum_time != 0 else None
+            score = get_sum_information(words, word_probs, min_prob).eval() / sum_line_time if sum_line_time != 0 else None
             if score is not None:
                 show['num_processed'] = f'{num_processed}/{num_total}'
                 print(show_name, 'score:', score)
                 scores.append(score)
                 show['difficulty'] = score
 
-            bloom_filters['shows'][show_name] = get_bloom_filter(
+            bloom_filters['shows'][show_name] = {
+                'num_lines': num_lines,
+                'sum_line_time': sum_line_time,
+                'sum_video_time': sum_video_time,
+            }
+            bloom_filters['shows'][show_name]['bloom'] = get_bloom_filter(
                 words,
                 n=BLOOM_FILTER_N,
                 k=BLOOM_FILTER_K,

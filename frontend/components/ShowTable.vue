@@ -35,6 +35,10 @@
                         {{ props.cols[1].value }}
                     </q-badge>
                 </q-td>
+                <q-td key="percent_known_vocab" :props="props">
+                    <q-linear-progress v-if="props.cols[2].value === null" query />
+                    <q-linear-progress v-else />
+                </q-td>
                 <q-td key="douban" :props="props">
                     <span v-if="props.cols[2].value === 'N/A'">N/A</span>
                     <q-badge v-else :color="mapDoubanToColor(props.cols[2].value)">
@@ -108,6 +112,13 @@ export default {
             align: 'left',
             field: row => roundToScale(10*(row.difficulty !== undefined ? row.difficulty : row.difficulty_manual), 0.1),
             format: val => `${val}`,
+            sortable: true
+          },
+          {
+            name: 'percent_known_vocab',
+            required: true,
+            label: 'Known',
+            field: row => row.percent_known_vocab,
             sortable: true
           },
           {

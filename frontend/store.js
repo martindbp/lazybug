@@ -287,8 +287,8 @@ const store = new Vuex.Store({
         setBloomFilters(state, filters) {
             for (const key of Object.keys(filters.shows)) {
                 const bloom = new BloomFilter(BLOOM_FILTER_N, BLOOM_FILTER_K);
-                bloom.fromHexString(filters.shows[key]);
-                filters.shows[key] = bloom;
+                bloom.fromHexString(filters.shows[key].bloom);
+                filters.shows[key].bloom = bloom;
             }
             state.showBloomFilters = filters;
         },
