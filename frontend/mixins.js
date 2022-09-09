@@ -19,6 +19,8 @@ const mixin = {
             this.syncDatabase(function(error) {
                 if (! error && closeAfterDone) {
                     // Close after some delay
+                    if (self.$store.state.syncError) return; // don't close if there's an error
+
                     setTimeout(function() {
                         self.$store.commit('setShowSyncDialog', false);
                     }, 500);
@@ -46,7 +48,7 @@ const mixin = {
                 const date = (new Date()).toUTCString();
                 self.$store.commit('setLastSyncDate', date);
 
-                uploadData(url, data, date, function(error) {
+                uploadData(url, data, date, self.$store.state.accessToken, function(error) {
                     if (error) {
                         callback(error);
                         return;

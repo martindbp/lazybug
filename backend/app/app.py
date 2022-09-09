@@ -1,9 +1,12 @@
 import os
+from datetime import datetime
+from typing import Union
+
 import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request, Header
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
@@ -13,12 +16,15 @@ from app.users import auth_backend, current_active_user, fastapi_users
 
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
-ENDPOINT = os.getenv('B2_ENDPOINT')
-KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
-APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
+LOCAL_ONLY = os.getenv('LOCAL_ONLY') is not None
+ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None
+if not LOCAL_ONLY:
+    ENDPOINT = os.getenv('B2_ENDPOINT')
+    KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
+    APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
 
 
-if ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None:
+if not LOCAL_ONLY and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
     print('ERROR: B2 secrets not set')
     exit(1)
 
@@ -37,6 +43,8 @@ b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="frontend/lazyweb"), name="static")
+
+app.mount("/cdn/lazybug-public", StaticFiles(directory="data/remote/public"), name="cdn")
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/api/auth/jwt", tags=["auth"]
@@ -78,11 +86,14 @@ async def get_signed_upload_link(size:int, user: User = Depends(current_active_u
     if size > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
         raise HTTPException(status_code=400, detail=f'Payload too large, > {ACCOUNT_FILE_SIZE_LIMIT_BYTES/10e6} Mb')
 
-    url = b2.meta.client.generate_presigned_url(
-        ClientMethod='put_object',
-        Params={'Bucket': ACCOUNTS_BUCKET, 'Key': get_account_file(user)},
-        ExpiresIn=120
-    )
+    if LOCAL_ONLY:
+        url = '/api/upload-file'
+    else:
+        url = b2.meta.client.generate_presigned_url(
+            ClientMethod='put_object',
+            Params={'Bucket': ACCOUNTS_BUCKET, 'Key': get_account_file(user)},
+            ExpiresIn=120
+        )
 
     return url
 
@@ -90,17 +101,28 @@ async def get_signed_upload_link(size:int, user: User = Depends(current_active_u
 @app.get("/api/signed-download-link")
 async def get_signed_download_link(user: User = Depends(current_active_user)):
     key = f'{user.email}.json'
-    url = b2.meta.client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params={'Bucket': 'lazybug-accounts', 'Key': key},
-        ExpiresIn=120
-    )
+
+    if LOCAL_ONLY:
+        return '/api/download-file/'
+    else:
+        url = b2.meta.client.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={'Bucket': 'lazybug-accounts', 'Key': key},
+            ExpiresIn=120
+        )
+
     return url
 
 
 @app.get("/api/database-last-modified-date")
 async def get_database_last_modified_date(user: User = Depends(current_active_user)):
     account_file = get_account_file(user)
+    if LOCAL_ONLY:
+        path = f'backend/{account_file}'
+        if not os.path.exists(path):
+            return None
+        return datetime.utcfromtimestamp(os.stat(path).st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+
     try:
         response = b2.meta.client.head_object(Bucket=ACCOUNTS_BUCKET, Key=account_file)
     except ClientError:
@@ -114,6 +136,15 @@ async def get_database_last_modified_date(user: User = Depends(current_active_us
         raise HTTPException(status_code=404, detail=f'File does not exist')
 
     return response["LastModified"]
+
+if LOCAL_ONLY:
+    @app.put("/api/upload-file")
+    async def upload_file(request: Request, user: User = Depends(current_active_user)):
+        body = await request.body()
+        account_file = get_account_file(user)
+        path = f'backend/{account_file}'
+        with open(path, 'wb') as f:
+            f.write(body)
 
 
 @app.get("/{rest_of_path:path}")

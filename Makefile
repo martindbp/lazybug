@@ -212,6 +212,13 @@ frontend:
 	make frontend-popup
 	make frontend-web
 
+.PHONY: local
+local:
+	make frontend
+	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/dist/*.js
+	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/lazyweb/*.js
+
+
 .PHONY: frontend-copy
 frontend-copy:
 	cp frontend/*.js frontend/dist/
@@ -220,9 +227,9 @@ frontend-copy:
 	cp frontend/deps/* frontend/dist/
 	cp frontend/css/* frontend/dist/
 	cp -r frontend/images frontend/dist/
-	-cp -r frontend/dist/* frontend/lazyweb/
 	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
+	-cp -r frontend/dist/* frontend/lazyweb/
 
 .PHONY: release
 release:
@@ -250,6 +257,9 @@ simple-chars:
 	SIMPLE_CHARS_HASH=$$(md5sum data/git/simple_chars.json | cut -d " " -f1) ; \
 	echo $$SIMPLE_CHARS_HASH > data/remote/public/simple_chars.hash ; \
 	cp data/git/simple_chars.json "data/remote/public/simple_chars-$$SIMPLE_CHARS_HASH.json"
+
+run-server-local-only:
+	LOCAL_ONLY=1 python backend/main.py
 
 run-server:
 	python backend/main.py

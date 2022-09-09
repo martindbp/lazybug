@@ -1,4 +1,4 @@
-const CDN_URL = "https://cdn.lazybug.ai/file/";
+const CDN_URL = LOCAL_ONLY ? "/cdn/" : "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;
 const SESSION_ID = uuidv4();
@@ -9,7 +9,7 @@ let lazybugIframe = null;
 
 if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe = document.createElement('iframe');
-    lazybugIframe.src = 'https://lazybug.ai/iframe.html';
+    lazybugIframe.src = LOCAL_ONLY ? '0.0.0.0:8000/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
     document.body.appendChild(lazybugIframe);
 }
@@ -694,15 +694,31 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
-function uploadData(uploadUrl, data, date, callback) {
+function uploadData(uploadUrl, data, date, accessToken, callback) {
+    // Actually, Date header is stripped from fetch
+    let headers = null;
+    if (LOCAL_ONLY) {
+        headers = new Headers({
+            'Date': date,
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        });
+    }
+    else {
+        headers = {
+            'Date': date
+        };
+    }
     fetch(uploadUrl, {
         method: "PUT",
         body: data,
-        headers: {
-            'Date': date
-        }
+        headers: headers,
     }).then(function(res) {
-        callback();
+    if (res.ok) {
+            console.log(res.headers);
+            callback();
+        }
+        else callback(res.statusText);
     }).catch((error) => {
         callback(error);
     });
@@ -712,6 +728,7 @@ function downloadData(downloadURL, callback) {
     fetch(downloadURL, {method: "GET"}).then((res) => {
         return res.json();
     }).then((data) => {
+        if (! res.ok) return callack(null, res.statusText);
         callback(data)
     }).catch((error) => {
         callback(null, error);
@@ -729,6 +746,7 @@ function login(username, password, callback) {
             'password': password
         })
     }).then(function(res) {
+        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         if (res.detail) callback(null, res);
@@ -766,6 +784,7 @@ function getSignedUploadLink(accessToken, size, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
+        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null)
@@ -782,6 +801,7 @@ function getSignedDownloadLink(accessToken, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
+        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null)
@@ -798,6 +818,7 @@ function getDatabaseLastModifiedDate(accessToken, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
+        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null);
