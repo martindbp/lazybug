@@ -70,7 +70,11 @@ export default {
             login(this.email, this.password, function(res, error) {
                 self.loading = false;
                 if (error) {
-                    self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
+                    self.error = error
+                    if (typeof error === 'object') {
+                        self.error = Array.isArray(error.detail) ? error.detail.map((error) => error.msg).join('\n') : error.detail;
+                    }
+
                     if (self.error === 'LOGIN_BAD_CREDENTIALS') self.error = 'Email or password was incorrect';
                 }
                 else if (res) {

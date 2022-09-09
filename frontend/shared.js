@@ -694,30 +694,20 @@ function youtubeThumbnailURL(captionId) {
     return `https://i.ytimg.com/vi/${videoId}/0.jpg`;
 }
 
-function uploadData(uploadUrl, data, date, accessToken, callback) {
-    // Actually, Date header is stripped from fetch
-    let headers = null;
+function uploadData(uploadUrl, data, accessToken, callback) {
+    let headers = {};
     if (LOCAL_ONLY) {
         headers = new Headers({
-            'Date': date,
             'Authorization': 'Bearer ' + accessToken,
             'Content-Type': 'application/x-www-form-urlencoded'
         });
-    }
-    else {
-        headers = {
-            'Date': date
-        };
     }
     fetch(uploadUrl, {
         method: "PUT",
         body: data,
         headers: headers,
     }).then(function(res) {
-    if (res.ok) {
-            console.log(res.headers);
-            callback();
-        }
+        if (res.ok) callback();
         else callback(res.statusText);
     }).catch((error) => {
         callback(error);
@@ -728,7 +718,6 @@ function downloadData(downloadURL, callback) {
     fetch(downloadURL, {method: "GET"}).then((res) => {
         return res.json();
     }).then((data) => {
-        if (! res.ok) return callack(null, res.statusText);
         callback(data)
     }).catch((error) => {
         callback(null, error);
@@ -746,7 +735,6 @@ function login(username, password, callback) {
             'password': password
         })
     }).then(function(res) {
-        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         if (res.detail) callback(null, res);
@@ -784,7 +772,6 @@ function getSignedUploadLink(accessToken, size, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
-        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null)
@@ -801,7 +788,6 @@ function getSignedDownloadLink(accessToken, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
-        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null)
@@ -818,7 +804,6 @@ function getDatabaseLastModifiedDate(accessToken, callback) {
             'Content-Type': 'application/x-www-form-urlencoded'
         }),
     }).then(function(res) {
-        if (! res.ok) return callack(null, res.statusText);
         return res.json();
     }).then((res) => {
         callback(res, null);
@@ -851,7 +836,6 @@ function createBloomFilter(state, n, k) {
                 const endIdx = startIdx + w;
                 const hzSub = hz.substring(startIdx, endIdx);
                 if (state.DICT[hzSub]) {
-                    console.log(hzSub);
                     allComponentWords.push(hzSub);
                 }
             }

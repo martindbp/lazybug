@@ -11,6 +11,7 @@
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
+                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowSyncDialog', true)">Show Sync Log</q-btn>
                     <q-btn color="red" flat @click="logout">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
@@ -57,16 +58,29 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
+        <q-dialog seamless v-model="showSyncLog">
+            <q-card>
+                <q-card-section class="row items-center">
+                    {{ $store.state.syncProgress }}
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Close" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </div>
 </template>
 
 <script>
+
 export default {
     mixins: [mixin],
     data: function() { return {
         clickedClearCache: false,
         confirmClearPersonalData: false,
         clickedClearPersonalData: false,
+        showSyncLog: false,
     }},
     methods: {
         clearCache: function() {

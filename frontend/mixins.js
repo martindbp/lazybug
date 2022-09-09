@@ -37,25 +37,33 @@ const mixin = {
         },
         getLinkAndUploadData: function(data, callback) {
             const self = this;
+            const accessToken = this.$store.state.accessToken;
             self.$store.commit('addSyncProgress', 'Getting signed upload link');
-            getSignedUploadLink(this.$store.state.accessToken, data.length, function(url, error) {
+            getSignedUploadLink(accessToken, data.length, function(url, error) {
                 if (error) {
                     callback(error);
                     return;
                 }
 
                 self.$store.commit('addSyncProgress', 'Uploading data');
-                const date = (new Date()).toUTCString();
-                self.$store.commit('setLastSyncDate', date);
-
-                uploadData(url, data, date, self.$store.state.accessToken, function(error) {
+                uploadData(url, data, accessToken, function(error) {
                     if (error) {
                         callback(error);
                         return;
                     }
-
-                    self.$store.commit('addSyncProgress', 'Successfully uploaded');
-                    callback(); // success
+                    self.$store.commit('addSyncProgress', 'Getting uploaded timestamp');
+                    getDatabaseLastModifiedDate(accessToken, function(serverLastSyncDateString, error) {
+                        if (error) {
+                            self.$store.commit('setSyncError', error);
+                            self.$store.commit('setIsSyncing', false);
+                            callback(error);
+                            return;
+                        }
+                        self.$store.commit('addSyncProgress', `New timestamp: ${serverLastSyncDateString}`);
+                        self.$store.commit('setLastSyncDate', serverLastSyncDateString);
+                        self.$store.commit('addSyncProgress', 'Successfully uploaded');
+                        callback(); // success
+                    });
                 });
             });
         },
@@ -346,9 +354,9 @@ const mixin = {
         showPersonalDifficultyScores: function() {
             const personalFilter = this.$store.state.bloomFilter;
             const showBloomFilters = this.$store.state.showBloomFilters;
-            if (personalFilter === null || showBloomFilters === null) return null;
+            if (this.$store.state.accessToken === null || personalFilter === null || showBloomFilters === null) return null;
             for (const key of Object.keys(showBloomFilters.shows)) {
-                const show = showBloomFilters.shows[key]
+                const show = showBloomFilters.shows[key];
                 const bloom = show.bloom;
                 console.log(key, personalFilter.size(), bloom.size(), bloom.intersectionCount(personalFilter));
                 console.log('new vocab per line', (bloom.size() - bloom.intersectionCount(personalFilter)) / show.num_lines);
