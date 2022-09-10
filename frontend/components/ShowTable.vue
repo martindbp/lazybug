@@ -36,46 +36,46 @@
                     </q-badge>
                 </q-td>
                 <q-td key="percent_known_vocab" :props="props">
-                    <q-linear-progress v-if="props.cols[2].value === null" query />
-                    <q-linear-progress v-else />
+                    <q-linear-progress v-if="[null, undefined].includes(props.cols[2].value)" query />
+                    <q-linear-progress color="green" instant-feedback v-else :value="props.cols[2].value" />
                 </q-td>
                 <q-td key="douban" :props="props">
-                    <span v-if="props.cols[2].value === 'N/A'">N/A</span>
-                    <q-badge v-else :color="mapDoubanToColor(props.cols[2].value)">
-                        {{ props.cols[2].value }}
-                    </q-badge>
-                </q-td>
-                <q-td key="type" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('type', 'type', props.cols[3].value)" :color="mapToColor('type', props.cols[3].value)">
+                    <span v-if="props.cols[3].value === 'N/A'">N/A</span>
+                    <q-badge v-else :color="mapDoubanToColor(props.cols[3].value)">
                         {{ props.cols[3].value }}
                     </q-badge>
                 </q-td>
+                <q-td key="type" :props="props" style="white-space: normal; max-width: 200px;">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('type', 'type', props.cols[4].value)" :color="mapToColor('type', props.cols[4].value)">
+                        {{ props.cols[4].value }}
+                    </q-badge>
+                </q-td>
                 <q-td key="year" :props="props" style="white-space: normal; max-width: 200px;">
-                    {{ props.cols[4].value }}
+                    {{ props.cols[5].value }}
                 </q-td>
                 <q-td key="genres" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', 'genres', genre)" v-for="genre in props.cols[5].value" :color="mapToColor('genres', genre)">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', 'genres', genre)" v-for="genre in props.cols[6].value" :color="mapToColor('genres', genre)">
                         {{ genre }}
                     </q-badge>
                 </q-td>
                 <q-td key="synopsis" :props="props" style="white-space: normal; max-width: 200px;">
-                    {{ props.cols[6].value }}
+                    {{ props.cols[7].value }}
                 </q-td>
                 <q-td key="sources" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[7].value[0])" :color="mapToColor('caption_source', props.cols[7].value[0])">
-                        {{ props.cols[7].value[0] }}
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[8].value[0])" :color="mapToColor('caption_source', props.cols[8].value[0])">
+                        {{ props.cols[8].value[0] }}
                     </q-badge>
                     <br>
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[7].value[1])" :color="mapToColor('translation_source', props.cols[7].value[1])">
-                        {{ props.cols[7].value[1] }}
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[8].value[1])" :color="mapToColor('translation_source', props.cols[8].value[1])">
+                        {{ props.cols[8].value[1] }}
                     </q-badge>
                 </q-td>
                 <q-td key="num_processed" :props="props" style="white-space: normal; max-width: 200px;">
-                    {{ props.cols[8].value }}
+                    {{ props.cols[9].value }}
                 </q-td>
                 <q-td key="free" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[9].value)"  :color="mapToColor('free', props.cols[9].value)">
-                        {{ props.cols[9].value ? 'free' : 'paid' }}
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[10].value)"  :color="mapToColor('free', props.cols[10].value)">
+                        {{ props.cols[10].value ? 'free' : 'paid' }}
                     </q-badge>
                 </q-td>
             </q-tr>
@@ -117,7 +117,7 @@ export default {
           {
             name: 'percent_known_vocab',
             required: true,
-            label: 'Known',
+            label: '% Known',
             field: row => row.percent_known_vocab,
             sortable: true
           },
@@ -196,7 +196,7 @@ export default {
     computed: {
         rows: function() {
             if (this.$store.state.showList === null) return [];
-            console.log(this.showPersonalDifficultyScores);
+            let showPercentKnown = this.showPercentKnown;
             let rows = Object.values(this.$store.state.showList).filter((show) => show.released);
             let filters = this.filters;
             if (filters !== null) {
@@ -212,7 +212,15 @@ export default {
                     }
                     return allMatch;
                 });
+
             }
+
+            // Add in the % known
+            rows = rows.map(row => {
+                const val = showPercentKnown[row.showId];
+                row.percent_known_vocab = val === undefined ? 0 : val;
+                return row;
+            });
             return rows;
         },
         columnFilters: function() {

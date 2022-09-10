@@ -352,19 +352,22 @@ const mixin = {
         },
     },
     computed: {
-        showPersonalDifficultyScores: function() {
+        showPercentKnown: function() {
             const personalFilter = this.$store.state.bloomFilter;
             const showBloomFilters = this.$store.state.showBloomFilters;
-            if (this.$store.state.accessToken === null || personalFilter === null || showBloomFilters === null) return null;
+            if (this.$store.state.accessToken === null || personalFilter === null || showBloomFilters === null) return {};
+            const percentKnown = {};
             for (const key of Object.keys(showBloomFilters.shows)) {
                 const show = showBloomFilters.shows[key];
                 const bloom = show.bloom;
-                console.log(key, personalFilter.size(), bloom.size(), bloom.intersectionCount(personalFilter));
-                console.log('new vocab per line', (bloom.size() - bloom.intersectionCount(personalFilter)) / show.num_lines);
-                console.log('new vocab per hour line time', (bloom.size() - bloom.intersectionCount(personalFilter)) / (show.sum_line_time / 3600));
-                console.log('new vocab per hour video', (bloom.size() - bloom.intersectionCount(personalFilter)) / (show.sum_video_time / 3600));
-                console.log('percent vocab known', bloom.intersectionCount(personalFilter) / bloom.size());
+                //console.log(key, personalFilter.size(), bloom.size(), bloom.intersectionCount(personalFilter));
+                //console.log('new vocab per line', (bloom.size() - bloom.intersectionCount(personalFilter)) / show.num_lines);
+                //console.log('new vocab per hour line time', (bloom.size() - bloom.intersectionCount(personalFilter)) / (show.sum_line_time / 3600));
+                //console.log('new vocab per hour video', (bloom.size() - bloom.intersectionCount(personalFilter)) / (show.sum_video_time / 3600));
+                //console.log('percent vocab known', bloom.intersectionCount(personalFilter) / bloom.size());
+                percentKnown[key] = bloom.intersectionCount(personalFilter) / bloom.size();
             }
+            return percentKnown;
         },
         hideWordsLevelStates: function() {
             return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
