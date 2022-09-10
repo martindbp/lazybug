@@ -13,16 +13,16 @@
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="login">
                     Please enter your email and password:
-                    <q-input v-model="email" filled type="email" hint="Email" />
+                    <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" />
                     <br>
-                    <q-input v-model="password" filled type="password" hint="Password" />
+                    <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" />
                     <div class="accounterror" v-if="error">{{ error }}</div>
                 </q-tab-panel>
                 <q-tab-panel name="register">
                     Please enter desired email and password:
-                    <q-input v-model="email" filled type="email" hint="Email" />
+                    <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" />
                     <br>
-                    <q-input v-model="password" filled type="password" hint="Password" />
+                    <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" />
                     <div class="accounterror" v-if="error">{{ error }}</div>
                 </q-tab-panel>
             </q-tab-panels>
@@ -59,10 +59,26 @@ export default {
         showAccountDialog: function() {
             if (this.show !== false) {
                 this.tab = this.$store.state.showAccountDialog;
+                const self = this;
+                // Need to delay this further as nextTick is not enough
+                setTimeout(function() {
+                    self.focus();
+                }, 50);
             }
-        }
+        },
+        tab: function() {
+            this.error = null;
+            this.focus();
+        },
     },
     methods: {
+        focus: function() {
+            const self = this;
+            this.$nextTick(() => {
+                if (self.tab === 'login') self.$refs.loginEmail.focus();
+                else self.$refs.registerEmail.focus();
+            });
+        },
         clickLogin: function() {
             this.loading = true;
             const self = this;
