@@ -16,10 +16,6 @@ export default {
     components: {
         Caption,
     },
-    mounted: function() {
-    },
-    updated: function() {
-    },
 };
 </script>
 
