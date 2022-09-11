@@ -31,6 +31,7 @@ const store = new Vuex.Store({
         accessToken: localStorage.getItem('accessToken'),
         accountEmail: localStorage.getItem('accountEmail'),
         captionId: null,
+        captionDocked: localStorage.getItem('captionDocked') === 'true',
         videoId: null,
         AVElement: null,
         videoAPI: null,
@@ -147,6 +148,10 @@ const store = new Vuex.Store({
         setNeedSync(state, val) {
             state.needSync = val;
             localStorage.setItem('needSync', val);
+        },
+        setCaptionDocked(state, val) {
+            state.captionDocked = val;
+            localStorage.setItem('captionDocked', val);
         },
         setShowSyncDialog(state, val) {
             state.showSyncDialog = val;

@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused}">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused, docked: $store.state.captionDocked}">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -130,6 +130,7 @@ export default {
 
 <style>
 .initialcontent {
+    display: inline-block;
     width: 580px;
     text-align: center;
     padding-top: 25px;
@@ -139,6 +140,7 @@ export default {
 }
 
 .loadingcontent {
+    display: inline-block;
     text-align: center;
     padding-top: 50px;
     padding-bottom: 50px;
@@ -148,12 +150,20 @@ export default {
 
 .lazybugcaptiondiv {
     color: white !important;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 0, 0, 1.0);
     text-align: left;
     font-size: 18px !important;
     padding: 0px;
     min-width: 7em;
+}
+
+.lazybugcaptiondiv:not(.docked) {
     filter: drop-shadow(rgb(25, 25, 25) 3px 3px 5px);
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.lazybugcaptiondiv.docked {
+    text-align: center;
 }
 
 .lazybugcaptiondiv.paused,

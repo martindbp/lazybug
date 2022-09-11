@@ -3,6 +3,7 @@
         <CaptionContainer
             id="captionroot"
             ref="captionroot"
+            :class="{ docked: $store.state.captionDocked }"
             :style="{ fontSize: $store.state.captionFontSize+'px !important' }"
             v-bind:isLoading="isLoading"
             v-bind:isLikelyAnAd="isLikelyAnAd"
@@ -111,7 +112,11 @@ export default {
         const self = this;
         this.$nextTick(function () {
             self.updateCaptionPositionBlur();
-            if (! [null, undefined].includes(self.$refs.captionroot) && ! [null, undefined].includes(self.$refs.captionroot.$el)) {
+            if (
+                ! self.$store.state.captionDocked &&
+                ! [null, undefined].includes(self.$refs.captionroot) &&
+                ! [null, undefined].includes(self.$refs.captionroot.$el)
+            ) {
                 self.$refs.captionroot.$el.style.minHeight = self.minHeight === null ? '0px' : self.minHeight + 'px';
 
                 // Make sure the root is always as wide as the menu
@@ -462,10 +467,13 @@ export default {
 <style>
 
 #captionroot {
-    position:absolute;
-    z-index: 6000;
     font-size: 24px !important;
     padding: 0 !important;
+}
+
+#captionroot:not(.docked) {
+    position:absolute;
+    z-index: 6000;
 }
 
 </style>

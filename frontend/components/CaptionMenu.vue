@@ -1,10 +1,13 @@
 <template>
-    <div class="captionmenu">
+    <div :class="{ captionmenu: true, docked: $store.state.captionDocked }">
         <SvgButton
+            v-if="! $store.state.captionDocked"
             name="move"
             title="Move"
             @mousedown.stop.prevent="moveMouseDown"
         />
+        <SvgButton v-if="$store.state.captionDocked" title="Undock" name="arrowtopleft" @click="clickDock(false)" />
+        <SvgButton v-else title="Dock" name="dock" @click="clickDock(true)" />
         <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
         <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
         <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
@@ -101,6 +104,9 @@ export default {
         window.removeEventListener('keydown', this.keyboardListener);
     },
     methods: {
+        clickDock: function(val) {
+            this.$store.commit('setCaptionDocked', val);
+        },
         showOptions: function(event) {
             this.$store.commit('setShowOptions', true);
         },
@@ -196,19 +202,27 @@ export default {
 <style>
 .captionmenu {
     background: rgba(0, 0, 0, 0.75);
-    transition: background-color 300ms linear;
-    position: absolute;
-    top: -30px;
-    display: inline-block;
-    vertical-align: top;
     font-size: 18px !important;
-    opacity: 0;
-    transition: opacity 150ms ease-in;
     height: 30px;
     white-space: nowrap;
 }
 
-.captionmenu.show {
+.captionmenu.docked {
+    background: rgba(0, 0, 0, 1.0);
+    display: block;
+}
+
+.captionmenu:not(.docked) {
+    position: absolute;
+    top: -30px;
+    display: inline-block;
+    vertical-align: top;
+    opacity: 0;
+    transition: opacity 150ms ease-in;
+    transition: background-color 300ms linear;
+}
+
+.captionmenu:not(.docked).show {
     opacity: 1;
     transition-delay: 0ms;
 }
