@@ -507,6 +507,13 @@ function videoIdFromCaptionId(captionId) {
     return parts.slice(1).join('-');
 }
 
+function secondsToTimestamp(time) {
+    const h = Math.floor(time / 3600);
+    const m = Math.floor((time - h * 3600) / 60);
+    const s = Math.floor((time - h * 3600 - m * 60));
+    return `${pad(h, 2)}:${pad(m, 2)}:${pad(s, 2)}`;
+}
+
 const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height = 315) => `<iframe width="${width}" height="${height}" src="https://www.youtube-nocookie.com/embed/${id}?start=${Math.floor(t0)}&end=${Math.ceil(t1)}&autoplay=${autoplay ? 1 : 0}&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 function captionToAnkiCloze(wordData, hiddenStates, captionIdx, type, i, captionId = null, captionHash = null, t0 = null, t1 = null, escape = false) {
     let html = `<table id="${captionId} hash="${captionHash} idx="${captionIdx}" type="${type}" i="${i}">\n`;

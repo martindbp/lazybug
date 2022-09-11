@@ -4,10 +4,12 @@
         <div v-if="$store.state.isMovingCaption && !localOnly" class="dragsurface" />
         <div ref="player" :id="playerID" class="player">
             <div style="position: absolute; bottom: 0; left: 0; right: 0;" v-if="localOnly" >
-                <q-btn vertical-middle dark color="red" v-if="substitutePlaying" label="Pause" @click="setSubstitutePlaying(false)" />
-                <q-btn vertical-middle dark color="green" v-else label="Play" @click="setSubstitutePlaying(true)"/>
-                <q-slider vertical-middle style="display: inline-block; width: 80%" color="red" dark v-model="substituteTime" :min="0" :max="captionDuration" :step="0.5" />
-                <span>{{currentTimeLabel()}}</span>
+                <div style="margin-left: 20%">
+                    <q-slider vertical-middle style="width: 80%" color="red" dark v-model="substituteTime" :min="0" :max="captionDuration" :step="0.5" />
+                    <q-btn vertical-middle dark color="red" v-if="substitutePlaying" label="Pause" @click="setSubstitutePlaying(false)" />
+                    <q-btn vertical-middle dark color="green" v-else label="Play" @click="setSubstitutePlaying(true)"/>
+                    <span class="timelabel">{{currentTimeLabel()}}</span>
+                </div>
             </div>
         </div>
         <EmbeddedCaption ref="embeddedcaption" v-show="playerReady" />
@@ -77,10 +79,9 @@ export default {
     },
     methods: {
         currentTimeLabel: function() {
-            return '';
-            //const h = Math.floor(this.getCurrentTime());
-            //const m = Math.floor(this.getCurrentTime());
-            //const s = 
+            const current = secondsToTimestamp(this.getCurrentTime());
+            const total = secondsToTimestamp(this.getDuration());
+            return `${current} / ${total}`;
         },
         setSubstitutePlaying: function(playing) {
             this.substitutePlaying = playing;
@@ -152,7 +153,7 @@ export default {
         },
         getDuration: function() {
             if (! this.playerReady) return 0;
-            if (LOCAL_ONLY) return this.captionDuration(); // we have no youtube iframe, so use the time we get from caption data
+            if (LOCAL_ONLY) return this.captionDuration; // we have no youtube iframe, so use the time we get from caption data
             return this.player.getDuration();
         },
         play: function() {
@@ -221,5 +222,10 @@ export default {
 .player {
     height: 100%;
     background: black;
+}
+
+.timelabel {
+    margin-left: 10px;
+    color: white;
 }
 </style>
