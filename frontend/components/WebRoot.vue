@@ -1,19 +1,26 @@
 <template>
     <div>
         <q-layout view="lHh Lpr lff" container class="shadow-2 rounded-borders">
+           <q-header v-if="isMobile" elevated class="bg-gray">
+               <q-toolbar>
+                   <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
+                   <q-toolbar-title>Lazybug - {{pageTitle}}</q-toolbar-title>
+               </q-toolbar>
+           </q-header>
+
           <q-drawer
             v-model="drawer"
             show-if-above
             bordered
+            :behavior="mobile"
             :width="200"
-            :breakpoint="400"
             style="text-align: left;"
             class="bg-grey-3"
           >
             <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="/static/images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
-                <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="$store.commit('setPage', 'player')" v-ripple>
+                <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="tv" />
                   </q-item-section>
@@ -23,7 +30,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'content'" clickable @click="$store.commit('setPage', 'content')" v-ripple>
+                <q-item :active="page === 'content'" clickable @click="clickPage('content')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="list" />
                   </q-item-section>
@@ -33,7 +40,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'history'" clickable @click="$store.commit('setPage', 'history')" v-ripple>
+                <q-item :active="page === 'history'" clickable @click="clickPage('history')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="history" />
                   </q-item-section>
@@ -43,7 +50,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'star'" clickable @click="$store.commit('setPage', 'star')" v-ripple>
+                <q-item :active="page === 'star'" clickable @click="clickPage('star')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="star" />
                   </q-item-section>
@@ -53,7 +60,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'account'" clickable @click="$store.commit('setPage', 'account')" v-ripple>
+                <q-item :active="page === 'account'" clickable @click="clickPage('account')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="account_circle" />
                   </q-item-section>
@@ -120,10 +127,22 @@ export default {
         AccountDialog,
         SyncDialog,
     },
+    data: function() { return {
+        drawer: this.isDesktop,
+    }},
+    methods: {
+        clickPage: function(page) {
+            this.$store.commit('setPage', page);
+            if (this.isMobile) this.drawer = false; // close after tap if on mobile
+        }
+    },
     computed: {
         page: {
             get: function() { return this.$store.state.page; },
             set: function(val) { this.$store.commit('setPage', val); },
+        },
+        pageTitle: function() {
+            return this.page[0].toUpperCase() + this.page.substring(1);
         },
         showNonEmbeddableDialog: {
             get: function() { return this.$store.state.showNonEmbeddableDialog; },

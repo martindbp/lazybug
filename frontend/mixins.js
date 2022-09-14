@@ -352,6 +352,12 @@ const mixin = {
         },
     },
     computed: {
+        isMobile: function() {
+            return Quasar.Platform.is.mobile === true;
+        },
+        isDesktop: function() {
+            return Quasar.Platform.is.desktop === true;
+        },
         showPercentKnown: function() {
             const personalFilter = this.$store.state.bloomFilter;
             const showBloomFilters = this.$store.state.showBloomFilters;
