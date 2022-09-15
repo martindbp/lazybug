@@ -6,7 +6,7 @@
           :pagination="pagination"
           :loading="isLoading"
           row-key="name"
-          style="display: inline-block; margin-top: 50px; margin-left: 50px"
+          :class="{historytable: true, mobile: isMobile}"
         >
             <template v-slot:body="props">
                 <q-tr :props="props" @click="clickVideo(props)" style="cursor: pointer;">
@@ -86,6 +86,14 @@ export default {
     }
 };
 </script>
-
 <style>
+.historytable {
+    display: inline-block;
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+.historytable.mobile {
+    margin: 0;
+}
 </style>

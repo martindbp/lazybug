@@ -6,7 +6,7 @@
       :pagination="pagination"
       :loading="isLoading"
       row-key="name"
-      style="display: inline-block; margin-top: 50px; margin-left: 50px"
+      :class="{showtable: true, mobile: isMobile}"
     >
         <template v-slot:header-cell="props">
             <q-th :props="props">
@@ -303,5 +303,9 @@ export default {
     margin-left: 2px;
     margin-bottom: 2px;
     cursor: pointer;
+}
+
+.showtable.mobile {
+    margin: 0;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <q-layout view="lHh Lpr lff" container class="shadow-2 rounded-borders">
-           <q-header v-if="isMobile" elevated class="bg-gray">
+           <q-header v-if="isMobile" elevated class="bg-blue">
                <q-toolbar>
                    <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
                    <q-toolbar-title>Lazybug - {{pageTitle}}</q-toolbar-title>
@@ -80,7 +80,7 @@
           </q-drawer>
 
           <q-page-container>
-            <q-page :padding="page !== 'player'">
+            <q-page :padding="page !== 'player' && isDesktop">
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-show="page === 'content'" />
                 <HistoryPage v-show="page === 'history'" />

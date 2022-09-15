@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-md" style="margin-left: 25px; margin-top: 25px;">
         <div class="q-pa-md row items-start q-gutter-md">
-            <q-card>
+            <q-card class="accountcard">
                 <q-card-section>
                     <div class="text-h6">Account</div>
                     <div v-if="$store.state.accountEmail" class="text-subtitle2">{{ $store.state.accountEmail }}</div>
@@ -19,7 +19,7 @@
                     <q-btn flat @click="login">Login</q-btn>
                 </q-card-actions>
             </q-card>
-            <q-card>
+            <q-card class="accountcard">
                 <q-card-section>
                     <div class="text-h6">Backup or Restore</div>
                     <div class="text-subtitle2">Download data file or restore from file</div>
@@ -33,7 +33,7 @@
                 </q-card-actions>
             </q-card>
 
-            <q-card>
+            <q-card class="accountcard">
                 <q-card-section>
                     <div class="text-h6">Clear Local Data</div>
                 </q-card-section>
@@ -172,4 +172,7 @@ export default {
 </script>
 
 <style>
+.accountcard {
+    min-width: 275px;
+}
 </style>

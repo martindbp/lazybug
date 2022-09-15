@@ -1,5 +1,5 @@
 <template>
-    <div style="display: inline-block; margin-top: 50px; margin-left: 50px; min-width: 500px;">
+    <div>
         <q-table
             title="Starred"
             :rows="rows"
@@ -10,6 +10,7 @@
             @request="onRequest"
             :pagination="pagination"
             hide-pagination
+            :class="{startable: true, mobile: isMobile}"
         >
           <template v-slot:body="props">
               <q-tr v-if="props.row.isNewSession">
@@ -540,4 +541,12 @@ export default {
 </script>
 
 <style>
+.startable {
+    display: inline-block;
+}
+.startable:not(.mobile) {
+    margin-top: 50px;
+    margin-left: 50px;
+    min-width: 500px;
+}
 </style>
