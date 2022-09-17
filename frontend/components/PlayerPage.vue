@@ -1,7 +1,7 @@
 <template>
     <div ref="playerpage" v-if="showInfo" style="position: relative">
         <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="captionId" />
-        <div v-if="showInfo.type !== 'movie'" style="position: absolute; left: 5px; top: 185px;">
+        <div v-if="showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile}">
             <div style="margin-bottom: 15px">
                 <q-fab
                     ref="seasonselector"
@@ -47,6 +47,7 @@
 import EmbeddedVideo from './EmbeddedVideo.vue'
 
 export default {
+    mixins: [mixin],
     components: {
         EmbeddedVideo,
     },
@@ -145,8 +146,25 @@ export default {
     min-width: 700px;
 }
 
+.mobile .episodeselector .q-fab__actions {
+    min-width: 300px;
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
+    overflow: auto;
+    height: 500px;
+}
+
 .episodeselector .q-fab__actions .q-btn {
     font-size: 10px !important;
 }
 
+.videopicker {
+    position: absolute;
+    left: 5px;
+    top: 185px;
+}
+
+.videopicker.mobile {
+    top: 15px;
+}
 </style>

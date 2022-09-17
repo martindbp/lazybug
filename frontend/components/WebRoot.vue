@@ -17,7 +17,7 @@
             style="text-align: left;"
             class="bg-grey-3"
           >
-            <q-scroll-area style="border-right: 1px solid #ddd">
+              <q-scroll-area style="border-right: 1px solid #ddd">
               <q-img src="/static/images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
               <q-list padding>
                 <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
@@ -79,7 +79,7 @@
             </q-scroll-area>
           </q-drawer>
 
-          <q-page-container>
+          <q-page-container :class="{nopadding: page === 'player' && isMobile}" >
             <q-page :padding="page !== 'player' && isDesktop">
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-show="page === 'content'" />
@@ -153,4 +153,7 @@ export default {
 </script>
 
 <style>
+.q-page-container.nopadding {
+    padding-top: 0px !important;
+}
 </style>
