@@ -28,8 +28,8 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
-        accessToken: localStorage.getItem('accessToken'),
-        accountEmail: localStorage.getItem('accountEmail'),
+        accessToken: getCookie('jwt'),
+        accountEmail: getCookie('email'),
         captionId: null,
         captionDocked: localStorage.getItem('captionDocked') === 'true',
         videoId: null,
@@ -177,14 +177,14 @@ const store = new Vuex.Store({
         setLogin(state, val) {
             state.accessToken = val.accessToken;
             state.accountEmail = val.email;
-            localStorage.setItem('accessToken', val.accessToken);
-            localStorage.setItem('accountEmail', val.email);
+            setCookie('jwt', val.accessToken, 365);
+            setCookie('email', val.email, 365);
         },
         setLogout(state) {
             state.accessToken = null;
             state.accountEmail = null;
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('accountEmail');
+            eraseCookie('jwt');
+            eraseCookie('email');
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;

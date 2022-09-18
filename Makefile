@@ -278,5 +278,5 @@ purge-lazyweb-cache: check-cloudflare-env
 
 .PHONY: deploy-frontend
 deploy-frontend:
-	cd frontend/lazyweb && git add . && git commit -m "B" && git push
+	cd frontend/lazyweb && git add . && git commit -m "B" && git push origin master
 	make purge-lazyweb-cache

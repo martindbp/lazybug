@@ -6,17 +6,20 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Header
+from fastapi import Depends, FastAPI, HTTPException, Request, Header, Cookie
 from fastapi.staticfiles import StaticFiles
+from fastapi.testclient import TestClient
 from starlette.responses import FileResponse
 
 from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
+from app.discoursesso import DiscourseSSO
 
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
 LOCAL_ONLY = os.getenv('LOCAL_ONLY') is not None
+DISCOURSE_SECRET = os.getenv('DISCOURSE_SECRET')
 ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None
 if not LOCAL_ONLY:
     ENDPOINT = os.getenv('B2_ENDPOINT')
@@ -41,6 +44,7 @@ def get_b2_resource(endpoint, key_id, application_key):
 b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 
 app = FastAPI()
+client = TestClient(app)
 
 app.mount("/static", StaticFiles(directory="frontend/lazyweb"), name="static")
 
@@ -150,3 +154,32 @@ if LOCAL_ONLY:
 @app.get("/{rest_of_path:path}")
 async def read_index():
     return FileResponse('frontend/lazyweb/index.html')
+
+
+@app.get("/api/discourse/get-id-and-email")
+async def discourse_get_email_and_id(user: User = Depends(current_active_user)):
+    return [user.id, user.email]
+
+
+@app.get("/api/discourse/sso")
+async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
+    # Get jwt from cookies, then do a local request to get the email
+    headers = {'Authorization': 'Bearer ' + jwt}
+    user_id, user_email = client.get('/api/discourse/get-id-and-email', headers=headers).json()
+
+    credentials = {
+        "external_id" : user_id,
+        "email" : user_email,
+    }
+
+    discourse = DiscourseSSO(DISCOURSE_SECRET)
+
+    if discourse.validate(sso, sig):
+        # Get users login credentials and build the URL to log the user
+        # into your discourse site. ex: discourse.example.com
+        credentials['nonce'] = discourse.get_nonce()
+        return_url_base = "https://discourse.lazybug.ai/session/sso_login?%s"
+        loginURL =  return_url_base % discourse.build_login_URL(credentials)
+        return redirect(loginURL)
+
+    raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
