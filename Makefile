@@ -280,3 +280,7 @@ purge-lazyweb-cache: check-cloudflare-env
 deploy-frontend:
 	cd frontend/lazyweb && git add . && git commit -m "B" && git push origin master
 	make purge-lazyweb-cache
+
+.PHONY: kill-server
+kill-server:
+	pgrep -f "python backend/main" | head -n1 | xargs -I{} kill -9 {}
