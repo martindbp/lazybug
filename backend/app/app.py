@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 from botocore.config import Config
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Header, Cookie
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.testclient import TestClient
 from starlette.responses import FileResponse
@@ -172,10 +173,11 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
     if discourse.validate(sso, sig):
         # Get users login credentials and build the URL to log the user
         # into your discourse site. ex: discourse.example.com
-        credentials['nonce'] = discourse.get_nonce()
+        credentials['nonce'] = discourse.get_nonce(sso)
         return_url_base = "https://discourse.lazybug.ai/session/sso_login?%s"
-        loginURL =  return_url_base % discourse.build_login_URL(credentials)
-        return redirect(loginURL)
+        return_url =  return_url_base % discourse.build_login_URL(credentials)
+        print(credentials)
+        return RedirectResponse(return_url)
 
     raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
 
