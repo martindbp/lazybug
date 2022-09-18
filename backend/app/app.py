@@ -151,11 +151,6 @@ if LOCAL_ONLY:
             f.write(body)
 
 
-@app.get("/{rest_of_path:path}")
-async def read_index():
-    return FileResponse('frontend/lazyweb/index.html')
-
-
 @app.get("/api/discourse/get-id-and-email")
 async def discourse_get_email_and_id(user: User = Depends(current_active_user)):
     return [user.id, user.email]
@@ -183,3 +178,9 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
         return redirect(loginURL)
 
     raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
+
+
+# NOTE: need to put this last!
+@app.get("/{rest_of_path:path}")
+async def read_index():
+    return FileResponse('frontend/lazyweb/index.html')
