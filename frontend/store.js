@@ -177,6 +177,7 @@ const store = new Vuex.Store({
         setLogin(state, val) {
             state.accessToken = val.accessToken;
             state.accountEmail = val.email;
+            state.needSync = true;
             setCookie('jwt', val.accessToken, 365);
             setCookie('email', val.email, 365);
         },

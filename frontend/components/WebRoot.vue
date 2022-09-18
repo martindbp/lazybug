@@ -60,6 +60,16 @@
                   </q-item-section>
                 </q-item>
 
+                <q-item :active="page === 'discuss'" clickable @click="clickDiscuss" v-ripple>
+                  <q-item-section avatar>
+                    <q-icon name="forum" />
+                  </q-item-section>
+
+                  <q-item-section>
+                    Discuss
+                  </q-item-section>
+                </q-item>
+
                 <q-item :active="page === 'account'" clickable @click="clickPage('account')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="account_circle" />
@@ -134,7 +144,18 @@ export default {
         clickPage: function(page) {
             this.$store.commit('setPage', page);
             if (this.isMobile) this.drawer = false; // close after tap if on mobile
-        }
+        },
+        clickDiscuss: function() {
+            const self = this;
+            if (this.$store.state.accessToken === null) {
+                this.showAccountModalWithCallback(function() {
+                    document.location = DISCOURSE_URL;
+                });
+            }
+            else {
+                document.location = DISCOURSE_URL;
+            }
+        },
     },
     computed: {
         page: {

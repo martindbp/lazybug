@@ -12,7 +12,28 @@ function combinations(options, accumulatorArray, currCombination = [], currIdx =
 }
 
 const mixin = {
+    data: function() { return {
+        accountCallback: null,
+    }},
+    watch: {
+        accessToken: function() {
+            if (this.accessToken && this.accountCallback && !this.needSync) {
+                this.accountCallback();
+                this.accountCallback = null;
+            }
+        },
+        needSync: function() {
+            if (this.accessToken && this.accountCallback && !this.needSync) {
+                this.accountCallback();
+                this.accountCallback = null;
+            }
+        },
+    },
     methods: {
+        showAccountModalWithCallback: function(callback = null) {
+            this.$store.commit('setShowAccountDialog', 'login');
+            this.accountCallback = callback;
+        },
         showModalAndSync: function(closeAfterDone = false, callback = null) {
             this.$store.commit('setShowSyncDialog', true);
             const self = this;
@@ -352,6 +373,12 @@ const mixin = {
         },
     },
     computed: {
+        accessToken: function() {
+            return this.$store.state.accessToken;
+        },
+        needSync: function() {
+            return this.$store.state.needSync;
+        },
         isMobile: function() {
             return Quasar.Platform.is.mobile === true;
         },
