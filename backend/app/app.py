@@ -159,6 +159,9 @@ async def discourse_get_email_and_id(user: User = Depends(current_active_user)):
 
 @app.get("/api/discourse/sso")
 async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
+    if jwt is None:
+        raise HTTPException(status_code=403, detail=f'No jwt token')
+
     # Get jwt from cookies, then do a local request to get the email
     headers = {'Authorization': 'Bearer ' + jwt}
     user_id, user_email = client.get('/api/discourse/get-id-and-email', headers=headers).json()
