@@ -6,7 +6,7 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Header, Cookie
+from fastapi import Depends, FastAPI, HTTPException, Request, Header, Cookie, Response
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.testclient import TestClient
@@ -27,6 +27,14 @@ if not LOCAL_ONLY:
     KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
     APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
 
+
+DISCOURSE_API_KEY = os.getenv('DISCOURSE_API_KEY')
+
+discourse_client = discourse.Client(
+    host='http://discourse.lazybug.ai/',
+    api_username='system',
+    api_key=DISCOURSE_API_KEY,
+)
 
 if not LOCAL_ONLY and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
     print('ERROR: B2 secrets not set')
@@ -183,6 +191,27 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
         return RedirectResponse(return_url)
 
     raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
+
+
+@app.get("/api/discourse/comments/{topic_id}")
+async def discourse_topic_comments(topic_id: int, response: Response):
+    response.headers['Cache-Control'] = 'max-age=300'  # cache for 5 minutes
+
+    try:
+        topic = discourse_client.get_topic(topic_id)
+    except:
+        raise HTTPException(status_code=404, detail='Topic does not exist')
+
+    posts = []
+    for post in topic.post_stream['posts']:
+        post_data = {
+            text: post['cooked'],
+            created_at: post['created_at'],
+            username: post['username'],
+        }
+        posts.append(post_data)
+
+    return posts
 
 
 # NOTE: need to put this last!
