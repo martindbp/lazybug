@@ -398,23 +398,46 @@ const store = new Vuex.Store({
         setPage(state, val) {
             let url = '/' + val;
             if (val === 'player') {
-                url += `/${state.playingShowId}/${state.playingSeason}/${state.playingEpisode}`;
+                url += `/${state.playingShowId}/${state.playingSeason + 1}/${state.playingEpisode + 1}`;
             }
             window.history.pushState(null, '', url);
             state.page = val;
         },
         setLocation(state, val) {
-            const parts = val.pathname.split('/');
-            if (parts[1] === '') state.page = 'content'; // default
-            else state.page = parts[1];
+            //
+            // Routing logic
+            //
+            const parts = val.pathname.split('/').filter((s) => s.length > 0);
+            if (parts[0] === '') state.page = 'content'; // default
+            else state.page = parts[0];
 
-            if (parts[1] === 'player' && parts.length === 5) {
-                const showId = parts[2];
-                const seasonIdx = parseInt(parts[3]);
-                const episodeIdx = parseInt(parts[4]);
+            if (parts[0] === 'player') {
+                const showId = parts[1];
                 state.playingShowId = showId;
-                state.playingSeason = seasonIdx;
-                state.playingEpisode = episodeIdx;
+
+                if (parts.length >= 4) {
+                    // Pattern: player/show/season/episode/(caption)
+                    const seasonIdx = parseInt(parts[2]) - 1;
+                    const episodeIdx = parseInt(parts[3]) - 1;
+                    if (parts.length === 5) {
+                        const captionIdx = parseInt(parts[4]) - 1;
+                        state.playingCaptionIdx = captionIdx;
+                    }
+                    state.playingSeason = seasonIdx;
+                    state.playingEpisode = episodeIdx;
+                }
+                else if (parts.length === 2) {
+                    // Pattern: player/movie/
+                    state.playingSeason = 0;
+                    state.playingEpisode = 0;
+                }
+                else if (parts.length === 3) {
+                    // Pattern: player/movie/caption
+                    const captionIdx = parseInt(parts[2]) - 1;
+                    state.playingCaptionIdx = captionIdx;
+                    state.playingSeason = 0;
+                    state.playingEpisode = 0;
+                }
             }
         },
     },

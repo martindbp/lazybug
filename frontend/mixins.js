@@ -16,13 +16,7 @@ const mixin = {
         accountCallback: null,
     }},
     watch: {
-        accessToken: function() {
-            if (this.accessToken && this.accountCallback && !this.needSync) {
-                this.accountCallback();
-                this.accountCallback = null;
-            }
-        },
-        needSync: function() {
+        accessTokenPlusNeedSync: function() {
             if (this.accessToken && this.accountCallback && !this.needSync) {
                 this.accountCallback();
                 this.accountCallback = null;
@@ -373,6 +367,9 @@ const mixin = {
         },
     },
     computed: {
+        accessTokenPlusNeedSync: function() {
+            return `${this.accessToken}|${this.needSync}`;
+        },
         accessToken: function() {
             return this.$store.state.accessToken;
         },

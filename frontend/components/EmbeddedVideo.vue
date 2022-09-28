@@ -41,7 +41,6 @@ export default {
         };
     },
     mounted: function(){
-        this.initYoutube();
         const self = this;
         // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
         this.focusInterval = setInterval(function() {
@@ -68,12 +67,40 @@ export default {
         this.focusInterval = null;
     },
     watch: {
+        youtubeAPIReady: {
+            immediate: true,
+            handler: function() {
+                this.initYoutube();
+            },
+        },
         captionId: function() {
             this.destroyYoutube();
             this.initYoutube();
         },
+        playingCaptionIdx: function() {
+            const captionData = this.$store.state.captionData;
+            const captionIdx = this.$store.state.playingCaptionIdx;
+            const videoAPI = this.$store.state.videoAPI;
+            if (! this.playerReady || captionData === null || captionIdx === null || videoAPI === null) {
+                return;
+            }
+
+            const line = captionArrayToDict(captionData.lines[captionIdx], captionData);
+            this.$store.state.playingCaptionIdx = null;
+            setTimeout(function() {
+                console.log('Setting videoAPI time', line.t0);
+                videoAPI.setCurrentTime(line.t0 + 0.001);
+                //videoAPI.play();
+            }, 1000);
+        },
     },
     computed: {
+        playingCaptionIdx: function() {
+            return `${this.playerReady}|${this.$store.state.playingCaptionIdx}|${this.$store.state.captionData}|${this.$store.state.videoAPI}`;
+        },
+        youtubeAPIReady: function() {
+            return this.$store.state.youtubeAPIReady;
+        },
         captionDuration: function() {
             if (this.$store.state.captionData === null) return 0;
             return this.$store.state.captionData.video_length;
@@ -100,7 +127,11 @@ export default {
         },
         initYoutube: function() {
             const self = this;
+            console.log('trying to initYoutube');
+            if (! this.$store.state.youtubeAPIReady) return;
+
             if (! LOCAL_ONLY) {
+                console.log('initing initYoutube');
                 this.player = new YT.Player(this.playerID, {
                     width: this.width,
                     height: this.height,
@@ -137,6 +168,7 @@ export default {
             const self = this;
             // Wait a bit before setting playerReady to remove flickering because iframe hasn't fully rendered yet
             setTimeout(function() {
+                console.log('playerReady');
                 self.playerReady = true;
             }, 100);
         },
