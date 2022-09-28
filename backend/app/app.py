@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 from typing import Union
 
+import discourse
+
 import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
@@ -16,6 +18,7 @@ from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from app.discoursesso import DiscourseSSO
+
 
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'

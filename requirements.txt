@@ -25,3 +25,4 @@ easyocr
 pycairo
 pangocairocffi
 scipy
+discourse
