@@ -408,7 +408,7 @@ const store = new Vuex.Store({
             // Routing logic
             //
             const parts = val.pathname.split('/').filter((s) => s.length > 0);
-            if (parts[0] === '') state.page = 'content'; // default
+            if (parts.length === 0) state.page = 'content'; // default
             else state.page = parts[0];
 
             if (parts[0] === 'player') {
