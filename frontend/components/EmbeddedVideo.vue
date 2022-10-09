@@ -30,7 +30,7 @@ export default {
     },
     data: function() {
         return {
-            playerID: uuidv4(),
+            playerID: 'player'+uuidv4().replaceAll('-', ''),
             player: null,
             playerReady: false,
             focusInterval: null,
@@ -81,7 +81,7 @@ export default {
             const captionData = this.$store.state.captionData;
             const captionIdx = this.$store.state.playingCaptionIdx;
             const videoAPI = this.$store.state.videoAPI;
-            if (! this.playerReady || captionData === null || captionIdx === null || videoAPI === null) {
+            if (! this.playerReady || captionData === null || [null, undefined].includes(captionIdx) || videoAPI === null) {
                 return;
             }
 
@@ -127,24 +127,29 @@ export default {
         },
         initYoutube: function() {
             const self = this;
-            console.log('trying to initYoutube');
             if (! this.$store.state.youtubeAPIReady) return;
 
             if (! LOCAL_ONLY) {
-                console.log('initing initYoutube');
-                this.player = new YT.Player(this.playerID, {
-                    width: this.width,
-                    height: this.height,
-                    videoId: videoIdFromCaptionId(this.captionId),
-                    playerVars: {
-                        'playsinline': 1,
-                        'rel': 0,
-                        'autoplay': 1,
-                    },
-                    events: {
-                        'onReady': self.onReady,
-                        'onStateChange': this.onPlayerStateChange
-                    }
+                console.log('initing initYoutube', this.playerID, this.captionId, document.querySelectorAll('#' + this.playerID));
+                this.$nextTick(() => { // nextTick because player element may not be done
+                    this.player = new YT.Player(this.playerID, {
+                        width: this.width,
+                        height: this.height,
+                        videoId: videoIdFromCaptionId(this.captionId),
+                        playerVars: {
+                            'playsinline': 1,
+                            'rel': 0,
+                            'autoplay': 1,
+                            'enablejsapi': 1,
+                            'origin': 'https://lazybug.ai',
+                            'showinfo': 0,
+                        },
+                        events: {
+                            'onReady': this.onReady,
+                            'onStateChange': this.onPlayerStateChange,
+                            'onError': this.onPlayerError,
+                        }
+                    });
                 });
             }
             const videoAPI =  {
@@ -171,6 +176,10 @@ export default {
                 console.log('playerReady');
                 self.playerReady = true;
             }, 100);
+        },
+        onPlayerError: function(error) {
+            console.log(error);
+            alert(error);
         },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
