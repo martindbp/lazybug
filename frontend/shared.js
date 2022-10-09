@@ -822,6 +822,8 @@ function getDatabaseLastModifiedDate(accessToken, callback) {
 
 
 function createBloomFilter(state, n, k) {
+    if (BROWSER_EXTENSION) return;
+
     const bloom = new BloomFilter(n, k);
     if (state.SIMPLE_CHARS === null || state.HSK_WORDS === null || state.DICT === null) return null;
     let allWords = state.SIMPLE_CHARS.pre.concat(state.SIMPLE_CHARS.post).concat(state.SIMPLE_CHARS.pre_post).concat(state.SIMPLE_CHARS.middle);

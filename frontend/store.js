@@ -459,9 +459,9 @@ const FETCH_PUBLIC_RESOURCES = [
     ['hsk_words.json', 'HSK word list', 'setHskWords'],
     ['video_list.json', 'video list', 'setVideoList'],
     ['show_list_full.json', 'show list', 'setShowList'],
-    ['bloom_filters.json', 'show bloom filters', 'setBloomFilters'],
     ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
 ];
+
 
 function fetchInitialResources() {
     for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
@@ -484,6 +484,7 @@ if (BROWSER_EXTENSION) {
     lazybugIframe.addEventListener('load', fetchInitialResources);
 }
 else {
+    FETCH_PUBLIC_RESOURCES.push(['bloom_filters.json', 'show bloom filters', 'setBloomFilters']);
     fetchInitialResources();
 
     store.commit('setLocation', document.location); // initial
