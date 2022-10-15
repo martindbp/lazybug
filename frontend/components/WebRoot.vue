@@ -108,7 +108,7 @@
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
-                    <q-btn flat label="Go to Youtube (new tab)" color="green" v-close-popup @click="goYoutube" />
+                    <q-btn flat label="Go to external video (new tab)" color="green" v-close-popup @click="goExternal" />
                 </q-card-actions>
             </q-card>
         </q-dialog>

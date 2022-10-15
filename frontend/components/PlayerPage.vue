@@ -74,14 +74,8 @@ export default {
             return this.showInfo.seasons[this.season].episodes[this.episode].id;
         },
     },
-    watch: {
-        data: function() {
-            this.updateVideoHeight();
-        },
-    },
     mounted: function() {
         const self = this;
-        this.updateVideoHeight();
         this.clickEventListener = document.addEventListener('click', function(evt) {
             if (self.hidden || evt.target.closest('.q-fab')) return;
             if (self.$refs.seasonselector) self.$refs.seasonselector.hide();
@@ -100,7 +94,6 @@ export default {
                 this.$refs.video.pause();
             }
         }
-        this.updateVideoHeight();
     },
     methods: {
         getSeasonName: function(i) {
@@ -108,32 +101,6 @@ export default {
         },
         getEpisodeName: function(i) {
             return getEpisodeName(this.showInfo, this.season, i);
-        },
-        updateVideoHeight: function() {
-            if (
-                [null, undefined].includes(this.showInfo) ||
-                [null, undefined].includes(this.$refs.video)
-            ) {
-                return;
-            }
-            //const width = this.$refs.video.width;
-            //const [frameHeight, frameWidth] = this.showInfo.frame_size;
-            //this.videoHeight = (width / frameWidth) * frameHeight;
-        },
-        youtubeURL: function(seasonIdx=null, episodeIdx=null) {
-            if ([null, undefined].includes(this.showInfo)) return null;
-            seasonIdx = seasonIdx || 0;
-            episodeIdx = episodeIdx || 0;
-            const playlist = this.showInfo.seasons[seasonIdx].youtube_playlist;
-            const captionId = this.showInfo.seasons[seasonIdx].episodes[episodeIdx].id;
-            const id = videoIdFromCaptionId(captionId);
-
-            if ([null, undefined].includes(playlist)) {
-                return `https://youtube.com/watch?v=${id}`;
-            }
-            else {
-                return `https://youtube.com/watch?v=${id}&list=${playlist}`;
-            }
         },
     }
 };

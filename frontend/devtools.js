@@ -7,11 +7,19 @@ let captionBottom = null;
 chrome.runtime.onMessage.addListener(msgObj => {
     if (msgObj === 'measurecaption') {
         if (AVElement === null) {
-            AVElement = document.querySelector("#primary video");
-            videoMenu = document.querySelector('.ytp-chrome-bottom');
+            switch (getCurrentSite()) {
+                case 'youtube':
+                    AVElement = document.querySelector("#primary video");
+                    videoMenu = document.querySelector('.ytp-chrome-bottom');
+                    break;
+                case 'bilibili':
+                    AVElement = document.querySelector("video");
+                    videoMenu = null;
+                    break;
+            }
         }
 
-        videoMenu.style.visibility = 'hidden';
+        if (videoMenu) videoMenu.style.visibility = 'hidden';
 
         let clientX = null;
         let clientY = null;
@@ -87,39 +95,45 @@ chrome.runtime.onMessage.addListener(msgObj => {
         }, { once: true, capture: true });
     }
     else if (msgObj === 'printplaylist') {
-        const title = document.querySelector('#playlist #video-title');
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        const playlistId = params["list"];
+        let data = {};
+        switch (getCurrentSite()) {
+            case 'youtube':
+                const title = document.querySelector('#playlist #video-title');
+                const urlSearchParams = new URLSearchParams(window.location.search);
+                const params = Object.fromEntries(urlSearchParams.entries());
+                const playlistId = params["list"];
 
-        let data = {
-            "name": {
-                "hz": "",
-                "py": "",
-                "en": ""
-            },
-            "description": "",
-            "seasons": [
-                {
-                    "youtube_playlist": playlistId,
-                    "episodes": [
-                    ]
+                let data = {
+                    "name": {
+                        "hz": "",
+                        "py": "",
+                        "en": ""
+                    },
+                    "description": "",
+                    "seasons": [
+                        {
+                            "playlist_id": playlistId,
+                            "episodes": [
+                            ]
+                        }
+                    ],
+                    "ocr_params": [
+                        {
+                            "type": "hanzi",
+                            "caption_top": captionTop,
+                            "caption_bottom": captionBottom,
+                            "start_time": 0
+                        }
+                    ],
+                };
+                for (var el of document.querySelectorAll("ytd-playlist-panel-renderer a.ytd-playlist-panel-video-renderer")) {
+                    let videoId = getYoutubeIdFromURL(el.href); // eslint-disable-line
+                    data.seasons[0].episodes.push({
+                        "id": "youtube-" + videoId
+                    });
                 }
-            ],
-            "ocr_params": [
-                {
-                    "type": "hanzi",
-                    "caption_top": captionTop,
-                    "caption_bottom": captionBottom,
-                    "start_time": 0
-                }
-            ],
-        };
-        for (var el of document.querySelectorAll("ytd-playlist-panel-renderer a.ytd-playlist-panel-video-renderer")) {
-            let videoId = getYoutubeIdFromURL(el.href); // eslint-disable-line
-            data.seasons[0].episodes.push({
-                "id": "youtube-" + videoId
-            });
+            case 'bilibili':
+                console.log('asd');
         }
 
         console.log(JSON.stringify(data, null, 2));

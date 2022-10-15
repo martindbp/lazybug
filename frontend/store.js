@@ -49,6 +49,7 @@ const store = new Vuex.Store({
         DICT: null,
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
+        STRINGS: null,
         states: Vue.ref({}),
         bloomFilter: null,
         captionFontScale: 0.5,
@@ -241,6 +242,9 @@ const store = new Vuex.Store({
         setSimpleCharsList(state, val) {
             state.SIMPLE_CHARS = val;
             state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+        },
+        setStringsList(state, val) {
+            state.STRINGS = val;
         },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
@@ -455,6 +459,7 @@ if (BROWSER_EXTENSION) {
 }
 
 const FETCH_PUBLIC_RESOURCES = [
+    ['strings.json', 'strings', 'setStringsList'],
     ['public_cedict.json', 'dictionary', 'setDict'],
     ['hsk_words.json', 'HSK word list', 'setHskWords'],
     ['video_list.json', 'video list', 'setVideoList'],
@@ -518,6 +523,8 @@ function addBadge($img, videoList) {
 }
 
 function initializeThumbnailBadges(videoList) {
+    if (getCurrentSite() === 'youtube') return null;
+
     for (const $img of document.querySelectorAll('#thumbnail img:not(.lazybugbadge)')) {
         addBadge($img, videoList);
     }

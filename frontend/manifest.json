@@ -29,6 +29,8 @@
             "matches": [
                 "*://*.youtube.com/*",
                 "*://*.youtu.be/*",
+                "*://*.bilibili.com/*",
+                "*://*.bilibili.cn/*",
                 "file:///*/*.mp4",
                 "file:///*/*.webp",
                 "file:///*/*.webm"

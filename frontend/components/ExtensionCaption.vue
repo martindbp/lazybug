@@ -12,12 +12,12 @@
 import Caption from './Caption.vue'
 
 export default {
+    mixins: [mixin],
     components: {
         Caption,
     },
     data: function() {
         return {
-            AVElementSelector: '#primary video, #player-theater-container video',
             AVElement: null,
             url: window.location.href,
             localVideoHash: null,
@@ -123,9 +123,12 @@ export default {
         },
     },
     computed: {
+        AVElementSelector: function() {
+            return this.getSiteString('AVElementSelector');
+        },
         videoId: function() {
             if (this.url !== null) {
-                const id = getYoutubeIdFromURL(this.url); // eslint-disable-line
+                const id = extractCurrentVideoId(this.$store.state.STRINGS, this.url); // eslint-disable-line
                 return id;
             }
             return null;
@@ -137,7 +140,7 @@ export default {
             }
 
             if (this.videoId !== null) {
-                captionId = 'youtube-' + this.videoId;
+                captionId = getCurrentSite() + '-' + this.videoId;
             }
 
             if (this.$store.state.videoList === null || ! this.$store.state.videoList.has(captionId)) {

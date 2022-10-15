@@ -276,16 +276,13 @@ const mixin = {
             this.$store.commit('setPlayingEpisode', episodeIdx);
             this.$store.commit('setPage', 'player');
         },
-        goYoutube: function() {
+        goExternal: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
-            const captionId = showInfo.seasons[this.playingSeason].episodes[this.playingEpisode].id;
-            const parts = captionId.split('-');
-            const id = parts.slice(1).join('-');
-            const list = showInfo.seasons[0].youtube_playlist;
-            let url = `https://youtube.com/watch?v=${id}`;
-            if (list) {
-                url += `&list=${list}`;
-            }
+            const captionId = showInfo.seasons[this.playingSeason || 0].episodes[this.playingEpisode || 0].id;
+            const videoId = videoIdFromCaptionId(captionId);
+            const site = siteFromCaptionId(captionId);
+            const template = this.$store.state.STRINGS[site].urlTemplates.videoId;
+            const url = template.replace('${id}', videoId);
             window.open(url, '_blank').focus();
             this.$store.commit('setNonEmbeddableVideoSelected', null);
             this.$store.commit('setPlayingSeason', null);
@@ -364,6 +361,10 @@ const mixin = {
                 }
             }
             return states;
+        },
+        getSiteString: function(name) {
+            if (this.$store.state.STRINGS === null) return null;
+            return this.$store.state.STRINGS[getCurrentSite()][name];
         },
     },
     computed: {

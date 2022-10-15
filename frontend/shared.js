@@ -10,7 +10,7 @@ let lazybugIframe = null;
 
 if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe = document.createElement('iframe');
-    lazybugIframe.src = LOCAL_ONLY ? '0.0.0.0:8000/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
+    lazybugIframe.src = LOCAL_ONLY ? 'https://localhost/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
     document.body.appendChild(lazybugIframe);
 }
@@ -61,6 +61,14 @@ function uuidv4() {
 
 function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
+}
+
+function getCurrentSite() {
+    return {
+        'www.youtube.com': 'youtube',
+        'www.bilibili.com': 'bilibili',
+        'www.bilibili.cn': 'bilibili',
+    }[document.location.hostname];
 }
 
 function sendMessageToBackground(message, callback) {
@@ -221,11 +229,19 @@ function getLogRows(callback) {
     }, callback);
 }
 
-const YOUTUBE_REGEXP = /(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/;
-function getYoutubeIdFromURL(url) {
-    const match = url.match(YOUTUBE_REGEXP);
-    if (match === null) return null;
-    return match[1];
+function extractCurrentVideoId(strings, url) {
+    if (strings === null) return null;
+    const site = getCurrentSite();
+    const regexps = Array.isArray(strings[site].idRegexp)? strings[site].idRegexp : [strings[site].idRegexp];
+    let id = null;
+    for (const regexpStr of regexps) {
+        const regexp = new RegExp(regexpStr, 'i');
+        const match = url.match(regexp);
+        if (match !== null) {
+            return match[1];
+        }
+    }
+    return null;
 }
 
 function dictArrayToDict(arr) {
@@ -507,6 +523,12 @@ function videoIdFromCaptionId(captionId) {
     const parts = captionId.split('-');
     return parts.slice(1).join('-');
 }
+
+function siteFromCaptionId(captionId) {
+    const parts = captionId.split('-');
+    return parts[0];
+}
+
 
 function secondsToTimestamp(time) {
     const h = Math.floor(time / 3600);

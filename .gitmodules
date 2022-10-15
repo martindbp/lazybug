@@ -5,5 +5,5 @@
 	path = modules/yt-dlp
 	url = git@github.com:martindbp/yt-dlp.git
 [submodule "frontend/lazyweb"]
-	path = frontend/lazyweb
+	path = modules/lazyweb
 	url = git@github.com:martindbp/lazyweb.git

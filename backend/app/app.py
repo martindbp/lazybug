@@ -58,7 +58,7 @@ b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 app = FastAPI()
 client = TestClient(app)
 
-app.mount("/static", StaticFiles(directory="frontend/lazyweb"), name="static")
+app.mount("/static", StaticFiles(directory="modules/lazyweb"), name="static")
 
 app.mount("/cdn/lazybug-public", StaticFiles(directory="data/remote/public"), name="cdn")
 
@@ -220,4 +220,4 @@ async def discourse_topic_comments(topic_id: int, response: Response):
 # NOTE: need to put this last!
 @app.get("/{rest_of_path:path}")
 async def read_index():
-    return FileResponse('frontend/lazyweb/index.html')
+    return FileResponse('modules/lazyweb/index.html')

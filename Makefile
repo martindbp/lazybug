@@ -43,6 +43,7 @@ pre-public-sync:
 	make names-list
 	make hsk-words
 	make simple-chars
+	make strings
 
 .PHONY: push-public
 push-public:
@@ -217,7 +218,7 @@ frontend:
 local:
 	make frontend
 	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/dist/*.js
-	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/lazyweb/*.js
+	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" modules/lazyweb/*.js
 
 
 .PHONY: frontend-copy
@@ -230,7 +231,7 @@ frontend-copy:
 	cp -r frontend/images frontend/dist/
 	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
-	-cp -r frontend/dist/* frontend/lazyweb/
+	-cp -r frontend/dist/* modules/lazyweb/
 
 .PHONY: release
 release:
@@ -259,12 +260,27 @@ simple-chars:
 	echo $$SIMPLE_CHARS_HASH > data/remote/public/simple_chars.hash ; \
 	cp data/git/simple_chars.json "data/remote/public/simple_chars-$$SIMPLE_CHARS_HASH.json"
 
-run-server-local-only:
-	LOCAL_ONLY=1 python backend/main.py
+.PHONY: strings
+strings:
+	STRINGS_HASH=$$(md5sum data/git/strings.json | cut -d " " -f1) ; \
+	echo $$STRINGS_HASH > data/remote/public/strings.hash ; \
+	cp data/git/strings.json "data/remote/public/strings-$$STRINGS_HASH.json"
 
+
+check-python-env:
+ifndef ENV_PYTHON
+	$(error ENV_PYTHON is undefined, set it to your virtualenv python path)
+endif
+
+.PHONY: run-server-local-only
+run-server-local-only: check-python-env
+	LOCAL_ONLY=1 sudo --preserve-env $(ENV_PYTHON) backend/main.py 443
+
+.PHONY: run-server
 run-server:
 	python backend/main.py
 
+.PHONY: run-server-prod
 run-server-prod:
 	sudo --preserve-env nohup python backend/main.py 443 &
 
@@ -279,9 +295,21 @@ purge-lazyweb-cache: check-cloudflare-env
 
 .PHONY: deploy-frontend
 deploy-frontend:
-	cd frontend/lazyweb && git add . && git commit -m "B" && git push origin master
+	cd modules/lazyweb && git add . && git commit -m "B" && git push origin master
 	make purge-lazyweb-cache
 
 .PHONY: kill-server
 kill-server:
 	pgrep -f "python backend/main" | head -n1 | xargs -I{} kill -9 {}
+
+local-ssl-cert:
+	mkdir data/local/ssl_cert/ && \
+	cd data/local/ssl_cert/ && \
+	openssl genrsa -out CA.key -des3 2048 && \
+	openssl req -x509 -sha256 -new -nodes -days 3650 -key CA.key -out CA.pem && \
+	openssl genrsa -out localhost.key -des3 2048 && \
+	openssl req -new -key localhost.key -out localhost.csr && \
+	openssl x509 -req -in localhost.csr -CA CA.pem -CAkey CA.key -CAcreateserial -days 3650 -sha256 -extfile ../../../data/git/localhost.ext -out localhost.crt && \
+	openssl rsa -in localhost.key -out localhost.decrypted.key && \
+	cp localhost.crt ../ssl_keys/fullchain.pem && \
+	cp localhost.crt ../ssl_keys/fullchain.pem
