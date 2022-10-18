@@ -832,7 +832,7 @@ def predict_video_captions(
     refine_bounding_rect=False,
 ):
     global easy_ocrs, cnocr
-    SUBSAMPLE_FRAME_RATE = 10
+    SUBSAMPLE_SECONDS = 1/3
     print('Processing video', video_path)
 
     lang = None
@@ -957,13 +957,13 @@ def predict_video_captions(
                     if curr_conditional_caption_idx >= len(conditional_captions['lines']):
                         curr_conditional_caption_idx = None
                 else:
-                    if len(frame_buffer) < 30: # about a second
+                    if frame_time[-1][0] - frame_time[0][0] < 1:
                         frame_buffer.append((frame_time, crop))
                     continue
             else:
                 frame_buffer.append((frame_time, crop))
 
-                if i != 0 and len(frame_buffer) < SUBSAMPLE_FRAME_RATE:
+                if i != 0 and frame_buffer[-1][0] - frame_buffer[0][0] < SUBSAMPLE_SECONDS:
                     print('buffering')
                     continue
 
