@@ -108,7 +108,7 @@ export default {
             this.$store.commit('setCaptionDocked', val);
         },
         showOptions: function(event) {
-            this.$store.commit('setShowOptions', true);
+            this.$store.commit('setShowDialog', {dialog: 'options', val: true});
         },
         showDictionary: function(event) {
             if (this.data) {

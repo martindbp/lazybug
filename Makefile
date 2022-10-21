@@ -92,19 +92,19 @@ purge-cloudflare-public: check-cloudflare-env
 
 .PHONY: pinyin-classifiers
 pinyin-classifiers:
-	merkl -v run predict_video.make_pinyin_db_classifiers
+	merkl -v run process_show.make_pinyin_db_classifiers
 
 .PHONY: cedict
 cedict:
-	merkl -v run predict_video.make_cedict_db
+	merkl -v run process_show.make_cedict_db
 
 .PHONY: public-cedict
 public-cedict:
-	merkl -v run predict_video.make_public_cedict_db
+	merkl -v run process_show.make_public_cedict_db
 
 .PHONY: names-list
 names-list:
-	merkl -v run predict_video.make_names_list
+	merkl -v run process_show.make_names_list
 
 .PHONY: download-yt
 download-yt:
@@ -118,15 +118,15 @@ mv-files:
 
 .PHONY: process-video-captions
 process-video-captions:
-	merkl -v run predict_video.process_video_captions ${show} ${videos}
+	merkl -v run process_show.process_show_captions ${show} ${videos}
 
 .PHONY: process-translations
 process-translations:
-	merkl -v run predict_video.process_translations ${show} --force-redo
+	merkl -v run process_show.process_translations ${show} --force-redo
 
 .PHONY: process-segmentation-alignments
 process-segmentation-alignments:
-	merkl -v run predict_video.process_segmentation_alignment ${show} ${video}
+	merkl -v run process_show.process_segmentation_alignment ${show} ${video}
 
 .PHONY: video-list
 video-list:

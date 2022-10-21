@@ -49,7 +49,7 @@ export default {
     computed: {
         show: {
             get: function() { return this.$store.state.showAccountDialog !== false; },
-            set: function(val) { this.$store.commit('setShowAccountDialog', val); },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'account', val: val}); },
         },
         showAccountDialog: {
             get: function() { return this.$store.state.showAccountDialog; },

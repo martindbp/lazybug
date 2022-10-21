@@ -308,7 +308,7 @@ export default {
             }
             else if (action === 'options') {
                 this.$store.commit('setOptionsHighlightSection', `knowledge-${type}-lvl`);
-                this.$store.commit('setShowOptions', true);
+                this.$store.commit('setShowDialog', {dialog: 'options', val: true});
                 return;
             }
 

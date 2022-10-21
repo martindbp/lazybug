@@ -25,11 +25,11 @@ const mixin = {
     },
     methods: {
         showAccountModalWithCallback: function(callback = null) {
-            this.$store.commit('setShowAccountDialog', 'login');
+            this.$store.commit('setShowDialog', {dialog: 'account', val: 'login'});
             this.accountCallback = callback;
         },
         showModalAndSync: function(closeAfterDone = false, callback = null) {
-            this.$store.commit('setShowSyncDialog', true);
+            this.$store.commit('setShowDialog', {dialog: 'sync', val: true});
             const self = this;
             this.syncDatabase(function(error) {
                 if (! error && closeAfterDone) {
@@ -37,7 +37,7 @@ const mixin = {
                     if (self.$store.state.syncError) return; // don't close if there's an error
 
                     setTimeout(function() {
-                        self.$store.commit('setShowSyncDialog', false);
+                        self.$store.commit('setShowDialog', {dialog: 'sync', val: false});
                     }, 500);
                 }
                 if (callback) callback(error);
@@ -268,7 +268,7 @@ const mixin = {
             const showInfo = this.$store.state.showList[showId];
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
-                this.$store.commit('setShowNonEmbeddableDialog', true);
+                this.$store.commit('setShowDialog', {dialog: 'embeddable', val: true});
                 return;
             }
             this.$store.commit('setPlayingShowId', showId);
@@ -287,7 +287,7 @@ const mixin = {
             this.$store.commit('setNonEmbeddableVideoSelected', null);
             this.$store.commit('setPlayingSeason', null);
             this.$store.commit('setPlayingEpisode', null);
-            this.$store.commit('setShowNonEmbeddableDialog', false);
+            this.$store.commit('setShowDialog', {dialog: 'embeddable', val: false});
         },
         sm2tr(text, optionsOverride = true) {
             if (this.$store.state.DICT === null) return null;

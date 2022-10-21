@@ -244,6 +244,10 @@ function extractCurrentVideoId(strings, url) {
     return null;
 }
 
+function extractCurrentCaptionId(strings, url) {
+    return `${getCurrentSite()}-${extractCurrentVideoId(strings, url)}`;
+}
+
 function dictArrayToDict(arr) {
     return {
         hzTrad: arr[0],

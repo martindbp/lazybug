@@ -166,8 +166,8 @@ export default {
             return this.page[0].toUpperCase() + this.page.substring(1);
         },
         showNonEmbeddableDialog: {
-            get: function() { return this.$store.state.showNonEmbeddableDialog; },
-            set: function(val) { this.$store.commit('setShowNonEmbeddableDialog', val); },
+            get: function() { return this.$store.state.showDialog.embeddable; },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'embeddable', value: val}); },
         },
     },
 };

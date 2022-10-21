@@ -1,10 +1,10 @@
 import os
 import sys
 import yaml
-from predict_video import predict_video_captions
+from process_show import extract_video_captions
 from levenshtein import weighted_levenshtein
 
-from predict_video import get_video_length_size
+from process_show import get_video_length_size
 
 
 def trim_ends(

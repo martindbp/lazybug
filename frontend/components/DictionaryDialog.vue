@@ -73,7 +73,7 @@ export default {
             };
         },
         show: {
-            get: function() { return this.$store.state.showDictionary; },
+            get: function() { return this.$store.state.showDialog.dictionary; },
             set: function(val) { this.$store.commit('setShowDictionary', {val: val}); },
         },
         showRange: {

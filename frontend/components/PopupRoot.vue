@@ -25,6 +25,7 @@
         </div>
         <div v-if="dev">
             <q-btn flat label="Measure caption" @click="measureCaption" />
+            <q-btn flat label="Toggle recording" @click="toggleRecording" />
             <q-btn flat label="Print playlist" @click="printPlaylist" />
         </div>
         <a href="https://www.patreon.com/martindbp">Donate</a>
@@ -95,6 +96,13 @@ export default {
             chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
                 tabs.forEach(tab => {
                     chrome.tabs.sendMessage(tab.id, 'measurecaption');
+                });
+            });
+        },
+        toggleRecording: function() {
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+                tabs.forEach(tab => {
+                    chrome.tabs.sendMessage(tab.id, 'togglerecording');
                 });
             });
         },

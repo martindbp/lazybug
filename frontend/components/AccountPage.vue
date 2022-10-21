@@ -11,7 +11,7 @@
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
-                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowSyncDialog', true)">Show Sync Log</q-btn>
+                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', val: true})">Show Sync Log</q-btn>
                     <q-btn color="red" flat @click="logout">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
@@ -109,13 +109,13 @@ export default {
             });
         },
         register: function() {
-            this.$store.commit('setShowAccountDialog', 'register');
+            this.$store.commit('setShowDialog', {dialog: 'account', val: 'register'});
         },
         login: function() {
             const self = this;
             this.clearDataThenCall(function(confirm) {
                 if (confirm) {
-                    self.$store.commit('setShowAccountDialog', 'login');
+                    self.$store.commit('setShowDialog', {dialog: 'account', val: 'login'});
                 }
             });
         },

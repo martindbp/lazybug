@@ -290,6 +290,6 @@ while True:
 
             save_path = f'{cutout_dir}{hash}.png'
             print('Saving to', save_path)
-            print('DONT FORGET TO RERUN PROCESS_VIDEO_CAPTIONS WITH FORCE_REDO')
+            print('DONT FORGET TO RERUN PROCESS_SHOW_CAPTIONS WITH FORCE_REDO')
             cv2.imwrite(save_path, cutout_img)
             cv2.waitKey(1)

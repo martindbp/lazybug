@@ -6,15 +6,18 @@
         v-bind:videoDuration="$store.state.videoDuration"
         v-bind:videoAPI="videoAPI"
     />
+    <DevtoolsDialog />
 </template>
 
 <script>
 import Caption from './Caption.vue'
+import DevtoolsDialog from './DevtoolsDialog.vue'
 
 export default {
     mixins: [mixin],
     components: {
         Caption,
+        DevtoolsDialog,
     },
     data: function() {
         return {

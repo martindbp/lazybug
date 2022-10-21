@@ -56,8 +56,14 @@ const store = new Vuex.Store({
         captionFontSize: 24,
         captionOffset: [0, 0],
         isMovingCaption: false,
-        nonEmbeddableVideoSelected: null,
-        showNonEmbeddableDialog: false,
+        showDialog: Vue.ref({
+            options: false,
+            account: false, // false, 'register' or 'login'
+            dictionary: false,
+            devtools: false,
+            sync: false,
+            embeddable: false,
+        }),
         peekStates: Vue.ref({
             py: [],
             hz: [],
@@ -80,10 +86,7 @@ const store = new Vuex.Store({
                 translation: false,
             }
         }),
-        showOptions: false,
-        showAccountDialog: false, // false, 'register' or 'login'
         optionsHighlightSection: null,
-        showDictionary: false,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
         page: 'content',
@@ -154,9 +157,6 @@ const store = new Vuex.Store({
             state.captionDocked = val;
             localStorage.setItem('captionDocked', val);
         },
-        setShowSyncDialog(state, val) {
-            state.showSyncDialog = val;
-        },
         setIsSyncing(state, val) {
             state.isSyncing = val;
         },
@@ -190,9 +190,6 @@ const store = new Vuex.Store({
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
-        },
-        setShowNonEmbeddableDialog(state, val) {
-            state.showNonEmbeddableDialog = val;
         },
         setPlayingShowId(state, val) {
             state.playingShowId = val;
@@ -272,14 +269,11 @@ const store = new Vuex.Store({
             state.captionHash = val.hash;
             state.fetchedCaptionId = val.id;
         },
-        setShowOptions(state, val) {
-            state.showOptions = val;
-        },
-        setShowAccountDialog(state, val) {
-            state.showAccountDialog = val;
+        setShowDialog(state, val) {
+            state.showDialog[val.dialog] = val.val;
         },
         setShowDictionary(state, val) {
-            if (! [null, undefined].includes(val.val)) state.showDictionary = val.val;
+            if (! [null, undefined].includes(val.val)) state.showDialog.dictionary = val.val;
             if (val.range) {
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {

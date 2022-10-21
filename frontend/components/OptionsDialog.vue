@@ -220,8 +220,8 @@ export default {
     }},
     computed: {
         show: {
-            get: function() { return this.$store.state.showOptions; },
-            set: function(val) { this.$store.commit('setShowOptions', val); },
+            get: function() { return this.$store.state.showDialog.options; },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'options', val: val}); },
         },
         timingOffset: {
             get: function() { return this.$store.state.timingOffset; },

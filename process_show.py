@@ -399,6 +399,80 @@ def get_video_length_size(path):
     return round(frame_count/fps, 2), size_bytes, (height, width)
 
 
+def find_sync_point(video_path):
+    cap = cv2.VideoCapture(video_path)
+
+    colors = [
+        ('blue', np.array([255, 0, 0])),
+        ('green', np.array([0, 255, 0])),
+        ('red', np.array([0, 0, 255])),
+    ]
+    seen_red = False
+    seen_green = False
+    seen_blue = False
+    done = False
+    intersection = None
+    height, width = None, None
+    while cap.isOpened():
+        ret, frame = cap.read()
+        print('frame', i)
+
+        if frame is None:
+            break
+
+        if width is None:
+            height, width = frame.shape[:2]
+
+        for name, color in colors:
+            diff = np.linalg.norm(frame.astype('int') - color, axis=-1).astype('int')
+            mask = diff < 25
+            mask_large_components = filter_components(mask, small_threshold=100*100)
+            if mask_large_components.sum() > 0:
+                if not seen_red and name == 'red':
+                    seen_red = True
+                    print('seen red')
+                    intersection = mask_large_components
+                    cv2.imshow('intersection', 255*intersection.astype('uint8'))
+                    key = cv2.waitKey()
+                    break
+                elif seen_red and not seen_green and name == 'green':
+                    seen_green = True
+                    print('seen green')
+                    intersection = intersection & mask_large_components
+                    cv2.imshow('intersection', 255*intersection.astype('uint8'))
+                    key = cv2.waitKey()
+                    break
+                elif seen_red and seen_green and not seen_blue and name == 'blue':
+                    seen_blue = True
+                    print('seen blue')
+                    intersection = intersection & mask_large_components
+                    cv2.imshow('intersection', 255*intersection.astype('uint8'))
+                    key = cv2.waitKey()
+                    break
+            elif seen_blue:
+                # We're done
+                done = True
+                print('done')
+                break
+
+        if done:
+            curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+            ys, xs = np.where(intersection)
+            x_max, x_min = xs.max()+1, xs.min()
+            y_max, y_min = ys.max()+1, ys.min()
+            if DEBUG:
+                cv2.imshow('intersection', 255*intersection.astype('uint8'))
+                key = cv2.waitKey()
+            cap.release()
+            return curr_time, y_min, x_min, y_max, x_max, height, width
+
+        if DEBUG:
+            cv2.imshow('frame', frame)
+            cv2.waitKey()
+
+    cap.release()
+
+
 def get_video_caption_area(
     video_path: str,
     caption_top: float,
@@ -809,7 +883,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
 
 
 @task(deps=[net])
-def predict_video_captions(
+def extract_video_captions(
     video_path: str,
     video_id: str,
     caption_top: float,
@@ -830,6 +904,7 @@ def predict_video_captions(
     use_bert_prior=True,
     conditional_captions=None,
     refine_bounding_rect=False,
+    screen_recording_video_timings=None,
 ):
     global easy_ocrs, cnocr
     SUBSAMPLE_SECONDS = 1/3
@@ -858,6 +933,14 @@ def predict_video_captions(
             cnocr = CnOcr()
         ocr_fn = ocr_for_single_lines_probs_CnOCR
         alphabet = cnocr._alphabet
+
+    if screen_recording_video_timings is not None:
+        print('Screen recording video timings provided, trying to find sync point')
+        sync_time, sync_top, sync_left, sync_bottom, sync_right, sync_height, sync_width = find_sync_point(video_path)
+        caption_top = sync_top / sync_height
+        caption_left = sync_left / sync_width
+        caption_bottom = sync_bottom / sync_height
+        caption_right = sync_right / sync_width
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
     frame_size = None
@@ -1534,7 +1617,7 @@ def make_public_cedict_db():
     return public_cedict
 
 
-def process_video_captions(
+def process_show_captions(
     show_name: str,
     videos_path: str,
     *,
@@ -1583,7 +1666,7 @@ def process_video_captions(
                 conditional_captions = prev_captions[depends_on]
                 conditional_params = prev_params[depends_on]
 
-            captions, frame_size = predict_video_captions(
+            captions, frame_size = extract_video_captions(
                 video_path,
                 vid,
                 param['caption_top'],
@@ -1600,6 +1683,7 @@ def process_video_captions(
                 conditional_captions=conditional_captions,
                 refine_bounding_rect=param.get('refine_bounding_rect', False),
                 height_buffer_px=param.get('height_buffer_px', 0),
+                screen_recording_video_timings=param.get('screen_recording_video_timings', None),
             )
 
             if param.get('fade_in_out', False) is True:
