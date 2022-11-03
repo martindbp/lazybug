@@ -9,7 +9,11 @@ try {
 
 let personalDb = initPersonalDb();
 let cacheDb = initCacheDb();
-const CACHE_HASHES_DURATION_S = 60*60;
+let CACHE_HASHES_DURATION_S = 60*60;
+if (LOCAL_ONLY) {
+    CACHE_HASHES_DURATION_S = 0;
+}
+
 const TRANSLATION_URL = 'http://localhost:8001';
 
 function clearIndexedDb() {
