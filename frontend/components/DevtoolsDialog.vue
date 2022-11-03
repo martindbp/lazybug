@@ -97,8 +97,8 @@ export default {
             let scrollX = getClosestParentScroll(this.AVElement, 'x');
             let scrollY = getClosestParentScroll(this.AVElement, 'y');
             window.addEventListener("mousemove", function(event) {
-                clientX = event.clientX;
-                clientY = event.clientY;
+                clientX = event.clientX + scrollX;
+                clientY = event.clientY + scrollY;
             });
 
             function stopMeasuring() {
@@ -129,7 +129,7 @@ export default {
             function startMeasuring() {
                 console.log('Start measuring');
                 measureDiv = document.createElement("div");
-                measureDiv.style.cssText = "position:absolute; color: white; border-color: black; border: 2px solid black; z-index: 9999";
+                measureDiv.style.cssText = "position: absolute; color: white; border-color: black; border: 2px solid black; z-index: 9999";
                 document.body.appendChild(measureDiv);
 
                 mouseDownClientX = clientX;
@@ -140,8 +140,8 @@ export default {
                 measureDiv.style.height = 0 + "px";
 
                 moveHandler = (moveEvent) => {
-                    measureDiv.style.width = (moveEvent.clientX - mouseDownClientX) + "px";
-                    measureDiv.style.height = (moveEvent.clientY - mouseDownClientY) + "px";
+                    measureDiv.style.width = ((moveEvent.clientX+scrollX) - mouseDownClientX) + "px";
+                    measureDiv.style.height = ((moveEvent.clientY+scrollY) - mouseDownClientY) + "px";
                 };
 
                 window.addEventListener("mousemove", moveHandler);
