@@ -71,6 +71,19 @@ function getCurrentSite() {
     }[document.location.hostname];
 }
 
+function getClosestParentScroll($el, axis) {
+    let variable = axis === 'y' ? 'scrollTop' : 'scrollLeft';
+    while ($el && $el[variable] === 0) {
+        $el = $el.parentElement;
+    }
+
+    if ($el) {
+        return $el[variable];
+    }
+
+    return axis === 'y' ? window.scrollY : window.scrollX;
+}
+
 function sendMessageToBackground(message, callback) {
     const responseHandler = function onResponse(response) {
         if (['error'].includes(response)) {

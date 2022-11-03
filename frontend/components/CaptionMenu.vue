@@ -41,6 +41,11 @@ export default {
     mounted: function() {
         const self = this;
         this.keyboardListener = window.addEventListener("keydown", function(event) {
+            const shift = event.getModifierState("Shift");
+            const ctrl = event.getModifierState("Control");
+            const alt = event.getModifierState("Alt");
+            if (shift || ctrl || alt) return;
+
             if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
                 // Turn off shortcuts when we're focused to an input element
                 return;

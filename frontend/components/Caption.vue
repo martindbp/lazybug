@@ -44,19 +44,6 @@ const CAPTION_END_BUFFER_TIME = 1;
 
 let lastCaptionIdxGlobal = 0;
 
-function getClosestParentScroll($el, axis) {
-    let variable = axis === 'y' ? 'scrollTop' : 'scrollLeft';
-    while ($el && $el[variable] === 0) {
-        $el = $el.parentElement;
-    }
-
-    if ($el) {
-        return $el[variable];
-    }
-
-    return axis === 'y' ? window.scrollY : window.scrollX;
-}
-
 export default {
     mixins: [mixin],
     components: {

@@ -1,14 +1,4 @@
-var captionRoot = document.createElement('div');
-captionRoot.setAttribute('id', 'extroot');
-captionRoot.setAttribute('class', 'lazybugcaption');
-
-document.body.appendChild(captionRoot);
-
-const app = Vue.createApp({
-    render: h => Vue.h(ExtensionCaption),
-})
-
-new MutationObserver((mutations) => {
+const mut = new MutationObserver((mutations) => {
     for(let mutation of mutations) {
         for(let node of mutation.addedNodes) {
             if (node.nodeType !== 1) continue;
@@ -21,7 +11,18 @@ new MutationObserver((mutations) => {
             }
         }
     }
-}).observe(document, {subtree: true, childList: true});
+});
+mut.observe(document, {subtree: true, childList: true});
+
+var captionRoot = document.createElement('div');
+captionRoot.setAttribute('id', 'extroot');
+captionRoot.setAttribute('class', 'lazybugcaption');
+
+document.body.appendChild(captionRoot);
+
+const app = Vue.createApp({
+    render: h => Vue.h(ExtensionCaption),
+})
 
 app.use(store)
 app.use(Quasar)
