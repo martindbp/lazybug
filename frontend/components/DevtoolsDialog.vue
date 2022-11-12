@@ -121,6 +121,24 @@ export default {
                 }
                 const start = window.performance.now() / 1000;
                 let interval = setInterval(function() {
+                    const offset = window.performance.now() / 1000 - start;
+                    const timing = [offset, self.AVElement.currentTime, self.AVElement.duration, self.AVElement.paused];
+                    if (self.recordedTimings.length === 0) {
+                        self.recordedTimings.push(timing);
+                        return;
+                    }
+                    const currentTime = self.AVElement.currentTime;
+                    const duration = self.AVElement.duration;
+                    const paused = self.AVElement.paused;
+                    const [lastOffset, lastCurrentTime, lastDuration, lastPaused] = self.recordedTimings[self.recordedTimings.length-1];
+                    const offsetDelta = offset - lastOffset;
+                    const videoDelta = currentTime - lastCurrentTime;
+                    const pausedNoChange = paused && lastPaused
+                    if (! self.recording || (! pausedNoChange  && (duration !== lastDuration || Math.abs(offsetDelta - videoDelta) > 0.1))) {
+                        console.log('Adding', timing);
+                        self.recordedTimings.push(timing);
+                    }
+
                     if (! self.recording) {
                         clearInterval(interval);
                         // Restore divs
@@ -130,9 +148,6 @@ export default {
                         }
                         return;
                     }
-                    const offset = window.performance.now() / 1000 - start;
-                    console.log(offset, self.AVElement.currentTime, self.AVElement.duration);
-                    self.recordedTimings.push([offset, self.AVElement.currentTime, self.AVElement.duration]);
                 }, 500);
             }, 100);
         },
