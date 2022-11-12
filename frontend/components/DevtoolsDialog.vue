@@ -1,34 +1,42 @@
 <template>
     <q-dialog seamless persistent position="top" v-model="show">
-        <q-card v-if="! recording">
-            <q-list bordered separator>
-                <q-item clickable v-ripple v-for="(rect, idx) of captionRects">
-                    <q-item-section>
-                        <b>Caption {{ idx + 1}}:</b>
-                        top={{parseInt(100*rect.top, 10)}}%
-                        bottom={{parseInt(100*rect.bottom, 10)}}%
-                        left={{parseInt(100*rect.left, 10)}}%
-                        right={{parseInt(100*rect.right, 10)}}%
-                        <q-btn label="Remove" color="red" @click="removeCaption(idx)"></q-btn>
-                    </q-item-section>
-                </q-item>
-                <q-item>
-                    <q-btn flat label="Add Caption" @click="addCaption"></q-btn>
-                </q-item>
-            </q-list>
+        <q-card>
+            <div v-if="! recording">
+                <q-input v-model="videoElementSelector" label="Video Element Selector" />
+                <span v-if="AVElement === null">
+                    No Video Element Found
+                </span>
+            </div>
+            <div v-if="! recording && AVElement">
+                <q-list bordered separator>
+                    <q-item clickable v-ripple v-for="(rect, idx) of captionRects">
+                        <q-item-section>
+                            <b>Caption {{ idx + 1}}:</b>
+                            top={{parseInt(100*rect.top, 10)}}%
+                            bottom={{parseInt(100*rect.bottom, 10)}}%
+                            left={{parseInt(100*rect.left, 10)}}%
+                            right={{parseInt(100*rect.right, 10)}}%
+                            <q-btn style="width: 100px" label="Remove" color="red" @click="removeCaption(idx)"></q-btn>
+                        </q-item-section>
+                    </q-item>
+                    <q-item>
+                        <q-btn flat label="Add Caption" @click="addCaption"></q-btn>
+                    </q-item>
+                </q-list>
 
-            <q-btn v-if="captionElements.length > 0" flat label="Clear Captions" @click="clearCaptions"></q-btn>
-            <q-btn flat v-if="captionElements.length > 0" label="Start Recording" @click="startRecording"></q-btn>
-            <q-btn flat v-if="recordedTimings.length > 0" label="Clear Timings" @click="this.recordedTimings = []"></q-btn>
-            <q-btn flat v-if="!showTimings" label="Show Timings" @click="showTimings = true"></q-btn>
-            <q-btn flat label="Close" @click="show = false"></q-btn>
-            <q-btn flat v-if="showTimings" label="Hide Timings" @click="showTimings = false"></q-btn>
-            <q-scroll-area v-if="showTimings" style="height: 200px;">
-                <div v-for="t in recordedTimings">{{ t }}</div>
-            </q-scroll-area>
-        </q-card>
-        <q-card v-else>
-            <q-btn flat v-if="recording" label="Stop Recording" @click="stopRecording"></q-btn>
+                <q-btn v-if="captionElements.length > 0" flat label="Clear Captions" @click="clearCaptions"></q-btn>
+                <q-btn flat v-if="captionElements.length > 0" label="Start Recording" @click="startRecording"></q-btn>
+                <q-btn flat v-if="recordedTimings.length > 0" label="Clear Timings" @click="this.recordedTimings = []"></q-btn>
+                <q-btn flat v-if="!showTimings" label="Show Timings" @click="showTimings = true"></q-btn>
+                <q-btn flat label="Close" @click="show = false"></q-btn>
+                <q-btn flat v-if="showTimings" label="Hide Timings" @click="showTimings = false"></q-btn>
+                <q-scroll-area v-if="showTimings" style="height: 200px;">
+                    <div v-for="t in recordedTimings">{{ t }}</div>
+                </q-scroll-area>
+            </div>
+            <div v-else>
+                <q-btn flat v-if="recording" label="Stop Recording" @click="stopRecording"></q-btn>
+            </div>
         </q-card>
     </q-dialog>
 </template>
@@ -45,6 +53,7 @@ export default {
         captionElements: [],
         recordedTimings: [],
         showTimings: false,
+        videoElementSelector: null,
     }},
     computed: {
         show: {
@@ -55,13 +64,18 @@ export default {
             return this.getSiteString('AVElementSelector');
         },
         AVElement: function() {
-            return document.querySelector(this.AVElementSelector);
+            return document.querySelector(this.videoElementSelector);
         },
         videoMenuSelector: function() {
             return this.getSiteString('videoMenuSelector');
         },
         videoMenuElement: function() {
             return document.querySelector(this.videoMenuSelector);
+        },
+    },
+    watch: {
+        AVElementSelector: function() {
+            if (this.AVElementSelector) this.videoElementSelector = this.AVElementSelector;
         },
     },
     mounted: function() {
