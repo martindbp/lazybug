@@ -1,15 +1,34 @@
 <template>
     <q-dialog seamless persistent position="top" v-model="show">
-        <q-card>
-            <div v-if="captionRect">
-                top: {{captionRect.top.toFixed(2)}}
-                bottom: {{captionRect.bottom.toFixed(2)}}
-                left: {{captionRect.left.toFixed(2)}}
-                right: {{captionRect.right.toFixed(2)}}
-            </div>
-            <q-btn flat label="Measure Caption" @click="measureCaption"></q-btn>
-            <q-btn flat :label="recording? 'Stop' : 'Record'" @click="toggleRecording"></q-btn>
+        <q-card v-if="! recording">
+            <q-list bordered separator>
+                <q-item clickable v-ripple v-for="(rect, idx) of captionRects">
+                    <q-item-section>
+                        <b>Caption {{ idx + 1}}:</b>
+                        top={{parseInt(100*rect.top, 10)}}%
+                        bottom={{parseInt(100*rect.bottom, 10)}}%
+                        left={{parseInt(100*rect.left, 10)}}%
+                        right={{parseInt(100*rect.right, 10)}}%
+                        <q-btn label="Remove" color="red" @click="removeCaption(idx)"></q-btn>
+                    </q-item-section>
+                </q-item>
+                <q-item>
+                    <q-btn flat label="Add Caption" @click="addCaption"></q-btn>
+                </q-item>
+            </q-list>
+
+            <q-btn v-if="captionElements.length > 0" flat label="Clear Captions" @click="clearCaptions"></q-btn>
+            <q-btn flat v-if="captionElements.length > 0" label="Start Recording" @click="startRecording"></q-btn>
+            <q-btn flat v-if="recordedTimings.length > 0" label="Clear Timings" @click="this.recordedTimings = []"></q-btn>
+            <q-btn flat v-if="!showTimings" label="Show Timings" @click="showTimings = true"></q-btn>
             <q-btn flat label="Close" @click="show = false"></q-btn>
+            <q-btn flat v-if="showTimings" label="Hide Timings" @click="showTimings = false"></q-btn>
+            <q-scroll-area v-if="showTimings" style="height: 200px;">
+                <div v-for="t in recordedTimings">{{ t }}</div>
+            </q-scroll-area>
+        </q-card>
+        <q-card v-else>
+            <q-btn flat v-if="recording" label="Stop Recording" @click="stopRecording"></q-btn>
         </q-card>
     </q-dialog>
 </template>
@@ -21,8 +40,11 @@ export default {
     mixins: [mixin],
     data: function() { return {
         keyboardListener: null,
-        captionRect: null,
+        captionRects: [],
         recording: false,
+        captionElements: [],
+        recordedTimings: [],
+        showTimings: false,
     }},
     computed: {
         show: {
@@ -58,41 +80,59 @@ export default {
         window.removeEventListener('keydown', this.keyboardListener);
     },
     methods: {
-        toggleRecording: function() {
-            let flashDiv = document.createElement("div");
-            flashDiv.style.cssText = "position:absolute;";
-            document.body.appendChild(flashDiv);
-
-            flashDiv.style.left = mouseDownClientX + "px";
-            flashDiv.style.top = mouseDownClientY + "px";
-            flashDiv.style.width = (captionRightPx - captionLeftPx) + "px";
-            flashDiv.style.height = (captionBottomPx - captionTopPx) + "px";
-            flashDiv.style.background = 'rgb(0, 255, 0)';
-            timings = [];
+        removeCaption: function(idx) {
+            this.captionElements[idx].remove();
+            this.captionElements.splice(idx, 1);
+            this.captionRects.splice(idx, 1);
+        },
+        clearCaptions: function() {
+            for (const $el of this.captionElements) {
+                $el.remove();
+            }
+            this.captionElements = [];
+            this.captionRects = [];
+        },
+        startRecording: function() {
+            this.recording = true;
+            for (const captionEl of this.captionElements) {
+                captionEl.style.background = 'rgb(0, 255, 0)';
+                captionEl.style.visibility = 'visible';
+            }
+            this.recordedTimings = [];
+            const self = this;
             setTimeout(function() {
-                flashDiv.remove();
+                // Hide the divs after 100 ms green flashing
+                for (const captionEl of self.captionElements) {
+                    captionEl.style.visibility = 'hidden';
+                }
                 const start = window.performance.now() / 1000;
                 let interval = setInterval(function() {
-                    if (timings === null) {
+                    if (! self.recording) {
                         clearInterval(interval);
+                        // Restore divs
+                        for (const captionEl of self.captionElements) {
+                            captionEl.style.background = 'transparent';
+                            captionEl.style.visibility = 'visible';
+                        }
                         return;
                     }
                     const offset = window.performance.now() / 1000 - start;
-                    console.log(offset, AVElement.currentTime, AVElement.duration);
-                    timings.push([offset, AVElement.currentTime, AVElement.duration]);
+                    console.log(offset, self.AVElement.currentTime, self.AVElement.duration);
+                    self.recordedTimings.push([offset, self.AVElement.currentTime, self.AVElement.duration]);
                 }, 500);
             }, 100);
         },
-        measureCaption: function() {
+        stopRecording: function() {
+            this.recording = false;
+        },
+        addCaption: function() {
             const self = this;
-            this.captionRect = null;
             if (this.videoMenuElement) this.videoMenuElement.style.visibility = 'hidden';
 
             let clientX = null;
             let clientY = null;
             let mouseDownClientX = null;
             let mouseDownClientY = null;
-            let measureDiv = null;
             let moveHandler = null;
             let scrollX = getClosestParentScroll(this.AVElement, 'x');
             let scrollY = getClosestParentScroll(this.AVElement, 'y');
@@ -112,36 +152,35 @@ export default {
                 captionLeft = captionLeftPx / videoRect.width;
                 captionRightPx = clientX - videoRect.left;
                 captionRight = captionRightPx / videoRect.width;
-                //measureDiv.remove();
-                measureDiv = null;
                 window.removeEventListener("mousemove", moveHandler);
                 moveHandler = null;
                 if (self.videoMenuElement) self.videoMenuElement.style.visibility = 'visible';
 
-                self.captionRect = {
+                self.captionRects.push({
                     top: captionTop,
                     bottom: captionBottom,
                     left: captionLeft,
                     right: captionRight,
-                };
+                });
             }
 
             function startMeasuring() {
                 console.log('Start measuring');
-                measureDiv = document.createElement("div");
-                measureDiv.style.cssText = "position: absolute; color: white; border-color: black; border: 2px solid black; z-index: 9999";
-                document.body.appendChild(measureDiv);
+                const captionEl = document.createElement("div");
+                self.captionElements.push(captionEl);
+                captionEl.style.cssText = "position: absolute; color: white; border-color: black; border: 2px solid black; z-index: 9999";
+                document.body.appendChild(captionEl);
 
                 mouseDownClientX = clientX;
                 mouseDownClientY = clientY;
-                measureDiv.style.left = clientX + "px";
-                measureDiv.style.top = clientY + "px";
-                measureDiv.style.width = 0 + "px";
-                measureDiv.style.height = 0 + "px";
+                captionEl.style.left = clientX + "px";
+                captionEl.style.top = clientY + "px";
+                captionEl.style.width = 0 + "px";
+                captionEl.style.height = 0 + "px";
 
                 moveHandler = (moveEvent) => {
-                    measureDiv.style.width = ((moveEvent.clientX+scrollX) - mouseDownClientX) + "px";
-                    measureDiv.style.height = ((moveEvent.clientY+scrollY) - mouseDownClientY) + "px";
+                    captionEl.style.width = ((moveEvent.clientX+scrollX) - mouseDownClientX) + "px";
+                    captionEl.style.height = ((moveEvent.clientY+scrollY) - mouseDownClientY) + "px";
                 };
 
                 window.addEventListener("mousemove", moveHandler);
