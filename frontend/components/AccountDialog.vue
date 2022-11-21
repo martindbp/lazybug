@@ -48,17 +48,18 @@ export default {
     }},
     computed: {
         show: {
-            get: function() { return this.$store.state.showAccountDialog !== false; },
-            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'account', val: val}); },
-        },
-        showAccountDialog: {
-            get: function() { return this.$store.state.showAccountDialog; },
+            get: function() {
+                return this.$store.state.showDialog.account !== false;
+            },
+            set: function(val) {
+                this.$store.commit('setShowDialog', {dialog: 'account', val: val});
+            },
         },
     },
     watch: {
-        showAccountDialog: function() {
+        show: function() {
             if (this.show !== false) {
-                this.tab = this.$store.state.showAccountDialog;
+                this.tab = this.$store.state.showDialog.account;
                 const self = this;
                 // Need to delay this further as nextTick is not enough
                 setTimeout(function() {
