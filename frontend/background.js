@@ -465,7 +465,10 @@ function backgroundMessageHandler(message, sender, sendResponse) {
 }
 
 if (BROWSER_EXTENSION) {
-    // Only for deepl now. We don't run the background.js for the normal extension stuff
+    //
+    // NOTE: background.js is only used from browser extension for deepl and extension toggling
+    //
+
     chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         backgroundMessageHandler(message, null, function(response) {
             sendResponse(response);
@@ -473,6 +476,35 @@ if (BROWSER_EXTENSION) {
         });
         return true;
     });
+
+    let extensionOn = null;
+    function toggleExtension() {
+        extensionOn = ! extensionOn;
+        chrome.storage.local.set({"extensionOn": extensionOn}, function() {});
+        if (extensionOn) {
+            chrome.action.setBadgeText({ text: "" });
+            chrome.action.setBadgeBackgroundColor({ color: "rgba(0,0,0,0)" });
+        }
+        else {
+            chrome.action.setBadgeText({ text: "OFF" });
+            chrome.action.setBadgeBackgroundColor({ color: "red" });
+        }
+
+        chrome.tabs.query({}, function(tabs) {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {type: "extensionOn", data: extensionOn});
+            }
+        });
+    }
+
+    chrome.storage.local.get("extensionOn", function(data) {
+        // Set opposite value and toggle to update badge and send message to content script
+        console.log('extensionOn=', data.extensionOn);
+        extensionOn = ! data.extensionOn;
+        toggleExtension();
+    });
+
+    chrome.action.onClicked.addListener(toggleExtension);
 }
 else {
     if (window.parent != window) {

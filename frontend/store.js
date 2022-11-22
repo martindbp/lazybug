@@ -28,6 +28,7 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
+        extensionOn: true,
         accessToken: getCookie('jwt'),
         accountEmail: getCookie('email'),
         captionId: null,
@@ -100,7 +101,6 @@ const store = new Vuex.Store({
         syncProgress: [],
         syncError: null,
         options: Vue.ref({
-            extensionToggle: true,
             autoPause: false,
             WPSThreshold: 2.0,
             characterSet: 'sm',
@@ -149,6 +149,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setExtensionOn(state, val) {
+            state.extensionOn = val;
+        },
         setNeedSync(state, val) {
             state.needSync = val;
             localStorage.setItem('needSync', val);
@@ -443,12 +446,15 @@ const store = new Vuex.Store({
 
 if (BROWSER_EXTENSION) {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.type === 'extensionToggle') {
+        if (message.type === 'extensionOn') {
             // Reset captionOffset so we have a way get out of the situation where it's outside the window
             store.commit('setCaptionOffset', [0, 0]);
-            store.commit('setOption', {key: 'extensionToggle', value: message.data});
+            store.commit('setExtensionOn', message.data);
         }
-        return true;
+    });
+
+    chrome.storage.local.get("extensionOn", function(data) {
+        store.commit('setExtensionOn', data.extensionOn);
     });
 }
 

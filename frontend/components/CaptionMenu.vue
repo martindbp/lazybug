@@ -55,7 +55,7 @@ export default {
                 self.$store.state.showOptions ||
                 ! self.$store.state.options.keyboardShortcutsToggle ||
                 ! self.$store.state.captionData ||
-                ! self.$store.state.options.extensionToggle
+                ! self.$store.state.extensionOn
             ) {
                 return;
             }

@@ -192,13 +192,6 @@ frontend-caption:
 	-cp frontend/dist_components/extensioncaption/*.css frontend/dist/
 	make frontend-copy
 
-.PHONY: frontend-popup
-frontend-popup:
-	vue-cli-service build frontend/components/PopupRoot.vue --target lib --dest frontend/dist_components/popuproot
-	cp frontend/dist_components/popuproot/*.umd.js frontend/dist/
-	-cp frontend/dist_components/popuproot/*.css frontend/dist/
-	make frontend-copy
-
 .PHONY: frontend-clean
 frontend-clean:
 	- rm -r frontend/dist
@@ -211,7 +204,6 @@ frontend-clean:
 .PHONY: frontend
 frontend:
 	make frontend-caption
-	make frontend-popup
 	make frontend-web
 
 .PHONY: local

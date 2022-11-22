@@ -22,7 +22,7 @@
         <CaptionBlur
             id="blurroot"
             ref="blurroot"
-            v-if="$store.state.captionData !== null && $store.state.options.extensionToggle"
+            v-if="$store.state.captionData !== null && $store.state.extensionOn"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
             v-bind:nextCaption="nextCaption"

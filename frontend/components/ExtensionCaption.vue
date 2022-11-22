@@ -1,6 +1,6 @@
 <template>
     <Caption
-        v-if="captionId && AVElement && $store.state.options.extensionToggle"
+        v-if="captionId && AVElement && $store.state.extensionOn"
         v-bind:captionId="captionId"
         v-bind:AVElement="AVElement"
         v-bind:videoDuration="$store.state.videoDuration"
