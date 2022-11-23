@@ -253,26 +253,28 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     }
     else if (message.type === 'fetchVersionedResource') {
         backgroundFetchVersionedResource('lazybug-public', message.filename, function (data, hash) {
+            clearNetworkError();
             sendResponse({data: data, hash: hash});
         }, function(error) {
-            console.log('ERROR');
-            console.log(error);
+            setNetworkError();
             sendResponse('error');
         });
     }
     else if (message.type === 'fetchResource') {
         backgroundFetchResource('lazybug-public', message.filename, function (data) {
             sendResponse({data: data});
+            clearNetworkError();
         }, function(error) {
-            console.log('ERROR');
-            console.log(error);
+            setNetworkError();
             sendResponse('error');
         });
     }
     else if (message.type === 'getCaptions') {
         backgroundFetchVersionedResource('lazybug-public/subtitles', `${message.data.captionId}.json`, function (data, hash) {
+            clearNetworkError();
             sendResponse({data: {data: data, hash: hash}});
         }, function(response) {
+            setNetworkError();
             sendResponse('error');
         });
     }
@@ -464,6 +466,30 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     return true;
 }
 
+let extensionOn = null;
+
+function updateExtensionStatusBadge() {
+    if (extensionOn) {
+        chrome.action.setBadgeText({ text: "" });
+        chrome.action.setBadgeBackgroundColor({ color: "rgba(0,0,0,0)" });
+    }
+    else {
+        chrome.action.setBadgeText({ text: "ERR" });
+        chrome.action.setBadgeBackgroundColor({ color: "red" });
+    }
+}
+
+function setNetworkError() {
+    if (! BROWSER_EXTENSION) return;
+    chrome.action.setBadgeText({ text: "OFF" });
+    chrome.action.setBadgeBackgroundColor({ color: "red" });
+}
+
+function clearNetworkError() {
+    if (! BROWSER_EXTENSION) return;
+    updateExtensionStatusBadge();
+}
+
 if (BROWSER_EXTENSION) {
     //
     // NOTE: background.js is only used from browser extension for deepl and extension toggling
@@ -477,19 +503,10 @@ if (BROWSER_EXTENSION) {
         return true;
     });
 
-    let extensionOn = null;
     function toggleExtension() {
         extensionOn = ! extensionOn;
         chrome.storage.local.set({"extensionOn": extensionOn}, function() {});
-        if (extensionOn) {
-            chrome.action.setBadgeText({ text: "" });
-            chrome.action.setBadgeBackgroundColor({ color: "rgba(0,0,0,0)" });
-        }
-        else {
-            chrome.action.setBadgeText({ text: "OFF" });
-            chrome.action.setBadgeBackgroundColor({ color: "red" });
-        }
-
+        updateExtensionStatusBadge();
         chrome.tabs.query({}, function(tabs) {
             for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {type: "extensionOn", data: extensionOn});
