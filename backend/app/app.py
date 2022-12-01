@@ -170,6 +170,11 @@ async def discourse_get_email_and_id(user: User = Depends(current_active_user)):
 
 @app.get("/api/discourse/sso")
 async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
+    """
+    When user enters discourse.lazybug.ai, Discourse calls this endpoint on lazybug.ai server
+    with sso and sig tokens. We check the cookies for the jwt token set on lazybug.ai
+    (user has to have logged in there first), and return the associated user id and email of the account
+    """
     if jwt is None:
         raise HTTPException(status_code=403, detail=f'No jwt token')
 
