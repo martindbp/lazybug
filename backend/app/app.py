@@ -23,7 +23,7 @@ from app.discoursesso import DiscourseSSO
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
 LOCAL_ONLY = os.getenv('LOCAL_ONLY') is not None
-DISCOURSE_SECRET, ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None
+DISCOURSE_SECRET, ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None, None
 if not LOCAL_ONLY:
     ENDPOINT = os.getenv('B2_ENDPOINT')
     KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
