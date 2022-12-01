@@ -296,12 +296,13 @@ kill-server:
 
 local-ssl-cert:
 	mkdir data/local/ssl_cert/ && \
+	mkdir data/local/ssl_keys/ && \
 	cd data/local/ssl_cert/ && \
 	openssl genrsa -out CA.key -des3 2048 && \
 	openssl req -x509 -sha256 -new -nodes -days 3650 -key CA.key -out CA.pem && \
 	openssl genrsa -out localhost.key -des3 2048 && \
 	openssl req -new -key localhost.key -out localhost.csr && \
-	openssl x509 -req -in localhost.csr -CA CA.pem -CAkey CA.key -CAcreateserial -days 3650 -sha256 -extfile ../../../data/git/localhost.ext -out localhost.crt && \
+	openssl x509 -req -in localhost.csr -CA CA.pem -CAkey CA.key -CAcreateserial -days 3650 -sha256 -extfile ../../git/localhost.ext -out localhost.crt && \
 	openssl rsa -in localhost.key -out localhost.decrypted.key && \
 	cp localhost.crt ../ssl_keys/fullchain.pem && \
-	cp localhost.crt ../ssl_keys/fullchain.pem
+	cp localhost.decrypted.key ../ssl_keys/privkey.pem
