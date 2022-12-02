@@ -13,17 +13,21 @@
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="login">
                     Please enter your email and password:
-                    <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" />
-                    <br>
-                    <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" />
-                    <div class="accounterror" v-if="error">{{ error }}</div>
+                    <form>
+                        <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" />
+                        <br>
+                        <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" />
+                        <div class="accounterror" v-if="error">{{ error }}</div>
+                    </form>
                 </q-tab-panel>
                 <q-tab-panel name="register">
                     Please enter desired email and password:
-                    <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" />
-                    <br>
-                    <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" />
-                    <div class="accounterror" v-if="error">{{ error }}</div>
+                    <form>
+                        <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" />
+                        <br>
+                        <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" />
+                        <div class="accounterror" v-if="error">{{ error }}</div>
+                    </form>
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
