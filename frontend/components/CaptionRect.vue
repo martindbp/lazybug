@@ -1,17 +1,27 @@
 <template>
     <div v-if="currRect !== null">
         <div
-            class="blurdiv"
+            class="captiondiv"
+            v-if="measureRect === null"
             v-for="index in numBlurLayers"
             :key="index"
             @click.prevent.stop="toggle"
             @dblclick.prevent.stop
             :style="{ opacity: toggleOn ? 1 : 0 }"
         />
+        <div
+            v-else
+            class="captiondiv"
+        />
     </div>
 </template>
 
 <script>
+//
+// NOTE: this component is dual purpose: the blur rect and measure rect for devtools
+// TODO: refactor this to two separate components sharing some logic
+//
+
 const DEFAULT_WIDTH = 916;
 
 
@@ -30,7 +40,9 @@ function rectsUnion(rects) {
 
 
 export default {
+    mixins: [mixin],
     props: {
+        measureRect: { default: null }, // if measure rect set this, otherwise the props below
         prevCaption: { default: null },
         currCaption: { default: null },
         nextCaption: { default: null },
@@ -44,10 +56,13 @@ export default {
     },
     computed: {
         toggleOn: {
-            get: function() { return this.$store.state.options.blurCaptions; },
+            get: function() { return this.measureRect !== null || this.$store.state.options.blurCaptions; },
             set: function(val) { this.$store.commit('setBlur', val); },
         },
         currRect: function() {
+            if (this.measureRect) {
+                return this.measureRect;
+            }
             let rects = this.currCaption !== null ? this.currCaption.boundingRects : [];
             if (this.prevCaption !== null) {
                 if (this.currTime < this.prevCaption.t1 + this.blurTimeBuffer) {
@@ -68,12 +83,15 @@ export default {
             const [height, width] = this.$store.state.captionData['frame_size'];
             return width / height;
         },
+        AVElementParentSelector: function() {
+            return this.getSiteString('AVElementParentSelector');
+        },
     },
     watch: {
         currRect: {
             immediate: true, 
             handler: function() {
-                this.updateBlurStyle();
+                this.updateStyle();
             }
         }
     },
@@ -84,9 +102,10 @@ export default {
     },
     methods: {
         toggle: function() {
+            if (this.measureRect !== null) return;
             this.toggleOn = ! this.toggleOn;
         },
-        updateBlurStyle: function() {
+        updateStyle: function() {
             if (this.$el === null ||
                 this.$el.children === undefined ||
                 this.AVElement === null ||
@@ -94,7 +113,7 @@ export default {
 
             let videoRect = this.AVElement.getBoundingClientRect();
             let videoAspectRatio = videoRect.width / videoRect.height;
-            let videoParent = this.AVElement.closest('.html5-video-player')
+            let videoParent = this.AVElement.closest(this.AVElementParentSelector);
             let videoParentRect = videoParent ? videoParent.getBoundingClientRect() : null;
             let parentAspectRatio = videoParent ? videoParentRect.width / videoParentRect.height : null;
             let offsetX = 0;
@@ -108,7 +127,7 @@ export default {
                 offsetX = videoRect.left - videoParentRect.left;
                 offsetY = videoRect.top - videoParentRect.top;
             }
-            else if (videoAspectRatio !== this.realAspectRatio) {
+            else if (this.measureRect === null && videoAspectRatio !== this.realAspectRatio) {
                 // Video is in iframe with different aspect ratio than underlying video
                 if (this.realAspectRatio < videoAspectRatio) {
                     // We have black bars on sides
@@ -125,25 +144,32 @@ export default {
             }
             let xMin, xMax, yMin, yMax;
             [xMin, xMax, yMin, yMax] = this.currRect;
-            // Blur more the wider the video element is (for both side padding, normal padding and num blur pixels)
-            const blurSidePadding = Math.ceil((videoWidth / DEFAULT_WIDTH) * this.blurSidePadding);
-            xMin -= blurSidePadding;
-            xMax += blurSidePadding;
+            if (this.measureRect === null) {
+                // Blur more the wider the video element is (for both side padding, normal padding and num blur pixels)
+                const blurSidePadding = Math.ceil((videoWidth / DEFAULT_WIDTH) * this.blurSidePadding);
+                xMin -= blurSidePadding;
+                xMax += blurSidePadding;
+            }
+
+            const videoFrameHeight = this.measureRect === null ? this.videoFrameSize[0] : videoHeight;
+            const videoFrameWidth = this.measureRect === null ? this.videoFrameSize[1] : videoWidth;
             for (let i = 0; i < this.$el.children.length; i++) {
-                const blurDiv = this.$el.children[i];
-                const padding = Math.ceil(1.0 * i * this.blurPadding); // increase the padding for each div
+                const captionDiv = this.$el.children[i];
+                const padding = this.measureRect === null ? Math.ceil(1.0 * i * this.blurPadding) : 0; // increase the padding for each div
                 const xMinDiv = xMin - padding;
                 const yMinDiv = yMin - padding;
                 const xMaxDiv = xMax + padding;
                 const yMaxDiv = yMax + padding;
                 let divWidth = xMaxDiv - xMinDiv;
                 let divHeight = yMaxDiv - yMinDiv;
-                blurDiv.style.top = offsetY + (videoHeight * yMinDiv / this.videoFrameSize[0]) + 'px';
-                blurDiv.style.left = offsetX + (videoWidth * xMinDiv / this.videoFrameSize[1]) + 'px';
-                blurDiv.style.height = ((videoRect.height - subtractY) * divHeight / this.videoFrameSize[0]) + 'px';
-                blurDiv.style.width = ((videoRect.width - subtractX) * divWidth / this.videoFrameSize[1]) + 'px';
-                const blurPixels = Math.pow(2, this.numBlurLayers - i - 1);
-                blurDiv.style.backdropFilter = `blur(${blurPixels}px)`;
+                captionDiv.style.top = offsetY + (videoHeight * yMinDiv / videoFrameHeight) + 'px';
+                captionDiv.style.left = offsetX + (videoWidth * xMinDiv / videoFrameWidth) + 'px';
+                captionDiv.style.height = ((videoRect.height - subtractY) * divHeight / videoFrameHeight) + 'px';
+                captionDiv.style.width = ((videoRect.width - subtractX) * divWidth / videoFrameWidth) + 'px';
+                if (this.measureRect === null) {
+                    const blurPixels = Math.pow(2, this.numBlurLayers - i - 1);
+                    captionDiv.style.backdropFilter = `blur(${blurPixels}px)`;
+                }
             }
         },
     }
@@ -151,7 +177,7 @@ export default {
 </script>
 
 <style>
-.blurdiv {
+.captiondiv {
     position:absolute;
     cursor: pointer;
 }

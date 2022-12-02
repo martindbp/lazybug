@@ -6,6 +6,20 @@
                 <span v-if="AVElement === null">
                     No Video Element Found
                 </span>
+
+                <q-input
+                    filled
+                    color="purple-12"
+                    v-model="showId"
+                    label="Show ID"
+                    bottom-slots
+                    hint="Press TAB to autocomplete"
+                    :error-message="showIdErrorMessage"
+                    :error="showIdErrorMessage !== null"
+                    :shadow-text="inputShadowText"
+                    @keydown="processInputFill"
+                    @focus="processInputFill"
+                />
             </div>
             <div v-if="! recording && AVElement">
                 <q-list bordered separator>
@@ -24,15 +38,24 @@
                     </q-item>
                 </q-list>
 
+                <CaptionRect v-for="rect of captionRects" :AVElement="AVElement" :measureRect="rect" />
+
                 <q-btn v-if="captionElements.length > 0" flat label="Clear Captions" @click="clearCaptions"></q-btn>
                 <q-btn flat v-if="captionElements.length > 0" label="Start Recording" @click="startRecording"></q-btn>
                 <q-btn flat v-if="recordedTimings.length > 0" label="Clear Timings" @click="this.recordedTimings = []"></q-btn>
-                <q-btn flat v-if="!showTimings" label="Show Timings" @click="showTimings = true"></q-btn>
-                <q-btn flat label="Close" @click="show = false"></q-btn>
-                <q-btn flat v-if="showTimings" label="Hide Timings" @click="showTimings = false"></q-btn>
+
+                <q-btn flat v-if="recordedTimings.length > 0" :label="(showTimings ? 'Hide' : 'Show') + ' Timings'" @click="showTimings = !showTimings"></q-btn>
                 <q-scroll-area v-if="showTimings" style="height: 200px;">
                     <div v-for="t in recordedTimings">{{ t }}</div>
                 </q-scroll-area>
+
+                <q-btn flat :label="(showData ? 'Hide' : 'Show') + ' Data'" @click="showData = !showData"></q-btn>
+                <q-scroll-area v-if="showData" style="height: 200px;">
+                    {{ allShows[showId] === undefined ? 'Nothing here' : allShows[showId] }}
+                </q-scroll-area>
+
+                <q-btn flat label="Save" @click="save"></q-btn>
+                <q-btn flat label="Close" @click="show = false"></q-btn>
             </div>
             <div v-else>
                 <q-btn flat v-if="recording" label="Stop Recording" @click="stopRecording"></q-btn>
@@ -42,10 +65,21 @@
 </template>
 
 <script>
+import CaptionRect from './CaptionRect.vue'
 
+function syncShows(data) {
+    setIndexedDbData('other', ['devtoolShows'], [data], function() {});
+}
+
+function getShows(callback) {
+    getIndexedDbData('other', ['devtoolShows'], callback);
+}
 
 export default {
     mixins: [mixin],
+    component: {
+        CaptionRect,
+    },
     data: function() { return {
         keyboardListener: null,
         captionRects: [],
@@ -53,9 +87,31 @@ export default {
         captionElements: [],
         recordedTimings: [],
         showTimings: false,
+        showData: false,
         videoElementSelector: null,
+        shows: {},
+        showId: null,
     }},
     computed: {
+        inputShadowText: function() {
+            if (this.showId === null) return null;
+            for (const id of this.allShowIds) {
+                if (id.startsWith(this.showId)) {
+                    const left = id.slice(this.showId.length);
+                    if (left.length === 0) return null;
+                    else return left;
+                }
+            }
+            return null;
+        },
+        showIdErrorMessage: function() {
+            const v = this.showId;
+            if (v === null) return null;
+            else if (v.length > 0 && ! v.match(/^[a-z0-9]+$/)) {
+                return 'Please use lowercase alpha-numeric characters only';
+            }
+            return null;
+        },
         show: {
             get: function() { return this.$store.state.showDialog.devtools; },
             set: function(val) { this.$store.commit('setShowDialog', {dialog: 'devtools', val: val}); },
@@ -72,10 +128,25 @@ export default {
         videoMenuElement: function() {
             return document.querySelector(this.videoMenuSelector);
         },
+        allShowIds: function() {
+            return Object.keys(this.shows).concat(this.remoteShowIds);
+        },
+        allShows: function() {
+            return Object.assign({}, this.shows, this.remoteShows)
+        },
+        remoteShows: function() {
+            return this.$store.state.showList || {};
+        },
+        remoteShowIds: function() {
+            return Object.keys(this.remoteShows);
+        },
     },
     watch: {
         AVElementSelector: function() {
             if (this.AVElementSelector) this.videoElementSelector = this.AVElementSelector;
+        },
+        shows: function() {
+            //syncShows(this.shows);
         },
     },
     mounted: function() {
@@ -89,11 +160,73 @@ export default {
                 self.show = true;
             }
         }, {capture: true});
+
+        getShows(function(data) {
+            self.shows = data;
+        });
     },
     beforeDestroy: function() {
         window.removeEventListener('keydown', this.keyboardListener);
     },
     methods: {
+        save: function() {
+            let show = this.shows[this.showId];
+            if (show === undefined) {
+                this.shows[this.showId] = {
+                    "name": {
+                        "hz": "",
+                        "py": "",
+                        "en": ""
+                    },
+                    "date_added": "",
+                    "douban": 0.0,
+                    "year": "",
+                    "type": "tv",
+                    "genres": [],
+                    "synopsis": "",
+                    "caption_source": "",
+                    "translation_source": "",
+                    "released": false,
+                    "seasons": [
+                        {
+                            "episodes": [{}]
+                        },
+                    ]
+                };
+                show = this.shows[this.showId];
+            }
+
+            if (this.captionRects.length > 0) {
+                show["ocr_params"] = this.captionRects.map(function (r) {
+                    return {
+                        "type": "hanzi",
+                        "caption_top": r.top,
+                        "caption_bottom": r.bottom,
+                        "caption_left": r.left,
+                        "caption_right": r.right,
+                        "start_time": 0
+                    }
+                });
+            }
+
+            const seasons = show.seasons;
+            const episodes = seasons[seasons.length-1].episodes;
+            const id = extractCurrentVideoId(this.$store.state.STRINGS, window.location.href);
+            const episode = episodes[episodes.length-1];
+            episode.id = id;
+
+            if (this.recordedTimings.length > 0) {
+                episode.timings = this.recordedTimings;
+            }
+
+            syncShows(this.shows);
+        },
+        processInputFill: function(e) {
+            if (e.keyCode === 9 && this.inputShadowText !== null) {
+                this.showId = this.showId + this.inputShadowText;
+                this.inputShadowText = null;
+            }
+        },
         removeCaption: function(idx) {
             this.captionElements[idx].remove();
             this.captionElements.splice(idx, 1);

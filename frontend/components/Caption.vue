@@ -19,7 +19,7 @@
             v-on:seeked="seekedFromMenu = true"
             v-on:mouseOver="pauseDuration = null"
         />
-        <CaptionBlur
+        <CaptionRect
             id="blurroot"
             ref="blurroot"
             v-if="$store.state.captionData !== null && $store.state.extensionOn"
@@ -36,7 +36,7 @@
 
 <script>
 import CaptionContainer from './CaptionContainer.vue'
-import CaptionBlur from './CaptionBlur.vue'
+import CaptionRect from './CaptionRect.vue'
 import OptionsDialog from './OptionsDialog.vue'
 
 const DEFAULT_WIDTH = 916;
@@ -48,7 +48,7 @@ export default {
     mixins: [mixin],
     components: {
         CaptionContainer,
-        CaptionBlur,
+        CaptionRect,
         OptionsDialog,
     },
     props: ['AVElement', 'captionId', 'videoDuration', 'videoAPI'],
@@ -359,7 +359,7 @@ export default {
             this.$refs.captionroot.$el.style.left = ((videoRect.left+scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
             this.$refs.captionroot.$el.style.top = (0.8 * (videoRect.bottom+scrollY) + this.captionOffset[1]) + 'px';
             if (this.$refs.blurroot) {
-                this.$refs.blurroot.updateBlurStyle();
+                this.$refs.blurroot.updateStyle();
             }
         },
         getCurrentCaptionIdx: function(withTimingOffset) {
