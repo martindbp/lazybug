@@ -38,6 +38,52 @@ make local
 make run-server-local-only
 ```
 
+# Data (Backblaze B2 and Cloudflare CDN)
+
+All data (besides Discourse and the backend user auth data), including things like captions and user databases are stored as plain files in Backblaze B2 (S3 compatible) and served through Cloudflare CDN. Transfering data from Backblaze to Cloudflare is free due to an agreement between them, and Cloudflare CDN is free which makes this a very cost efficient combination. Backblaze storage cost is 1/2 of Amazon S3, and 1/10 the download fees (outside of Cloudflare), and no upload fees.
+
+## Buckets
+
+Captions, show data, dictionaries and other public data is stored in a public bucket accessible at `https://cdn.lazybug.ai/file/lazybug-public/`. Personal user data, such as the interaction log and user settings are stored in a private bucket at `https://cdn.lazybug.ai/file/lazybug-accounts/`. Other data, which we don't want/need to serve to users is stored in another private bucket.
+
+The accounts bucket, being private cannot be served through the CDN, and therefore we have to pay data fees for when users download their personal database (upload is free). Downloads are $0.01/GB. Downloads should only happen when the user switches clients or logs out/in. 10k downloads per day @ 5MB amounts to $15/month. By the time this becomes expensive we can switch to something more fine-grained than syncing the entire database every time.
+
+## Versioning and Syncing
+
+For captions and other data, we want to keep old versions of the same file in case it's updated but references to it remain elsewhere in user data. We also want to reduce the number of requests and amount of data we pull from Cloudflare (and Backblaze), even if it's free (minimizing waste is the decent thing to do), therefore we want to make files immutable so that Cloudflare doesn't have to keep fetching from Backblaze to see if the data changed.
+
+1. We store a `{filename}.hash` with the SHA256 content hash of the file, and the contents at `{filename}-{hash}.{ext}`
+2. When the file changes, we save the new version in a new file with the hash in the filname and update the .hash file to point to it
+3. We then upload the new files with the `make push-public` command.
+4. We then use the `purge_cache` Cloudflare API to purge the .hash files from the cache, so that clients will download the new one This can be done for all files in `data/remote/public` by calling the `make purge-cloudflare-public` command.
+
+We also cache files in the IndexedDB for lazybug.ai in order to minimize uncessary fetching from Cloudflare as the browser cache can be unreliable.
+
+## User account data
+
+User data is stored in the browser IndexedDB of lazybug.ai and is synced to the private lazybug-accounts bucket on Backblaze via the Python backend. This is done by exporting the database file, calling the `/api/signed-upload-link/{size}` end-point, which will in turn authenticate the user and call the B2 API to get a signed upload link for that user's database file. When the frontend receives this URL, which is valid for a temporary duration, it simply uploads the file directly to it. This avoids having to send the data to our backend first, which saves on bandwidth. The same goes for downloads, but instead using the `api/signed-download-link` endpoint. 
+
+## Dev notes
+
+### Backblaze Settings
+
+Cache header for lazybug-public: `{"cache-control":"max-age=31536000"}`
+
+Update cors rules for lazybug-accounts bucket to allow signed upload/download URLs:
+```
+b2 update-bucket --corsRules '[{"corsRuleName":"uploadDownloadFromAnyOrigin", "allowedOrigins": [""], "allowedHeaders": [""], "allowedOperations": ["s3_delete", "s3_get", "s3_head", "s3_post", "s3_put"], "maxAgeSeconds": 3600}]' lazybug-accounts allPublic
+```
+
+### Cloudflare Settings
+
+1. SSL/TLS mode should be set to Full (strict)
+2. SSL/TLS -> Origin Server: The Python backend needs a certificate for serving HTTPS, which can be created/downloaded here
+3. SSL/TLS -> Edge Certificates -> Always Use HTTPS (ON)
+4. Rules -> Page Rules:
+    * `discourse.lazybug.ai/*` | Disable Performance  (https://meta.discourse.org/t/how-do-you-setup-cloudflare/32258/22?page=2)
+    * `lazybug.ai/static/*` | Browser Cache TTL: 2 minutes, Cache Level: Cache Everything
+    * `cdn.lazybug.ai/file/lazybug-public/*` | Cache Level: Cache Everything
+
 # Discourse
 
 Lazybug integrates comments and discussion with a separate discourse instance.
