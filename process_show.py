@@ -38,7 +38,6 @@ from levenshtein import weighted_levenshtein, OpType
 from pinyin_freq_db import make_pinyin_freq_db
 from pinyin_classifiers import train_pinyin_classifiers
 from collect_names import collect_names
-from breakdown import get_cedict_breakdown_characters, get_captions_breakdown_characters
 
 DEBUG = False
 
