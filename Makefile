@@ -1,14 +1,3 @@
-.PHONY: install
-install:
-	sudo apt update
-	sudo apt install -y libcairo2-dev pkg-config python3.9-dev nodejs npm
-	pip install -r requirements.txt
-	npm install canvas utfstring
-	sudo npm install -g vue@next @vue/cli-service @vue/compiler-sfc @vue/cli-init sass
-	# For some reason, some module is trying to import "vue/compiler-sfc" instead of "@vue/compiler-sfc"
-	# The hack below works
-	ln -s /usr/local/lib/node_modules/@vue /usr/local/lib/node_modules/vue
-
 .PHONY: clean
 clean:
 	rm -rf dataset
@@ -294,6 +283,7 @@ deploy-frontend:
 kill-server:
 	pgrep -f "python backend/main" | head -n1 | xargs -I{} kill -9 {}
 
+.PHONY: local-ssl-cert
 local-ssl-cert:
 	mkdir data/local/ssl_cert/ && \
 	mkdir data/local/ssl_keys/ && \
@@ -306,3 +296,24 @@ local-ssl-cert:
 	openssl rsa -in localhost.key -out localhost.decrypted.key && \
 	cp localhost.crt ../ssl_keys/fullchain.pem && \
 	cp localhost.decrypted.key ../ssl_keys/privkey.pem
+
+.PHONY: docker-images
+docker-images:
+	cp backend/requirements.txt docker_server/
+	docker build --rm -t martindbp/lazybug-server docker_server
+	cp requirements.txt docker_processing/
+	docker build --rm -t martindbp/lazybug-processing docker_processing
+	rm docker_server/requirements.txt docker_processing/requirements.txt
+
+.PHONY: docker-push
+docker-push:
+	docker push martindbp/lazybug-server
+	docker push martindbp/lazybug-processing
+
+.PHONY: run-docker-bash
+run-docker-bash:
+	docker run --volume $$(pwd):/lazybug --workdir /lazybug --rm -it --entrypoint bash martindbp/lazybug-processing
+
+.PHONY: docker
+docker:
+	docker run --volume $$(pwd):/lazybug --workdir /lazybug martindbp/lazybug-server make $(COMMAND)

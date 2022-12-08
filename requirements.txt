@@ -11,8 +11,7 @@ mxnet
 webvtt-py
 zhon
 wordfreq
-sklearn
-jieba_fast
+scikit-learn
 jieba
 pyperclip
 sentence-transformers

@@ -117,3 +117,9 @@ This ability to add prefill a reply doesn't come with Discourse by default, but 
 In order for users to be able to comment on a specific video and show, one topic has to be generated for each show. This is done in `make_discourse_topics.py` by going through all the shows in `data/remote/public/shows/*.json`, checking if a topic for this show id exists and if not, create it through the Discourse API. Note that the DISCOURSE_API_KEY environment variable has to be set. This script also needs to save the internal Discourse topic id in the show json, in order for the frontend to be able to link to it.
 
 Note that `make_discourse_topics.py` is run as part of the `show-list-full` make command, which bakes all the individual show files into one, creates bloom filters for the vocabulary etc.
+
+# Docker
+
+There is a docker image which contains everything needed to build the frontend and extract captions from videos etc. To download the image run: `docker pull martindbp/lazybug`.
+
+To run a make command (e.g. `frontend`) inside a lazybug container, run `make docker COMMAND=frontend`. This will also map a volume from current directory to the container.
