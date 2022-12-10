@@ -1,3 +1,51 @@
+# Introduction
+
+[Lazybug](lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
+
+The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing them.
+
+## Project Principles
+
+1. Remain free and open source by minimizing hosting costs
+
+Whenever possible, do as much processing as possible on the front-end rather on servers. For example:
+  * Keep all logic client side (except account and social functionality), including ML inference if possible
+  * Store user data client side and sync it to cheaper object storage rather than using SQL database server
+  * Run heavy processing offline on local machines rather than in the cloud, such as extracting subtitles from video
+
+2. Single Language
+
+Supporting multiple languages creates a "Jack of all trades, master of none" kind of situation. Chinese is vastly different from any other language out there and requires very specific solutions that in general cannot be generalized to others.
+
+3. Single Purpose
+
+This project is for learning Chinese from TV and movies. While other functionality might grow out of it, this is priority number one. Things like learning how to write is best left for other apps.
+
+4. Open Data Format
+
+Work towards an open data format for Chinese learning activity (impressions and SRS) to enable interoperability between apps. Today, a major inefficiency for learners is splitting their data between apps. A unified format/place for data would enable much more efficient scheduling for Spaced Repetition Systems, ranking of content etc.
+
+5. Copyright
+
+This project provides content based on fair use doctrine:
+
+1. "the purpose and character of the use, including whether such use is of a commercial nature or is for nonprofit educational purposes;"
+   Interpretation: Lazybug is freely availble and open source and could thus be seen as non-commercial
+2. "the nature of the copyrighted work;"
+   Interpretation: the content is merely a written down and augmented version of what the user hears and sees (through hard or soft-subs) on the page. Google already does this when translating whole websites for end users.
+3. "the amount and substantiality of the portion used in relation to the copyrighted work as a whole; and"
+   Interpretation: videos themselves are not hosted nor copied, only the subtitles
+4. "the effect of the use upon the potential market for or value of the copyrighted work."
+   Interpretation: the project does not include subtitles for work that is illegally provided, e.g. only on legal sites like Youtube.com and Bilibili.com. The project does not interfere with ads or paid subscriptions. It also does not include subtitles where they affect the creator financially, such as when PDF scripts are provided for Patreon supporters or available after paid subscription.
+
+## General Project Structure
+
+This project consists of a number of different high-level parts:
+
+1. Algorithms to extract Chinese captions from video, and process them in various ways, like performing sentence segmentation and word disambiguation
+2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content
+3. A browser extension for viewing videos that cannot be embedded into the web app
+
 # Backend server
 
 The Python backend is meant to be simple and do mainly lightweight work in order to keep costs down. It's used for few things:
@@ -7,8 +55,21 @@ The Python backend is meant to be simple and do mainly lightweight work in order
 4. Discourse Single Sign On
 5. Relay comments from the Discourse API
 
+## Production dev notes
+
 The server can be run with the command `make run-server` for local development, or `make run-server-prod` on the production server.
 On prod, server can be conveniently killed with `make kill-server`
+
+The server needs a cert in `data/local/ssl_keys/{privkey,fullchain}.pem`. Create one in [Cloudflare](#clouflare) and copy them here.
+
+# Frontend
+
+For local development read [here](#localfrontend)
+
+To release new frontend changes do:
+1. `make purge-web-cache`
+2. ssh into server
+3. `make update-server`  # this kills the server, pulls changes, builds the frontend and runs the server again
 
 ## Environment variables
 
@@ -18,6 +79,7 @@ These environment variables need to be set for the server if not LOCAL_ONLY is s
 1. DISCOURSE_SECRET: for Discourse SSO. Secret is created in the UI when setting up DiscordConnect
 2. B2_ENDPOINT, B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY: keys for integrating with Backblaze B2, for creating upload and download links for personal data
 
+<a name="localfrontend"></a>
 ## Local SSL cert for Browser Extension development
 
 In order to use the local backend server with the browser extension, you need a self-signed certificate for SSL. The reason for this is that in the browser extension we inject an iframe pointing at `https://localhost/static/iframe.html`. We then communicate with this iframe using message passing in order to load and save data. This way we don't have a syncronization problem between the extension and the website when the user uses both.
@@ -74,6 +136,7 @@ Update cors rules for lazybug-accounts bucket to allow signed upload/download UR
 b2 update-bucket --corsRules '[{"corsRuleName":"uploadDownloadFromAnyOrigin", "allowedOrigins": [""], "allowedHeaders": [""], "allowedOperations": ["s3_delete", "s3_get", "s3_head", "s3_post", "s3_put"], "maxAgeSeconds": 3600}]' lazybug-accounts allPublic
 ```
 
+<a name="cloudflare"></a>
 ### Cloudflare Settings
 
 1. SSL/TLS mode should be set to Full (strict)
