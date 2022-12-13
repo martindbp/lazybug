@@ -263,6 +263,14 @@ run-server:
 run-server-prod:
 	sudo --preserve-env nohup python backend/main.py 443 &
 
+.PHONY: update-server
+update-server:
+	make kill-server
+	git fetch
+	git reset --hard origin/master
+	make docker COMMAND=frontend
+	make run-server-prod
+
 .PHONY: purge-web-cache
 purge-web-cache: check-cloudflare-env
 	ls frontend/dist | xargs -I{}  curl -X POST "https://api.cloudflare.com/client/v4/zones/$$CLOUDFLARE_ZONE_ID/purge_cache" \
