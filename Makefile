@@ -315,10 +315,23 @@ docker-push:
 	docker push martindbp/lazybug-server
 	docker push martindbp/lazybug-processing
 
-.PHONY: run-docker-bash
-run-docker-bash:
+.PHONY: docker-pull
+docker-pull:
+	docker pull martindbp/lazybug-server
+	docker pull martindbp/lazybug-processing
+
+.PHONY: run-docker-processing-bash
+run-docker-processing-bash:
 	docker run --volume $$(pwd):/lazybug --workdir /lazybug --rm -it --entrypoint bash martindbp/lazybug-processing
 
-.PHONY: docker
-docker:
+.PHONY: run-docker-server-bash
+run-docker-server-bash:
+	docker run --volume $$(pwd):/lazybug --workdir /lazybug --rm -it --entrypoint bash martindbp/lazybug-processing
+
+.PHONY: docker-server
+docker-server:
 	docker run --volume $$(pwd):/lazybug --workdir /lazybug martindbp/lazybug-server make $(COMMAND)
+
+.PHONY: docker-processing
+docker-processing:
+	docker run --volume $$(pwd):/lazybug --workdir /lazybug martindbp/lazybug-processing make $(COMMAND)

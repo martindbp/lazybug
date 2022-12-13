@@ -46,7 +46,9 @@ This project consists of a number of different high-level parts:
 2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content
 3. A browser extension for viewing videos that cannot be embedded into the web app
 
-# Backend server
+# Code and development details
+
+## Backend server
 
 The Python backend is meant to be simple and do mainly lightweight work in order to keep costs down. It's used for few things:
 1. Serve the static frontend files (js, html and images). These files are then cached on Cloudflare CDN until updated.
@@ -55,16 +57,14 @@ The Python backend is meant to be simple and do mainly lightweight work in order
 4. Discourse Single Sign On
 5. Relay comments from the Discourse API
 
-## Production dev notes
+### Production dev notes
 
 The server can be run with the command `make run-server` for local development, or `make run-server-prod` on the production server.
 On prod, server can be conveniently killed with `make kill-server`
 
-The server needs a cert in `data/local/ssl_keys/{privkey,fullchain}.pem`. Create one in [Cloudflare](#clouflare) and copy them here.
+The server needs a cert in `data/local/ssl_keys/{privkey,fullchain}.pem`. Create one in [Cloudflare](#cloudflare) and copy them here.
 
-# Frontend
-
-For local development read [here](#localfrontend)
+## Frontend
 
 To release new frontend changes do:
 1. `make purge-web-cache`
@@ -100,17 +100,17 @@ make local
 make run-server-local-only
 ```
 
-# Data (Backblaze B2 and Cloudflare CDN)
+## Data (Backblaze B2 and Cloudflare CDN)
 
 All data (besides Discourse and the backend user auth data), including things like captions and user databases are stored as plain files in Backblaze B2 (S3 compatible) and served through Cloudflare CDN. Transfering data from Backblaze to Cloudflare is free due to an agreement between them, and Cloudflare CDN is free which makes this a very cost efficient combination. Backblaze storage cost is 1/2 of Amazon S3, and 1/10 the download fees (outside of Cloudflare), and no upload fees.
 
-## Buckets
+### Buckets
 
 Captions, show data, dictionaries and other public data is stored in a public bucket accessible at `https://cdn.lazybug.ai/file/lazybug-public/`. Personal user data, such as the interaction log and user settings are stored in a private bucket at `https://cdn.lazybug.ai/file/lazybug-accounts/`. Other data, which we don't want/need to serve to users is stored in another private bucket.
 
 The accounts bucket, being private cannot be served through the CDN, and therefore we have to pay data fees for when users download their personal database (upload is free). Downloads are $0.01/GB. Downloads should only happen when the user switches clients or logs out/in. 10k downloads per day @ 5MB amounts to $15/month. By the time this becomes expensive we can switch to something more fine-grained than syncing the entire database every time.
 
-## Versioning and Syncing
+### Versioning and Syncing
 
 For captions and other data, we want to keep old versions of the same file in case it's updated but references to it remain elsewhere in user data. We also want to reduce the number of requests and amount of data we pull from Cloudflare (and Backblaze), even if it's free (minimizing waste is the decent thing to do), therefore we want to make files immutable so that Cloudflare doesn't have to keep fetching from Backblaze to see if the data changed.
 
@@ -121,11 +121,9 @@ For captions and other data, we want to keep old versions of the same file in ca
 
 We also cache files in the IndexedDB for lazybug.ai in order to minimize uncessary fetching from Cloudflare as the browser cache can be unreliable.
 
-## User account data
+### User account data
 
 User data is stored in the browser IndexedDB of lazybug.ai and is synced to the private lazybug-accounts bucket on Backblaze via the Python backend. This is done by exporting the database file, calling the `/api/signed-upload-link/{size}` end-point, which will in turn authenticate the user and call the B2 API to get a signed upload link for that user's database file. When the frontend receives this URL, which is valid for a temporary duration, it simply uploads the file directly to it. This avoids having to send the data to our backend first, which saves on bandwidth. The same goes for downloads, but instead using the `api/signed-download-link` endpoint. 
-
-## Dev notes
 
 ### Backblaze Settings
 
@@ -147,15 +145,15 @@ b2 update-bucket --corsRules '[{"corsRuleName":"uploadDownloadFromAnyOrigin", "a
     * `lazybug.ai/static/*` | Browser Cache TTL: 2 minutes, Cache Level: Cache Everything
     * `cdn.lazybug.ai/file/lazybug-public/*` | Cache Level: Cache Everything
 
-# Discourse
+## Discourse
 
 Lazybug integrates comments and discussion with a separate discourse instance.
 
-## Installation
+### Installation
 
 [Guide how to set up Discourse on a DigitalOcean droplet](https://www.digitalocean.com/community/tutorials/how-to-install-discourse-on-ubuntu-20-04)
 
-## SSO
+### SSO
 
 We use the accounts on the main site (lazybug.ai) as a SSO for Discourse. Here is the authentication flow:
 
@@ -169,20 +167,20 @@ We use the accounts on the main site (lazybug.ai) as a SSO for Discourse. Here i
 
 See [this article](https://meta.discourse.org/t/setup-discourseconnect-official-single-sign-on-for-discourse-sso/13045) for enabling SSO on Discourse.
 
-## Prefilled comments
+### Prefilled comments
 
 When a user wants to ask a question regarding a specific caption we link to the topic with a special query parameter "reply_quote", for example `https://discourse.lazybug.ai/t/lud-ngji-the-deer-and-the-cauldron/71?reply_quote=%3E+hello+world`. This prefills a reply with some text, where we can put the context of the specific caption (a link back to the video, the chinese etc), so that it's easier to ask a question about it. This context is thus generated on the lazybug.ai frontend and supplied through the query parameter.
 
 This ability to add prefill a reply doesn't come with Discourse by default, but is implemented using a simple [plugin](https://github.com/martindbp/discourse-lazybug-plugin), which the [admin installs on the Discourd server](https://meta.discourse.org/t/install-plugins-in-discourse/19157).
 
-## Automatically generated show/movie topics
+### Automatically generated show/movie topics
 
 In order for users to be able to comment on a specific video and show, one topic has to be generated for each show. This is done in `make_discourse_topics.py` by going through all the shows in `data/remote/public/shows/*.json`, checking if a topic for this show id exists and if not, create it through the Discourse API. Note that the DISCOURSE_API_KEY environment variable has to be set. This script also needs to save the internal Discourse topic id in the show json, in order for the frontend to be able to link to it.
 
 Note that `make_discourse_topics.py` is run as part of the `show-list-full` make command, which bakes all the individual show files into one, creates bloom filters for the vocabulary etc.
 
-# Docker
+## Docker
 
-There is a docker image which contains everything needed to build the frontend and extract captions from videos etc. To download the image run: `docker pull martindbp/lazybug`.
+There area two docker images which contains everything needed to build the frontend and run the server (martindbp/lazybug-server) and one for other processing such as extracting captions from videos etc (martindbp/lazybug-processing). To download one of them image run: `docker pull martindbp/lazybug-{server,processing}` or `make docker-pull` to download both.
 
-To run a make command (e.g. `frontend`) inside a lazybug container, run `make docker COMMAND=frontend`. This will also map a volume from current directory to the container.
+To run a make command (e.g. `frontend`) inside a lazybug container, run `make docker-server COMMAND=frontend`. This maps a volume from current directory to the container so the container can access anything in the repository.
