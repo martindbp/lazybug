@@ -55,7 +55,7 @@ b2 = get_b2_resource(ENDPOINT, KEY_ID, APPLICATION_KEY)
 app = FastAPI()
 client = TestClient(app)
 
-app.mount("/static", StaticFiles(directory="modules/lazyweb"), name="static")
+app.mount("/static", StaticFiles(directory="frontend/dist"), name="static")
 
 app.mount("/cdn/lazybug-public", StaticFiles(directory="data/remote/public"), name="cdn")
 
@@ -221,4 +221,4 @@ else:
 # NOTE: need to put this last!
 @app.get("/{rest_of_path:path}")
 async def read_index():
-    return FileResponse('modules/lazyweb/index.html')
+    return FileResponse('frontend/dist/index.html')

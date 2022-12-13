@@ -199,7 +199,6 @@ frontend:
 local:
 	make frontend
 	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/dist/*.js
-	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" modules/lazyweb/*.js
 
 
 .PHONY: frontend-copy
@@ -212,7 +211,6 @@ frontend-copy:
 	cp -r frontend/images frontend/dist/
 	VERSION=$$(grep "\"version\"" frontend/manifest.json | cut -d"\"" -f 4) ; \
 	sed -i -E "s/VERSION = null/VERSION = $$VERSION/g" frontend/dist/*.js
-	-cp -r frontend/dist/* modules/lazyweb/
 
 .PHONY: release
 release:
@@ -265,9 +263,9 @@ run-server:
 run-server-prod:
 	sudo --preserve-env nohup python backend/main.py 443 &
 
-.PHONY: purge-lazyweb-cache
-purge-lazyweb-cache: check-cloudflare-env
-	ls modules/lazyweb | xargs -I{}  curl -X POST "https://api.cloudflare.com/client/v4/zones/$$CLOUDFLARE_ZONE_ID/purge_cache" \
+.PHONY: purge-web-cache
+purge-web-cache: check-cloudflare-env
+	ls frontend/dist | xargs -I{}  curl -X POST "https://api.cloudflare.com/client/v4/zones/$$CLOUDFLARE_ZONE_ID/purge_cache" \
      -H "X-Auth-Email: $$CLOUDFLARE_EMAIL" \
      -H "X-Auth-Key: $$CLOUDFLARE_AUTH_KEY" \
      -H "Content-Type: application/json" \
@@ -276,8 +274,7 @@ purge-lazyweb-cache: check-cloudflare-env
 
 .PHONY: deploy-frontend
 deploy-frontend:
-	cd modules/lazyweb && git add . && git commit -m "B" && git push origin master
-	make purge-lazyweb-cache
+	make purge-web-cache
 
 .PHONY: kill-server
 kill-server:
