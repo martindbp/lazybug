@@ -474,14 +474,14 @@ function updateExtensionStatusBadge() {
         chrome.action.setBadgeBackgroundColor({ color: "rgba(0,0,0,0)" });
     }
     else {
-        chrome.action.setBadgeText({ text: "ERR" });
+        chrome.action.setBadgeText({ text: "OFF" });
         chrome.action.setBadgeBackgroundColor({ color: "red" });
     }
 }
 
 function setNetworkError() {
     if (! BROWSER_EXTENSION) return;
-    chrome.action.setBadgeText({ text: "OFF" });
+    chrome.action.setBadgeText({ text: "ERR" });
     chrome.action.setBadgeBackgroundColor({ color: "red" });
 }
 
