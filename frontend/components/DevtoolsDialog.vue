@@ -155,8 +155,8 @@ export default {
             const shift = event.getModifierState("Shift");
             const ctrl = event.getModifierState("Control");
             const alt = event.getModifierState("Alt");
-            console.log(shift, ctrl, alt, event.key);
-            if (shift && ctrl && alt && event.key === 'D') {
+            console.log(shift, ctrl, alt);
+            if (shift && ctrl && alt) {
                 self.show = true;
             }
         }, {capture: true});
