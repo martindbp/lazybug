@@ -23,7 +23,7 @@
                 <q-separator color="orange" v-if="dictEntries.length > 0"/>
                 <div v-for="entry in dictEntries">
                     <div>
-                        <span class="text-h4">{{ entry.hz }}</span> <span class="hsklvl" v-if="entry.lvl !== null">(HSK{{entry.lvl}})</span>
+                        <span class="text-h4">{{ entry.hz }}</span> <span class="hsklvl">(HSK{{ entry.lvl !== null ? entry.lvl : ': unknown'}})</span>
                     </div>
                     <div class="text-h6" :style="{ color: '#E8E8E8' }" v-for="item in entry.items">
                         <span v-for="(py, i) in item.pysDiacriticals" :style="{ color: COLORS[parseInt(item.pys[i].slice(-1))] }">
