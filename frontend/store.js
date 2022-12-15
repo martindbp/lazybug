@@ -102,7 +102,7 @@ const store = new Vuex.Store({
         syncProgress: [],
         syncError: null,
         options: Vue.ref({
-            autoPause: false,
+            autoPause: 'off',
             WPSThreshold: 2.0,
             characterSet: 'sm',
             blurCaptions: true,
