@@ -24,6 +24,12 @@ const mixin = {
         },
     },
     methods: {
+        getSeasonName: function(i) {
+            return getSeasonName(this.showInfo, i);
+        },
+        getEpisodeName: function(i) {
+            return getEpisodeName(this.showInfo, this.season, i);
+        },
         showAccountModalWithCallback: function(callback = null) {
             this.$store.commit('setShowDialog', {dialog: 'account', val: 'login'});
             this.accountCallback = callback;
@@ -368,6 +374,22 @@ const mixin = {
         },
     },
     computed: {
+        showInfo: function() {
+            if (this.$store.state.showList === null || this.$store.state.playingShowId === null) return null;
+            return this.$store.state.showList[this.$store.state.playingShowId];
+        },
+        season: {
+            get: function() { return this.$store.state.playingSeason; },
+            set: function(val) { this.$store.commit('setPlayingSeason', val); },
+        },
+        episode: {
+            get: function() { return this.$store.state.playingEpisode; },
+            set: function(val) { this.$store.commit('setPlayingEpisode', val); },
+        },
+        captionId: function() {
+            if ([null, undefined].includes(this.showInfo)) return null;
+            return this.showInfo.seasons[this.season].episodes[this.episode].id;
+        },
         accessTokenPlusNeedSync: function() {
             return `${this.accessToken}|${this.needSync}`;
         },

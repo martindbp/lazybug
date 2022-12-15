@@ -1,91 +1,23 @@
 <template>
     <div ref="playerpage" v-if="showInfo" style="position: relative">
         <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="captionId" />
-        <div v-if="showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile}">
-            <div style="margin-bottom: 15px">
-                <q-fab
-                    ref="seasonselector"
-                    :label="getSeasonName(season)"
-                    color="blue"
-                    icon="keyboard_arrow_right"
-                    direction="right"
-                    padding="xs"
-                >
-                    <q-fab-action
-                        v-for="(s, i) in showInfo.seasons"
-                        color="blue"
-                        :label="getSeasonName(i)"
-                        @click.stop.prevent="season = i; $refs.episodeselector.show()"
-                    />
-                </q-fab>
-            </div>
-            <div>
-                <q-fab
-                    ref="episodeselector"
-                    class="episodeselector"
-                    :label="getEpisodeName(episode)"
-                    color="green"
-                    icon="keyboard_arrow_right"
-                    @click="$refs.seasonselector.hide()"
-                    direction="right"
-                    padding="xs"
-                >
-                    <q-fab-action
-                        v-for="(e, i) in showInfo.seasons[season].episodes"
-                        :color="e.processed ? 'green' : 'red'"
-                        paddings="xs"
-                        :label="i+1"
-                        @click.stop.prevent="episode = i;"
-                    />
-                </q-fab>
-            </div>
-        </div>
+        <VideoPicker :hidden="hidden" />
     </div>
 </template>
 
 <script>
 import EmbeddedVideo from './EmbeddedVideo.vue'
+import VideoPicker from './VideoPicker.vue'
 
 export default {
     mixins: [mixin],
     components: {
         EmbeddedVideo,
+        VideoPicker,
     },
     data: function() { return {
-        videoHeight: 0,
-        clickEventListener: null,
         hidden: false,
     }},
-    computed: {
-        showInfo: function() {
-            if (this.$store.state.showList === null || this.$store.state.playingShowId === null) return null;
-            return this.$store.state.showList[this.$store.state.playingShowId];
-        },
-        season: {
-            get: function() { return this.$store.state.playingSeason; },
-            set: function(val) { this.$store.commit('setPlayingSeason', val); },
-        },
-        episode: {
-            get: function() { return this.$store.state.playingEpisode; },
-            set: function(val) { this.$store.commit('setPlayingEpisode', val); },
-        },
-        captionId: function() {
-            if ([null, undefined].includes(this.showInfo)) return null;
-            return this.showInfo.seasons[this.season].episodes[this.episode].id;
-        },
-    },
-    mounted: function() {
-        const self = this;
-        this.clickEventListener = document.addEventListener('click', function(evt) {
-            if (self.hidden || evt.target.closest('.q-fab')) return;
-            if (self.$refs.seasonselector) self.$refs.seasonselector.hide();
-            if (self.$refs.episodeselector) self.$refs.episodeselector.hide();
-        });
-    },
-    unmounted: function() {
-        document.removeEventListener(this.clickEventListener);
-        this.clickEventListener = null;
-    },
     updated: function() {
         if (this.$refs.playerpage) {
             this.hidden = this.$refs.playerpage.style.display === 'none';
@@ -95,14 +27,6 @@ export default {
             }
         }
     },
-    methods: {
-        getSeasonName: function(i) {
-            return getSeasonName(this.showInfo, i);
-        },
-        getEpisodeName: function(i) {
-            return getEpisodeName(this.showInfo, this.season, i);
-        },
-    }
 };
 </script>
 
