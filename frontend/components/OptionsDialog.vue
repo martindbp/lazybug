@@ -35,7 +35,7 @@
                     </q-card>
 
                     <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
-                        Pin pinyin at HSK level or above
+                        When pinyin is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
                                 <q-slider
@@ -54,7 +54,7 @@
                     </q-card>
 
                     <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
-                        Pin hanzi at HSK level or above
+                        When hanzi is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
                                 <q-slider
@@ -73,7 +73,7 @@
                     </q-card>
 
                     <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
-                        Pin word translations at HSK level or above
+                        When word translation is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
                                 <q-slider
