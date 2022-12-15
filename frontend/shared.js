@@ -257,7 +257,10 @@ function extractCurrentVideoId(strings, url) {
     return null;
 }
 
-function extractCurrentCaptionId(strings, url) {
+function extractCurrentCaptionId(strings, localVideoHash, url) {
+    if (![null, undefined].includes(localVideoHash)) {
+        return 'local-' + localVideoHash;
+    }
     return `${getCurrentSite()}-${extractCurrentVideoId(strings, url)}`;
 }
 

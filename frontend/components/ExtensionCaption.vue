@@ -1,29 +1,29 @@
 <template>
     <Caption
-        v-if="captionId && AVElement && $store.state.extensionOn"
-        v-bind:captionId="captionId"
-        v-bind:AVElement="AVElement"
+        v-if="displayCaption"
+        v-bind:captionId="$store.state.captionId"
+        v-bind:AVElement="$store.state.AVElement"
         v-bind:videoDuration="$store.state.videoDuration"
         v-bind:videoAPI="videoAPI"
     />
+    <VideoPicker />
     <DevtoolsDialog />
 </template>
 
 <script>
 import Caption from './Caption.vue'
 import DevtoolsDialog from './DevtoolsDialog.vue'
+import VideoPicker from './VideoPicker.vue'
 
 export default {
     mixins: [mixin],
     components: {
         Caption,
         DevtoolsDialog,
+        VideoPicker,
     },
     data: function() {
         return {
-            AVElement: null,
-            url: window.location.href,
-            localVideoHash: null,
             mutationObserver: null,
             videoAPI: {
                 getCurrentTime: this.getCurrentTime,
@@ -36,9 +36,10 @@ export default {
         };
     },
     mounted: function(){
-        this.AVElement = document.querySelector(this.AVElementSelector);
-        if (this.AVElement) {
-            this.$store.commit('setVideoDuration', this.AVElement.duration);
+        const AVElement = document.querySelector(this.AVElementSelector);
+        if (AVElement) {
+            this.$store.commit('setAVElement', AVElement);
+            this.$store.commit('setVideoDuration', AVElement.duration);
         }
         this.setObserversAndHandlers();
     },
@@ -47,59 +48,50 @@ export default {
     },
     methods: {
         getCurrentTime: function() {
-            if (! this.AVElement) return 0;
-            return this.AVElement.currentTime;
+            if (! this.$store.state.AVElement) return 0;
+            return this.$store.state.AVElement.currentTime;
         },
         setCurrentTime: function(t) {
-            if (! this.AVElement) return;
-            this.AVElement.currentTime = t;
+            if (! this.$store.state.AVElement) return;
+            this.$store.state.AVElement.currentTime = t;
         },
         getDuration: function() {
-            if (! this.AVElement) return 0;
-            return this.AVElement.duration;
+            if (! this.$store.state.AVElement) return 0;
+            return this.$store.state.AVElement.duration;
         },
         play: function() {
-            if (! this.AVElement) return;
-            this.AVElement.play();
+            if (! this.$store.state.AVElement) return;
+            this.$store.state.AVElement.play();
         },
         pause: function() {
-            if (! this.AVElement) return;
-            this.AVElement.pause();
+            if (! this.$store.state.AVElement) return;
+            this.$store.state.AVElement.pause();
         },
         isPaused: function() {
-            if (! this.AVElement) return;
-            return this.AVElement.paused;
+            if (! this.$store.state.AVElement) return;
+            return this.$store.state.AVElement.paused;
         },
         setObserversAndHandlers: function() {
             const self = this;
-            window.addEventListener('lazybugviewlocal', function(event) {
-                self.localVideoHash = event.detail;
-            });
 
-            // Observe position changes of the url / video element.
+            // Observe position changes of the video element.
             this.mutationObserver = new MutationObserver((mutations) => {
-                // The URL and video may change without reloading page, e.g. Youtube is an SPA
-                if (window.location.href !== self.url) {  // may help with performance to check before assigning?
-                    self.url = window.location.href;
-                }
-
                 // If a video element has been added, we update the reference
-                if (self.AVElement == null) {
+                if (self.$store.state.AVElement == null) {
                     for (let mutation of mutations) {
                         for (let node of mutation.addedNodes) {
                             if (node.nodeType !== 1) continue;
                             if (node.matches(self.AVElementSelector)) {
-                                self.AVElement = node;
+                                self.$store.commit('setAVElement', node);
                                 break;
                             }
                             else if (node.querySelector(self.AVElementSelector)) {
-                                self.AVElement = node.querySelector(self.AVElementSelector);
-                                console.log('setting AVElement to', self.AVElement)
+                                self.$store.commit('setAVElement', node.querySelector(self.AVElementSelector));
                                 break;
                             }
                         }
                         for (let node of mutation.removedNodes) {
-                            if (node == self.AVElement) {
+                            if (node == self.$store.state.AVElement) {
                                 break;
                             }
                         }
@@ -107,51 +99,28 @@ export default {
                 }
                 else {
                     // in case video changed (ad)
-                    self.$store.commit('setVideoDuration', this.AVElement.duration);
+                    self.$store.commit('setVideoDuration', this.$store.state.AVElement.duration);
                 }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});
 
             document.addEventListener('DOMContentLoaded', () => {
-                self.AVElement = document.querySelector(self.AVElementSelector);
+                self.$store.commit('setAVElement', document.querySelector(self.AVElementSelector));
             });
-        },
-    },
-    watch: {
-        videoId: {
-            immediate: true,
-            handler: function() {
-                this.$store.commit('setVideoId', this.videoId);
-            }
         },
     },
     computed: {
         AVElementSelector: function() {
             return this.getSiteString('AVElementSelector');
         },
-        videoId: function() {
-            if (this.url !== null) {
-                const id = extractCurrentVideoId(this.$store.state.STRINGS, this.url); // eslint-disable-line
-                return id;
-            }
-            return null;
-        },
-        captionId: function() {
-            let captionId = null;
-            if (this.localVideoHash !== null) {
-                captionId = 'local-' + this.localVideoHash;
-            }
-
-            if (this.videoId !== null) {
-                captionId = getCurrentSite() + '-' + this.videoId;
-            }
-
-            if (this.$store.state.videoList === null || ! this.$store.state.videoList.has(captionId)) {
-                return null;
-            }
-
-            console.log('Setting captionId to', captionId);
-            return captionId;
+        displayCaption: function() {
+            return (
+                this.$store.state.AVElement &&
+                this.$store.state.extensionOn &&
+                this.$store.state.captionId &&
+                this.$store.state.videoList &&
+                this.$store.state.videoList.has(this.$store.state.captionId)
+            );
         },
     },
 };

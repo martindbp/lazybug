@@ -28,6 +28,7 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
+        url: null,
         isExtension: BROWSER_EXTENSION,
         extensionOn: true,
         accessToken: getCookie('jwt'),
@@ -35,6 +36,7 @@ const store = new Vuex.Store({
         captionId: null,
         captionDocked: localStorage.getItem('captionDocked') === 'true',
         videoId: null,
+        localVideoHash: null,
         AVElement: null,
         videoAPI: null,
         videoDuration: null,
@@ -102,7 +104,7 @@ const store = new Vuex.Store({
         syncProgress: [],
         syncError: null,
         options: Vue.ref({
-            autoPause: 'off',
+            autoPause: 'off', // 'off', 'basic' or 'WPS'
             WPSThreshold: 2.0,
             characterSet: 'sm',
             blurCaptions: true,
@@ -150,6 +152,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setLocalVideoHash(state, val) {
+            state.localVideoHash = val;
+        },
         setExtensionOn(state, val) {
             state.extensionOn = val;
         },
@@ -239,6 +244,9 @@ const store = new Vuex.Store({
                 val[key].showId = key;
             }
             state.showList = val;
+            if (BROWSER_EXTENSION) {
+                this.commit('setURL', state.url); // in case this was loaded after URL
+            }
         },
         setSimpleCharsList(state, val) {
             state.SIMPLE_CHARS = val;
@@ -246,6 +254,9 @@ const store = new Vuex.Store({
         },
         setStringsList(state, val) {
             state.STRINGS = val;
+            if (BROWSER_EXTENSION) {
+                this.commit('setURL', state.url); // in case this was loaded after URL
+            }
         },
         resetResourceFetchError(state, val) {
             // We only reset it if the currente error holds this resource type
@@ -264,14 +275,22 @@ const store = new Vuex.Store({
             state.timingOffset = val;
         },
         setCaptionId(state, val) {
+            if (state.captionId === val) return;
+            const prev = state.captionId;
             state.captionId = val;
             state.sessionTime = Date.now();
-            if ([null, undefined].includes(val)) return;
+            if (BROWSER_EXTENSION && prev === null) {
+                this.commit('setURL', state.url); // in case this was loaded after URL
+            }
         },
         setCaptionIdDataHash(state, val) {
             state.captionData = val.data;
             state.captionHash = val.hash;
+            console.log('setCaptionId', val);
             state.fetchedCaptionId = val.id;
+            if (BROWSER_EXTENSION) {
+                this.commit('setURL', state.url); // in case this was loaded after URL
+            }
         },
         setShowDialog(state, val) {
             state.showDialog[val.dialog] = val.val;
@@ -405,40 +424,62 @@ const store = new Vuex.Store({
             window.history.pushState(null, '', url);
             state.page = val;
         },
-        setLocation(state, val) {
-            //
-            // Routing logic
-            //
-            const parts = val.pathname.split('/').filter((s) => s.length > 0);
-            if (parts.length === 0) state.page = 'content'; // default
-            else state.page = parts[0];
+        setURL(state, url) {
+            state.url = {href: url.href, pathname: url.pathname};
+            if (BROWSER_EXTENSION) {
+                //
+                // Browser Extension Logic
+                //
+                if (
+                    url === null ||
+                    state.STRINGS === null ||
+                    state.showList === null
+                    // NOTE: if you add another state condition here, need to call setURL again when it's set
+                ) return;
 
-            if (parts[0] === 'player') {
-                const showId = parts[1];
-                state.playingShowId = showId;
+                this.commit('setVideoId', extractCurrentVideoId(state.STRINGS, url.href)); // eslint-disable-line
+                this.commit('setCaptionId', extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href));
+                if (state.captionData === null) return;
+                const showInfo = getShowInfo(null, state);
+                const [season, episode] = findVideoInShowInfo(showInfo, state.captionId);
+                state.playingShowId = showInfo.showId;
+                state.playingSeason = season;
+                state.playingEpisode = episode;
+            } else {
+                //
+                // Website Routing Logic
+                //
+                const parts = url.pathname.split('/').filter((s) => s.length > 0);
+                if (parts.length === 0) state.page = 'content'; // default
+                else state.page = parts[0];
 
-                if (parts.length >= 4) {
-                    // Pattern: player/show/season/episode/(caption)
-                    const seasonIdx = parseInt(parts[2]) - 1;
-                    const episodeIdx = parseInt(parts[3]) - 1;
-                    if (parts.length === 5) {
-                        const captionIdx = parseInt(parts[4]) - 1;
-                        state.playingCaptionIdx = captionIdx;
+                if (parts[0] === 'player') {
+                    const showId = parts[1];
+                    state.playingShowId = showId;
+
+                    if (parts.length >= 4) {
+                        // Pattern: player/show/season/episode/(caption)
+                        const seasonIdx = parseInt(parts[2]) - 1;
+                        const episodeIdx = parseInt(parts[3]) - 1;
+                        if (parts.length === 5) {
+                            const captionIdx = parseInt(parts[4]) - 1;
+                            state.playingCaptionIdx = captionIdx;
+                        }
+                        state.playingSeason = seasonIdx;
+                        state.playingEpisode = episodeIdx;
                     }
-                    state.playingSeason = seasonIdx;
-                    state.playingEpisode = episodeIdx;
-                }
-                else if (parts.length === 2) {
-                    // Pattern: player/movie/
-                    state.playingSeason = 0;
-                    state.playingEpisode = 0;
-                }
-                else if (parts.length === 3) {
-                    // Pattern: player/movie/caption
-                    const captionIdx = parseInt(parts[2]) - 1;
-                    state.playingCaptionIdx = captionIdx;
-                    state.playingSeason = 0;
-                    state.playingEpisode = 0;
+                    else if (parts.length === 2) {
+                        // Pattern: player/movie/
+                        state.playingSeason = 0;
+                        state.playingEpisode = 0;
+                    }
+                    else if (parts.length === 3) {
+                        // Pattern: player/movie/caption
+                        const captionIdx = parseInt(parts[2]) - 1;
+                        state.playingCaptionIdx = captionIdx;
+                        state.playingSeason = 0;
+                        state.playingEpisode = 0;
+                    }
                 }
             }
         },
@@ -457,6 +498,19 @@ if (BROWSER_EXTENSION) {
     chrome.storage.local.get("extensionOn", function(data) {
         store.commit('setExtensionOn', data.extensionOn);
     });
+
+    // Listen for custom event from local video page
+    window.addEventListener('lazybugviewlocal', function(event) {
+        store.commit('setLocalVideoHash', event.detail);
+    });
+
+    // Observe position changes of the url
+    new MutationObserver((mutations) => {
+        // The URL and video may change without reloading page, e.g. Youtube is an SPA
+        if (store.state.url && window.location.href !== store.state.url.href) {
+            store.commit('setURL', window.location);
+        }
+     }).observe(document, {subtree: true, childList: true});
 }
 
 const FETCH_PUBLIC_RESOURCES = [
@@ -485,6 +539,8 @@ function fetchInitialResources() {
     fetchPersonalDataToStore(store);
 }
 
+store.commit('setURL', document.location); // initial
+
 if (BROWSER_EXTENSION) {
     // We have to wait for the iframe to load before we can fetch stuff from it
     lazybugIframe.addEventListener('load', fetchInitialResources);
@@ -493,9 +549,8 @@ else {
     FETCH_PUBLIC_RESOURCES.push(['bloom_filters.json', 'show bloom filters', 'setBloomFilters']);
     fetchInitialResources();
 
-    store.commit('setLocation', document.location); // initial
     window.onpopstate = (event) => {
-        store.commit('setLocation', document.location);
+        store.commit('setURL', document.location);
     }
 }
 
@@ -524,7 +579,7 @@ function addBadge($img, videoList) {
 }
 
 function initializeThumbnailBadges(videoList) {
-    if (getCurrentSite() === 'youtube') return null;
+    if (getCurrentSite() !== 'youtube') return null;
 
     for (const $img of document.querySelectorAll('#thumbnail img:not(.lazybugbadge)')) {
         addBadge($img, videoList);

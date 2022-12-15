@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile}">
+    <div v-if="showInfo && showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile}">
         <div style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"

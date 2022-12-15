@@ -116,7 +116,6 @@ export default {
         captionId: {
             immediate: true,
             handler: function() {
-                this.$store.commit('setCaptionId', this.captionId);
                 this.fetchCaptionMaybe();
                 lastCaptionIdxGlobal = 0;
             }
