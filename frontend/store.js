@@ -28,6 +28,7 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
+        isExtension: BROWSER_EXTENSION,
         extensionOn: true,
         accessToken: getCookie('jwt'),
         accountEmail: getCookie('email'),

@@ -6,8 +6,8 @@
             title="Move"
             @mousedown.stop.prevent="moveMouseDown"
         />
-        <SvgButton v-if="$store.state.captionDocked" title="Undock" name="arrowtopleft" @click="clickDock(false)" />
-        <SvgButton v-else title="Dock" name="dock" @click="clickDock(true)" />
+        <SvgButton v-if="! $store.state.isExtension && $store.state.captionDocked" title="Undock" name="arrowtopleft" @click="clickDock(false)" />
+        <SvgButton v-else-if="! $store.state.isExtension" title="Dock" name="dock" @click="clickDock(true)" />
         <SvgButton title="Increase font size" @click="$store.commit('increaseCaptionFontScale')" name="math-plus" />
         <SvgButton title="Decrease font size" @click="$store.commit('decreaseCaptionFontScale')" name="math-minus" style="margin-right: 10px" />
         <SvgButton title="Go to previous line" @click="prev" name="play-track-prev" />
