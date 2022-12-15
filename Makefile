@@ -268,7 +268,7 @@ update-server:
 	make kill-server
 	git fetch
 	git reset --hard origin/master
-	make docker COMMAND=frontend
+	make docker-server COMMAND=frontend
 	make run-server-prod
 
 .PHONY: purge-web-cache
@@ -304,11 +304,11 @@ local-ssl-cert:
 
 .PHONY: docker-images
 docker-images:
-	cp backend/requirements.txt docker_server/
-	docker build --rm -t martindbp/lazybug-server docker_server
-	cp requirements.txt docker_processing/
-	docker build --rm -t martindbp/lazybug-processing docker_processing
-	rm docker_server/requirements.txt docker_processing/requirements.txt
+	cp backend/requirements.txt docker/server/
+	docker build --rm -t martindbp/lazybug-server docker/server
+	cp requirements.txt docker/processing/
+	docker build --rm -t martindbp/lazybug-processing docker/processing
+	rm docker/server/requirements.txt docker/processing/requirements.txt
 
 .PHONY: docker-push
 docker-push:
