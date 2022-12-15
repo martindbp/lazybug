@@ -103,7 +103,7 @@
                             {label: 'Traditional', value: 'tr'}
                         ]"
                     />
-                    <q-item-label header>Display translation (if available)</q-item-label>
+                    <q-item-label header>Prefer translation (if available)</q-item-label>
                     <q-btn-toggle
                         push
                         glossy
