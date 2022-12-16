@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div ref="historypage">
         <q-table
           :rows="rows"
           :columns="columns"
@@ -50,6 +50,12 @@ export default {
             },
         ],
     }},
+    updated: function() {
+        if (this.$refs.historypage && this.$refs.historypage.style.display !== 'none') {
+            // We navigated to this page, so update
+            this.updateHistory();
+        }
+    },
     computed: {
         showList: function() {
             return this.$store.state.showList;
@@ -60,23 +66,28 @@ export default {
             immediate: true,
             handler: function(newData) {
                 if (! newData) return;
-                const self = this;
-                getViewingHistory(0, null, function(data) {
-                    for (const row of data) {
-                        const showId = row.showId;
-                        row.showInfo = self.$store.state.showList[showId];
-                        const showName = resolveShowName(row.showInfo.name);
-                        const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
-                        const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
-                        row.name = `${showName} - ${seasonName} ${episodeName}`;
-                    }
-                    self.rows = data;
-                    self.isLoading = false;
-                });
+                this.updateHistory();
             },
         },
     },
     methods: {
+        updateHistory: function() {
+            if (this.showList === null) return;
+
+            const self = this;
+            getViewingHistory(0, null, function(data) {
+                for (const row of data) {
+                    const showId = row.showId;
+                    row.showInfo = self.showList[showId];
+                    const showName = resolveShowName(row.showInfo.name);
+                    const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
+                    const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
+                    row.name = `${showName} - ${seasonName} ${episodeName}`;
+                }
+                self.rows = data;
+                self.isLoading = false;
+            });
+        },
         thumbnailURL: function(captionId) {
             return youtubeThumbnailURL(captionId);
         },
