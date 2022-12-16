@@ -265,10 +265,11 @@ run-server-prod:
 
 .PHONY: update-server
 update-server:
-	make kill-server
 	git fetch
 	git reset --hard origin/master
 	make docker-server COMMAND=frontend
+	make purge-web-cache
+	make kill-server
 	make run-server-prod
 
 .PHONY: purge-web-cache
@@ -279,10 +280,6 @@ purge-web-cache: check-cloudflare-env
      -H "Content-Type: application/json" \
      -H "Origin: chrome-extension://ackcmdammmejmpannblpninboapjkcgm" \
      --data '{"files":["https://lazybug.ai/static/{}"]}'
-
-.PHONY: deploy-frontend
-deploy-frontend:
-	make purge-web-cache
 
 .PHONY: kill-server
 kill-server:
