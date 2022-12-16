@@ -45,7 +45,7 @@ const store = new Vuex.Store({
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
         fetchedCaptionId: null,
         resourceFetchErrors: [],
-        youtubeAPIReady: LOCAL_ONLY, // if local only we don't use youtube, so set to true
+        youtubeAPIReady: LOCAL, // if local only we don't use youtube, so set to true
         showList: null,
         showBloomFilters: null,
         thumbnailObserver: null,

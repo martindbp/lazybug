@@ -10,7 +10,7 @@ try {
 let personalDb = initPersonalDb();
 let cacheDb = initCacheDb();
 let CACHE_HASHES_DURATION_S = 60*60;
-if (LOCAL_ONLY) {
+if (LOCAL) {
     CACHE_HASHES_DURATION_S = 0;
 }
 

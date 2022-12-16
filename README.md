@@ -73,7 +73,7 @@ To release new frontend changes do:
 
 ## Environment variables
 
-These environment variables need to be set for the server if not LOCAL_ONLY is set:
+These environment variables need to be set for the server if not LOCAL is set:
 
 1. DISCOURSE_API_KEY: for integration with the Discourse API. Secret can be created in the Admin UI
 1. DISCOURSE_SECRET: for Discourse SSO. Secret is created in the UI when setting up DiscordConnect
@@ -97,7 +97,7 @@ To run a local only version of the frontend and server, run:
 # but with URLs pointing to localhost and other online features turned off
 make local
 # This runs the server for local development, in SSL mode
-make run-server-local-only
+make run-server-local
 ```
 
 ## Data (Backblaze B2 and Cloudflare CDN)

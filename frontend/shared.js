@@ -1,5 +1,5 @@
 const DISCOURSE_URL = 'https://discourse.lazybug.ai';
-const CDN_URL = LOCAL_ONLY ? "/cdn/" : "https://cdn.lazybug.ai/file/";
+const CDN_URL = LOCAL ? "/cdn/" : "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;
 const SESSION_ID = uuidv4();
@@ -10,7 +10,7 @@ let lazybugIframe = null;
 
 if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe = document.createElement('iframe');
-    lazybugIframe.src = LOCAL_ONLY ? 'https://localhost/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
+    lazybugIframe.src = LOCAL ? 'https://localhost/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
     document.body.appendChild(lazybugIframe);
 }
@@ -746,7 +746,7 @@ function youtubeThumbnailURL(captionId) {
 
 function uploadData(uploadUrl, data, accessToken, callback) {
     let headers = {};
-    if (LOCAL_ONLY) {
+    if (LOCAL) {
         headers = new Headers({
             'Authorization': 'Bearer ' + accessToken,
             'Content-Type': 'application/x-www-form-urlencoded'

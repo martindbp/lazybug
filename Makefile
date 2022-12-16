@@ -198,7 +198,7 @@ frontend:
 .PHONY: local
 local:
 	make frontend
-	sed -i -E "s/LOCAL_ONLY = false/LOCAL_ONLY = true/g" frontend/dist/*.js
+	sed -i -E "s/LOCAL = false/LOCAL = true/g" frontend/dist/*.js
 
 
 .PHONY: frontend-copy
@@ -251,9 +251,9 @@ ifndef ENV_PYTHON
 	$(error ENV_PYTHON is undefined, set it to your virtualenv python path)
 endif
 
-.PHONY: run-server-local-only
-run-server-local-only: check-python-env
-	LOCAL_ONLY=1 sudo --preserve-env $(ENV_PYTHON) backend/main.py 443
+.PHONY: run-server-local
+run-server-local: check-python-env
+	LOCAL=1 sudo --preserve-env $(ENV_PYTHON) backend/main.py 443
 
 .PHONY: run-server
 run-server:

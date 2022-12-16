@@ -34,8 +34,8 @@ export default {
             player: null,
             playerReady: false,
             focusInterval: null,
-            localOnly: LOCAL_ONLY,
-            // Substitute variables are used if LOCAL_ONLY is true (i.e. no youtube available)
+            localOnly: LOCAL,
+            // Substitute variables are used if LOCAL is true (i.e. no youtube available)
             substitutePlaying: false,
             substituteTime: 0.0,
         };
@@ -49,7 +49,7 @@ export default {
             }
         }, 100);
 
-        if (LOCAL_ONLY) {
+        if (LOCAL) {
             this.sustitueClock = setInterval(function() {
                 if (self.substitutePlaying) {
                     self.substituteTime += SUBSTITUTE_CLOCK_SPEED;
@@ -117,7 +117,7 @@ export default {
             this.onPlayerStateChange({data: playing ? YT.PlayerState.PLAYING : YT.PlayerState.PAUSED});
         },
         destroyYoutube: function() {
-            if (this.player && ! LOCAL_ONLY) {
+            if (this.player && ! LOCAL) {
                 this.player.destroy();
                 this.player = null;
             }
@@ -129,7 +129,7 @@ export default {
             const self = this;
             if (! this.$store.state.youtubeAPIReady) return;
 
-            if (! LOCAL_ONLY) {
+            if (! LOCAL) {
                 console.log('initing initYoutube', this.playerID, this.captionId, document.querySelectorAll('#' + this.playerID));
                 this.$nextTick(() => { // nextTick because player element may not be done
                     this.player = new YT.Player(this.playerID, {
@@ -162,7 +162,7 @@ export default {
             };
             this.$store.commit('setCaptionId', this.captionId);
             this.$store.commit('setVideoAPI', videoAPI);
-            if (LOCAL_ONLY) {
+            if (LOCAL) {
                 this.onReady();
             }
         },
@@ -183,12 +183,12 @@ export default {
         },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
-            if (LOCAL_ONLY) return this.substituteTime;
+            if (LOCAL) return this.substituteTime;
             return this.player.getCurrentTime();
         },
         setCurrentTime: function(t) {
             if (! this.playerReady) return;
-            if (LOCAL_ONLY) {
+            if (LOCAL) {
                 this.substituteTime = Math.floor(t);
                 return;
             }
@@ -196,12 +196,12 @@ export default {
         },
         getDuration: function() {
             if (! this.playerReady) return 0;
-            if (LOCAL_ONLY) return this.captionDuration; // we have no youtube iframe, so use the time we get from caption data
+            if (LOCAL) return this.captionDuration; // we have no youtube iframe, so use the time we get from caption data
             return this.player.getDuration();
         },
         play: function() {
             if (! this.playerReady) return;
-            if (LOCAL_ONLY) {
+            if (LOCAL) {
                 this.setSubstitutePlaying(true);
                 return;
             }
@@ -209,7 +209,7 @@ export default {
         },
         pause: function() {
             if (! this.playerReady) return;
-            if (LOCAL_ONLY) {
+            if (LOCAL) {
                 this.setSubstitutePlaying(false);
                 return;
             }
@@ -217,7 +217,7 @@ export default {
         },
         isPaused: function() {
             if (! this.playerReady) return false;
-            if (LOCAL_ONLY) return !this.substitutePlaying;
+            if (LOCAL) return !this.substitutePlaying;
             return this.player.getPlayerState() === 2;
         },
         onPlayerStateChange: function(event) {

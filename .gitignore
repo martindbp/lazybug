@@ -10,3 +10,6 @@ data/remote
 data/local
 synced.txt
 modules/
+checkpoints/
+backend/*.json
+backend/*.db

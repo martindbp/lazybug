@@ -22,9 +22,9 @@ from app.discoursesso import DiscourseSSO
 
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
-LOCAL_ONLY = os.getenv('LOCAL_ONLY') is not None
+LOCAL = os.getenv('LOCAL') is not None
 DISCOURSE_SECRET, ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None, None
-if not LOCAL_ONLY:
+if not LOCAL:
     ENDPOINT = os.getenv('B2_ENDPOINT')
     KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
     APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
@@ -36,7 +36,7 @@ if not LOCAL_ONLY:
         api_key=DISCOURSE_API_KEY,
     )
 
-if not LOCAL_ONLY and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
+if not LOCAL and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
     print('ERROR: B2 secrets not set')
     exit(1)
 
@@ -99,7 +99,7 @@ async def get_signed_upload_link(size:int, user: User = Depends(current_active_u
     if size > ACCOUNT_FILE_SIZE_LIMIT_BYTES:
         raise HTTPException(status_code=400, detail=f'Payload too large, > {ACCOUNT_FILE_SIZE_LIMIT_BYTES/10e6} Mb')
 
-    if LOCAL_ONLY:
+    if LOCAL:
         url = '/api/upload-file'
     else:
         url = b2.meta.client.generate_presigned_url(
@@ -115,7 +115,7 @@ async def get_signed_upload_link(size:int, user: User = Depends(current_active_u
 async def get_signed_download_link(user: User = Depends(current_active_user)):
     key = f'{user.email}.json'
 
-    if LOCAL_ONLY:
+    if LOCAL:
         return '/api/download-file/'
     else:
         url = b2.meta.client.generate_presigned_url(
@@ -130,7 +130,7 @@ async def get_signed_download_link(user: User = Depends(current_active_user)):
 @app.get("/api/database-last-modified-date")
 async def get_database_last_modified_date(user: User = Depends(current_active_user)):
     account_file = get_account_file(user)
-    if LOCAL_ONLY:
+    if LOCAL:
         path = f'backend/{account_file}'
         if not os.path.exists(path):
             return None
@@ -150,7 +150,7 @@ async def get_database_last_modified_date(user: User = Depends(current_active_us
 
     return response["LastModified"]
 
-if LOCAL_ONLY:
+if LOCAL:
     @app.put("/api/upload-file")
     async def upload_file(request: Request, user: User = Depends(current_active_user)):
         body = await request.body()
