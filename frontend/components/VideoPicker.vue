@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showInfo && showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile}">
+    <div v-if="showInfo && showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
         <div style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"
@@ -33,7 +33,7 @@
                     :color="e.processed ? 'green' : 'red'"
                     paddings="xs"
                     :label="i+1"
-                    @click.stop.prevent="episode = i;"
+                    @click.stop.prevent="playEpisode(i)"
                 />
             </q-fab>
         </div>
@@ -61,6 +61,11 @@ export default {
     unmounted: function() {
         document.removeEventListener(this.clickEventListener);
         this.clickEventListener = null;
+    },
+    methods: {
+        playEpisode: function(i) {
+            this.setPlaying(this.showInfo.showId, this.$store.state.playingSeason, i);
+        }
     },
 };
 </script>

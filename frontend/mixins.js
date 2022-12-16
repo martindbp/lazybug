@@ -271,16 +271,20 @@ const mixin = {
             });
         },
         setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
-            const showInfo = this.$store.state.showList[showId];
-            if (showInfo.embeddable === false) {
-                this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
+            if (this.showInfo.embeddable === false) {
+                this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
                 this.$store.commit('setShowDialog', {dialog: 'embeddable', val: true});
                 return;
             }
             this.$store.commit('setPlayingShowId', showId);
             this.$store.commit('setPlayingSeason', seasonIdx);
             this.$store.commit('setPlayingEpisode', episodeIdx);
-            this.$store.commit('setPage', 'player');
+            if (BROWSER_EXTENSION) {
+                document.location = this.getVideoURL(seasonIdx, episodeIdx);
+            }
+            else {
+                this.$store.commit('setPage', 'player');
+            }
         },
         goExternal: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
@@ -294,6 +298,13 @@ const mixin = {
             this.$store.commit('setPlayingSeason', null);
             this.$store.commit('setPlayingEpisode', null);
             this.$store.commit('setShowDialog', {dialog: 'embeddable', val: false});
+        },
+        getVideoURL: function(seasonIdx, episodeIdx) {
+            const captionId = this.showInfo.seasons[seasonIdx].episodes[episodeIdx].id;
+            const videoId = videoIdFromCaptionId(captionId);
+            const template = this.getSiteString('urlTemplates').videoId;
+            const url = template.replace('${id}', videoId);
+            return url;
         },
         sm2tr(text, optionsOverride = true) {
             if (this.$store.state.DICT === null) return null;
@@ -401,6 +412,9 @@ const mixin = {
         },
         isMobile: function() {
             return Quasar.Platform.is.mobile === true;
+        },
+        isExtension: function() {
+            return this.$store.state.isExtension;
         },
         isDesktop: function() {
             return Quasar.Platform.is.desktop === true;
