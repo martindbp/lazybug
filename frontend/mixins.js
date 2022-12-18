@@ -22,15 +22,23 @@ const mixin = {
                 this.accountCallback = null;
             }
         },
-        showInfo: function() {
+
+        showInfo: function(newData, oldData) {
             if (this.playingSeason === null || this.playingEpisode === null) return;
+            if (newData && oldData && newData.showId === oldData.showId) return;
 
             const showId = this.showInfo.showId;
-            // Fetch the comments for this video
-            const message = {type: 'getDiscourseTopicComments', data: this.showInfo.discourse_topic_id};
+            const topicId = this.showInfo.discourse_topic_id;
+            if (this.$store.state.videoDiscourseComments === topicId) return; // already fetching
+            const message = {type: 'getDiscourseTopicComments', data: topicId};
             const self = this;
+            self.$store.commit('setVideoDiscourseComments', topicId);  // set as fetching
             sendMessageToBackground(message, function(data) {
-                if (this.showInfo.showId !== showId) return; // show changed, discard this fetch
+                if (data === 'error') {
+                    self.$store.commit('setVideoDiscourseComments', null);
+                    return;
+                }
+                if (self.showInfo && self.showInfo.showId !== showId) return; // show changed, discard this fetch
                 self.$store.commit('setVideoDiscourseComments', data);
             });
         },
