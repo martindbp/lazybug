@@ -21,9 +21,14 @@ function syncOptions(state) {
 
 function getShowInfo(store, state = null) {
     if (state === null) state = store.state;
-    if ([null, undefined].includes(state.captionData) || [null, undefined].includes(state.showList)) return null;
+    if (
+        (
+            [null, undefined].includes(state.playingShowId) &&
+            [null, undefined].includes(state.captionData)
+        ) || [null, undefined].includes(state.showList)
+    ) return null;
 
-    return state.showList[state.captionData.show_name];
+    return state.showList[state.playingShowId || state.captionData.show_name];
 }
 
 const store = new Vuex.Store({

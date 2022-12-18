@@ -283,12 +283,12 @@ const mixin = {
             });
         },
         setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
+            this.$store.commit('setPlayingShowId', showId);
             if (this.showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
                 this.$store.commit('setShowDialog', {dialog: 'embeddable', val: true});
                 return;
             }
-            this.$store.commit('setPlayingShowId', showId);
             this.$store.commit('setPlayingSeason', seasonIdx);
             this.$store.commit('setPlayingEpisode', episodeIdx);
             if (BROWSER_EXTENSION) {
