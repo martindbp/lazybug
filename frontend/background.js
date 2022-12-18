@@ -461,7 +461,10 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     }
     else if (message.type === 'getDiscourseTopicComments') {
         const topicURL = `${DISCOURSE_COMMENTS_URL}/${message.data}.json`;
-        fetch(topicURL, { method: 'GET' }).then((response) => {
+        fetch(topicURL, {
+            method: 'GET',
+            credentials: 'include',
+        }).then((response) => {
             if (!response.ok) {
                 sendResponse('error');
                 return null;
