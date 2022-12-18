@@ -52,6 +52,7 @@ import CaptionMenu from './CaptionMenu.vue'
 import CaptionContent from './CaptionContent.vue'
 
 export default {
+    mixins: [mixin],
     props: [
         'currentCaptionIdx',
         'firstCaption',
@@ -71,11 +72,6 @@ export default {
         showData: null,
         fadeOut: false,
     }},
-    computed: {
-        showInfo: function() {
-            return getShowInfo(this.$store);
-        }
-    },
     updated: function() {
         const self = this;
         this.$nextTick(function () {

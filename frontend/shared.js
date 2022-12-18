@@ -1,4 +1,5 @@
 const DISCOURSE_URL = 'https://discourse.lazybug.ai';
+const DISCOURSE_COMMENTS_URL = `${DISCOURSE_URL}/t`;
 const CDN_URL = LOCAL ? "/cdn/" : "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;

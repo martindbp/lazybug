@@ -44,9 +44,9 @@ if __name__ == "__main__":
                 title = show['name']
 
             if show['type'] == 'movie':
-                raw = f'[Link](https://lazybug.ai/player/{show_name}/)'
+                raw = f'Description: {show["synopsis"]} \n[Link](https://lazybug.ai/player/{show_name}/)'
             else:
-                raw = f'[Link](https://lazybug.ai/player/{show_name}/1/1)'
+                raw = f'Description: {show["synopsis"]} \n[Link to first episode](https://lazybug.ai/player/{show_name}/1/1)'
             print('Creating', title, raw)
 
             # NOTE: client.create_topic is outdated, endpoint changed to /posts and
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 'category': category_id,
                 'draft_key': 'new_topic',
             })
-            show['discourse_topic_id'] = response['id']
+            show['discourse_topic_id'] = response['topic_id']
 
         with open(filename, 'w') as f:
             json.dump(show, f)

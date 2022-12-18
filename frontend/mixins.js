@@ -22,6 +22,18 @@ const mixin = {
                 this.accountCallback = null;
             }
         },
+        showInfo: function() {
+            if (this.playingSeason === null || this.playingEpisode === null) return;
+
+            const showId = this.showInfo.showId;
+            // Fetch the comments for this video
+            const message = {type: 'getDiscourseTopicComments', data: this.showInfo.discourse_topic_id};
+            const self = this;
+            sendMessageToBackground(message, function(data) {
+                if (this.showInfo.showId !== showId) return; // show changed, discard this fetch
+                self.$store.commit('setVideoDiscourseComments', data);
+            });
+        },
     },
     methods: {
         getSeasonName: function(i) {
@@ -386,8 +398,7 @@ const mixin = {
     },
     computed: {
         showInfo: function() {
-            if (this.$store.state.showList === null || this.$store.state.playingShowId === null) return null;
-            return this.$store.state.showList[this.$store.state.playingShowId];
+            return getShowInfo(this.$store);
         },
         season: {
             get: function() { return this.$store.state.playingSeason; },

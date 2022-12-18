@@ -23,18 +23,13 @@ from app.discoursesso import DiscourseSSO
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
 LOCAL = os.getenv('LOCAL') is not None
-DISCOURSE_SECRET, ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None, None
+ENDPOINT, KEY_ID, APPLICATION_KEY = None, None, None
 if not LOCAL:
     ENDPOINT = os.getenv('B2_ENDPOINT')
     KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
     APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
-    DISCOURSE_SECRET = os.getenv('DISCOURSE_SECRET')
-    DISCOURSE_API_KEY = os.getenv('DISCOURSE_API_KEY')
-    discourse_client = discourse.Client(
-        host='http://discourse.lazybug.ai/',
-        api_username='system',
-        api_key=DISCOURSE_API_KEY,
-    )
+
+DISCOURSE_SECRET = os.getenv('DISCOURSE_SECRET')
 
 if not LOCAL and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
     print('ERROR: B2 secrets not set')
@@ -164,58 +159,37 @@ else:
         return [user.id, user.email]
 
 
-    @app.get("/api/discourse/sso")
-    async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
-        """
-        When user enters discourse.lazybug.ai, Discourse calls this endpoint on lazybug.ai server
-        with sso and sig tokens. We check the cookies for the jwt token set on lazybug.ai
-        (user has to have logged in there first), and return the associated user id and email of the account
-        """
-        if jwt is None:
-            raise HTTPException(status_code=403, detail=f'No jwt token')
+@app.get("/api/discourse/sso")
+async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
+    """
+    When user enters discourse.lazybug.ai, Discourse calls this endpoint on lazybug.ai server
+    with sso and sig tokens. We check the cookies for the jwt token set on lazybug.ai
+    (user has to have logged in there first), and return the associated user id and email of the account
+    """
+    if jwt is None:
+        raise HTTPException(status_code=403, detail=f'No jwt token')
 
-        # Get jwt from cookies, then do a local request to get the email
-        headers = {'Authorization': 'Bearer ' + jwt}
-        user_id, user_email = client.get('/api/discourse/get-id-and-email', headers=headers).json()
+    # Get jwt from cookies, then do a local request to get the email
+    headers = {'Authorization': 'Bearer ' + jwt}
+    user_id, user_email = client.get('/api/discourse/get-id-and-email', headers=headers).json()
 
-        credentials = {
-            "external_id" : user_id,
-            "email" : user_email,
-        }
+    credentials = {
+        "external_id" : user_id,
+        "email" : user_email,
+    }
 
-        discourse = DiscourseSSO(DISCOURSE_SECRET)
+    discourse = DiscourseSSO(DISCOURSE_SECRET)
 
-        if discourse.validate(sso, sig):
-            # Get users login credentials and build the URL to log the user
-            # into your discourse site. ex: discourse.example.com
-            credentials['nonce'] = discourse.get_nonce(sso)
-            return_url_base = "https://discourse.lazybug.ai/session/sso_login?%s"
-            return_url =  return_url_base % discourse.build_login_URL(credentials)
-            print(credentials)
-            return RedirectResponse(return_url)
+    if discourse.validate(sso, sig):
+        # Get users login credentials and build the URL to log the user
+        # into your discourse site. ex: discourse.example.com
+        credentials['nonce'] = discourse.get_nonce(sso)
+        return_url_base = "https://discourse.lazybug.ai/session/sso_login?%s"
+        return_url =  return_url_base % discourse.build_login_URL(credentials)
+        print(credentials)
+        return RedirectResponse(return_url)
 
-        raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
-
-
-    @app.get("/api/discourse/comments/{topic_id}")
-    async def discourse_topic_comments(topic_id: int, response: Response):
-        response.headers['Cache-Control'] = 'max-age=300'  # cache for 5 minutes
-
-        try:
-            topic = discourse_client.get_topic(topic_id)
-        except:
-            raise HTTPException(status_code=404, detail='Topic does not exist')
-
-        posts = []
-        for post in topic.post_stream['posts']:
-            post_data = {
-                text: post['cooked'],
-                created_at: post['created_at'],
-                username: post['username'],
-            }
-            posts.append(post_data)
-
-        return posts
+    raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
 
 
 # NOTE: need to put this last!

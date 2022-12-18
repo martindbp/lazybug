@@ -459,6 +459,18 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             sendResponse({data: data});
         });
     }
+    else if (message.type === 'getDiscourseTopicComments') {
+        const topicURL = `${DISCOURSE_COMMENTS_URL}/${message.data}.json`;
+        fetch(topicURL, { method: 'GET' }).then((response) => {
+            if (!response.ok) {
+                sendResponse('error');
+                return null;
+            }
+            return response;
+        })
+        .then((response) => response.json())
+        .then((data) => sendResponse(data));
+    }
     else if (message.type === 'translation') {
         fetch(TRANSLATION_URL, { method: 'POST', body: message.data }).then(() => sendResponse());
     }

@@ -42,8 +42,8 @@ This project provides content based on fair use doctrine:
 
 This project consists of a number of different high-level parts:
 
-1. Algorithms to extract Chinese captions from video, and process them in various ways, like performing sentence segmentation and word disambiguation
-2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content
+1. Algorithms to extract Chinese captions from video, and process them in various ways, like performing sentence segmentation and word disambiguation. These algorithms are mostly implemented in Python.
+2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content. The frontend is written in JS and Vue, the backend in Python
 3. A browser extension for viewing videos that cannot be embedded into the web app
 
 # Code and development details
@@ -55,7 +55,6 @@ The Python backend is meant to be simple and do mainly lightweight work in order
 2. User accounts and authentication
 3. Managing the syncing of personal data to Backblaze B2
 4. Discourse Single Sign On
-5. Relay comments from the Discourse API
 
 ### Production dev notes
 
@@ -75,7 +74,6 @@ To release new frontend changes do:
 
 These environment variables need to be set for the server if not LOCAL is set:
 
-1. DISCOURSE_API_KEY: for integration with the Discourse API. Secret can be created in the Admin UI
 1. DISCOURSE_SECRET: for Discourse SSO. Secret is created in the UI when setting up DiscordConnect
 2. B2_ENDPOINT, B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY: keys for integrating with Backblaze B2, for creating upload and download links for personal data
 
@@ -178,6 +176,10 @@ This ability to add prefill a reply doesn't come with Discourse by default, but 
 In order for users to be able to comment on a specific video and show, one topic has to be generated for each show. This is done in `make_discourse_topics.py` by going through all the shows in `data/remote/public/shows/*.json`, checking if a topic for this show id exists and if not, create it through the Discourse API. Note that the DISCOURSE_API_KEY environment variable has to be set. This script also needs to save the internal Discourse topic id in the show json, in order for the frontend to be able to link to it.
 
 Note that `make_discourse_topics.py` is run as part of the `show-list-full` make command, which bakes all the individual show files into one, creates bloom filters for the vocabulary etc.
+
+### Discourse API
+
+Comments on a show topic is accessed directly from the frontend by the api at `discourse.lazybug.api/t/{topic_id}.json`.
 
 ## Docker
 

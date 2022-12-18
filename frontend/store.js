@@ -33,23 +33,24 @@ const store = new Vuex.Store({
         extensionOn: true,
         accessToken: getCookie('jwt'),
         accountEmail: getCookie('email'),
-        captionId: null,
+        captionId: null, // captionId of the currently viewed video
+        videoId: null, // videoId of the currently viewed video
         captionDocked: localStorage.getItem('captionDocked') === 'true',
-        videoId: null,
         localVideoHash: null,
         AVElement: null,
         videoAPI: null,
         videoDuration: null,
         sessionTime: null,
+        fetchedCaptionId: null, // captionId of the currently fetched captionData/captionHash (may differ from store.state.captionId)
         captionData: null,
         captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
-        fetchedCaptionId: null,
         resourceFetchErrors: [],
         youtubeAPIReady: LOCAL, // if local only we don't use youtube, so set to true
         showList: null,
         showBloomFilters: null,
         thumbnailObserver: null,
         videoList: null,
+        videoDiscourseComments: null,
         DICT: null,
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
@@ -152,6 +153,9 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setVideoDiscourseComments(state, val) {
+            state.videoDiscourseComments = val;
+        },
         setLocalVideoHash(state, val) {
             state.localVideoHash = val;
         },
@@ -286,7 +290,6 @@ const store = new Vuex.Store({
         setCaptionIdDataHash(state, val) {
             state.captionData = val.data;
             state.captionHash = val.hash;
-            console.log('setCaptionId', val);
             state.fetchedCaptionId = val.id;
             if (BROWSER_EXTENSION) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
