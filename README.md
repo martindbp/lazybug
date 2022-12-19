@@ -179,7 +179,7 @@ Note that `make_discourse_topics.py` is run as part of the `show-list-full` make
 
 ### Discourse API
 
-Comments on a show topic is accessed directly from the frontend by the api at `discourse.lazybug.api/t/{topic_id}.json`.
+Comments on a show topic is accessed directly from the frontend by the api at `discourse.lazybug.api/t/{topic_id}.json`. To enable this the `https://lazybug.ai` has to be added to acceptable CORS origins in the Discourse Admin UI.
 
 ## Docker
 

@@ -460,7 +460,9 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getDiscourseTopicComments') {
-        const topicURL = `${DISCOURSE_COMMENTS_URL}/${message.data}.json`;
+        // NOTE: by default this endpoint returns only 20 comments, it's reported that with `print=true` it
+        // should return 1000.
+        const topicURL = `${DISCOURSE_COMMENTS_URL}/${message.data}.json?print=true`;
         fetch(topicURL, {
             method: 'GET',
             credentials: 'include',
@@ -472,7 +474,17 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             return response;
         })
         .then((response) => response.json())
-        .then((data) => sendResponse(data));
+        .then((data) => {
+            if (data.post_stream && data.post_stream.posts) {
+                if (data.post_stream.posts.length === 1000) {
+                    console.log(`{topicURL} returned 1000 comments, may have reached limit of API`);
+                }
+                sendResponse(data.post_stream && data.post_stream.posts)
+            }
+            else {
+                sendResponse('error');
+            }
+        });
     }
     else if (message.type === 'translation') {
         fetch(TRANSLATION_URL, { method: 'POST', body: message.data }).then(() => sendResponse());
