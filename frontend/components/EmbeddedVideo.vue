@@ -179,7 +179,6 @@ export default {
         },
         onPlayerError: function(error) {
             console.log(error);
-            alert(error);
         },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;

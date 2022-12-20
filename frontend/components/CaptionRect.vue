@@ -84,6 +84,7 @@ export default {
             return width / height;
         },
         AVElementParentSelector: function() {
+            if (!BROWSER_EXTENSION) return null;
             return this.getSiteString('AVElementParentSelector');
         },
     },
@@ -113,7 +114,7 @@ export default {
 
             let videoRect = this.AVElement.getBoundingClientRect();
             let videoAspectRatio = videoRect.width / videoRect.height;
-            let videoParent = this.AVElement.closest(this.AVElementParentSelector);
+            let videoParent = this.AVElementParentSelector ? this.AVElement.closest(this.AVElementParentSelector) : null;
             let videoParentRect = videoParent ? videoParent.getBoundingClientRect() : null;
             let parentAspectRatio = videoParent ? videoParentRect.width / videoParentRect.height : null;
             let offsetX = 0;

@@ -315,7 +315,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                 sendResponse();
             })
             .catch(function(error) {
-                console.log(error);
+                console.log('setIndexedDbData error', error);
                 sendResponse('error');
             });
         });
@@ -336,7 +336,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                     sendResponse();
                 })
                 .catch(function(error) {
-                    console.log(error);
+                    console.log('appendSessionLog error', error);
                     sendResponse('error');
                 });
             }
@@ -354,7 +354,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                     sendResponse();
                 })
                 .catch(function(error) {
-                    console.log(error);
+                    console.log('appendSessionLog error', error);
                     sendResponse('error');
                 });
             }
@@ -484,6 +484,10 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             else {
                 sendResponse('error');
             }
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
         });
     }
     else if (message.type === 'translation') {
