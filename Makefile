@@ -269,7 +269,7 @@ update-server:
 	git reset --hard origin/master
 	make docker-server COMMAND=frontend
 	make purge-web-cache
-	make kill-server
+	-make kill-server
 	make run-server-prod
 
 .PHONY: purge-web-cache
