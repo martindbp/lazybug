@@ -243,7 +243,10 @@ function backgroundFetchVersionedResource(folder, resourceFilename, callback, fa
 }
 
 function backgroundMessageHandler(message, sender, sendResponse) {
-    if (message.type === 'clearCache') {
+    if (message.type === 'ping') {
+        sendResponse({data: 'pong'});
+    }
+    else if (message.type === 'clearCache') {
         backgroundClearCache();
         sendResponse();
     }
@@ -468,7 +471,6 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             credentials: 'include',
         }).then((response) => {
             if (!response.ok) {
-                sendResponse('error');
                 return null;
             }
             return response;

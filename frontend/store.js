@@ -551,7 +551,16 @@ store.commit('setURL', document.location); // initial
 
 if (BROWSER_EXTENSION) {
     // We have to wait for the iframe to load before we can fetch stuff from it
-    lazybugIframe.addEventListener('load', fetchInitialResources);
+    //lazybugIframe.addEventListener('load', fetchInitialResources);
+    // NOTE: 'load' event sometimes doesn't trigger, let's just ping the iframe until it responds
+    let pingIframeInterval = setInterval(function() {
+        sendMessageToBackground({type: 'ping'}, function(response) {
+            if (response === 'pong') {
+                clearInterval(pingIframeInterval);
+                fetchInitialResources();
+            }
+        });
+    }, 100);
 }
 else {
     FETCH_PUBLIC_RESOURCES.push(['bloom_filters.json', 'show bloom filters', 'setBloomFilters']);
