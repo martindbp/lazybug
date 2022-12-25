@@ -1,7 +1,7 @@
 <template>
-    <div :class="{ captionmenu: true, docked: $store.state.captionDocked }">
+    <div :class="{ captionmenu: true, docked: ! $store.state.isExtension && $store.state.captionDocked }">
         <SvgButton
-            v-if="! $store.state.captionDocked"
+            v-if="$store.state.isExtension || ! $store.state.captionDocked"
             name="move"
             title="Move"
             @mousedown.stop.prevent="moveMouseDown"

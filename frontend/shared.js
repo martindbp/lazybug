@@ -132,6 +132,7 @@ if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     window.addEventListener("message", message => {
         if (message.data.requestId === undefined) return;
 
+        console.log('got Message', message.data.requestId, message);
         let callback = requestCallbacks[message.data.requestId];
         callback(message.data.data);
         delete requestCallbacks[message.data.requestId];
