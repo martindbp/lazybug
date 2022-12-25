@@ -42,6 +42,7 @@ export default {
             this.$store.commit('setVideoDuration', AVElement.duration);
         }
         this.setObserversAndHandlers();
+        $q = this.$q; // global variable in shared.js
     },
     beforeDestroy: function() {
         if (this.mutationObserver !== null) this.mutationObserver.disconnect();

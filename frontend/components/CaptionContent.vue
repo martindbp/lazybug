@@ -296,13 +296,13 @@ export default {
 
             if (action === 'copy') {
                 if (type === 'translation') {
-                    updateClipboard(this.wordData[type], this.$q, 'Copied to clipboard');
+                    updateClipboard(this.wordData[type], 'Copied to clipboard');
                 }
                 else if (type === 'py') {
-                    updateClipboard(this.wordData.py.join(' '), this.$q, 'Copied to clipboard');
+                    updateClipboard(this.wordData.py.join(' '), 'Copied to clipboard');
                 }
                 else if (type === 'hz') {
-                    updateClipboard(this.wordData.text, this.$q, 'Copied to clipboard');
+                    updateClipboard(this.wordData.text, 'Copied to clipboard');
                 }
                 return;
             }
@@ -331,7 +331,7 @@ export default {
                 this.applyState(type, i, StateStarred, StateStarred);
 
                 const self = this;
-                this.$q.notify({
+                $q.notify({
                     type: 'positive',
                     message: `"${content}" starred`,
                     actions: [
@@ -349,11 +349,11 @@ export default {
             }
             else if (action === 'copy') {
                 if (type === 'translation') {
-                    updateClipboard(this.wordData[type], this.$q, 'Copied to clipboard');
+                    updateClipboard(this.wordData[type], 'Copied to clipboard');
                 }
                 else {
                     const text = `${this.wordData.hz[i]}-${this.wordData.py[i]}-${this.wordData.tr[i]}`;
-                    updateClipboard(text, this.$q, 'Copied to clipboard');
+                    updateClipboard(text, 'Copied to clipboard');
                 }
             }
             else if (action === 'switch') {

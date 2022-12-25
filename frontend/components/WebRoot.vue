@@ -140,6 +140,9 @@ export default {
     data: function() { return {
         drawer: this.isDesktop,
     }},
+    mounted: function() {
+        $q = this.$q; // global variable in shared.js
+    },
     methods: {
         clickPage: function(page) {
             this.$store.commit('setPage', page);

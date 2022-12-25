@@ -16,6 +16,8 @@ if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     document.body.appendChild(lazybugIframe);
 }
 
+let $q = null;
+
 const events = [
     'EVENT_SHOW_CAPTION_IDX',
     'EVENT_REPLAY_CAPTION',
@@ -87,8 +89,14 @@ function getClosestParentScroll($el, axis) {
 
 function sendMessageToBackground(message, callback) {
     const responseHandler = function onResponse(response) {
-        if (['error'].includes(response)) {
+        if (response === 'error') {
             console.log('Failed for message ', message);
+            if ($q) {
+                $q.notify({
+                    type: 'negative',
+                    message: `An error occurred during background message: ${JSON.stringify(message)}`,
+                });
+            }
             if (callback) callback('error');
             return false;
         }
@@ -645,7 +653,7 @@ function captionToAnkiCloze(wordData, hiddenStates, captionIdx, type, i, caption
     return html;
 }
 
-function updateClipboard(newClip, $q = null, message = null) {
+function updateClipboard(newClip, message = null) {
     navigator.clipboard.writeText(newClip).then(function() {
     }, function() {
         console.log('Clipboard failed');
