@@ -14,6 +14,7 @@ if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe.src = LOCAL ? 'https://localhost/static/iframe.html' : 'https://lazybug.ai/static/iframe.html';
     lazybugIframe.style = 'position: absolute;width:0;height:0;border:0;';
     document.body.appendChild(lazybugIframe);
+    console.log('appended lazybugIframe');
 }
 
 let $q = null;
@@ -116,9 +117,10 @@ function sendMessageToBackground(message, callback) {
             message: message,
             requestId: requestId,
         }));
-        lazybugIframe.contentWindow.postMessage(data, '*');
         requestCallbacks[requestId] = responseHandler;
         nextRequestId += 1;
+        console.log('postMessage', requestId, data, lazybugIframe);
+        lazybugIframe.contentWindow.postMessage(data, '*');
     }
     else {
         // Call directly
