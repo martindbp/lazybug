@@ -55,7 +55,7 @@ const store = new Vuex.Store({
         showBloomFilters: null,
         thumbnailObserver: null,
         videoList: null,
-        videoDiscourseComments: null,
+        showDiscourseComments: null,
         DICT: null,
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
@@ -103,6 +103,8 @@ const store = new Vuex.Store({
         playingShowId: null,
         playingSeason: null,
         playingEpisode: null,
+        playingCaptionIdx: null,
+        navigateToCaptionIdx: null,
         showSyncDialog: false,
         lastSyncDate: localStorage.getItem('lastSyncDate'),
         needSync: localStorage.getItem('needSync', 'false') === 'true',
@@ -158,8 +160,8 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
-        setVideoDiscourseComments(state, val) {
-            state.videoDiscourseComments = val;
+        setShowDiscourseComments(state, val) {
+            state.showDiscourseComments = val;
         },
         setLocalVideoHash(state, val) {
             state.localVideoHash = val;
@@ -217,6 +219,12 @@ const store = new Vuex.Store({
         },
         setPlayingEpisode(state, episode) {
             state.playingEpisode = episode;
+        },
+        setPlayingCaptionIdx(state, captionIdx) {
+            state.playingCaptionIdx = captionIdx;
+        },
+        setNavigateToCaptionIdx(state, captionIdx) {
+            state.navigateToCaptionIdx = captionIdx;
         },
         setVideoAPI(state, api) {
             state.videoAPI = api;
@@ -471,7 +479,7 @@ const store = new Vuex.Store({
                         const episodeIdx = parseInt(parts[3]) - 1;
                         if (parts.length === 5) {
                             const captionIdx = parseInt(parts[4]) - 1;
-                            state.playingCaptionIdx = captionIdx;
+                            state.navigateToCaptionIdx = captionIdx;
                         }
                         state.playingSeason = seasonIdx;
                         state.playingEpisode = episodeIdx;
@@ -484,7 +492,7 @@ const store = new Vuex.Store({
                     else if (parts.length === 3) {
                         // Pattern: player/movie/caption
                         const captionIdx = parseInt(parts[2]) - 1;
-                        state.playingCaptionIdx = captionIdx;
+                        state.navigateToCaptionIdx = captionIdx;
                         state.playingSeason = 0;
                         state.playingEpisode = 0;
                     }

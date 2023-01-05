@@ -2,9 +2,9 @@
     <div :class="{ iframecontainer: true, docked: $store.state.captionDocked }">
         <div class="videocontainer">
             <div v-show="!playerReady" class="videoloading" />
-            <div v-if="$store.state.isMovingCaption && !localOnly" class="dragsurface" />
+            <div v-if="$store.state.isMovingCaption && !local" class="dragsurface" />
             <div ref="player" :id="playerID" class="player">
-                <div style="position: absolute; bottom: 0; left: 0; right: 0;" v-if="localOnly" >
+                <div v-if="local" style="position: absolute; bottom: 0; left: 0; right: 0;">
                     <div style="margin-left: 20%">
                         <q-slider vertical-middle style="width: 80%" color="red" dark v-model="substituteTime" :min="0" :max="captionDuration" :step="0.5" />
                         <q-btn vertical-middle dark color="red" v-if="substitutePlaying" label="Pause" @click="setSubstitutePlaying(false)" />
@@ -34,10 +34,10 @@ export default {
             player: null,
             playerReady: false,
             focusInterval: null,
-            localOnly: LOCAL,
-            // Substitute variables are used if LOCAL is true (i.e. no youtube available)
-            substitutePlaying: false,
-            substituteTime: 0.0,
+            local: LOCAL,
+            // Mock variables are used if LOCAL is true (i.e. no youtube available)
+            mockPlaying: false,
+            mockTime: 0.0,
         };
     },
     mounted: function(){
@@ -77,16 +77,16 @@ export default {
             this.destroyYoutube();
             this.initYoutube();
         },
-        playingCaptionIdx: function() {
+        navigateToCaptionIdx: function() {
             const captionData = this.$store.state.captionData;
-            const captionIdx = this.$store.state.playingCaptionIdx;
+            const captionIdx = this.$store.state.navigateToCaptionIdx;
             const videoAPI = this.$store.state.videoAPI;
             if (! this.playerReady || captionData === null || [null, undefined].includes(captionIdx) || videoAPI === null) {
                 return;
             }
 
             const line = captionArrayToDict(captionData.lines[captionIdx], captionData);
-            this.$store.state.playingCaptionIdx = null;
+            this.$store.commit('setNavigateToCaptionIdx', null);
             setTimeout(function() {
                 console.log('Setting videoAPI time', line.t0);
                 videoAPI.setCurrentTime(line.t0 + 0.001);
@@ -95,8 +95,8 @@ export default {
         },
     },
     computed: {
-        playingCaptionIdx: function() {
-            return `${this.playerReady}|${this.$store.state.playingCaptionIdx}|${this.$store.state.captionData}|${this.$store.state.videoAPI}`;
+        navigateToCaptionIdx: function() {
+            return `${this.playerReady}|${this.$store.state.navigateToCaptionIdx}|${this.$store.state.captionData}|${this.$store.state.videoAPI}`;
         },
         youtubeAPIReady: function() {
             return this.$store.state.youtubeAPIReady;

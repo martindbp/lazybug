@@ -29,7 +29,7 @@ if __name__ == "__main__":
             print(f'{show_name} not released, skipping')
             continue
 
-        if show.get('discourse_topic_id', None) is not None:
+        if show.get('discourse_topic_slug', None) is not None:
             print(f'{show_name} already has discourse topic')
             continue
 
@@ -59,6 +59,7 @@ if __name__ == "__main__":
                 'draft_key': 'new_topic',
             })
             show['discourse_topic_id'] = response['topic_id']
+            show['discourse_topic_slug'] = response['topic_slug']
 
         with open(filename, 'w') as f:
             json.dump(show, f)

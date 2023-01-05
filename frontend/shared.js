@@ -88,11 +88,11 @@ function getClosestParentScroll($el, axis) {
     return axis === 'y' ? window.scrollY : window.scrollX;
 }
 
-function sendMessageToBackground(message, callback) {
+function sendMessageToBackground(message, callback, notifyFailure=true) {
     const responseHandler = function onResponse(response) {
         if (response === 'error') {
             console.log('Failed for message ', message);
-            if ($q) {
+            if ($q && notifyFailure) {
                 $q.notify({
                     type: 'negative',
                     message: `An error occurred during background message: ${JSON.stringify(message)}`,
@@ -155,8 +155,8 @@ function fetchVersionedResource(filename, callback) {
     sendMessageToBackground({type: 'fetchVersionedResource', filename: filename}, callback);
 };
 
-function getIndexedDbData(storageName, keys, callback) {
-    sendMessageToBackground({type: 'getIndexedDbData', storage: storageName, keys: keys}, callback);
+function getIndexedDbData(storageName, keys, callback, notifyFailure=true) {
+    sendMessageToBackground({type: 'getIndexedDbData', storage: storageName, keys: keys}, callback, notifyFailure);
 }
 
 function setIndexedDbData(storageName, keys, values, callback) {
@@ -203,7 +203,7 @@ function fetchPersonalDataToStore(store) {
             // No options, so we set the default
             setIndexedDbData('other', ['options'], [store.state.options], function() {});
         }
-    });
+    }, false); // don't notify failure since it's to be expected
 }
 
 function appendSessionLog($store, data) {
@@ -699,6 +699,8 @@ function getShowSeasonEpisode(showInfo, captionId) {
 }
 
 function getSeasonName(showInfo, seasonIdx) {
+    if ([null, undefined].includes(showInfo)) return null;
+
     const season = showInfo.seasons[seasonIdx];
     const number = season.number;
     if (! [null, undefined].includes(number)) { // if explicit number is available, use that

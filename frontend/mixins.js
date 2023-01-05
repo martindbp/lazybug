@@ -22,25 +22,38 @@ const mixin = {
                 this.accountCallback = null;
             }
         },
+        showInfo: function(newData, oldData) { // fetch Discourse comments for show
+            if (
+                this.$store.state.playingSeason === null ||
+                this.$store.state.playingEpisode === null ||
+                [null, undefined].includes(this.$store.state.accountEmail) // need to be logged in
+            ) {
+                return;
+            }
 
-        showInfo: function(newData, oldData) {
-            if (this.playingSeason === null || this.playingEpisode === null) return;
             if (newData && oldData && newData.showId === oldData.showId) return;
 
             const showId = this.showInfo.showId;
             const topicId = this.showInfo.discourse_topic_id;
-            if (this.$store.state.videoDiscourseComments === topicId) return; // already fetching
-            const message = {type: 'getDiscourseTopicComments', data: topicId};
+            if (this.$store.state.showDiscourseComments === topicId) return; // already fetching
+            const message = {
+                type: 'getDiscourseTopicComments',
+                data: topicId,
+                // Following fields are for testing
+                showId: this.$store.state.playingShowId,
+                season: this.$store.state.playingSeason,
+                episode: this.$store.state.playingEpisode,
+            };
             const self = this;
-            self.$store.commit('setVideoDiscourseComments', topicId);  // set as fetching
+            self.$store.commit('setShowDiscourseComments', topicId);  // set as fetching
             sendMessageToBackground(message, function(data) {
                 if (data === 'error') {
-                    self.$store.commit('setVideoDiscourseComments', null);
+                    self.$store.commit('setShowDiscourseComments', 'error');
                     return;
                 }
                 if (self.showInfo && self.showInfo.showId !== showId) return; // show changed, discard this fetch
-                self.$store.commit('setVideoDiscourseComments', data);
-            });
+                self.$store.commit('setShowDiscourseComments', data);
+            }, false); // don't notify failure
         },
     },
     methods: {
@@ -308,7 +321,7 @@ const mixin = {
         },
         goExternal: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
-            const captionId = showInfo.seasons[this.playingSeason || 0].episodes[this.playingEpisode || 0].id;
+            const captionId = showInfo.seasons[this.$store.state.playingSeason || 0].episodes[this.$store.state.playingEpisode || 0].id;
             const videoId = videoIdFromCaptionId(captionId);
             const site = siteFromCaptionId(captionId);
             const template = this.$store.state.STRINGS[site].urlTemplates.videoId;
@@ -492,6 +505,29 @@ const mixin = {
                 }
             }
             return states;
+        },
+        videoComments: function() {
+            const c = this.$store.state.showDiscourseComments;
+            if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
+            const showId = this.$store.state.playingShowId;
+            const season = this.$store.state.playingSeason;
+            const episode = this.$store.state.playingEpisode;
+            // Look for a link to this video
+            let regex = `https://lazybug\.ai/${showId}/${season+1}/${episode+1}.*`;
+            return c.filter((post) => post.cooked.match(regex) !== null);
+        },
+        captionComments: function() {
+            const c = this.$store.state.showDiscourseComments;
+            if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
+            const showId = this.$store.state.playingShowId;
+            const season = this.$store.state.playingSeason;
+            const episode = this.$store.state.playingEpisode;
+            let captionIdx = this.$store.state.playingCaptionIdx;
+            if (captionIdx === null) return [];
+            if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];
+            // Look for a link to this caption
+            let regex = `https://lazybug\.ai/${showId}/${season+1}/${episode+1}/${captionIdx+1}.*`;
+            return c.filter((post) => post.cooked.match(regex) !== null);
         },
     },
 };

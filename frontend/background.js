@@ -463,6 +463,55 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         });
     }
     else if (message.type === 'getDiscourseTopicComments') {
+        if (LOCAL) {
+            // Return fake data
+            let showId = message.showId;
+            let season = message.season + 1;
+            let episode = message.episode + 1;
+            let posts = [{ // first post is system
+                post_number: 0,
+                username: "system",
+                cooked: `\u003cp\u003e\u003ca href=\"https://lazybug.ai/player/${showId}/${season}/${episode}\"\u003eLink\u003c/a\u003e\u003c/p\u003e`,
+                reply_to_post_number: null,
+                created_at:"2022-09-24T12:03:01.473Z",
+                link_counts: [
+                   {
+                      url: `https://lazybug.ai/player/${showId}/${season}/${episode}`,
+                   }
+                ],
+            }]
+            for (let i = 0; i < 5; i++) {
+                // Create one caption comment and one response to it
+                posts.push({
+                    post_number: 1 + 2*i,
+                    username: "user1",
+                    cooked:`\u003cblockquote\u003e\n\u003cp\u003e\u003ca href=\"https://lazybug.ai/${showId}/${season}/${episode}/${i+1}\"\u003eS01E01 - 00:30:22\u003c/a\u003e\u003cbr\u003e\n你 好像 不 爱 吃 馒头 啊\u003cbr\u003e\nnǐ hǎoxiàng bù ài chī mántou a\u003cbr\u003e\nYou don’t seem to like steamed buns.\u003c/p\u003e\n\u003c/blockquote\u003e\n\u003cp\u003etest\u003c/p\u003e`,
+                    reply_to_post_number: null,
+                    created_at:"2022-09-24T12:03:01.473Z",
+                    link_counts: [
+                       {
+                          url: `https://lazybug.ai/player/${showId}/${season}/${episode}/${i+1}`,
+                       }
+                    ],
+                });
+                posts.push({
+                    post_number: 1 + 2*i + 1,
+                    username: "user2",
+                    cooked: `\u003cblockquote\u003e\u003cblockquote\u003e\n\u003cp\u003e\u003ca href=\"https://lazybug.ai/${showId}/${season}/${episode}/${i+1}\"\u003eS01E01 - 00:30:22\u003c/a\u003e\u003cbr\u003e\n你 好像 不 爱 吃 馒头 啊\u003cbr\u003e\nnǐ hǎoxiàng bù ài chī mántou a\u003cbr\u003e\nYou don’t seem to like steamed buns.\u003c/p\u003e\n\u003c/blockquote\u003e\n\u003cp\u003etest\u003c/p\u003e\u003c/blockquote\u003e\n\u003cp\u003eOK\u003c/p\u003e`,
+                    reply_to_post_number: 2*i,
+                    created_at:"2022-09-24T12:03:01.473Z",
+                    link_counts: [
+                       {
+                          url: `https://lazybug.ai/player/${showId}/${season}/${episode}/${i+1}`,
+                       }
+                    ],
+                });
+            }
+
+            sendResponse({data: posts});
+            return true;
+        }
+
         // NOTE: by default this endpoint returns only 20 comments, it's reported that with `print=true` it
         // should return 1000.
         const topicURL = `${DISCOURSE_COMMENTS_URL}/${message.data}.json?print=true`;
@@ -481,7 +530,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                 if (data.post_stream.posts.length === 1000) {
                     console.log(`{topicURL} returned 1000 comments, may have reached limit of API`);
                 }
-                sendResponse(data.post_stream && data.post_stream.posts)
+                sendResponse({data: data.post_stream.posts})
             }
             else {
                 sendResponse('error');

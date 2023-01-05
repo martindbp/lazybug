@@ -160,6 +160,7 @@ export default {
         },
         currentCaptionIdx: function(newIdx, oldIdx) {
             if (newIdx === oldIdx) return;
+            this.$store.commit('setPlayingCaptionIdx', newIdx);
 
             const captionData = this.$store.state.captionData;
 
@@ -302,7 +303,7 @@ export default {
         setUpdateInterval: function() {
             const self = this;
             self.currentTimeInterval = setInterval(() => {
-                if (self.AVElement === null || self.$store.state.captionData == null) return;
+                if (self.$store.state.captionData == null) return;
                 const newTime = self.videoAPI.getCurrentTime();
                 if (self.paused && self.automaticallyPausedThisCaption && ! self.seeked && ! self.seekedFromMenu) {
                     return;
