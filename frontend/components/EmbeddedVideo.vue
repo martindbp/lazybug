@@ -6,9 +6,9 @@
             <div ref="player" :id="playerID" class="player">
                 <div v-if="local" style="position: absolute; bottom: 0; left: 0; right: 0;">
                     <div style="margin-left: 20%">
-                        <q-slider vertical-middle style="width: 80%" color="red" dark v-model="substituteTime" :min="0" :max="captionDuration" :step="0.5" />
-                        <q-btn vertical-middle dark color="red" v-if="substitutePlaying" label="Pause" @click="setSubstitutePlaying(false)" />
-                        <q-btn vertical-middle dark color="green" v-else label="Play" @click="setSubstitutePlaying(true)"/>
+                        <q-slider vertical-middle style="width: 80%" color="red" dark v-model="mockTime" :min="0" :max="captionDuration" :step="0.5" />
+                        <q-btn vertical-middle dark color="red" v-if="mockPlaying" label="Pause" @click="setMockPlaying(false)" />
+                        <q-btn vertical-middle dark color="green" v-else label="Play" @click="setMockPlaying(true)"/>
                         <span class="timelabel">{{currentTimeLabel()}}</span>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
 <script>
 import EmbeddedCaption from './EmbeddedCaption.vue'
 
-const SUBSTITUTE_CLOCK_SPEED = 0.01; // s
+const MOCK_CLOCK_SPEED = 0.01; // s
 
 export default {
     props: ['captionId', 'width', 'height'],
@@ -51,14 +51,14 @@ export default {
 
         if (LOCAL) {
             this.sustitueClock = setInterval(function() {
-                if (self.substitutePlaying) {
-                    self.substituteTime += SUBSTITUTE_CLOCK_SPEED;
-                    if (self.substituteTime > self.captionDuration) {
-                        self.substituteTime = self.captionDuration;
-                        self.substitutePlaying = false;
+                if (self.mockPlaying) {
+                    self.mockTime += MOCK_CLOCK_SPEED;
+                    if (self.mockTime > self.captionDuration) {
+                        self.mockTime = self.captionDuration;
+                        self.mockPlaying = false;
                     }
                 }
-            }, SUBSTITUTE_CLOCK_SPEED * 1000);
+            }, MOCK_CLOCK_SPEED * 1000);
         }
     },
     beforeUnmount: function() {
@@ -112,8 +112,8 @@ export default {
             const total = secondsToTimestamp(this.getDuration());
             return `${current} / ${total}`;
         },
-        setSubstitutePlaying: function(playing) {
-            this.substitutePlaying = playing;
+        setMockPlaying: function(playing) {
+            this.mockPlaying = playing;
             this.onPlayerStateChange({data: playing ? YT.PlayerState.PLAYING : YT.PlayerState.PAUSED});
         },
         destroyYoutube: function() {
@@ -122,8 +122,8 @@ export default {
                 this.player = null;
             }
             this.playerReady = false;
-            this.substituteTime = 0;
-            this.substitutePlaying = false;
+            this.mockTime = 0;
+            this.mockPlaying = false;
         },
         initYoutube: function() {
             const self = this;
@@ -182,13 +182,13 @@ export default {
         },
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
-            if (LOCAL) return this.substituteTime;
+            if (LOCAL) return this.mockTime;
             return this.player.getCurrentTime();
         },
         setCurrentTime: function(t) {
             if (! this.playerReady) return;
             if (LOCAL) {
-                this.substituteTime = Math.floor(t);
+                this.mockTime = Math.floor(t);
                 return;
             }
             this.player.seekTo(t, true); // allowSeekAhead
@@ -201,7 +201,7 @@ export default {
         play: function() {
             if (! this.playerReady) return;
             if (LOCAL) {
-                this.setSubstitutePlaying(true);
+                this.setMockPlaying(true);
                 return;
             }
             this.player.playVideo();
@@ -209,14 +209,14 @@ export default {
         pause: function() {
             if (! this.playerReady) return;
             if (LOCAL) {
-                this.setSubstitutePlaying(false);
+                this.setMockPlaying(false);
                 return;
             }
             this.player.pauseVideo();
         },
         isPaused: function() {
             if (! this.playerReady) return false;
-            if (LOCAL) return !this.substitutePlaying;
+            if (LOCAL) return !this.mockPlaying;
             return this.player.getPlayerState() === 2;
         },
         onPlayerStateChange: function(event) {
