@@ -35,7 +35,9 @@ const store = new Vuex.Store({
     state: {
         url: null,
         isExtension: BROWSER_EXTENSION,
+        isLocal: LOCAL,
         extensionOn: true,
+        loggedInThisSession: false, // used to add an iframe to Discourse to automatically log in there
         accessToken: getCookie('jwt'),
         accountEmail: getCookie('email'),
         captionId: null, // captionId of the currently viewed video
@@ -199,6 +201,7 @@ const store = new Vuex.Store({
             state.accessToken = val.accessToken;
             state.accountEmail = val.email;
             state.needSync = true;
+            state.loggedInThisSession = true;
             setCookie('jwt', val.accessToken, 365);
             setCookie('email', val.email, 365);
         },

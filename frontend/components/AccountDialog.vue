@@ -36,6 +36,16 @@
                 <q-btn v-else :loading="loading" flat color="primary" label="Register" @click="clickRegister"></q-btn>
             </q-card-actions>
         </q-card>
+
+        <!--
+            Add an iframe to Discourse if we log in to automatically log in there as well
+            so that we can fetch comments from here right away
+        -->
+        <iframe
+            v-if="!$store.state.isLocal && $store.state.loggedInThisSession"
+            src="https://discourse.lazybug.ai"
+            hidden
+        />
     </q-dialog>
 </template>
 

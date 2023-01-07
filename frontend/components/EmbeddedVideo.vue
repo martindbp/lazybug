@@ -2,9 +2,9 @@
     <div :class="{ iframecontainer: true, docked: $store.state.captionDocked }">
         <div class="videocontainer">
             <div v-show="!playerReady" class="videoloading" />
-            <div v-if="$store.state.isMovingCaption && !local" class="dragsurface" />
+            <div v-if="$store.state.isMovingCaption && !$store.state.isLocal" class="dragsurface" />
             <div ref="player" :id="playerID" class="player">
-                <div v-if="local" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                <div v-if="$store.state.isLocal" style="position: absolute; bottom: 0; left: 0; right: 0;">
                     <div style="margin-left: 20%">
                         <q-slider vertical-middle style="width: 80%" color="red" dark v-model="mockTime" :min="0" :max="captionDuration" :step="0.5" />
                         <q-btn vertical-middle dark color="red" v-if="mockPlaying" label="Pause" @click="setMockPlaying(false)" />
@@ -34,7 +34,6 @@ export default {
             player: null,
             playerReady: false,
             focusInterval: null,
-            local: LOCAL,
             // Mock variables are used if LOCAL is true (i.e. no youtube available)
             mockPlaying: false,
             mockTime: 0.0,
