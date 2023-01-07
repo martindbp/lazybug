@@ -156,7 +156,7 @@ export default {
             this.$store.commit('setShowDialog', {dialog: 'comments', val: true});
         },
         showComment: function(comment) {
-            const commentURL = `${this.baseDiscourseURL}/${comment.id}`
+            const commentURL = `${this.baseDiscourseURL}/${comment.post_number}`
             window.open(this.baseDiscourseURL, '_blank');
         },
         askQuestion: function() {
