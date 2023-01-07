@@ -141,10 +141,16 @@ export default {
                         const data = JSON.parse(e.target.result);
                         importDatabaseJson(data, self.$store, function(error) {
                             if (! [null, undefined].includes(error)) {
-                                alert('Something went wrong: ' + error);
+                                self.$q.dialog({
+                                    title: 'ERROR',
+                                    message: 'Something went wrong importing database: ' + error + '. Take a screenshot and report the problem in the Discourse forum (go to "Discuss")',
+                                });
                             }
                             else {
-                                alert('Successfully imported database');
+                                self.$q.dialog({
+                                    title: 'Success',
+                                    message: 'Database successfully imported from file',
+                                });
                             }
                        });
                     }
