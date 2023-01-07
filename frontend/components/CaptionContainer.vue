@@ -15,24 +15,18 @@
         </div>
         <div class="initialcontent" v-else-if="isLikelyAnAd">
             Ad detected
-            <br/><br/><br/>
-            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null && firstCaption && currTime >= 0 && currTime < firstCaption.t0">
             <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
             <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
             <br/>
             <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
-            <br/><br/>
-            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <div class="initialcontent" v-else-if="showData === null">
             <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
             <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
             <br/>
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
-            <br/><br/>
-            <div class="text-caption">Support this project on <a target="_blank" href="https://www.patreon.com/martindbp">Patreon</a></div>
         </div>
         <CaptionContent
             :class="{ showpeekall: showMenu }"
