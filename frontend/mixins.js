@@ -525,6 +525,7 @@ const mixin = {
             let captionIdx = this.$store.state.playingCaptionIdx;
             if (captionIdx === null) return [];
             if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];
+            if (captionIdx === null) return []; // could be null again if before first caption
             // Look for a link to this caption
             let regex = `https://lazybug\.ai/${showId}/${season+1}/${episode+1}/${captionIdx+1}.*`;
             return c.filter((post) => post.cooked.match(regex) !== null);
