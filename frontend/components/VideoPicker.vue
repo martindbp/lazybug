@@ -60,6 +60,7 @@
                 color="accent"
                 vertical-actions-align="left"
                 :label="numComments > 0 ? numComments : ''"
+                @click.stop.prevent="clickComments()"
                 direction="down"
                 padding="s"
             >
@@ -97,7 +98,8 @@ export default {
     },
     data: function() { return {
         clickEventListener: null,
-        openedComments: false,
+        commentsAreOpen: false,
+        manuallyClosedComments: false,
     }},
     computed: {
         isMovie: function() {
@@ -139,12 +141,25 @@ export default {
                 node.innerHTML = node.innerText;
             }
 
-            // Open the comments once if there are comments, but after that it remains closed if user closes it
-            if (self.$refs.commentselector && self.numComments > 0 && !self.openedComments) {
-                self.$refs.commentselector.show();
-                self.openedComments = true;
-            }
         });
+    },
+    watch: {
+        numComments: {
+            immediate: true,
+            handler: function() {
+                // Open the comments once if there are comments, but after that it remains closed if user closes it
+                if (! this.$refs.commentselector || this.numComments === null) return;
+
+                if (this.commentsAreOpen && this.numComments === 0) {
+                    this.$refs.commentselector.hide();
+                    this.commentsAreOpen = false;
+                }
+                else if (!this.commentsAreOpen && this.numComments > 0 && ! this.manuallyClosedComments) {
+                    this.$refs.commentselector.show();
+                    this.commentsAreOpen = true;
+                }
+            },
+        }
     },
     methods: {
         playEpisode: function(i) {
@@ -153,14 +168,21 @@ export default {
         goDiscourse: function() {
             window.open(this.baseDiscourseURL, '_blank');
         },
+        clickComments: function() {
+            this.manuallyClosedComments = this.commentsAreOpen;
+            this.commentsAreOpen = ! this.commentsAreOpen;
+        },
         showComments: function() {
+            this.commentsAreOpen = false;
             this.$store.commit('setShowDialog', {dialog: 'comments', val: true});
         },
         showComment: function(comment) {
+            this.commentsAreOpen = false;
             const commentURL = `${this.baseDiscourseURL}/${comment.post_number}`
             window.open(this.baseDiscourseURL, '_blank');
         },
         askQuestion: function() {
+            this.commentsAreOpen = false;
             const d = this.$store.state.captionData;
             let captionIdx = this.$store.state.playingCaptionIdx;
             if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];

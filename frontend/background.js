@@ -480,7 +480,8 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                    }
                 ],
             }]
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 10; i++) {
+                if (i % 2 == 1) continue; // leave every other caption empty
                 // Create one caption comment and one response to it
                 posts.push({
                     post_number: 1 + 2*i,
