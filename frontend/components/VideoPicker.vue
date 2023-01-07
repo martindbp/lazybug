@@ -57,7 +57,7 @@
                 ref="commentselector"
                 class="commentselector"
                 icon="chat"
-                color="accent"
+                color="secondary"
                 vertical-actions-align="left"
                 :label="numComments > 0 ? numComments : ''"
                 @click.stop.prevent="clickComments()"
@@ -65,20 +65,20 @@
                 padding="s"
             >
                 <q-fab-action
-                    color="accent"
-                    paddings="xs"
-                    label="Ask Question"
-                    @click.stop.prevent="askQuestion()"
-                />
-                <q-fab-action
                     v-for="comment in captionComments"
                     class="comment"
-                    color="blue"
+                    color="primary"
                     paddings="xs"
                     @click.stop.prevent="showComment(comment)"
                 >
                     <span class="innercomment" v-html="`@${comment.username}: ${comment.cooked}`" />
                 </q-fab-action>
+                <q-fab-action
+                    color="secondary"
+                    paddings="xs"
+                    label="Ask Question"
+                    @click.stop.prevent="askQuestion()"
+                />
             </q-fab>
         </div>
         <CommentsDialog :comments="captionComments" />
