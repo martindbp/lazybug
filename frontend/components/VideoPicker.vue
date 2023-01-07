@@ -58,6 +58,7 @@
                 class="commentselector"
                 icon="chat"
                 color="accent"
+                vertical-actions-align="left"
                 :label="numComments > 0 ? numComments : ''"
                 direction="down"
                 padding="s"
