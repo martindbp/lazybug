@@ -109,7 +109,6 @@ const store = new Vuex.Store({
         playingEpisode: null,
         playingCaptionIdx: null,
         navigateToCaptionIdx: null,
-        showSyncDialog: false,
         lastSyncDate: localStorage.getItem('lastSyncDate'),
         needSync: localStorage.getItem('needSync', 'false') === 'true',
         isSyncing: false,

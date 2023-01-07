@@ -1,5 +1,5 @@
 <template>
-    <q-dialog seamless v-model="$store.state.showSyncDialog">
+    <q-dialog seamless v-model="$store.state.showDialog.sync">
         <q-card>
             <q-card-section>
                 <div class="text-h6">Syncing Data</div>

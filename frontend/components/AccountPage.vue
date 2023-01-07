@@ -61,17 +61,6 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <q-dialog seamless v-model="showSyncLog">
-            <q-card>
-                <q-card-section class="row items-center">
-                    {{ $store.state.syncProgress }}
-                </q-card-section>
-
-                <q-card-actions align="right">
-                    <q-btn flat label="Close" color="primary" v-close-popup />
-                </q-card-actions>
-            </q-card>
-        </q-dialog>
     </div>
 </template>
 
@@ -83,7 +72,6 @@ export default {
         clickedClearCache: false,
         confirmClearPersonalData: false,
         clickedClearPersonalData: false,
-        showSyncLog: false,
     }},
     methods: {
         clearCache: function() {
