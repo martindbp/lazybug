@@ -1,6 +1,6 @@
 <template>
-    <div v-if="showInfo && showInfo.type !== 'movie'" :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
-        <div style="margin-bottom: 15px">
+    <div :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
+        <div v-if="!isMovie" style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"
                 :label="getSeasonName(season)"
@@ -17,7 +17,7 @@
                 />
             </q-fab>
         </div>
-        <div style="margin-bottom: 15px">
+        <div v-if="!isMovie" style="margin-bottom: 15px">
             <q-fab
                 ref="episodeselector"
                 class="episodeselector"
@@ -38,16 +38,20 @@
             </q-fab>
         </div>
         <div v-if="$store.state.playingCaptionIdx !== null">
-            <q-fab
-                v-if="numComments === null"
-                ref="commentselector"
-                class="commentselector"
-                icon="chat"
-                color="accent"
-                disable
-                padding="s"
-            >
-            </q-fab>
+            <div v-if="numComments === null">
+                <q-fab
+                    ref="commentselector"
+                    class="commentselector"
+                    icon="chat"
+                    color="accent"
+                    disable
+                    padding="s"
+                >
+                </q-fab>
+                <q-tooltip>
+                    You need to be logged in to see comments and participate
+                </q-tooltip>
+            </div>
             <q-fab
                 v-else
                 ref="commentselector"
@@ -95,6 +99,9 @@ export default {
         openedComments: false,
     }},
     computed: {
+        isMovie: function() {
+            return this.showInfo && this.showInfo.type === 'movie';
+        },
         numComments: function() {
             return Array.isArray(this.captionComments) ? this.captionComments.length : null;
         },
