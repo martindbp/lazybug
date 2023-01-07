@@ -1,6 +1,6 @@
 <template>
     <div :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
-        <div v-if="!isMovie" style="margin-bottom: 15px">
+        <div v-if="!isMovie && hasMultipleSeasons" style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"
                 :label="getSeasonName(season)"
@@ -102,6 +102,9 @@ export default {
         manuallyClosedComments: false,
     }},
     computed: {
+        hasMultipleSeasons: function() {
+            return this.showInfo.seasons.length > 1;
+        },
         isMovie: function() {
             return this.showInfo && this.showInfo.type === 'movie';
         },
