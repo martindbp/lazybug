@@ -1,8 +1,8 @@
 # Introduction
 
-[Lazybug](lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
+[Lazybug](lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible to beginners and intermediate learners. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
 
-The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing them.
+The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing them, saving and exporting vocabulary. In the future exercises and SRS (Spaced Repetition System) will be integrated.
 
 ## Project Principles
 
@@ -13,7 +13,7 @@ Whenever possible, do as much processing as possible on the front-end rather on 
   * Store user data client side and sync it to cheaper object storage rather than using SQL database server
   * Run heavy processing offline on local machines rather than in the cloud, such as extracting subtitles from video
 
-2. Single Language
+2. Single Language (Chinese)
 
 Supporting multiple languages creates a "Jack of all trades, master of none" kind of situation. Chinese is vastly different from any other language out there and requires very specific solutions that in general cannot be generalized to others.
 
@@ -156,14 +156,16 @@ Lazybug integrates comments and discussion with a separate discourse instance.
 We use the accounts on the main site (lazybug.ai) as a SSO for Discourse. Here is the authentication flow:
 
 1. User enters `lazybug.ai` and logs in. When logged in a JWT is stored in a cookie on this domain
-2. User clicks "Discuss" which diverts them to `discourse.lazybug.ai`
-3. Discourse server does a request to `lazybug.ai/api/discourse/sso` with an sso and sig token as query parameters (see `discourse_sso` [endpoint](https://github.com/martindbp/lazybug/blob/master/backend/app/app.py))
+2. We embed a hidden iframe pointing to `discourse.lazybug.ai`.
+3. When loading the iframe, the discourse server does a request back to `lazybug.ai/api/discourse/sso` with an sso and sig token as query parameters (see `discourse_sso` [endpoint](https://github.com/martindbp/lazybug/blob/master/backend/app/app.py))
 )
 4. Lazybug server validates the sso and sig using the key in the `DISCOURSE_SECRET` env variable (created by admin on Discourse)
 5. Lazybug server uses the JWT stored in the cookie to extract user id and email, and returns this info to Discourse
-6. User is now logged in using their email on Discourse
+6. Discourse sets session tokens in the cookies for discourse.lazybug.ai
+7. User is now logged in using their email on Discourse
 
 See [this article](https://meta.discourse.org/t/setup-discourseconnect-official-single-sign-on-for-discourse-sso/13045) for enabling SSO on Discourse.
+
 
 ### Prefilled comments
 
@@ -173,13 +175,13 @@ This ability to add prefill a reply doesn't come with Discourse by default, but 
 
 ### Automatically generated show/movie topics
 
-In order for users to be able to comment on a specific video and show, one topic has to be generated for each show. This is done in `make_discourse_topics.py` by going through all the shows in `data/remote/public/shows/*.json`, checking if a topic for this show id exists and if not, create it through the Discourse API. Note that the DISCOURSE_API_KEY environment variable has to be set. This script also needs to save the internal Discourse topic id in the show json, in order for the frontend to be able to link to it.
+In order for users to be able to comment on a specific video and show, one topic has to be generated for each show. This is done in `make_discourse_topics.py` by going through all the shows in `data/remote/public/shows/*.json`, checking if a topic for this show id exists and if not, create it through the Discourse API and save the topic slug and id in the show json. Note that the DISCOURSE_API_KEY environment variable has to be set. This script also needs to save the internal Discourse topic id in the show json, in order for the frontend to be able to link to it.
 
 Note that `make_discourse_topics.py` is run as part of the `show-list-full` make command, which bakes all the individual show files into one, creates bloom filters for the vocabulary etc.
 
 ### Discourse API
 
-Comments on a show topic is accessed directly from the frontend by the api at `discourse.lazybug.api/t/{topic_id}.json`. To enable this the `https://lazybug.ai` has to be added to acceptable CORS origins in the Discourse Admin UI. The value for "same site cookies" under Security also needs to be set to "None".
+Comments on a show topic is accessed directly from the frontend by the api at `discourse.lazybug.ai/t/{topic_id}.json`. Linking to a topic or a comment a comment requires the topic slug as well as the id, the URL template being `discourse.lazybug.ai/t/${topic_slug}/${topic_id}/${post_number}`. To enable this the `https://lazybug.ai` has to be added to acceptable CORS origins in the Discourse Admin UI. The value for "same site cookies" under Security also needs to be set to "None".
 
 ## Docker
 
