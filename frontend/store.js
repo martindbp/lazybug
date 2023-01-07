@@ -44,7 +44,7 @@ const store = new Vuex.Store({
         accountEmail: getCookie('email'),
         captionId: null, // captionId of the currently viewed video
         videoId: null, // videoId of the currently viewed video
-        captionDocked: localStorage.getItem('captionDocked') === 'true' && ! BROWSER_EXTENSION,
+        captionDocked: ['true', null].includes(localStorage.getItem('captionDocked')) && ! BROWSER_EXTENSION,
         localVideoHash: null,
         AVElement: null,
         videoAPI: null,
