@@ -10,9 +10,12 @@
                 <q-separator />
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
-                    <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
-                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', val: true})">Show Sync Log</q-btn>
-                    <q-btn color="red" flat @click="logout">Logout</q-btn>
+                    <div v-if="$store.state.loggingOut" />
+                    <div v-else>
+                        <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
+                        <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', val: true})">Show Sync Log</q-btn>
+                        <q-btn color="red" flat @click="logout">Logout</q-btn>
+                    </div>
                 </q-card-actions>
                 <q-card-actions v-else>
                     <q-btn color="primary" flat @click="register">Register</q-btn>
@@ -121,9 +124,15 @@ export default {
         },
         logout: function() {
             const self = this;
+            this.$q.loading.show({
+              message: 'Logging out...',
+              boxClass: 'bg-grey-2 text-grey-9',
+              spinnerColor: 'primary'
+            })
             this.showModalAndSync(true, function(error) {
                 clearPersonalData(function() {
-                    self.$store.commit('setLogout');
+                    self.$store.commit('setLoggedOut');
+                    self.$q.loading.hide()
                 });
             });
         },

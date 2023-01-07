@@ -205,7 +205,7 @@ const store = new Vuex.Store({
             setCookie('jwt', val.accessToken, 365);
             setCookie('email', val.email, 365);
         },
-        setLogout(state) {
+        setLoggedOut(state) {
             state.accessToken = null;
             state.accountEmail = null;
             eraseCookie('jwt');
