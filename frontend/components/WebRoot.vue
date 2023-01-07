@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-show="applicationReady">
         <q-layout view="lHh Lpr lff" container class="shadow-2 rounded-borders">
            <q-header v-if="isMobile" elevated class="bg-blue">
                <q-toolbar>
@@ -179,5 +179,12 @@ export default {
 <style>
 .q-page-container.nopadding {
     padding-top: 0px !important;
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 </style>

@@ -16,6 +16,12 @@ const mixin = {
         accountCallback: null,
     }},
     watch: {
+        applicationReady: function() {
+            let $el = document.querySelector('.loading-container');
+            if ($el) {
+                $el.remove()
+            }
+        },
         accessTokenPlusNeedSync: function() {
             if (this.accessToken && this.accountCallback && !this.needSync) {
                 this.accountCallback();
@@ -418,6 +424,9 @@ const mixin = {
         },
     },
     computed: {
+        applicationReady: function() {
+            return this.$store.state.cssLoaded && this.$store.state.fetchedAllPublicResources;
+        },
         showInfo: function() {
             return getShowInfo(this.$store);
         },

@@ -33,6 +33,8 @@ function getShowInfo(store, state = null) {
 
 const store = new Vuex.Store({
     state: {
+        cssLoaded: false,
+        fetchedAllPublicResources: false,
         url: null,
         isExtension: BROWSER_EXTENSION,
         isLocal: LOCAL,
@@ -162,6 +164,12 @@ const store = new Vuex.Store({
         }),
     },
     mutations: {
+        setFetchedAllPublicResources(state) {
+            state.fetchedAllPublicResources = true;
+        },
+        setCssLoaded(state) {
+            state.cssLoaded = true;
+        },
         setShowDiscourseComments(state, val) {
             state.showDiscourseComments = val;
         },
@@ -543,6 +551,7 @@ const FETCH_PUBLIC_RESOURCES = [
 
 
 function fetchInitialResources() {
+    let numFetched = 0;
     for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
         fetchVersionedResource(filename, function (data) {
             if (data === 'error') {
@@ -551,6 +560,10 @@ function fetchInitialResources() {
             else {
                 store.commit('resetResourceFetchError', errorName);
                 store.commit(mutation, data);
+            }
+            numFetched++;
+            if (numFetched == FETCH_PUBLIC_RESOURCES.length) {
+                store.commit('setFetchedAllPublicResources');
             }
         });
     }
@@ -580,6 +593,14 @@ else {
     window.onpopstate = (event) => {
         store.commit('setURL', document.location);
     }
+
+    let numCss = Array.from(document.querySelectorAll('head link')).filter(($el) => $el.href.endsWith('css')).length;
+    let checkCssInterval = setInterval(function() {
+        if (document.styleSheets.length === numCss) {
+            clearInterval(checkCssInterval);
+            store.commit('setCssLoaded');
+        }
+    }, 100);
 }
 
 function addBadge($img, videoList) {
