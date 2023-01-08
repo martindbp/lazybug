@@ -29,33 +29,3 @@ export default {
     },
 };
 </script>
-
-<style>
-.episodeselector .q-fab__actions {
-    flex-wrap: wrap !important;
-    justify-content: left !important;
-    min-width: 700px;
-}
-
-.mobile .episodeselector .q-fab__actions {
-    min-width: 300px;
-    -webkit-overflow-scrolling: touch;
-    will-change: scroll-position;
-    overflow: auto;
-    height: 500px;
-}
-
-.episodeselector .q-fab__actions .q-btn {
-    font-size: 10px !important;
-}
-
-.videopicker {
-    position: absolute;
-    left: 5px;
-    top: 185px;
-}
-
-.videopicker.mobile {
-    top: 15px;
-}
-</style>
