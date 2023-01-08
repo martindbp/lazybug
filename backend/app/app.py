@@ -20,6 +20,8 @@ from app.users import auth_backend, current_active_user, fastapi_users
 from app.discoursesso import DiscourseSSO
 
 
+DISCOURSE_SECRET = os.getenv('DISCOURSE_SECRET')
+DISCOURSE_API_KEY = os.getenv('DISCOURSE_API_KEY')
 ACCOUNT_FILE_SIZE_LIMIT_BYTES = 100_000_000
 ACCOUNTS_BUCKET = 'lazybug-accounts'
 LOCAL = os.getenv('LOCAL') is not None
@@ -28,8 +30,12 @@ if not LOCAL:
     ENDPOINT = os.getenv('B2_ENDPOINT')
     KEY_ID = os.getenv('B2_APPLICATION_KEY_ID')
     APPLICATION_KEY = os.getenv('B2_APPLICATION_KEY')
+    discourse_client = discourse.Client(
+        host='https://discourse.lazybug.ai/',
+        api_username='system',
+        api_key=DISCOURSE_API_KEY,
+    )
 
-DISCOURSE_SECRET = os.getenv('DISCOURSE_SECRET')
 
 if not LOCAL and (ENDPOINT is None or KEY_ID is None or APPLICATION_KEY is None):
     print('ERROR: B2 secrets not set')
@@ -145,6 +151,12 @@ async def get_database_last_modified_date(user: User = Depends(current_active_us
 
     return response["LastModified"]
 
+
+@app.get("/api/get-id-and-email")
+async def get_email_and_id(user: User = Depends(current_active_user)):
+    return [user.id, user.email]
+
+
 if LOCAL:
     @app.put("/api/upload-file")
     async def upload_file(request: Request, user: User = Depends(current_active_user)):
@@ -153,10 +165,6 @@ if LOCAL:
         path = f'backend/{account_file}'
         with open(path, 'wb') as f:
             f.write(body)
-else:
-    @app.get("/api/discourse/get-id-and-email")
-    async def discourse_get_email_and_id(user: User = Depends(current_active_user)):
-        return [user.id, user.email]
 
 
 @app.get("/api/discourse/sso")
@@ -171,7 +179,7 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
 
     # Get jwt from cookies, then do a local request to get the email
     headers = {'Authorization': 'Bearer ' + jwt}
-    user_id, user_email = client.get('/api/discourse/get-id-and-email', headers=headers).json()
+    user_id, user_email = client.get('/api/get-id-and-email', headers=headers).json()
 
     credentials = {
         "external_id" : user_id,
@@ -190,6 +198,16 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
         return RedirectResponse(return_url)
 
     raise HTTPException(status_code=403, detail=f'Discourse SSO failed')
+
+
+@app.post("/api/discourse/logout")
+async def discourse_logout(user: User = Depends(current_active_user)):
+    """
+    We need to use the discourse API (with API key) in order to log out a user, we can't
+    do it directly from the front-end because we don't have the CSRF token
+    """
+    user = discourse_client.get_user(external_id=user.id)
+    user.log_out()
 
 
 # NOTE: need to put this last!

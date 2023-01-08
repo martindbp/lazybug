@@ -110,8 +110,22 @@ export default {
         logout: function() {
             const self = this;
             this.showModalAndSync(true, function(error) {
+                self.$store.commit('addSyncProgress', 'Clearing IndexedDB');
                 clearPersonalData(function() {
-                    self.$store.commit('setLoggedOut');
+                    self.$store.commit('addSyncProgress', 'Logging out of Discourse');
+                    fetch('/api/discourse/logout', {
+                        method: 'POST',
+                        headers: new Headers({
+                            'Authorization': 'Bearer ' + self.$store.state.accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }),
+                    })
+                    .catch((error) => {
+                        self.$store.commit('addSyncProgress', 'Discourse logout error:', error);
+                    })
+                    .then(() => {
+                        self.$store.commit('setLoggedOut');
+                    });
                 });
             });
         },
