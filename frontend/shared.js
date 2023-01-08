@@ -351,6 +351,10 @@ function isName(tr) {
     return /^[A-Z][^A-Z]+/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
 }
 
+function removeDiacritics(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function hiddenStates(states, wordData) {
     const hidden = getStates(states, wordData, StateHidden, StateNone, StateHidden);
     // Translation is always hidden:

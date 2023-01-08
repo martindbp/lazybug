@@ -8,6 +8,13 @@
       row-key="name"
       :class="{showtable: true, mobile: isMobile}"
     >
+        <template v-slot:top-left>
+            <q-input borderless dense debounce="300" v-model="searchFilter" placeholder="Search">
+                <template v-slot:prepend>
+                    <q-icon name="search" />
+                </template>
+            </q-input>
+        </template>
         <template v-slot:header-cell="props">
             <q-th :props="props">
                 {{ props.col.label }}
@@ -93,6 +100,7 @@ var roundToScale = function(n, scale) {
 export default {
     mixins: [mixin],
     data: function() { return {
+        searchFilter: '',
         pagination: {
             rowsPerPage: 25,
         },
@@ -212,7 +220,29 @@ export default {
                     }
                     return allMatch;
                 });
+            }
+            if (this.searchFilter.length > 0) {
+                rows = rows.filter(row => {
+                    let sourceStrings = [
+                        removeDiacritics(this.searchFilter.toLowerCase().replace(' ', '')),
+                    ];
 
+                    let targetStrings = [];
+                    if (typeof(row.name) === 'object') {
+                        if (row.name.hz) targetStrings.push(row.name.hz.toLowerCase().replace(' ', ''));
+                        if (row.name.py) targetStrings.push(removeDiacritics(row.name.py).toLowerCase().replace(' ', ''));
+                        if (row.name.en) targetStrings.push(row.name.en.toLowerCase().replace(' ', ''));
+                    }
+                    else {
+                        targetStrings.push(row.name.toLowerCase().replace(' ', ''))
+                    }
+                    for (const t of targetStrings) {
+                        for (const s of sourceStrings) {
+                            if (t.includes(s)) return true;
+                        }
+                    }
+                    return false;
+                });
             }
 
             // Add in the % known
