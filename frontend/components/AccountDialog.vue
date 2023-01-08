@@ -14,18 +14,18 @@
                 <q-tab-panel name="login">
                     Enter email and password:
                     <form>
-                        <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" />
+                        <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" @keydown.enter.prevent="submit" />
                         <br>
-                        <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" />
+                        <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" @keydown.enter.prevent="submit" />
                         <div class="accounterror" v-if="error">{{ error }}</div>
                     </form>
                 </q-tab-panel>
                 <q-tab-panel name="register">
                     Enter desired email and password:
                     <form>
-                        <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" />
+                        <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" @keydown.enter.prevent="submit" />
                         <br>
-                        <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" />
+                        <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" @keydown.enter.prevent="submit" />
                         <div class="accounterror" v-if="error">{{ error }}</div>
                     </form>
                 </q-tab-panel>
@@ -96,6 +96,10 @@ export default {
                 if (self.tab === 'login') self.$refs.loginEmail.focus();
                 else self.$refs.registerEmail.focus();
             });
+        },
+        submit: function() {
+            if (this.tab === 'login') this.clickLogin();
+            else if (this.tab === 'register') this.clickRegister();
         },
         clickLogin: function() {
             this.loading = true;
