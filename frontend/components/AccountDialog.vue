@@ -12,7 +12,7 @@
 
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="login">
-                    Please enter your email and password:
+                    Enter email and password:
                     <form>
                         <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" />
                         <br>
@@ -21,7 +21,7 @@
                     </form>
                 </q-tab-panel>
                 <q-tab-panel name="register">
-                    Please enter desired email and password:
+                    Enter desired email and password:
                     <form>
                         <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" />
                         <br>
