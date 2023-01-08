@@ -50,13 +50,13 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :active="page === 'star'" clickable @click="clickPage('star')" v-ripple>
+                <q-item :active="page === 'words'" clickable @click="clickPage('words')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="star" />
                   </q-item-section>
 
                   <q-item-section>
-                    Starred
+                    Words
                   </q-item-section>
                 </q-item>
 
@@ -94,7 +94,7 @@
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-show="page === 'content'" />
                 <HistoryPage v-show="page === 'history'" />
-                <StarTable v-show="page === 'star'" />
+                <WordTable v-show="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
             </q-page>
           </q-page-container>
@@ -119,7 +119,7 @@
 
 <script>
 import ShowTable from './ShowTable.vue'
-import StarTable from './StarTable.vue'
+import WordTable from './WordTable.vue'
 import AccountPage from './AccountPage.vue'
 import PlayerPage from './PlayerPage.vue'
 import HistoryPage from './HistoryPage.vue'
@@ -130,7 +130,7 @@ export default {
     mixins: [mixin],
     components: {
         ShowTable,
-        StarTable,
+        WordTable,
         AccountPage,
         PlayerPage,
         HistoryPage,

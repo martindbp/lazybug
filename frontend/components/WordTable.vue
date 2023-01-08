@@ -1,7 +1,7 @@
 <template>
     <div>
         <q-table
-            title="Starred"
+            title="Starred Words"
             :rows="rows"
             :columns="columns"
             selection="multiple"
@@ -10,7 +10,7 @@
             @request="onRequest"
             :pagination="pagination"
             hide-pagination
-            :class="{startable: true, mobile: isMobile}"
+            :class="{wordtable: true, mobile: isMobile}"
         >
           <template v-slot:body="props">
               <q-tr v-if="props.row.isNewSession">
@@ -43,7 +43,7 @@
           </template>
 
           <template v-slot:top>
-              <div class="text-h5">Starred</div>
+              <div class="text-h5">Starred Words</div>
               <q-btn icon="first_page" color="grey-8" round dense flat :disable="isFirstPage" @click="firstPage" />
               <q-btn icon="chevron_left" color="grey-8" round dense flat :disable="isFirstPage" @click="prevPage" />
               <q-btn icon="chevron_right" color="grey-8" round dense flat :disable="isLastPage" @click="nextPage" />
@@ -541,10 +541,10 @@ export default {
 </script>
 
 <style>
-.startable {
+.wordtable {
     display: inline-block;
 }
-.startable:not(.mobile) {
+.wordtable:not(.mobile) {
     margin-top: 50px;
     margin-left: 50px;
     min-width: 500px;
