@@ -521,7 +521,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             credentials: 'include',
         }).then((response) => {
             if (!response.ok) {
-                return null;
+                throw new Error('Fetch failed');
             }
             return response;
         })
