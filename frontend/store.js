@@ -559,6 +559,11 @@ function fetchInitialResources() {
             else {
                 store.commit('resetResourceFetchError', errorName);
                 store.commit(mutation, data);
+
+                let $el = document.querySelector('.loading-text');
+                if ($el) {
+                    $el.innerText = `Loaded ${filename}`;
+                }
             }
             numFetched++;
             if (numFetched == FETCH_PUBLIC_RESOURCES.length) {

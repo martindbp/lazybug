@@ -180,11 +180,4 @@ export default {
 .q-page-container.nopadding {
     padding-top: 0px !important;
 }
-
-.loading-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
 </style>
