@@ -237,7 +237,7 @@ export default {
 }
 
 .videopicker.mobile {
-    top: 15px;
+    top: 70px;
 }
 
 .commentselector .q-fab__actions {
