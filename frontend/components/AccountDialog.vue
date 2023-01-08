@@ -71,15 +71,18 @@ export default {
         },
     },
     watch: {
-        show: function() {
-            if (this.show !== false) {
-                this.tab = this.$store.state.showDialog.account;
-                const self = this;
-                // Need to delay this further as nextTick is not enough
-                setTimeout(function() {
-                    self.focus();
-                }, 50);
-            }
+        show: {
+            immediate: true,
+            handler: function() {
+                if (this.show !== false) {
+                    this.tab = this.$store.state.showDialog.account;
+                    const self = this;
+                    // Need to delay this further as nextTick is not enough
+                    setTimeout(function() {
+                        self.focus();
+                    }, 50);
+                }
+            },
         },
         tab: function() {
             this.error = null;

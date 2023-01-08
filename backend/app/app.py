@@ -175,7 +175,8 @@ async def discourse_sso(sso, sig, jwt = Cookie(default=None)):
     (user has to have logged in there first), and return the associated user id and email of the account
     """
     if jwt is None:
-        raise HTTPException(status_code=403, detail=f'No jwt token')
+        # Not logged in, so redirect to the account page with login modal
+        return RedirectResponse('https://lazybug.ai/account/login')
 
     # Get jwt from cookies, then do a local request to get the email
     headers = {'Authorization': 'Bearer ' + jwt}
