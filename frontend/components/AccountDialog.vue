@@ -12,11 +12,18 @@
 
             <q-tab-panels v-model="tab">
                 <q-tab-panel name="login">
-                    Enter email and password:
                     <form>
-                        <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" @keydown.enter.prevent="submit" />
-                        <br>
+                        <div v-show="sentPasswordResetEmail === false">
+                            <q-input ref="loginEmail" v-model="email" filled type="email" hint="Email" @keydown.enter.prevent="submit" />
+                            <br>
+                        </div>
                         <q-input ref="loginPassword" v-model="password" filled type="password" hint="Password" @keydown.enter.prevent="submit" />
+                        <div v-if="sentPasswordResetEmail" >
+                            <br>
+                            <q-input ref="resetPasswordTokenInput" v-model="passwordResetToken" filled type="text" hint="Password Reset Code" @keydown.enter.prevent="submit" />
+                        </div>
+                        <div class="accountmessage" v-if="sentPasswordResetEmail === true">A reset code has been sent, copy and paste it above</div>
+                        <div class="accountmessage" v-if="sentPasswordResetEmail === 'loading'">Sending an email, hang on...</div>
                         <div class="accounterror" v-if="error">{{ error }}</div>
                     </form>
                 </q-tab-panel>
@@ -31,8 +38,14 @@
                 </q-tab-panel>
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
+                <div v-if="tab === 'login'">
+                    <q-btn v-if="!sentPasswordResetEmail" :loading="loading" flat color="deep-orange" label="Forgot Password" @click="clickForgotPassword"></q-btn>
+                    <q-btn v-if="sentPasswordResetEmail" :loading="loading" flat color="primary" label="Reset Password" @click="clickResetPassword"></q-btn>
+                </div>
                 <q-btn flat label="Close" v-close-popup></q-btn>
-                <q-btn v-if="tab === 'login'" :loading="loading" flat color="primary" label="Login" @click="clickLogin"></q-btn>
+                <div v-if="tab === 'login'">
+                    <q-btn v-if="sentPasswordResetEmail === false" :loading="loading" flat color="primary" label="Login" @click="clickLogin"></q-btn>
+                </div>
                 <q-btn v-else :loading="loading" flat color="primary" label="Register" @click="clickRegister"></q-btn>
             </q-card-actions>
         </q-card>
@@ -57,6 +70,8 @@ export default {
         tab: Vue.ref('login'),
         email: '',
         password: '',
+        passwordResetToken: null,
+        sentPasswordResetEmail: false,
         loading: false,
         error: null,
     }},
@@ -90,6 +105,70 @@ export default {
         },
     },
     methods: {
+        clickResetPassword: function() {
+            this.error = null;
+            if (this.password.length === 0) {
+                this.error = 'You need to a new password to reset'
+                return;
+            }
+
+            this.sentPasswordResetEmail = false;
+            this.loading = true;
+            const self = this;
+            fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: this.passwordResetToken,
+                    password: this.password,
+                }),
+            })
+            .catch((error) => {
+                self.error = `Something went wrong: ${error}`;
+                self.loading = false;
+            })
+            .then(() => {
+                self.passwordResetToken = null;
+                self.loading = false;
+                self.$q.dialog({
+                    title: 'Success!',
+                    message: 'Your password has been successfully changed',
+                }).onOk(() => {
+                    self.clickLogin();
+                });
+            });
+        },
+        clickForgotPassword: function() {
+            this.error = null;
+            if (this.email.length === 0) {
+                this.error = 'You need to provide an email to request new password'
+                return;
+            }
+
+            this.loading = true;
+            this.sentPasswordResetEmail = 'loading';
+            const self = this;
+            fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: this.email
+                }),
+            })
+            .then((data) => {
+                self.sentPasswordResetEmail = true;
+                self.loading = false;
+            })
+            .catch((error) => {
+                self.error = error;
+                self.loading = false;
+                self.sentPasswordResetEmail = false;
+            });
+        },
         focus: function() {
             const self = this;
             this.$nextTick(() => {
@@ -103,6 +182,7 @@ export default {
         },
         clickLogin: function() {
             this.loading = true;
+            this.error = null;
             const self = this;
 
             login(this.email, this.password, function(res, error) {
@@ -126,6 +206,7 @@ export default {
         },
         clickRegister: function() {
             this.loading = true;
+            this.error = null;
             const self = this;
 
             register(this.email, this.password, function(error) {
@@ -155,5 +236,10 @@ export default {
 .accounterror {
     margin-top: 10px;
     color: red;
+}
+
+.accountmessage {
+    margin-top: 10px;
+    color: black;
 }
 </style>

@@ -1,5 +1,6 @@
 fastapi
 fastapi-users[sqlalchemy]
+fastapi-mail[httpx]
 uvicorn[standard]
 aiosqlite
 boto3

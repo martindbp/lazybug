@@ -507,10 +507,8 @@ const store = new Vuex.Store({
                         state.playingEpisode = 0;
                     }
                 }
-                else if (parts[0] === 'account') {
-                    if (parts.length > 1 && ['register', 'login'].includes(parts[1])) {
-                        state.showDialog.account = parts[1];
-                    }
+                else if (parts[0] === 'account' && parts.length === 2 && ['register', 'login'].includes(parts[1])) {
+                    state.showDialog.account = parts[1];
                 }
             }
         },
