@@ -1,5 +1,5 @@
 <template>
-    <q-dialog seamless v-model="show" dark ref="optionmodal" class="fixdialogheight">
+    <q-dialog seamless v-model="show" dark ref="optionmodal" class="fixoptionsdialogheight">
         <q-card dark class="q-px-sm q-pb-md" style="min-height: 500px">
             <q-tabs
               v-model="tab"
@@ -337,11 +337,11 @@ export default {
     border: 2px solid red;
 }
 
-.fixdialogheight .q-panel {
+.fixoptionsdialogheight .q-panel {
     height: auto !important;
 }
 
-.fixdialogheight .q-panel > div {
+.fixoptionsdialogheight .q-panel > div {
     height: auto !important;
 }
 
