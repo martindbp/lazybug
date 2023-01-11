@@ -1,7 +1,7 @@
 {
     "name": "Lazybug",
     "version": "3.0",
-    "description": "",
+    "description": "Free and open-source way to learning Chinese through TV and movies",
     "background": {
         "service_worker": "background.js"
     },

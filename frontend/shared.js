@@ -208,6 +208,8 @@ function fetchPersonalDataToStore(store) {
 }
 
 function appendSessionLog($store, data) {
+    if ([null, undefined].includes($store.state.captionData)) return;
+
     const showId = $store.state.captionData.show_name;
     const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(null, $store.state), $store.state.captionId);
     console.log('Append log', $store.state.captionId, $store.state.captionHash, $store.state.sessionTime, data, showName, seasonName, episodeName);

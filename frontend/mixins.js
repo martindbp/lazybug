@@ -424,6 +424,9 @@ const mixin = {
         },
     },
     computed: {
+        discourseURL: function() {
+            return DISCOURSE_URL;
+        },
         applicationReady: function() {
             return this.$store.state.cssLoaded && this.$store.state.fetchedAllPublicResources;
         },

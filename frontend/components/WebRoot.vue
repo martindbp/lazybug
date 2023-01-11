@@ -124,6 +124,18 @@
         </q-dialog>
         <AccountDialog />
         <SyncDialog />
+
+        <!--
+            Add an iframe to Discourse if we log in to automatically log in there as well
+            so that we can fetch comments from here right away
+        -->
+        <iframe
+            ref="discourseIframe"
+            v-if="!$store.state.isLocal && $store.state.loggedInThisSession"
+            @load="onIframeLoaded()"
+            :src="discourseURL"
+            hidden
+        />
     </div>
 </template>
 
@@ -149,11 +161,18 @@ export default {
     },
     data: function() { return {
         drawer: this.isDesktop,
+        iframeLoaded: false,
     }},
     mounted: function() {
         $q = this.$q; // global variable in shared.js
     },
     methods: {
+        onIframeLoaded: function() {
+            if (this.iframeLoaded) return;
+            this.iframeLoaded = true;
+            // Reload iframe since the first time we could be stuck in "You've logged out", and SSO is never initiated
+            this.$refs.discourseIframe.src = DISCOURSE_URL;
+        },
         clickAbout: function() {
             window.open('https://github.com/martindbp/lazybug#readme', '_blank');
         },

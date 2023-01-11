@@ -24,7 +24,7 @@
                 :label="getEpisodeName(episode)"
                 color="green"
                 icon="keyboard_arrow_right"
-                @click="$refs.seasonselector.hide()"
+                @click="$refs.seasonselector ? $refs.seasonselector.hide() : null"
                 direction="right"
                 padding="xs"
             >
@@ -38,7 +38,7 @@
             </q-fab>
         </div>
         <div v-if="$store.state.playingCaptionIdx !== null">
-            <div v-if="numComments === null">
+            <div v-if="[null, undefined].includes($store.state.accountEmail) || numComments === null">
                 <q-fab
                     ref="commentselector"
                     class="commentselector"
@@ -103,7 +103,8 @@ export default {
     }},
     computed: {
         hasMultipleSeasons: function() {
-            return this.showInfo.seasons.length > 1;
+            if (this.showInfo) return this.showInfo.seasons.length > 1;
+            else return false;
         },
         isMovie: function() {
             return this.showInfo && this.showInfo.type === 'movie';
