@@ -80,6 +80,16 @@
                   </q-item-section>
                 </q-item>
 
+                <q-item :active="page === 'about'" clickable @click="clickAbout()" v-ripple>
+                  <q-item-section avatar>
+                    <q-icon name="info" />
+                  </q-item-section>
+
+                  <q-item-section>
+                    About
+                  </q-item-section>
+                </q-item>
+
                 <q-item v-if="$store.state.accessToken && $store.state.needSync">
                     <q-btn color="green" flat @click="showModalAndSync">Sync Changes</q-btn>
                 </q-item>
@@ -144,6 +154,9 @@ export default {
         $q = this.$q; // global variable in shared.js
     },
     methods: {
+        clickAbout: function() {
+            window.open('https://github.com/martindbp/lazybug#readme', '_blank');
+        },
         clickPage: function(page) {
             this.$store.commit('setPage', page);
             if (this.isMobile) this.drawer = false; // close after tap if on mobile
