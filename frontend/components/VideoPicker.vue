@@ -212,6 +212,10 @@ export default {
 </script>
 
 <style>
+.q-fab__actions {
+    top: -10px; /* fixes alignment on mobile */
+}
+
 .episodeselector .q-fab__actions {
     flex-wrap: wrap !important;
     justify-content: left !important;
