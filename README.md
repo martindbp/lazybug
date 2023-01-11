@@ -2,14 +2,16 @@
 
 [Lazybug](lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible to beginners and intermediate learners. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
 
-The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing them, saving and exporting vocabulary. In the future exercises and SRS (Spaced Repetition System) will be integrated.
+The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing and customaizing them, and saving/exporting vocabulary. In the future exercises and SRS (Spaced Repetition System) will be integrated.
+
+The app (and browser extension) works more like a mobile app than a web app in that it stores all data locally in the browser and only syncs to the cloud on the user's request. The app is fully functional without a backend server, except in the cloud syncing functionality and forum. In the future the app will also be usable offline.
 
 ## Project Principles
 
 1. Remain free and open source by minimizing hosting costs
 
-Whenever possible, do as much processing as possible on the front-end rather on servers. For example:
-  * Keep all logic client side (except account and social functionality), including ML inference if possible
+Do as much processing as possible on the front-end rather on servers. For example:
+  * Keep all logic client side (except account and social functionality), including ML inference (if possible)
   * Store user data client side and sync it to cheaper object storage rather than using SQL database server
   * Run heavy processing offline on local machines rather than in the cloud, such as extracting subtitles from video
 
@@ -21,30 +23,56 @@ Supporting multiple languages creates a "Jack of all trades, master of none" kin
 
 This project is for learning Chinese from TV and movies. While other functionality might grow out of it, this is priority number one. Things like learning how to write is best left for other apps.
 
-4. Open Data Format
+4. Open Data and Format
+
+The user should own their data, it should be easily exported.
 
 Work towards an open data format for Chinese learning activity (impressions and SRS) to enable interoperability between apps. Today, a major inefficiency for learners is splitting their data between apps. A unified format/place for data would enable much more efficient scheduling for Spaced Repetition Systems, ranking of content etc.
 
-5. Copyright
+5. Works Offline
+
+The parts of the app that don't depend on a network (e.g. viewing videos) should work offline.
+
+6. Copyright
 
 This project provides content based on fair use doctrine:
 
 1. "the purpose and character of the use, including whether such use is of a commercial nature or is for nonprofit educational purposes;"
-   Interpretation: Lazybug is freely availble and open source and could thus be seen as non-commercial
+   Interpretation: The full functionality of Lazybug is freely available and open source and could thus be seen as non-commercial educational in nature
 2. "the nature of the copyrighted work;"
    Interpretation: the content is merely a written down and augmented version of what the user hears and sees (through hard or soft-subs) on the page. Google already does this when translating whole websites for end users.
 3. "the amount and substantiality of the portion used in relation to the copyrighted work as a whole; and"
    Interpretation: videos themselves are not hosted nor copied, only the subtitles
 4. "the effect of the use upon the potential market for or value of the copyrighted work."
-   Interpretation: the project does not include subtitles for work that is illegally provided, e.g. only on legal sites like Youtube.com and Bilibili.com. The project does not interfere with ads or paid subscriptions. It also does not include subtitles where they affect the creator financially, such as when PDF scripts are provided for Patreon supporters or available after paid subscription.
+   Interpretation: the project does not include subtitles for work that is illegally provided, e.g. only on legal sites like Youtube.com and Bilibili.com. The project does not interfere with ads or paid subscriptions. It also does not include subtitles where they could affect the creator financially, such as when PDF scripts are provided for Patreon supporters or available after paid subscription.
+
+## DMCA
+
+If you own the copyright to content hosted on lazybug.ai and it is being used inappropriately, please notify us at martin@lazybug.ai.
+
+## Contributing
+
+If you're interested in contributing to the project, here are some possible areas:
+
+  * Processing shows - Finding good shows
+  * Frontend (Vue.js / Quasar) - Design improvements, code cleanup and bug fixes very welcome
+  * Machine Learning (Python, PyTorch, Segmentation, OCR, NLP) - There are plenty of interesting ML projects and improvements for processing videos and subtitles
+
+Some work items may be found in the Github issues of this project, but before starting on anything please reach out to me@martindbp.com with details of your skillset and what you'd like to help out on.
+
+## Reporting Bugs
+
+If you have a Github account you can open an issue here, or you can create a new topic on the [forum](https://discourse.lazybug.ai/) (requires Lazybug account) with the category "Site Feedback and Bugs".
 
 ## General Project Structure
+
+NOTE: this document is currently incomplete, as I'd adding to it as I revisit the different parts of the codebase.
 
 This project consists of a number of different high-level parts:
 
 1. Algorithms to extract Chinese captions from video, and process them in various ways, like performing sentence segmentation and word disambiguation. These algorithms are mostly implemented in Python.
-2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content. The frontend is written in JS and Vue, the backend in Python
-3. A browser extension for viewing videos that cannot be embedded into the web app
+2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content. The frontend is written in JS and Vue.js, the backend in Python.
+3. A browser extension for viewing videos that cannot be embedded into the web app. The codebase is shared with the JS web app.
 
 # Code and development details
 
@@ -66,9 +94,9 @@ The server needs a cert in `data/local/ssl_keys/{privkey,fullchain}.pem`. Create
 ## Frontend
 
 To release new frontend changes do:
-1. `make purge-web-cache`
-2. ssh into server
-3. `make update-server`  # this kills the server, pulls changes, builds the frontend and runs the server again
+1. `ssh root@$LAZYBUG_SERVER_IP`
+2. `cd lazybug && make update-server`  # this kills the server, pulls changes, builds the frontend and runs the server again
+3. The previous command purges the Cloudflare cache, but this sometimes doesn't work, in that case go to cloudflare and do "Purge Cache -> Purge Everything"
 
 ## Environment variables
 
@@ -156,13 +184,14 @@ Lazybug integrates comments and discussion with a separate discourse instance.
 We use the accounts on the main site (lazybug.ai) as a SSO for Discourse. Here is the authentication flow:
 
 1. User enters `lazybug.ai` and logs in. When logged in a JWT is stored in a cookie on this domain
-2. We embed a hidden iframe pointing to `discourse.lazybug.ai`.
+2. Embed a hidden iframe pointing to `discourse.lazybug.ai`.
 3. When loading the iframe, the discourse server does a request back to `lazybug.ai/api/discourse/sso` with an sso and sig token as query parameters (see `discourse_sso` [endpoint](https://github.com/martindbp/lazybug/blob/master/backend/app/app.py))
 )
 4. Lazybug server validates the sso and sig using the key in the `DISCOURSE_SECRET` env variable (created by admin on Discourse)
 5. Lazybug server uses the JWT stored in the cookie to extract user id and email, and returns this info to Discourse
 6. Discourse sets session tokens in the cookies for discourse.lazybug.ai
 7. User is now logged in using their email on Discourse
+8. When the user logs out from Lazybug, we call the Python server endpoint at `/api/discourse/logout` which calls the Discourse API to log the user out. This can't be done from the frontend because it requires a CSRF token.
 
 See [this article](https://meta.discourse.org/t/setup-discourseconnect-official-single-sign-on-for-discourse-sso/13045) for enabling SSO on Discourse.
 
