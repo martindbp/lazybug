@@ -8,6 +8,7 @@ let nextRequestId = 1;
 const requestCallbacks = {}; // map between SESSION_ID+request_id to a callback handler
 
 let lazybugIframe = null;
+let store = null;
 
 if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     lazybugIframe = document.createElement('iframe');
@@ -956,11 +957,13 @@ function getIconSvg(name, size, color = "white") {
     return ICON_SVG[name].replaceAll('${width}', size).replaceAll('${height}', size).replaceAll('${color}', color);
 }
 
-function setCookie(cname, cvalue, exdays) {
+function setCookie(cname, cvalue, exdays, secure="true", samesite="none") {
   const d = new Date();
   d.setTime(d.getTime() + (exdays*24*60*60*1000));
-  let expires = "expires="+ d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  let expires = "expires=" + d.toUTCString();
+  secure = "secure=" + secure;
+  samesite = "samesite=" + samesite;
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";" + secure + ";" + samesite + ";path=/";
 }
 
 function getCookie(cname) {

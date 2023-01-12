@@ -462,6 +462,15 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             sendResponse({data: data});
         });
     }
+    else if (message.type === 'getLoginCredentials') {
+        if (getCookie('jwt')) {
+            sendResponse({data: {email: getCookie('email'), accessToken: getCookie('jwt')}});
+        }
+        else {
+            sendResponse(null);
+        }
+        return true;
+    }
     else if (message.type === 'getDiscourseTopicComments') {
         if (LOCAL) {
             // Return fake data

@@ -31,7 +31,7 @@ function getShowInfo(store, state = null) {
     return state.showList[state.playingShowId || state.captionData.show_name];
 }
 
-const store = new Vuex.Store({
+store = new Vuex.Store({
     state: {
         cssLoaded: false,
         fetchedAllPublicResources: false,
@@ -586,10 +586,16 @@ if (BROWSER_EXTENSION) {
     // NOTE: 'load' event sometimes doesn't trigger, let's just ping the iframe until it responds
     let pingIframeInterval = setInterval(function() {
         sendMessageToBackground({type: 'ping'}, function(response) {
-            if (response === 'pong') {
-                clearInterval(pingIframeInterval);
-                fetchInitialResources();
-            }
+            if (response !== 'pong') return;
+            clearInterval(pingIframeInterval);
+            fetchInitialResources();
+
+            // Fetch login info
+            sendMessageToBackground({type: 'getLoginCredentials'}, function(response) {
+                if (response !== null) {
+                    store.commit('setLogin', {email: response.email, accessToken: response.accessToken});
+                }
+            });
         });
     }, 100);
 }
