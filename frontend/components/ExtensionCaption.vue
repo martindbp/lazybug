@@ -6,8 +6,8 @@
         v-bind:videoDuration="$store.state.videoDuration"
         v-bind:videoAPI="videoAPI"
     />
-    <VideoPicker />
-    <DevtoolsDialog />
+    <VideoPicker v-if="displayCaption" />
+    <DevtoolsDialog v-if="$store.state.extensionOn" />
 </template>
 
 <script>
