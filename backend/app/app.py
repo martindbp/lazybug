@@ -207,8 +207,11 @@ async def discourse_logout(user: User = Depends(current_active_user)):
     We need to use the discourse API (with API key) in order to log out a user, we can't
     do it directly from the front-end because we don't have the CSRF token
     """
-    user = discourse_client.get_user(external_id=user.id)
-    user.log_out()
+    try:
+        user = discourse_client.get_user(external_id=user.id)
+        user.log_out()
+    except:
+        raise HTTPException(status_code=500, detail=f'Discourse SSO logout failed')
 
 
 # NOTE: need to put this last!
