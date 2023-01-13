@@ -39,14 +39,14 @@
             </q-tab-panels>
             <q-card-actions align="right" class="text-teal absolute-bottom">
                 <div v-if="tab === 'login'">
-                    <q-btn v-if="!sentPasswordResetEmail" :loading="loading" flat color="deep-orange" label="Forgot Password" @click="clickForgotPassword"></q-btn>
-                    <q-btn v-if="sentPasswordResetEmail" :loading="loading" flat color="primary" label="Reset Password" @click="clickResetPassword"></q-btn>
+                    <q-btn v-if="!sentPasswordResetEmail" :loading="loading === 'forgot'" flat color="deep-orange" label="Forgot Password" @click="clickForgotPassword"></q-btn>
+                    <q-btn v-if="sentPasswordResetEmail" :loading="loading === 'reset'" flat color="primary" label="Reset Password" @click="clickResetPassword"></q-btn>
                 </div>
                 <q-btn flat label="Close" v-close-popup></q-btn>
                 <div v-if="tab === 'login'">
-                    <q-btn v-if="sentPasswordResetEmail === false" :loading="loading" flat color="primary" label="Login" @click="clickLogin"></q-btn>
+                    <q-btn v-if="sentPasswordResetEmail === false" :loading="loading === 'login'" flat color="primary" label="Login" @click="clickLogin"></q-btn>
                 </div>
-                <q-btn v-else :loading="loading" flat color="primary" label="Register" @click="clickRegister"></q-btn>
+                <q-btn v-else :loading="loading === 'register'" flat color="primary" label="Register" @click="clickRegister"></q-btn>
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -103,7 +103,7 @@ export default {
             }
 
             this.sentPasswordResetEmail = false;
-            this.loading = true;
+            this.loading = 'reset';
             const self = this;
             fetch('/api/auth/reset-password', {
                 method: 'POST',
@@ -137,7 +137,7 @@ export default {
                 return;
             }
 
-            this.loading = true;
+            this.loading = 'forgot';
             this.sentPasswordResetEmail = 'loading';
             const self = this;
             fetch('/api/auth/forgot-password', {
@@ -171,7 +171,7 @@ export default {
             else if (this.tab === 'register') this.clickRegister();
         },
         clickLogin: function() {
-            this.loading = true;
+            this.loading = 'login';
             this.error = null;
             const self = this;
 
@@ -195,7 +195,7 @@ export default {
 
         },
         clickRegister: function() {
-            this.loading = true;
+            this.loading = 'register';
             this.error = null;
             const self = this;
 
