@@ -330,7 +330,7 @@ const mixin = {
             const captionId = showInfo.seasons[this.$store.state.playingSeason || 0].episodes[this.$store.state.playingEpisode || 0].id;
             const videoId = videoIdFromCaptionId(captionId);
             const site = siteFromCaptionId(captionId);
-            const template = this.$store.state.STRINGS[site].urlTemplates.videoId;
+            const template = this.$store.state.STRINGS.site[site].urlTemplates.videoId;
             const url = template.replace('${id}', videoId);
             window.open(url, '_blank').focus();
             this.$store.commit('setNonEmbeddableVideoSelected', null);
@@ -420,10 +420,75 @@ const mixin = {
         },
         getSiteString: function(name) {
             if (this.$store.state.STRINGS === null) return null;
-            return this.$store.state.STRINGS[getCurrentSite()][name];
+            return this.$store.state.STRINGS.site[this.site][name];
+        },
+        addBadge: function($img) {
+            // For browser extension only
+            if ($img === null) return;
+            const $a = $img.closest("#thumbnail");
+            const youtubeIdRegex = /^.*\?v\=([a-zA-Z0-9_-]*)&?.*/;
+            const match = youtubeIdRegex.exec($a.href);
+            if (!match) return;
+
+            const id = match[1];
+            if (! this.$store.state.videoList.has(`youtube-${id}`)) {
+                return;
+            }
+
+            $img.style.position = 'relative';
+            const badge = document.createElement('img');
+            badge.classList.add('lazybugbadge');
+            badge.src = CDN_URL + 'lazybug-public/images/64_lazybug.png';
+            badge.style.filter = 'drop-shadow(5px 5px 5px black)';
+            badge.style.width = badge.style.height = '28px';
+            badge.style.position = 'absolute';
+            badge.style.top = '4px';
+            badge.style.left = '4px';
+            $img.parentNode.appendChild(badge);
+        },
+        initializeThumbnailBadges: function() {
+            if (! BROWSER_EXTENSION) return;
+
+            if (this.site !== 'youtube') return null;
+
+            for (const $img of document.querySelectorAll('#thumbnail img:not(.lazybugbadge)')) {
+                addBadge($img);
+            }
+
+            return new MutationObserver((mutations) => {
+                let hasNewThumbnails = false;
+                for (let mutation of mutations) {
+                    switch(mutation.type) {
+                        case 'childList':
+                            for (let node of mutation.addedNodes) {
+                                if (node.nodeType !== 1) continue;
+                                if (node.tagName === 'IMG' && !node.classList.contains('lazybugbadge') && node.closest('#thumbnail')) {
+                                    addBadge(node);
+                                }
+                                else if (node.id === 'thumbnail') {
+                                    addBadge(node.querySelector('img:not(.lazybugbadge)'));
+                                }
+                            }
+                            break;
+                        case 'attributes':
+                            if (mutation.target.id === 'thumbnail' && mutation.attributeName === 'href' && mutation.oldValue !== null) {
+                                const $img = mutation.target.querySelector('img:not(.lazybugbadge)');
+                                for (const $badgeImg of mutation.target.querySelectorAll('img.lazybugbadge')) {
+                                    $badgeImg.remove();
+                                }
+                                addBadge($img);
+                            }
+                            break;
+                    }
+                }
+            }).observe(document, {subtree: true, childList: true, attributes: true, attributeOldValue: true});
         },
     },
     computed: {
+        site: function() {
+            if (this.$store.state.STRINGS === null) return null;
+            return this.$store.state.STRINGS.urls[document.location.hostname];
+        },
         discourseURL: function() {
             return DISCOURSE_URL;
         },

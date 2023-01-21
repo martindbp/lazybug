@@ -68,14 +68,6 @@ function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
 }
 
-function getCurrentSite() {
-    return {
-        'www.youtube.com': 'youtube',
-        'www.bilibili.com': 'bilibili',
-        'www.bilibili.cn': 'bilibili',
-    }[document.location.hostname];
-}
-
 function getClosestParentScroll($el, axis) {
     let variable = axis === 'y' ? 'scrollTop' : 'scrollLeft';
     while ($el && $el[variable] === 0) {
@@ -259,8 +251,8 @@ function getLogRows(callback) {
 
 function extractCurrentVideoId(strings, url) {
     if (strings === null) return null;
-    const site = getCurrentSite();
-    const regexps = Array.isArray(strings[site].idRegexp)? strings[site].idRegexp : [strings[site].idRegexp];
+    const site = strings.urls[document.location.hostname];
+    const regexps = Array.isArray(strings.site[site].idRegexp)? strings[site].idRegexp : [strings.site[site].idRegexp];
     let id = null;
     for (const regexpStr of regexps) {
         const regexp = new RegExp(regexpStr, 'i');
@@ -276,7 +268,9 @@ function extractCurrentCaptionId(strings, localVideoHash, url) {
     if (![null, undefined].includes(localVideoHash)) {
         return 'local-' + localVideoHash;
     }
-    return `${getCurrentSite()}-${extractCurrentVideoId(strings, url)}`;
+
+    const site = strings.urls[document.location.hostname];
+    return `${site}-${extractCurrentVideoId(strings, url)}`;
 }
 
 function dictArrayToDict(arr) {

@@ -89,9 +89,6 @@ export default {
         },
     }},
     computed: {
-        site: function() {
-            return getCurrentSite();
-        },
         inputShadowText: function() {
             if (this.showId === null) return null;
             for (const id of this.allShowIds) {
