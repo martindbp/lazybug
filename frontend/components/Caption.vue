@@ -146,12 +146,6 @@ export default {
                 this.resizeObserver.observe(newValue);
             }
         },
-        '$store.state.videoList': {
-            immediate: true,
-            handler: function() {
-                this.fetchCaptionMaybe();
-            }
-        },
         captionOffset: function() {
             this.updateCaptionPositionBlur();
         },
@@ -426,7 +420,6 @@ export default {
         isLoading: function() {
             return (
                 this.captionId !== null && (
-                    this.$store.state.videoList === null ||
                     getShowInfo(this.$store) === null ||
                     this.$store.state.captionData === null ||
                     this.$store.state.DICT === null ||

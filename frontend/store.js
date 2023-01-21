@@ -56,16 +56,16 @@ store = new Vuex.Store({
         resourceFetchErrors: [],
         youtubeAPIReady: LOCAL, // if local only we don't use youtube, so set to true
         showList: null,
-        showBloomFilters: null,
-        thumbnailObserver: null,
-        videoList: null,
-        showDiscourseComments: null,
+        showBloomFilters: null, // only for web app
+        thumbnailObserver: null, // only for browser extension
+        videoList: null, // only for browser extension
+        discourseCommentsForShow: null,
         DICT: null,
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
         STRINGS: null,
         states: Vue.ref({}),
-        bloomFilter: null,
+        bloomFilter: null, // bloom filter for known vocab, only for web app
         captionFontScale: 0.5,
         captionFontSize: 24,
         captionOffset: [0, 0],
@@ -170,7 +170,7 @@ store = new Vuex.Store({
             state.cssLoaded = true;
         },
         setShowDiscourseComments(state, val) {
-            state.showDiscourseComments = val;
+            state.discourseCommentsForShow = val;
         },
         setLocalVideoHash(state, val) {
             state.localVideoHash = val;
@@ -538,20 +538,22 @@ if (BROWSER_EXTENSION) {
 }
 
 const FETCH_PUBLIC_RESOURCES = [
-    ['strings.json', 'strings', 'setStringsList'],
-    ['public_cedict.json', 'dictionary', 'setDict'],
-    ['hsk_words.json', 'HSK word list', 'setHskWords'],
-    ['video_list.json', 'video list', 'setVideoList'],
-    ['show_list_full.json', 'show list', 'setShowList'],
-    ['simple_chars.json', 'simple chars list', 'setSimpleCharsList'],
+    ['strings.json', 'strings', 'setStringsList', true],
+    ['show_list_full.json', 'show list', 'setShowList', true],
+    ['simple_chars.json', 'simple chars list', 'setSimpleCharsList', false],
+    ['public_cedict.json', 'dictionary', 'setDict', false],
+    ['hsk_words.json', 'HSK word list', 'setHskWords', false],
 ];
 
 
 function fetchInitialResources() {
     let numFetched = 0;
-    for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
+    let numRequired = FETCH_PUBLIC_RESOURCES.reduce((acc, r) => acc + (r[3] ? 1 : 0), 0);
+    for (const [filename, errorName, mutation, required_for_loading] of FETCH_PUBLIC_RESOURCES) {
         fetchVersionedResource(filename, function (data) {
-            numFetched++;
+            if (required_for_loading) {
+                numFetched++;
+            }
             if (data === 'error') {
                 store.commit('setResourceFetchError', errorName);
             }
@@ -564,7 +566,7 @@ function fetchInitialResources() {
                     $el.innerText = 'Loading' +'.'.repeat(numFetched);
                 }
             }
-            if (numFetched == FETCH_PUBLIC_RESOURCES.length) {
+            if (numFetched == numRequired) {
                 store.commit('setFetchedAllPublicResources');
             }
         });
@@ -576,6 +578,7 @@ function fetchInitialResources() {
 store.commit('setURL', document.location); // initial
 
 if (BROWSER_EXTENSION) {
+    FETCH_PUBLIC_RESOURCES.unshift(['video_list.json', 'video list', 'setVideoList', true]);
     // We have to wait for the iframe to load before we can fetch stuff from it
     //lazybugIframe.addEventListener('load', fetchInitialResources);
     // NOTE: 'load' event sometimes doesn't trigger, let's just ping the iframe until it responds
@@ -595,7 +598,7 @@ if (BROWSER_EXTENSION) {
     }, 100);
 }
 else {
-    FETCH_PUBLIC_RESOURCES.push(['bloom_filters.json', 'show bloom filters', 'setBloomFilters']);
+    FETCH_PUBLIC_RESOURCES.push(['bloom_filters.json', 'show bloom filters', 'setBloomFilters', false]);
     fetchInitialResources();
 
     window.onpopstate = (event) => {

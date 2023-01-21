@@ -41,7 +41,7 @@ const mixin = {
 
             const showId = this.showInfo.showId;
             const topicId = this.showInfo.discourse_topic_id;
-            if (this.$store.state.showDiscourseComments === topicId) return; // already fetching
+            if (this.$store.state.discourseCommentsForShow === topicId) return; // already fetching
             const message = {
                 type: 'getDiscourseTopicComments',
                 data: topicId,
@@ -584,7 +584,7 @@ const mixin = {
             return states;
         },
         videoComments: function() {
-            const c = this.$store.state.showDiscourseComments;
+            const c = this.$store.state.discourseCommentsForShow;
             if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
             const showId = this.$store.state.playingShowId;
             const season = this.$store.state.playingSeason;
@@ -594,7 +594,7 @@ const mixin = {
             return c.filter((post) => post.cooked.match(regex) !== null);
         },
         captionComments: function() {
-            const c = this.$store.state.showDiscourseComments;
+            const c = this.$store.state.discourseCommentsForShow;
             if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
             const showId = this.$store.state.playingShowId;
             const season = this.$store.state.playingSeason;
