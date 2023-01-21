@@ -1,0 +1,336 @@
+{
+	"name": {
+		"hz": "喜羊羊與灰太狼",
+		"py": "Xǐyángyáng yǔ huītàiláng",
+		"en": "Pleasant Goat and Big Big Wolf"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.9,
+	"type": "tv",
+	"genres": [
+		"childrens-cartoon"
+	],
+	"synopsis": "A group of goats lives peacefully while a clumsy wolf tries to eat them",
+	"year": "2005",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLCxAtDkpA3f__tWXEHqr5C1o-iCyQ897k",
+			"episodes": [
+				{
+					"id": "youtube-CTv5KGvYF0o"
+				},
+				{
+					"id": "youtube-G3GD_OuIlRA"
+				},
+				{
+					"id": "youtube-qQgN_KqfNnk"
+				},
+				{
+					"id": "youtube-iGrEPy5aQK8"
+				},
+				{
+					"id": "youtube-BdToDqD3je8"
+				},
+				{
+					"id": "youtube-d5VIWno0YZM"
+				},
+				{
+					"id": "youtube-PVVlJiAwAPM"
+				},
+				{
+					"id": "youtube-XLXti2jLnEk"
+				},
+				{
+					"id": "youtube-eMMuNxYmgTg"
+				},
+				{
+					"id": "youtube-2QWE-HSsB_I"
+				},
+				{
+					"id": "youtube-USz5D_ibgDI"
+				},
+				{
+					"id": "youtube--sDuHfe8YAE"
+				},
+				{
+					"id": "youtube-LsthtDZSxgw"
+				},
+				{
+					"id": "youtube-YtcIg6d_y_E"
+				},
+				{
+					"id": "youtube-hKpbJBxFTPU"
+				},
+				{
+					"id": "youtube-JPBZ5Bx9Wjs"
+				},
+				{
+					"id": "youtube-KNfpf-nD4k4"
+				},
+				{
+					"id": "youtube-Z4FS_zhmXww"
+				},
+				{
+					"id": "youtube-YIvmS_quX20"
+				},
+				{
+					"id": "youtube-F95and1jBuY"
+				},
+				{
+					"id": "youtube-c-tSPQtFRsI"
+				},
+				{
+					"id": "youtube-815GgnztgDU"
+				},
+				{
+					"id": "youtube-DmoRlVHqEr8"
+				},
+				{
+					"id": "youtube-kxWLiiqdSag"
+				},
+				{
+					"id": "youtube-Z0o52IjnN2c"
+				},
+				{
+					"id": "youtube-yZUK_F11D8s"
+				},
+				{
+					"id": "youtube-oRiFfe7SW38"
+				},
+				{
+					"id": "youtube-u7IY07oucv8"
+				},
+				{
+					"id": "youtube-amrFBi4adw4"
+				},
+				{
+					"id": "youtube-bgZQ0AtJTQQ"
+				},
+				{
+					"id": "youtube-3PvTaoeTGEE"
+				},
+				{
+					"id": "youtube-isIKTcC8yvg"
+				},
+				{
+					"id": "youtube-CHuWEg_KUXM"
+				},
+				{
+					"id": "youtube-KOG2uCJgVTo"
+				},
+				{
+					"id": "youtube-34xT-EmeBa4"
+				},
+				{
+					"id": "youtube-pcSgwq2fw6E"
+				},
+				{
+					"id": "youtube-Dh_J3rpcfrI"
+				},
+				{
+					"id": "youtube-YooBZnKyRmI"
+				},
+				{
+					"id": "youtube-y9SjBrG5Rk8"
+				},
+				{
+					"id": "youtube-sb1EOq0BDto"
+				},
+				{
+					"id": "youtube-0LRSrOcDGuc"
+				},
+				{
+					"id": "youtube-RlaRtCjp5p0"
+				},
+				{
+					"id": "youtube-2nY8TFhq6XU"
+				},
+				{
+					"id": "youtube-2POshzwXoX8"
+				},
+				{
+					"id": "youtube-uIrkWqk9Wug"
+				},
+				{
+					"id": "youtube-2r3hYQLWhhQ"
+				},
+				{
+					"id": "youtube-YlL7YDhZODE"
+				},
+				{
+					"id": "youtube-p8NqCIurzfY"
+				},
+				{
+					"id": "youtube-0KdIib1Ey_4"
+				},
+				{
+					"id": "youtube-dyTIrd2loXI"
+				},
+				{
+					"id": "youtube-z8F-YC5O10E"
+				},
+				{
+					"id": "youtube-rUewi3X7KW4"
+				},
+				{
+					"id": "youtube-ltRnGWTg2Oo"
+				},
+				{
+					"id": "youtube-PHus8mGZTcQ"
+				},
+				{
+					"id": "youtube-G1Gwy9QyTf4"
+				},
+				{
+					"id": "youtube-6b09piT6A9k"
+				},
+				{
+					"id": "youtube-0JvSj9EY3l8"
+				},
+				{
+					"id": "youtube-J7FdkTrGP3I"
+				},
+				{
+					"id": "youtube-qFBLgu_Z_MY"
+				},
+				{
+					"id": "youtube-8_Jkid_wrYo"
+				},
+				{
+					"id": "youtube-4aCkt22WiJY"
+				},
+				{
+					"id": "youtube-s55QpBllEX0"
+				},
+				{
+					"id": "youtube-aa2k7EPkZG4"
+				},
+				{
+					"id": "youtube-HUkZUPbjQuE"
+				},
+				{
+					"id": "youtube-uz5istcc7DQ"
+				},
+				{
+					"id": "youtube-j3aRtJvZcpk"
+				},
+				{
+					"id": "youtube-kUuqhPGNEPU"
+				},
+				{
+					"id": "youtube-7CgfihQ60mo"
+				},
+				{
+					"id": "youtube-gp_ktaaTNXs"
+				},
+				{
+					"id": "youtube-yYeafngsY3A"
+				},
+				{
+					"id": "youtube-RLODlybXQqQ"
+				},
+				{
+					"id": "youtube-krJDFhZ9czw"
+				},
+				{
+					"id": "youtube-UtNPTfOheN0"
+				},
+				{
+					"id": "youtube-inV3v1mjtaU"
+				},
+				{
+					"id": "youtube-O39maxs2bYM"
+				},
+				{
+					"id": "youtube-sYtFdl4l-EM"
+				},
+				{
+					"id": "youtube-HvkTMensgMs"
+				},
+				{
+					"id": "youtube-xDa8NbqifpQ"
+				},
+				{
+					"id": "youtube-x5UF2GzSUMs"
+				},
+				{
+					"id": "youtube-R1Nn1WgNjZw"
+				},
+				{
+					"id": "youtube-ZI6Dl6vDLcQ"
+				},
+				{
+					"id": "youtube-04nuLqzp9kc"
+				},
+				{
+					"id": "youtube-GdJm6fRFVl8"
+				},
+				{
+					"id": "youtube-GLRDqvlTsuY"
+				},
+				{
+					"id": "youtube--pr7JPvPqpw"
+				},
+				{
+					"id": "youtube-fxg59oxUPoA"
+				},
+				{
+					"id": "youtube-aSSjA28JpXo"
+				},
+				{
+					"id": "youtube-mr3qUQfZ93s"
+				},
+				{
+					"id": "youtube--JHsrC5dAMI"
+				},
+				{
+					"id": "youtube-54l_-VcnCtQ"
+				},
+				{
+					"id": "youtube-jcRA-ViCk2A"
+				},
+				{
+					"id": "youtube-hZYO4hwTtg4"
+				},
+				{
+					"id": "youtube-mt5wvxn7hfM"
+				},
+				{
+					"id": "youtube-QOmEW4V4H5k"
+				},
+				{
+					"id": "youtube-bkAUWcNovLo"
+				},
+				{
+					"id": "youtube-9QESs27-onY"
+				},
+				{
+					"id": "youtube-zqsWDlocj4s"
+				},
+				{
+					"id": "youtube-Fyu8dgCqP50"
+				},
+				{
+					"id": "youtube-jBgrARIdENA"
+				},
+				{
+					"id": "youtube-n3Cte1aS-p8"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8777777777777778,
+			"caption_bottom": 0.9319444444444445,
+			"refine_bounding_rect": true,
+			"start_time": 80
+		}
+	],
+	"discourse_topic_id": 218,
+	"discourse_topic_slug": "x-yangyang-y-huitailang-pleasant-goat-and-big-big-wolf"
+}

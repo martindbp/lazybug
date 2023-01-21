@@ -1,0 +1,169 @@
+{
+	"name": {
+		"hz": "外科风云",
+		"py": "Wàikē fēngyún",
+		"en": "Surgeons"
+	},
+	"embeddable": false,
+	"date_added": "2022-07-03",
+	"douban": 7.3,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"romance"
+	],
+	"synopsis": "Hospital drama with a touch of conspiracy",
+	"year": "2017",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLQqbdnAgoRmbuYn7t_hJauhrnCFI0rv7N",
+			"episodes": [
+				{
+					"id": "youtube-QHSCYoRdJNA"
+				},
+				{
+					"id": "youtube-_Rdy0nXsXSM"
+				},
+				{
+					"id": "youtube-CjpLPHq9VTA"
+				},
+				{
+					"id": "youtube-nDZkn31YDV0"
+				},
+				{
+					"id": "youtube-GqIGAxtQz3I"
+				},
+				{
+					"id": "youtube-fyU9fbr7Iqg"
+				},
+				{
+					"id": "youtube-3uu8D461cYU"
+				},
+				{
+					"id": "youtube-p-FLJZ9HDGE"
+				},
+				{
+					"id": "youtube-1EJon0tpzlo"
+				},
+				{
+					"id": "youtube-Ejz3An6fwk4"
+				},
+				{
+					"id": "youtube-DLpflx6qLLw"
+				},
+				{
+					"id": "youtube-KTFq3TWg2Po"
+				},
+				{
+					"id": "youtube-RWMiPyHS2ew"
+				},
+				{
+					"id": "youtube-hKCPDGXNt8o"
+				},
+				{
+					"id": "youtube-HKbThT2a4Io"
+				},
+				{
+					"id": "youtube-pYJq2_hx_bY"
+				},
+				{
+					"id": "youtube-a4mxRcOPzBM"
+				},
+				{
+					"id": "youtube-1fvTQfVp9kQ"
+				},
+				{
+					"id": "youtube-JhVW4yEtdpc"
+				},
+				{
+					"id": "youtube-huwQ_CxWD4g"
+				},
+				{
+					"id": "youtube-C5F1KzVBToM"
+				},
+				{
+					"id": "youtube-iph-lL7gCkk"
+				},
+				{
+					"id": "youtube-ASXcyYjizQA"
+				},
+				{
+					"id": "youtube-KN5QaHc-VtI"
+				},
+				{
+					"id": "youtube-f9ACDgs9acU"
+				},
+				{
+					"id": "youtube-f7PQIvj2f0o"
+				},
+				{
+					"id": "youtube-ZMRYA1li9uU"
+				},
+				{
+					"id": "youtube-BSbzXo9wkXA"
+				},
+				{
+					"id": "youtube-IPmfpdWzmVA"
+				},
+				{
+					"id": "youtube-JfSQWTGyFrw"
+				},
+				{
+					"id": "youtube-vIF1uGKmmBI"
+				},
+				{
+					"id": "youtube-9kM69XLaZp4"
+				},
+				{
+					"id": "youtube-4Itc9mfPf0E"
+				},
+				{
+					"id": "youtube-FD4LN8aD7nQ"
+				},
+				{
+					"id": "youtube-EPH18BU4sL4"
+				},
+				{
+					"id": "youtube-YwiNzVJBly0"
+				},
+				{
+					"id": "youtube-Rqm71ulP46w"
+				},
+				{
+					"id": "youtube-LkpAlo0RJ0M"
+				},
+				{
+					"id": "youtube-hOy0jfGtytE"
+				},
+				{
+					"id": "youtube-VPvRtgAf7R4"
+				},
+				{
+					"id": "youtube-9tRJfAsXQCw"
+				},
+				{
+					"id": "youtube-36Mx6u2TuIs"
+				},
+				{
+					"id": "youtube--fANx4deWsk"
+				},
+				{
+					"id": "youtube-2ofRrvKp_W4"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8375,
+			"caption_bottom": 0.8972222222222223,
+			"start_time": 60
+		}
+	],
+	"discourse_topic_id": 219,
+	"discourse_topic_slug": "waike-fengyun-surgeons"
+}

@@ -1124,7 +1124,7 @@ def extract_video_captions(
 @task(serializer=json)
 def update_conditional_captions(caption_lines, conditional_captions, action):
     assert 'type' in action
-    assert ('join' in action) or action['type'] == 'replace'
+    assert ('join' in action) or action['type'] == 'assign'
 
     # We update the original conditional captions and return those instead
     for cond_line in conditional_captions['lines']:
@@ -1481,7 +1481,7 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
     show_data = None
     video_ids = None
     if show_name is not None:
-        with open(f'data/remote/public/shows/{show_name}.json') as f:
+        with open(f'data/git/shows/{show_name}.json') as f:
             show_data = json.load(f)
             video_ids = []
             for season in show_data['seasons']:
@@ -1785,7 +1785,7 @@ def process_translations(
 
 
 def _get_show_fixed_translations(show_name):
-    with open(f'data/remote/public/shows/{show_name}.json') as f:
+    with open(f'data/git/shows/{show_name}.json') as f:
         show_data = json.load(f)
 
     return show_data.get('fixed_translations', {})

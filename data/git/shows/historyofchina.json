@@ -1,0 +1,337 @@
+{
+	"name": {
+		"en": "History of China",
+		"hz": "中国通史",
+		"py": "Zhōngguó tōngshǐ"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.1,
+	"year": "2013",
+	"released": true,
+	"description": "",
+	"genres": [
+		"documentary"
+	],
+	"type": "tv",
+	"synopsis": "Complete summary of Chinese history",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLOrf2h5ONlwUTW9etWK4b3xQiz8LdgkKS",
+			"episodes": [
+				{
+					"id": "youtube-CTRvs6bW6CQ"
+				},
+				{
+					"id": "youtube-bM77ikvvRtc"
+				},
+				{
+					"id": "youtube-b6lKvQfHGq0"
+				},
+				{
+					"id": "youtube-2TxucSA0v9M"
+				},
+				{
+					"id": "youtube-6s9JziziLtM"
+				},
+				{
+					"id": "youtube-lS9TUandsI4"
+				},
+				{
+					"id": "youtube-Lw0fn4eJDG8"
+				},
+				{
+					"id": "youtube-v5NkwiSa4SU"
+				},
+				{
+					"id": "youtube-frNNoSOSnm4"
+				},
+				{
+					"id": "youtube-3oEoKSRNh-Q"
+				},
+				{
+					"id": "youtube-p0yTTgstVko"
+				},
+				{
+					"id": "youtube-eNVssZdWxuM"
+				},
+				{
+					"id": "youtube-FVG8TNux7ls"
+				},
+				{
+					"id": "youtube-YtP58C-ijkI"
+				},
+				{
+					"id": "youtube-Ke9JAY1AfWU"
+				},
+				{
+					"id": "youtube-0NXQ0HhmONA"
+				},
+				{
+					"id": "youtube-C7pd3y2AvVg"
+				},
+				{
+					"id": "youtube-GVuwVpdgmTU"
+				},
+				{
+					"id": "youtube-MSN9NeO9ZYg"
+				},
+				{
+					"id": "youtube-3UVbpTF3-P4"
+				},
+				{
+					"id": "youtube-0Vc73Bzr0Ao"
+				},
+				{
+					"id": "youtube-t9TeG6MdbmY"
+				},
+				{
+					"id": "youtube-HabJx6fPza0"
+				},
+				{
+					"id": "youtube-HvYs9RisprM"
+				},
+				{
+					"id": "youtube-v8oUalRBZf8"
+				},
+				{
+					"id": "youtube-GjESroGEDTk"
+				},
+				{
+					"id": "youtube-UsHB90oSEJc"
+				},
+				{
+					"id": "youtube-E6eCTlA1fJE"
+				},
+				{
+					"id": "youtube-ws0aD05ITKY"
+				},
+				{
+					"id": "youtube-ounPv4IJVZI"
+				},
+				{
+					"id": "youtube-B3mCBCLdwPg"
+				},
+				{
+					"id": "youtube-Po8ZsvxkMwQ"
+				},
+				{
+					"id": "youtube-sO8Z1ZNjwxI"
+				},
+				{
+					"id": "youtube-uXss-Ni7Alc"
+				},
+				{
+					"id": "youtube-U9C2EIUg388"
+				},
+				{
+					"id": "youtube-CsiNs7LVgMA"
+				},
+				{
+					"id": "youtube-zQaXM_cUvH4"
+				},
+				{
+					"id": "youtube-BTcL0tvDvcs"
+				},
+				{
+					"id": "youtube-8Xfsq_epwIo"
+				},
+				{
+					"id": "youtube-BBtL30ikRwo"
+				},
+				{
+					"id": "youtube-sHiXZzk5LmM"
+				},
+				{
+					"id": "youtube-rXh_FVYkavg"
+				},
+				{
+					"id": "youtube-mOyC8qdv514"
+				},
+				{
+					"id": "youtube-X_2Hbxs_A9s"
+				},
+				{
+					"id": "youtube-tS95e6Z3nis"
+				},
+				{
+					"id": "youtube-SgN6rykJEqk"
+				},
+				{
+					"id": "youtube-XORQzQd_Mj0"
+				},
+				{
+					"id": "youtube-u7Jjtm8E4us"
+				},
+				{
+					"id": "youtube-QYyCL9roSjM"
+				},
+				{
+					"id": "youtube-oJYoRpAx0Ko"
+				},
+				{
+					"id": "youtube-0KAhXQoqXTE"
+				},
+				{
+					"id": "youtube-K36f_WmoRxc"
+				},
+				{
+					"id": "youtube--O640_JqYeI"
+				},
+				{
+					"id": "youtube-d5vsn7uklfk"
+				},
+				{
+					"id": "youtube-ItXWyPxEKHs"
+				},
+				{
+					"id": "youtube-cJ5M8JFkzwI"
+				},
+				{
+					"id": "youtube-915T7Sj7JzQ"
+				},
+				{
+					"id": "youtube-YykVqbtR6Qo"
+				},
+				{
+					"id": "youtube-GL3LHHM317k"
+				},
+				{
+					"id": "youtube-bBVu4Fc_igE"
+				},
+				{
+					"id": "youtube-uB9EI5XCLFQ"
+				},
+				{
+					"id": "youtube-fFI9AEYVSg8"
+				},
+				{
+					"id": "youtube-j4pSqprdOzY"
+				},
+				{
+					"id": "youtube-bJ-w7TJYAnc"
+				},
+				{
+					"id": "youtube-Qqsfa5ZgC8g"
+				},
+				{
+					"id": "youtube-BmjgfeOMDjw"
+				},
+				{
+					"id": "youtube-u5gIS0a9nHE"
+				},
+				{
+					"id": "youtube-4jSxBR0PJwA"
+				},
+				{
+					"id": "youtube-mbAKh7IV8mo"
+				},
+				{
+					"id": "youtube-ElGtIPOsvvQ"
+				},
+				{
+					"id": "youtube-sGPUQMy5ELE"
+				},
+				{
+					"id": "youtube-O1TCG3G4Bec"
+				},
+				{
+					"id": "youtube-oWLKZXBA-L4"
+				},
+				{
+					"id": "youtube-1vDBzyjB6Q0"
+				},
+				{
+					"id": "youtube-o5wtBLgoKuA"
+				},
+				{
+					"id": "youtube-w8ob8ElwuCc"
+				},
+				{
+					"id": "youtube-NH2L8kVh6QQ"
+				},
+				{
+					"id": "youtube-HX8oInOBUvw"
+				},
+				{
+					"id": "youtube-IoKEpH-7R1c"
+				},
+				{
+					"id": "youtube-B0Orq8x_XC8"
+				},
+				{
+					"id": "youtube-6KJun8LaHq0"
+				},
+				{
+					"id": "youtube-X-wfPNr5TsQ"
+				},
+				{
+					"id": "youtube-WCPmi4j_GfA"
+				},
+				{
+					"id": "youtube-YjhsjtQzBtU"
+				},
+				{
+					"id": "youtube-Jkni5T9Pqk0"
+				},
+				{
+					"id": "youtube-C3BINyGIn_M"
+				},
+				{
+					"id": "youtube-geLaBIhZ6MU"
+				},
+				{
+					"id": "youtube-pCAbKoEB2os"
+				},
+				{
+					"id": "youtube-I4FOw5kYNRU"
+				},
+				{
+					"id": "youtube-_b3Lys3inZs"
+				},
+				{
+					"id": "youtube-DVVLjg1yFFQ"
+				},
+				{
+					"id": "youtube-1BLwgRpdB0E"
+				},
+				{
+					"id": "youtube-djGyjaAYiPI"
+				},
+				{
+					"id": "youtube-bJyoZLaBQMY"
+				},
+				{
+					"id": "youtube-gbU3JSanlOI"
+				},
+				{
+					"id": "youtube-e2ZW3rTtZGA"
+				},
+				{
+					"id": "youtube-ia5o9s5BISc"
+				},
+				{
+					"id": "youtube-doE20WDYht0"
+				},
+				{
+					"id": "youtube-SmK8gpObEjk"
+				},
+				{
+					"id": "youtube-Ui_JaiXxnoc"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8652777777777778,
+			"caption_bottom": 0.9277777777777778,
+			"refine_bounding_rect": true,
+			"start_time": 75
+		}
+	],
+	"discourse_topic_id": 207,
+	"discourse_topic_slug": "zhongguo-tongsh-history-of-china"
+}

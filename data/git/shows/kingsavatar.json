@@ -1,0 +1,124 @@
+{
+	"name": {
+		"en": "King's Avatar",
+		"hz": "全职高手",
+		"py": "Quánzhí Gāoshǒu"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.1,
+	"type": "tv",
+	"genres": [
+		"donghua",
+		"drama"
+	],
+	"synopsis": "Ex pro-gamer tries to return to glory",
+	"year": "2017",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"free": false,
+	"seasons": [
+		{
+			"name": "Season 1",
+			"playlist_id": "PLxOs22nkVmnIH4lspgvhTmxanrbi8lv7D",
+			"episodes": [
+				{
+					"id": "youtube-O-9D65trtXE"
+				},
+				{
+					"id": "youtube-JKC3MdrnYFI"
+				},
+				{
+					"id": "youtube-UqrNQNpjyrs"
+				},
+				{
+					"id": "youtube-Zh06omr_sxM"
+				},
+				{
+					"id": "youtube-2aIDsyPo0M4"
+				},
+				{
+					"id": "youtube-R8VbknUKEuc"
+				},
+				{
+					"id": "youtube-JyhUC2PMvO4"
+				},
+				{
+					"id": "youtube-s5nEG-Mo8fo"
+				},
+				{
+					"id": "youtube-TcTsm8BXXzc"
+				},
+				{
+					"id": "youtube-xxGfIDgJDFk"
+				},
+				{
+					"id": "youtube-WDLXg271JDA"
+				},
+				{
+					"id": "youtube-PPZ8oO0TO7U"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.875,
+					"caption_bottom": 0.932,
+					"start_time": 45
+				}
+			]
+		},
+		{
+			"name": "Season 2",
+			"playlist_id": "PLMX26aiIvX5p9K1tPKPd2pX-8idpid2s5",
+			"episodes": [
+				{
+					"id": "youtube-xugJUqL8E0c"
+				},
+				{
+					"id": "youtube-LCS6zXHf96c"
+				},
+				{
+					"id": "youtube-aU3nA0xKrYs"
+				},
+				{
+					"id": "youtube-qDRlcAVO8Dk"
+				},
+				{
+					"id": "youtube-63VV4QmCLxE"
+				},
+				{
+					"id": "youtube-B1-9pZyQCA0"
+				},
+				{
+					"id": "youtube-HoG_1UxGhbA"
+				},
+				{
+					"id": "youtube-03vXvd9eN44"
+				},
+				{
+					"id": "youtube-5rUtwEKW_no"
+				},
+				{
+					"id": "youtube-CYdCgwA-WvA"
+				},
+				{
+					"id": "youtube-hKiiF0WDrUE"
+				},
+				{
+					"id": "youtube-29UDTx28oR0"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.9055555555555556,
+					"caption_bottom": 0.9541666666666667,
+					"start_time": 32
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 186,
+	"discourse_topic_slug": "quanzhi-gaosh-u-kings-avatar"
+}

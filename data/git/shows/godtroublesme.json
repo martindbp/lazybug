@@ -1,0 +1,40 @@
+{
+	"name": {
+		"hz": "汉化日记",
+		"py": "Hànhuà rìjì",
+		"en": "God Troubles Me"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.4,
+	"type": "tv",
+	"genres": [
+		"comedy",
+		"donghua"
+	],
+	"synopsis": "For those who like weird humor",
+	"difficulty_manual": 0.9,
+	"year": "2019-2020",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8625,
+			"caption_bottom": 0.8972222222222223,
+			"start_time": 0,
+			"refine_bounding_rect": true
+		}
+	],
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-6HZKQSuG4ow"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 180,
+	"discourse_topic_slug": "hanhua-riji-god-troubles-me"
+}

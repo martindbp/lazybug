@@ -1,0 +1,165 @@
+{
+	"name": {
+		"hz": "叛逆者",
+		"py": "Pànnì zhě",
+		"en": "The Rebel"
+	},
+	"date_added": "2022-07-03",
+	"synopsis": "Espionage thriller about the making of a communist spy in 1936",
+	"type": "tv",
+	"genres": [
+		"thriller",
+		"historical"
+	],
+	"year": "2021",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"douban": 7.7,
+	"seasons": [
+		{
+			"playlist_id": "PLAYWca_88zhEPnHifk2D7V9S3NM974O7P",
+			"episodes": [
+				{
+					"id": "youtube-l67-g6a7SL8"
+				},
+				{
+					"id": "youtube-qxMcQMz_wYM"
+				},
+				{
+					"id": "youtube-3GrN5Svg4yQ"
+				},
+				{
+					"id": "youtube-rvYYQHM-9h4"
+				},
+				{
+					"id": "youtube-qX27A2xTTSg"
+				},
+				{
+					"id": "youtube-Pauap-4KE0M"
+				},
+				{
+					"id": "youtube-PgHFl2WBI5E"
+				},
+				{
+					"id": "youtube-0tq2T5obcB4"
+				},
+				{
+					"id": "youtube-ZMRHgoLJWsc"
+				},
+				{
+					"id": "youtube-AVbvMQOcC8I"
+				},
+				{
+					"id": "youtube-4IfJExxsLZY"
+				},
+				{
+					"id": "youtube-W5atHdAmPKs"
+				},
+				{
+					"id": "youtube-WfAC1S3DUKM"
+				},
+				{
+					"id": "youtube-HAdYlAbJknE"
+				},
+				{
+					"id": "youtube-8vgF5e6dQc4"
+				},
+				{
+					"id": "youtube-etLw_y62kDw"
+				},
+				{
+					"id": "youtube-PnUZ_6GOkGc"
+				},
+				{
+					"id": "youtube-8leLRGCUdyE"
+				},
+				{
+					"id": "youtube-zLdm2tQesF4"
+				},
+				{
+					"id": "youtube-I2hjX9Vrwz0"
+				},
+				{
+					"id": "youtube-BxcLY97h7nw"
+				},
+				{
+					"id": "youtube-m6JyJhzyVPQ"
+				},
+				{
+					"id": "youtube-UmecA_rjGSw"
+				},
+				{
+					"id": "youtube-LIz0tNbpYe8"
+				},
+				{
+					"id": "youtube-2G3kYvG5nNk"
+				},
+				{
+					"id": "youtube-wHIljYyzkqQ"
+				},
+				{
+					"id": "youtube-YVQRqDCpecI"
+				},
+				{
+					"id": "youtube-DkrgCAmLgHs"
+				},
+				{
+					"id": "youtube-xqE7USi7ZRs"
+				},
+				{
+					"id": "youtube-yoTDpCmWHT4"
+				},
+				{
+					"id": "youtube-yY3YfjN-4qI"
+				},
+				{
+					"id": "youtube-Nilv6pml-HE"
+				},
+				{
+					"id": "youtube-Ed2N3Dk_-zs"
+				},
+				{
+					"id": "youtube-EpbzOYIM8Rk"
+				},
+				{
+					"id": "youtube-_-EfkWtsn54"
+				},
+				{
+					"id": "youtube-5j8NUJBRXwc"
+				},
+				{
+					"id": "youtube--Tr0VCSzkuc"
+				},
+				{
+					"id": "youtube-gAiSvmAQiXU"
+				},
+				{
+					"id": "youtube-rI2tlnYDVdM"
+				},
+				{
+					"id": "youtube-Gt8YoGpk0bE"
+				},
+				{
+					"id": "youtube-5bHdb1dgFEw"
+				},
+				{
+					"id": "youtube-PeKIIMSjEXk"
+				},
+				{
+					"id": "youtube-JTQ124ODqZ4"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8708333333333333,
+			"caption_bottom": 0.9277777777777778,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 178,
+	"discourse_topic_slug": "panni-zhe-the-rebel"
+}

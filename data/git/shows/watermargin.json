@@ -1,0 +1,152 @@
+{
+  "name": "",
+  "description": "",
+  "seasons": [
+    {
+      "name": {},
+      "playlist_id": "PLU39TFGUKRrM49xvVKeeyQaLNSoFil90-",
+      "episodes": [
+        {
+          "id": "youtube-aWXIfhvF0Lc",
+          "start_time": 300
+        },
+        {
+          "id": "youtube-vxp9pUETuhU"
+        },
+        {
+          "id": "youtube-Mf8ot7UOCH0"
+        },
+        {
+          "id": "youtube-t_dUwBui8ik"
+        },
+        {
+          "id": "youtube-VdX6RvRPXdU"
+        },
+        {
+          "id": "youtube-dr7vW7JXKBc"
+        },
+        {
+          "id": "youtube-OpULPOaN6Y0"
+        },
+        {
+          "id": "youtube-4tGXK5hNeWU"
+        },
+        {
+          "id": "youtube-CBx7pgTD9IY"
+        },
+        {
+          "id": "youtube-1z6H2Mo6XP8"
+        },
+        {
+          "id": "youtube-xmO7JlcqW5I"
+        },
+        {
+          "id": "youtube-ylpgmEyRBBg"
+        },
+        {
+          "id": "youtube-BicaNJOVUJ8"
+        },
+        {
+          "id": "youtube-MviOHhgfSkw"
+        },
+        {
+          "id": "youtube-dpIKpdcNUSk"
+        },
+        {
+          "id": "youtube-6ChOPQ1juO4"
+        },
+        {
+          "id": "youtube-RVKwivPeFMA"
+        },
+        {
+          "id": "youtube-6_ZpZ7iSOA4"
+        },
+        {
+          "id": "youtube-Zxc6IBO2iT0"
+        },
+        {
+          "id": "youtube-fozjYqM9Kao"
+        },
+        {
+          "id": "youtube-sBH9ltCpsL4"
+        },
+        {
+          "id": "youtube-yrfpHKCzH6E"
+        },
+        {
+          "id": "youtube-2zXMQczVMw4"
+        },
+        {
+          "id": "youtube-rKpJSWshGd0"
+        },
+        {
+          "id": "youtube-rEhvp0yr5do"
+        },
+        {
+          "id": "youtube-m8Rhdpcgeeo"
+        },
+        {
+          "id": "youtube-8XbfdMKaDn0"
+        },
+        {
+          "id": "youtube-PZtEzwSp1ho"
+        },
+        {
+          "id": "youtube-iMdJrV0nCCM"
+        },
+        {
+          "id": "youtube-l-VOXNVl0pc"
+        },
+        {
+          "id": "youtube-akOQJbin_Jk"
+        },
+        {
+          "id": "youtube-TeyrdUJQu04"
+        },
+        {
+          "id": "youtube-oPETfvAzGuo"
+        },
+        {
+          "id": "youtube-JsSDMH4KJ4Y"
+        },
+        {
+          "id": "youtube-xuIBWixwsno"
+        },
+        {
+          "id": "youtube-6WaDN3GfKe4"
+        },
+        {
+          "id": "youtube-73WKbWhLir8"
+        },
+        {
+          "id": "youtube-quShlt8y9tk"
+        },
+        {
+          "id": "youtube-ZLi0JXIG_Ck"
+        },
+        {
+          "id": "youtube-WCtABbs_7Qk"
+        },
+        {
+          "id": "youtube-c3omWZnG69Q"
+        },
+        {
+          "id": "youtube-uOZ6GphpatY"
+        },
+        {
+          "id": "youtube-uo7zx6N_wFA"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.893979057591623,
+      "caption_bottom": 0.9424083769633508,
+      "refine_bounding_rect": true,
+      "fade_in_out": true,
+      "start_time": 60
+    }
+  ]
+}

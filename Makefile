@@ -98,12 +98,12 @@ names-list:
 .PHONY: download-yt
 download-yt:
 	mkdir -p $(out)/$(show)
-	- cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} yt-dlp -o "$(out)/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs --default-search "ytsearch" -- {}
+	- cat data/git/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} yt-dlp -o "$(out)/$(show)/youtube-%(id)s.%(ext)s" --write-srt --all-subs --default-search "ytsearch" -- {}
 	mv $(out)/$(show)/*.vtt data/remote/private/caption_data/translations/
 
 .PHONY: mv-files
 mv-files:
-	cat data/remote/public/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} echo mv "data/remote/private/caption_data/raw_captions/youtube-{}{.json,-hanzi.json}"
+	cat data/git/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} echo mv "data/remote/private/caption_data/raw_captions/youtube-{}{.json,-hanzi.json}"
 
 .PHONY: process-video-captions
 process-video-captions:

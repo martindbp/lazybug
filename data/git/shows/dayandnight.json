@@ -1,0 +1,151 @@
+{
+	"name": {
+		"hz": "白夜追凶",
+		"py": "Báiyè zhuī xiōng",
+		"en": "Day and Night"
+	},
+	"douban": 9.0,
+	"year": "2017",
+	"date_added": "2022-08-16",
+	"type": "tv",
+	"genres": [
+		"suspense",
+		"thriller",
+		"crime"
+	],
+	"synopsis": "Former police captain suffering from nyctophobia (fear of dark) returns to solve mysteries",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLy8WDOJkSFFw6M7lSM0eXYmXipyn5-zXX",
+			"episodes": [
+				{
+					"id": "youtube-xI_4MlehGhw",
+					"start_time": 100
+				},
+				{
+					"id": "youtube-b4S3QrBCSj0"
+				},
+				{
+					"id": "youtube-jLMGscvfSnw"
+				},
+				{
+					"id": "youtube-w2ePdKjZQWQ"
+				},
+				{
+					"id": "youtube-hWwpK9KW5lM"
+				},
+				{
+					"id": "youtube-krzLCL0mU6g"
+				},
+				{
+					"id": "youtube-Xo5QLRygXM4"
+				},
+				{
+					"id": "youtube-AlITsid8LCo"
+				},
+				{
+					"id": "youtube-UvGSheF8eL8"
+				},
+				{
+					"id": "youtube-G7bXsEPIHIA"
+				},
+				{
+					"id": "youtube-PClwEch40T4"
+				},
+				{
+					"id": "youtube-o95Pw4L-sm8"
+				},
+				{
+					"id": "youtube-a_IkYztVlXY"
+				},
+				{
+					"id": "youtube-So-mZBGaNx8"
+				},
+				{
+					"id": "youtube-ss1bivsU7CI"
+				},
+				{
+					"id": "youtube-f_lNScIYuW0"
+				},
+				{
+					"id": "youtube-cAc1UocIcw0"
+				},
+				{
+					"id": "youtube-dEf-UAHgZtA"
+				},
+				{
+					"id": "youtube-wz1QmVSdIj4"
+				},
+				{
+					"id": "youtube-yj1L_9qqdMc"
+				},
+				{
+					"id": "youtube-dVO2vi0mpFM"
+				},
+				{
+					"id": "youtube-yViZq9stDz0"
+				},
+				{
+					"id": "youtube-MJ4PHc9-_x4"
+				},
+				{
+					"id": "youtube-URMtbJLr-qM"
+				},
+				{
+					"id": "youtube-D1s25nzADhA"
+				},
+				{
+					"id": "youtube-RqSaMCFOdzo"
+				},
+				{
+					"id": "youtube-5yxDexTRctI"
+				},
+				{
+					"id": "youtube-ULwh7ytQVLA"
+				},
+				{
+					"id": "youtube-yPxS0mNYtlo"
+				},
+				{
+					"id": "youtube-bZ8c2ocOrlw"
+				},
+				{
+					"id": "youtube-LqbeQTOeZFU"
+				},
+				{
+					"id": "youtube-PSk3pXekjLg"
+				},
+				{
+					"id": "youtube-XSBVKBdIocE"
+				},
+				{
+					"id": "youtube-YfCXkIGXKmg"
+				},
+				{
+					"id": "youtube-ss1bivsU7CI"
+				},
+				{
+					"id": "youtube-UrdrbToy0vs"
+				},
+				{
+					"id": "youtube-yV7evh0znYo"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8811700182815356,
+			"caption_bottom": 0.943327239488117,
+			"caption_left": 0.18203125,
+			"caption_right": 0.86015625,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 225,
+	"discourse_topic_slug": "baiye-zhui-xiong-day-and-night"
+}

@@ -1,0 +1,73 @@
+{
+	"name": {
+		"hz": "我是余欢水",
+		"py": "Wǒ shì yúhuānshuǐ",
+		"en": "If There Is No Tomorrow"
+	},
+	"date_added": "2022-08-13",
+	"released": true,
+	"type": "tv",
+	"genres": [
+		"comedy",
+		"dark-comedy"
+	],
+	"synopsis": "Dark comedy about man diagnosed with terminal cancer",
+	"year": 2020,
+	"douban": 7.3,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLe6kzjvDlTo5OvIDygdM5aAEzpr0AKnmd",
+			"episodes": [
+				{
+					"id": "youtube-LuONELdLVvo"
+				},
+				{
+					"id": "youtube-ZMAhf-lgnB8"
+				},
+				{
+					"id": "youtube-J9a_KGQu-R4"
+				},
+				{
+					"id": "youtube-MW0ZrmWG_yk"
+				},
+				{
+					"id": "youtube-PdjDnKWng6U"
+				},
+				{
+					"id": "youtube-WuWG-KZZkck"
+				},
+				{
+					"id": "youtube-q9t4N7aiMeY"
+				},
+				{
+					"id": "youtube-C3WgnZRz4nI"
+				},
+				{
+					"id": "youtube-KgEQVViVEc0"
+				},
+				{
+					"id": "youtube-lBAa4wK0g2Y"
+				},
+				{
+					"id": "youtube-aGASY6Js6uM"
+				},
+				{
+					"id": "youtube-LmfG94xvg5s"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8988580750407831,
+			"caption_bottom": 0.9608482871125612,
+			"start_time": 90,
+			"refine_bounding_rect": "true"
+		}
+	],
+	"discourse_topic_id": 224,
+	"discourse_topic_slug": "w-shi-yuhuanshu-if-there-is-no-tomorrow"
+}

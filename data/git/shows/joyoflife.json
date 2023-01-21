@@ -1,0 +1,175 @@
+{
+	"name": {
+		"hz": "庆余年",
+		"py": "Qìng yúnián",
+		"en": "Joy of Life"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.9,
+	"type": "tv",
+	"genres": [
+		"historical",
+		"wuxia",
+		"sci-fi"
+	],
+	"synopsis": "Man is transported to the past as a young baby and uses his modern ideas to survive",
+	"year": "2019",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLhqe0CIJjJn9A_tI7XYqnVKLpws5gYzX7",
+			"episodes": [
+				{
+					"id": "youtube-_Lg6BJ1gBDo"
+				},
+				{
+					"id": "youtube-oqP7C58Ci24"
+				},
+				{
+					"id": "youtube-hG6DocFN0ws"
+				},
+				{
+					"id": "youtube-MFO-Uhg8q4s"
+				},
+				{
+					"id": "youtube-hQ73CkMrGxE"
+				},
+				{
+					"id": "youtube-tsz5_7zwhnk"
+				},
+				{
+					"id": "youtube-mmPkOMQHGx4"
+				},
+				{
+					"id": "youtube-eTS3W1VQO0E"
+				},
+				{
+					"id": "youtube-Ygrnzu0vsZ4"
+				},
+				{
+					"id": "youtube-YWj5hIPRoUk"
+				},
+				{
+					"id": "youtube-jeDM5YNzIxY"
+				},
+				{
+					"id": "youtube-CTuLYAkLwXo"
+				},
+				{
+					"id": "youtube-hRuEU6tHHpo"
+				},
+				{
+					"id": "youtube-VlGrWCugKos"
+				},
+				{
+					"id": "youtube-IoBLPMPGeME"
+				},
+				{
+					"id": "youtube-ojBcLqoFWvI"
+				},
+				{
+					"id": "youtube-cVcMjzKfl6M"
+				},
+				{
+					"id": "youtube-L6jFYz-DVXA"
+				},
+				{
+					"id": "youtube-gdkAuXrP9tI"
+				},
+				{
+					"id": "youtube-MKHMoeM6VRs"
+				},
+				{
+					"id": "youtube-7Xt_6nDfuQ8"
+				},
+				{
+					"id": "youtube-Ns8b4p2h9ws"
+				},
+				{
+					"id": "youtube-8KnRx4llHHs"
+				},
+				{
+					"id": "youtube-GYaM5IMTdbw"
+				},
+				{
+					"id": "youtube-PIiO-viQabE"
+				},
+				{
+					"id": "youtube-Hzaf2VGxrNs"
+				},
+				{
+					"id": "youtube-l9qDLRLc8ec"
+				},
+				{
+					"id": "youtube-IFMVhotLFQE"
+				},
+				{
+					"id": "youtube-IXlCGluO1T4"
+				},
+				{
+					"id": "youtube-VE8EX_WsT1A"
+				},
+				{
+					"id": "youtube-fOIjvpfNplo"
+				},
+				{
+					"id": "youtube-ZlpduieF0yo"
+				},
+				{
+					"id": "youtube-A0-yQcqS5io"
+				},
+				{
+					"id": "youtube-L7267o9PNXo"
+				},
+				{
+					"id": "youtube-8h7MfJ6iuQE"
+				},
+				{
+					"id": "youtube-UXq2KMDNyto"
+				},
+				{
+					"id": "youtube-WLp3ZKJ6m-U"
+				},
+				{
+					"id": "youtube-_wIO3n2t-t4"
+				},
+				{
+					"id": "youtube-winfyzVBYeI"
+				},
+				{
+					"id": "youtube-xzQ0FKNEoiE"
+				},
+				{
+					"id": "youtube-9jpVxb1VwuM"
+				},
+				{
+					"id": "youtube-PK-XfUPYMDA"
+				},
+				{
+					"id": "youtube-yYQ-AEEUn0c"
+				},
+				{
+					"id": "youtube-4w-5mwbseqY"
+				},
+				{
+					"id": "youtube-8SqmwPRiXwg"
+				},
+				{
+					"id": "youtube-2lxBF3Gcnhs"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8791666666666667,
+			"caption_bottom": 0.9444444444444444,
+			"start_time": 90
+		}
+	],
+	"discourse_topic_id": 211,
+	"discourse_topic_slug": "qing-yunian-joy-of-life"
+}

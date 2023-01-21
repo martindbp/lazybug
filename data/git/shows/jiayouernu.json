@@ -1,0 +1,337 @@
+{
+	"name": {
+		"hz": "家有儿女",
+		"py": "Jiā yǒu érnǚ",
+		"en": "Home with Kids"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.0,
+	"type": "tv",
+	"genres": [
+		"sitcom",
+		"drama"
+	],
+	"synopsis": "Two divorced parents start a family together with their respective children in Beijing",
+	"year": "2004-2007",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLO1KXMn-Zv0ImMjoFJq-ReoQmbz8OPhsI",
+			"episodes": [
+				{
+					"id": "youtube-PC3DmhI-3tU"
+				},
+				{
+					"id": "youtube-1bCj2rxYMHI"
+				},
+				{
+					"id": "youtube-Nar0A5-T058"
+				},
+				{
+					"id": "youtube-c1ZIY_SOszU"
+				},
+				{
+					"id": "youtube-QTIn-JPiToY"
+				},
+				{
+					"id": "youtube-Aenf-e9-qSk"
+				},
+				{
+					"id": "youtube-PnDI8QaADtU"
+				},
+				{
+					"id": "youtube-sXBaHMh7icE"
+				},
+				{
+					"id": "youtube-v_1Jta_F1mc"
+				},
+				{
+					"id": "youtube-bnqC7TvAyXw"
+				},
+				{
+					"id": "youtube-pPYZ8UGnEx8"
+				},
+				{
+					"id": "youtube-u7abNIAOi68"
+				},
+				{
+					"id": "youtube-e6_SSybmUXo"
+				},
+				{
+					"id": "youtube-fN8b3AJBgUo"
+				},
+				{
+					"id": "youtube-6ASarRovA4c"
+				},
+				{
+					"id": "youtube-0Cc7B28ABeU"
+				},
+				{
+					"id": "youtube-KKhnIoCP_EY"
+				},
+				{
+					"id": "youtube-5GBHqL8t-DA"
+				},
+				{
+					"id": "youtube-3tmNIxlOnQY"
+				},
+				{
+					"id": "youtube-FHHSum0ShiM"
+				},
+				{
+					"id": "youtube-UpzUJbrAm6I"
+				},
+				{
+					"id": "youtube-Ph6ZhYMRQuU"
+				},
+				{
+					"id": "youtube-MGv4ALBd6Xc"
+				},
+				{
+					"id": "youtube-HFRZyfOIH8E"
+				},
+				{
+					"id": "youtube-ZFFvnC_Ry9g"
+				},
+				{
+					"id": "youtube-HMorum91hbk"
+				},
+				{
+					"id": "youtube-48wol7Y6hzU"
+				},
+				{
+					"id": "youtube-KDnPXoKbdcI"
+				},
+				{
+					"id": "youtube-ijNRxgwB-n0"
+				},
+				{
+					"id": "youtube-Eqdlof7JBrc"
+				},
+				{
+					"id": "youtube-A3bo7rLKrRE"
+				},
+				{
+					"id": "youtube-tZQ3LpT4NHo"
+				},
+				{
+					"id": "youtube-eN_8Ktk4hzQ"
+				},
+				{
+					"id": "youtube-wba8WtJr6Ew"
+				},
+				{
+					"id": "youtube-qHLJOviDGuY"
+				},
+				{
+					"id": "youtube-mkQKmKcJ3uY"
+				},
+				{
+					"id": "youtube-EcY1koKo6mQ"
+				},
+				{
+					"id": "youtube-DKlC-r_oP90"
+				},
+				{
+					"id": "youtube-jbXBgAthqOc"
+				},
+				{
+					"id": "youtube-NZESFYiIonQ"
+				},
+				{
+					"id": "youtube-hQ5kIYcMeGY"
+				},
+				{
+					"id": "youtube-BnIa_RJVIk8"
+				},
+				{
+					"id": "youtube-nOmpi5dJzz0"
+				},
+				{
+					"id": "youtube-TlOus-SBCjM"
+				},
+				{
+					"id": "youtube-46ZJItMb0HI"
+				},
+				{
+					"id": "youtube-bzJ7u2XIzfw"
+				},
+				{
+					"id": "youtube-yA0-MP6z_Ps"
+				},
+				{
+					"id": "youtube-ugIEHEvzTmY"
+				},
+				{
+					"id": "youtube-Td09myyxMbQ"
+				},
+				{
+					"id": "youtube-LALY6A5VPnE"
+				},
+				{
+					"id": "youtube-2u71F2FhpG4"
+				},
+				{
+					"id": "youtube-AXfFFmdSbu8"
+				},
+				{
+					"id": "youtube-0axp82Cd3mU"
+				},
+				{
+					"id": "youtube-JX_oAhW8_YM"
+				},
+				{
+					"id": "youtube-GW2kdnioIkg"
+				},
+				{
+					"id": "youtube-SEL9enmGV5A"
+				},
+				{
+					"id": "youtube-_Wq7k3Ti65I"
+				},
+				{
+					"id": "youtube-fsdMsqTGMRc"
+				},
+				{
+					"id": "youtube-ODNLMNSXi4U"
+				},
+				{
+					"id": "youtube-ttxa6cNpANg"
+				},
+				{
+					"id": "youtube-FTT4NqbtZdo"
+				},
+				{
+					"id": "youtube-zLtJUago5ms"
+				},
+				{
+					"id": "youtube-hHIcGs5VWzw"
+				},
+				{
+					"id": "youtube-EmiAnj7CQOE"
+				},
+				{
+					"id": "youtube-cy0N_4_HGfs"
+				},
+				{
+					"id": "youtube-L2ay298btjA"
+				},
+				{
+					"id": "youtube-AXhnkvhVNs8"
+				},
+				{
+					"id": "youtube-UW9mUJQFtr4"
+				},
+				{
+					"id": "youtube-wV3TQJpoYck"
+				},
+				{
+					"id": "youtube-PRkaKEGjCwk"
+				},
+				{
+					"id": "youtube-SS1npV61hlE"
+				},
+				{
+					"id": "youtube-YN6hzCcytkw"
+				},
+				{
+					"id": "youtube-AT2cx6FUHJ0"
+				},
+				{
+					"id": "youtube-9ZdHTPKtlXE"
+				},
+				{
+					"id": "youtube-nxnIu8WLLK4"
+				},
+				{
+					"id": "youtube--x7grTmoYzA"
+				},
+				{
+					"id": "youtube-htaFjlEeUrU"
+				},
+				{
+					"id": "youtube-fftdWql8N8U"
+				},
+				{
+					"id": "youtube-e4dosR2GBzM"
+				},
+				{
+					"id": "youtube-lm9NZK6LHdY"
+				},
+				{
+					"id": "youtube-LWiIE2gHByI"
+				},
+				{
+					"id": "youtube-1gELGdZkxec"
+				},
+				{
+					"id": "youtube-KW4hHu5BGrc"
+				},
+				{
+					"id": "youtube-Gel6W2G_IrI"
+				},
+				{
+					"id": "youtube-Vlg5ZuYDWlQ"
+				},
+				{
+					"id": "youtube-_lChx_QCUT4"
+				},
+				{
+					"id": "youtube-bWC8fbXbiwo"
+				},
+				{
+					"id": "youtube-8Gk7xuzT3l0"
+				},
+				{
+					"id": "youtube-_kPLkRdlR0M"
+				},
+				{
+					"id": "youtube-T1BQ-9ioIR0"
+				},
+				{
+					"id": "youtube-Xs71ij-WOh4"
+				},
+				{
+					"id": "youtube-nhcuL-3mSl0"
+				},
+				{
+					"id": "youtube-jpCWBBqzFNg"
+				},
+				{
+					"id": "youtube-Lj8FvgLh31U"
+				},
+				{
+					"id": "youtube-g__2WsMZU3s"
+				},
+				{
+					"id": "youtube-jbSs5b6yxoc"
+				},
+				{
+					"id": "youtube-DQo547mECKI"
+				},
+				{
+					"id": "youtube-JOWxqRB9KJ4"
+				},
+				{
+					"id": "youtube-OIhySY5obI8"
+				},
+				{
+					"id": "youtube-ZhpH5uP-KGk"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8653846153846153,
+			"caption_bottom": 0.915680473372781,
+			"start_time": 0,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 181,
+	"discourse_topic_slug": "jia-y-u-ern-home-with-kids"
+}

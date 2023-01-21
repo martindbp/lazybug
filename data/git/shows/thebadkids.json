@@ -1,0 +1,72 @@
+{
+	"name": {
+		"en": "The Bad Kids",
+		"hz": "隐秘的角落",
+		"py": "Yǐnmì De Jiǎoluò"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.8,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"crime"
+	],
+	"synopsis": "Three kids witness a murder",
+	"year": "2020",
+	"released": true,
+	"caption_source": "soft",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLlCrV9TCfzMY0tLVaSHA3w3eg21KZzEKG",
+			"ocr_params": [
+				{
+					"type": "hanzi"
+				},
+				{
+					"type": "english"
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-XkQg0r93-eU"
+				},
+				{
+					"id": "youtube-jF1BPMsLtDk"
+				},
+				{
+					"id": "youtube-BKs-tBvNlSs"
+				},
+				{
+					"id": "youtube-A24cc2meBik"
+				},
+				{
+					"id": "youtube-gd8ZQb6uPAw"
+				},
+				{
+					"id": "youtube-_vgm7eAQZDY"
+				},
+				{
+					"id": "youtube-tLVq2U_b3s8"
+				},
+				{
+					"id": "youtube-TZJuEUsvNP0"
+				},
+				{
+					"id": "youtube-93rYd-qdO40"
+				},
+				{
+					"id": "youtube-OQS5A39E67s"
+				},
+				{
+					"id": "youtube-Odhd2_3--mA"
+				},
+				{
+					"id": "youtube-wZ34jXzjd54"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 188,
+	"discourse_topic_slug": "y-nmi-de-ji-oluo-the-bad-kids"
+}

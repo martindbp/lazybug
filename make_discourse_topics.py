@@ -20,7 +20,7 @@ category_id = [c for c in client.get_category_list() if c.slug == 'show-movie-di
 print('Category id', category_id)
 
 if __name__ == "__main__":
-    for filename in glob.glob('data/remote/public/shows/*.json'):
+    for filename in glob.glob('data/git/shows/*.json'):
         show_name = filename.split('/')[-1].split('.')[0]
         print('Processing', show_name)
         with open(filename, 'r') as f:

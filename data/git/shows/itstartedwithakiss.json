@@ -1,0 +1,86 @@
+{
+  "name": {
+    "hz": "",
+    "py": "",
+    "en": "It Started With A Kiss"
+  },
+  "description": "",
+  "seasons": [
+    {
+      "playlist_id": "PLk2gvyPpHLReeXzQUBv33BJ8YncN8qY9j",
+      "episodes": [
+        {
+          "id": "youtube-8aTQyInBemI"
+        },
+        {
+          "id": "youtube-Nk9l1kwUAL8"
+        },
+        {
+          "id": "youtube-tFdVaq_krow"
+        },
+        {
+          "id": "youtube-LfKW93JKWzc"
+        },
+        {
+          "id": "youtube-qHtSyJAUQs4"
+        },
+        {
+          "id": "youtube-zEbjeA1qOmY"
+        },
+        {
+          "id": "youtube-qgQVKvVwVzw"
+        },
+        {
+          "id": "youtube-F-LgN8QDdpw"
+        },
+        {
+          "id": "youtube-ou7uE3iNTZs"
+        },
+        {
+          "id": "youtube-kqRUsics5qY"
+        },
+        {
+          "id": "youtube-xIKGbfXnznU"
+        },
+        {
+          "id": "youtube-GQbwna8e9NA"
+        },
+        {
+          "id": "youtube-rSo8gB_BvK8"
+        },
+        {
+          "id": "youtube-G386hoKDCVA"
+        },
+        {
+          "id": "youtube-bpGRgQRkCso"
+        },
+        {
+          "id": "youtube-WzE_eIl2ocw"
+        },
+        {
+          "id": "youtube-Y7wmX0SvMWo"
+        },
+        {
+          "id": "youtube--JUOcdhOFAw"
+        },
+        {
+          "id": "youtube-Jv9bJoy0-ic"
+        },
+        {
+          "id": "youtube-AcHX_Dkc9xk"
+        },
+        {
+          "id": "youtube-PoxcWR84tNU"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": null,
+      "caption_bottom": null,
+      "start_time": 0
+    }
+  ]
+}

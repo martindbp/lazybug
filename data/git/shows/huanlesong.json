@@ -1,0 +1,162 @@
+{
+	"name": {
+		"hz": "欢乐颂",
+		"py": "Huānlè sòng",
+		"en": "Ode to Joy"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.6,
+	"type": "tv",
+	"genres": [
+		"drama"
+	],
+	"released": true,
+	"synopsis": "Women of different ages live in same floor face life challenges",
+	"year": "2016",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLK0HDlrZ5dNqjxvnhdMKwgwqldKPVYQ-i",
+			"episodes": [
+				{
+					"id": "youtube-4wGpu56WQGQ"
+				},
+				{
+					"id": "youtube-2PN5IIEViu8"
+				},
+				{
+					"id": "youtube-aocYkY49_bs"
+				},
+				{
+					"id": "youtube-qOxQPcW0YyE"
+				},
+				{
+					"id": "youtube-8fKoldIlxyQ"
+				},
+				{
+					"id": "youtube-Q7NK-oj8HL8"
+				},
+				{
+					"id": "youtube-O9De_Nh8dII"
+				},
+				{
+					"id": "youtube-EF2GlpAjXmE"
+				},
+				{
+					"id": "youtube-wpBVh3WOCQc"
+				},
+				{
+					"id": "youtube-vhYRspZXj3k"
+				},
+				{
+					"id": "youtube-bS2ZJvYjovk"
+				},
+				{
+					"id": "youtube-6vb6ZErc34k"
+				},
+				{
+					"id": "youtube-3Ii2nM3zJAQ"
+				},
+				{
+					"id": "youtube-hZye133IRag"
+				},
+				{
+					"id": "youtube-W6Y1Zd35m1w"
+				},
+				{
+					"id": "youtube-5FpP79TFBvU"
+				},
+				{
+					"id": "youtube-isBZatIR3_4"
+				},
+				{
+					"id": "youtube-82kFaZQaVwo"
+				},
+				{
+					"id": "youtube-l6uotQ7IJos"
+				},
+				{
+					"id": "youtube-WVnlWIgzD30"
+				},
+				{
+					"id": "youtube-LmrmQdHbQ4U"
+				},
+				{
+					"id": "youtube-FHk1WZcWVRI"
+				},
+				{
+					"id": "youtube-nUaKE9bhw1g"
+				},
+				{
+					"id": "youtube-wnbzv039cmY"
+				},
+				{
+					"id": "youtube-DoaFTe1tW4k"
+				},
+				{
+					"id": "youtube-2zaMkjlZpFE"
+				},
+				{
+					"id": "youtube-MsYvyPVEfIY"
+				},
+				{
+					"id": "youtube-Rmb67iyHaNU"
+				},
+				{
+					"id": "youtube-9_uKzGHtgxw"
+				},
+				{
+					"id": "youtube-2hsdPfhljFM"
+				},
+				{
+					"id": "youtube-yD0NWOIqe-8"
+				},
+				{
+					"id": "youtube-I_yVO66IHK8"
+				},
+				{
+					"id": "youtube-aafl4u2lngE"
+				},
+				{
+					"id": "youtube-2iG0f71fTj4"
+				},
+				{
+					"id": "youtube-SB4KzLwTdEE"
+				},
+				{
+					"id": "youtube-jSP-s_xqUO0"
+				},
+				{
+					"id": "youtube-x3tzf4SY9uY"
+				},
+				{
+					"id": "youtube-7u418jqFh4c"
+				},
+				{
+					"id": "youtube-V_6nN4aPxvI"
+				},
+				{
+					"id": "youtube-nTTJ-cBqX2Q"
+				},
+				{
+					"id": "youtube-3IM7uZ8O3Xw"
+				},
+				{
+					"id": "youtube-TOXyR9JxC5k"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.87890625,
+			"caption_bottom": 0.939453125,
+			"start_time": 65,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 204,
+	"discourse_topic_slug": "huanle-song-ode-to-joy"
+}

@@ -1,0 +1,137 @@
+{
+  "name": {
+    "hz": "",
+    "py": "",
+    "en": ""
+  },
+  "description": "",
+  "seasons": [
+    {
+      "playlist_id": "PLooD8l3FSd6m1J79CKohvioff-V8hFXBN",
+      "episodes": [
+        {
+          "id": "youtube-UjQq16ZGc84"
+        },
+        {
+          "id": "youtube-xcZwchLLLX8"
+        },
+        {
+          "id": "youtube-Kxz23QuOj1s"
+        },
+        {
+          "id": "youtube-tIp4A3etFfY"
+        },
+        {
+          "id": "youtube-FtEmo5HnHbE"
+        },
+        {
+          "id": "youtube-t6qJ_fcLU8Q"
+        },
+        {
+          "id": "youtube-clFJufzprzY"
+        },
+        {
+          "id": "youtube-qEdgG5LTeY0"
+        },
+        {
+          "id": "youtube-KLrBF4p3tdI"
+        },
+        {
+          "id": "youtube-iSYRSf80NLE"
+        },
+        {
+          "id": "youtube-54BkK-QITzs"
+        },
+        {
+          "id": "youtube-3DdPQi0ZLJs"
+        },
+        {
+          "id": "youtube-HiJ0u4QcMLY"
+        },
+        {
+          "id": "youtube-HaCzemIqX5U"
+        },
+        {
+          "id": "youtube-QZtaOgk3YVA"
+        },
+        {
+          "id": "youtube-B6Cq7p33Hy0"
+        },
+        {
+          "id": "youtube-bnLTSMZYl8U"
+        },
+        {
+          "id": "youtube-xyPg_LZx0yA"
+        },
+        {
+          "id": "youtube-CGLVfwvRiOg"
+        },
+        {
+          "id": "youtube-reWFa93RQEU"
+        },
+        {
+          "id": "youtube-kbYFUGCsaHM"
+        },
+        {
+          "id": "youtube-gRzxXXw4Us4"
+        },
+        {
+          "id": "youtube-C6zdOB4vkSM"
+        },
+        {
+          "id": "youtube-fumbP7l6IEk"
+        },
+        {
+          "id": "youtube-uzkFvEQaIiA"
+        },
+        {
+          "id": "youtube-oL-5Db5uspk"
+        },
+        {
+          "id": "youtube-evvYI81cU5Y"
+        },
+        {
+          "id": "youtube-Sag9tFlg-pE"
+        },
+        {
+          "id": "youtube-lCCVAePbLhk"
+        },
+        {
+          "id": "youtube-_RJbjqRi_Ww"
+        },
+        {
+          "id": "youtube-J6gkgGlxTmc"
+        },
+        {
+          "id": "youtube-Ewo_aTF0o3s"
+        },
+        {
+          "id": "youtube-GV46Aeci5so"
+        },
+        {
+          "id": "youtube-CbUvOgxosrA"
+        },
+        {
+          "id": "youtube-DGLKiZy7DtY"
+        },
+        {
+          "id": "youtube-pUWF6Q8f_5Y"
+        },
+        {
+          "id": "youtube-UouzmRkwvv4"
+        },
+        {
+          "id": "youtube--AIHzCs9Xuo"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.8277777777777777,
+      "caption_bottom": 0.9041666666666667,
+      "start_time": 90
+    }
+  ]
+}

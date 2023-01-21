@@ -1,0 +1,137 @@
+{
+	"name": "小Lin说",
+	"date_added": "2022-07-03",
+	"released": true,
+	"type": "vlog",
+	"genres": [
+		"technology",
+		"economics",
+		"politics"
+	],
+	"synopsis": "Wall-street banker talks about politics, economics, tech and more",
+	"year": null,
+	"douban": null,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PL-c0DN3fTeQehw1ZGXim96ZvSMEaAi_Bt",
+			"episodes": [
+				{
+					"id": "youtube-jXF-oeuRdlw"
+				},
+				{
+					"id": "youtube-SdV-U1ttWYM"
+				},
+				{
+					"id": "youtube-aJ957mEAFis"
+				},
+				{
+					"id": "youtube-EKS6mfLtR2s"
+				},
+				{
+					"id": "youtube-R1q-13fyvRQ"
+				},
+				{
+					"id": "youtube-fKRwpnMb75c"
+				},
+				{
+					"id": "youtube-BcgyPJWclEw"
+				},
+				{
+					"id": "youtube-8cph2_Xvfbo"
+				},
+				{
+					"id": "youtube-mjlNa0BV-OM"
+				},
+				{
+					"id": "youtube-wu-tBDhmkB4"
+				},
+				{
+					"id": "youtube-za6-ykbukug"
+				},
+				{
+					"id": "youtube-pFRXGxwat_U"
+				},
+				{
+					"id": "youtube-4HOwZXAVkZg"
+				},
+				{
+					"id": "youtube-pJyMf5NCyV8"
+				},
+				{
+					"id": "youtube-xnIYIpXKvNM"
+				},
+				{
+					"id": "youtube-_AvJwpZQfTU"
+				},
+				{
+					"id": "youtube-WjkJ2VkAHic"
+				},
+				{
+					"id": "youtube-i0hac3c_xhs"
+				},
+				{
+					"id": "youtube-8CI82PPsksU"
+				},
+				{
+					"id": "youtube-CSJ83slUHNU"
+				},
+				{
+					"id": "youtube-m7i2xSxYS3o"
+				},
+				{
+					"id": "youtube-iSQipTxiqH0"
+				},
+				{
+					"id": "youtube-XaBxlOnzYvg"
+				},
+				{
+					"id": "youtube-Prq7YLauL84"
+				},
+				{
+					"id": "youtube-hDkCf4FIbfI"
+				},
+				{
+					"id": "youtube-JnOV6XHhZCg"
+				},
+				{
+					"id": "youtube-motxyzLrf4Y"
+				},
+				{
+					"id": "youtube-2lkk0_aZrVQ"
+				},
+				{
+					"id": "youtube-d_kJgwxhOJM"
+				},
+				{
+					"id": "youtube-EHffEv0IQlY"
+				},
+				{
+					"id": "youtube-CudzwXZHoaM"
+				},
+				{
+					"id": "youtube-T-ZEqZdp-gc"
+				},
+				{
+					"id": "youtube-h4idVAkqslE"
+				},
+				{
+					"id": "youtube-Tg0KpAFgyso"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8333333333333334,
+			"caption_bottom": 0.9055555555555556,
+			"start_time": 0,
+			"filter_out_too_many_low_prob_chars": false,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 185,
+	"discourse_topic_slug": "lin"
+}

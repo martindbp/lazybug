@@ -1,0 +1,71 @@
+{
+  "name": {
+      "hz": "",
+      "py": "",
+      "en": ""
+  },
+  "date_added": "2022-07-03",
+  "year": "",
+  "description": "",
+  "seasons": [
+    {
+      "playlist_id": "PLh22mWJjYqs9ZKTOy8p9fyFV2cv-vGFRa",
+      "episodes": [
+        {
+          "id": "youtube-BF5rO2Oq6tQ"
+        },
+        {
+          "id": "youtube-sPu8GCBD3Y4"
+        },
+        {
+          "id": "youtube-iY3e4agQ9RA"
+        },
+        {
+          "id": "youtube-Z4KUHYAzTXw"
+        },
+        {
+          "id": "youtube-lLzWQ-6k8Gk"
+        },
+        {
+          "id": "youtube-bulZxM1LDL0"
+        },
+        {
+          "id": "youtube-CszviOZ4Mws"
+        },
+        {
+          "id": "youtube-xvuM6wJTXSo"
+        },
+        {
+          "id": "youtube-tlbyHB9o0Tg"
+        },
+        {
+          "id": "youtube-bhGz8WOrKKw"
+        },
+        {
+          "id": "youtube-syC5viNdESs"
+        },
+        {
+          "id": "youtube-Kodj_uRvmFA"
+        },
+        {
+          "id": "youtube-P3VQYd-gXa4"
+        },
+        {
+          "id": "youtube-ebyC4aQTUgY"
+        },
+        {
+          "id": "youtube-b-tzcpTkc68"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.9041666666666667,
+      "caption_bottom": 0.9486111111111111,
+      "refine_bounding_rect": true,
+      "start_time": 45
+    }
+  ]
+}

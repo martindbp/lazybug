@@ -1,0 +1,183 @@
+{
+	"name": {
+		"hz": "小欢喜",
+		"en": "A Little Reunion",
+		"py": "Xiǎo huānxǐ"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.2,
+	"type": "tv",
+	"genres": [
+		"drama"
+	],
+	"synopsis": "Students struggling to prepare for college entrance exam",
+	"year": "2019",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLkvG4EWPDB0kkjJ-RBHMFdCLDFzn5UNlJ",
+			"episodes": [
+				{
+					"id": "youtube-mTMb8e_gDzE"
+				},
+				{
+					"id": "youtube-nnxSTdpBAV4"
+				},
+				{
+					"id": "youtube-iRzQkfyxl2c"
+				},
+				{
+					"id": "youtube-yzs5YShQdrY"
+				},
+				{
+					"id": "youtube-2WNpWUfr4XY"
+				},
+				{
+					"id": "youtube-M7hR8hjYcMo"
+				},
+				{
+					"id": "youtube-uSlT6dSkRC8"
+				},
+				{
+					"id": "youtube-hkU2mXM_HBw"
+				},
+				{
+					"id": "youtube-dcm3PxCe2vw"
+				},
+				{
+					"id": "youtube-qLxcr6MBv_Q"
+				},
+				{
+					"id": "youtube-gl_X7K7k-Is"
+				},
+				{
+					"id": "youtube-CpdRY4155Ek"
+				},
+				{
+					"id": "youtube-UKAvnPZ48Dg"
+				},
+				{
+					"id": "youtube-tI-7-NQrsxQ"
+				},
+				{
+					"id": "youtube-Os89K1octlo"
+				},
+				{
+					"id": "youtube-E-U8ONs4ENI"
+				},
+				{
+					"id": "youtube-TwLI_PFZ7Z8"
+				},
+				{
+					"id": "youtube-kAMCB069_u0"
+				},
+				{
+					"id": "youtube-DWUQaA1tPW0"
+				},
+				{
+					"id": "youtube-N5dWGcBz5dA"
+				},
+				{
+					"id": "youtube-WPMFmCGaAeU"
+				},
+				{
+					"id": "youtube-WlCOfngbVxA"
+				},
+				{
+					"id": "youtube-k7BKeheImFk"
+				},
+				{
+					"id": "youtube-sfRDaeT-bPU"
+				},
+				{
+					"id": "youtube-87pDmWyhIXg"
+				},
+				{
+					"id": "youtube-LmTQSwihXWY"
+				},
+				{
+					"id": "youtube-e7x3qZBJc10"
+				},
+				{
+					"id": "youtube-a6KaaUI6Zag"
+				},
+				{
+					"id": "youtube-BtlhRZZBKS0"
+				},
+				{
+					"id": "youtube-DX7X2gLYAlg"
+				},
+				{
+					"id": "youtube-vuzJPY6BTQ4"
+				},
+				{
+					"id": "youtube-oZQ3GCFHiMs"
+				},
+				{
+					"id": "youtube-gVMD8ulMzLE"
+				},
+				{
+					"id": "youtube-c53QC2eWzIk"
+				},
+				{
+					"id": "youtube-B3eYEdnIxqE"
+				},
+				{
+					"id": "youtube--t67r1tFRjE"
+				},
+				{
+					"id": "youtube-HydUsOrM8Gs"
+				},
+				{
+					"id": "youtube-38aOIDwVy2A"
+				},
+				{
+					"id": "youtube-D6UqgINWM3s"
+				},
+				{
+					"id": "youtube-uA-XixQCSBg"
+				},
+				{
+					"id": "youtube-0lgoebtgx18"
+				},
+				{
+					"id": "youtube-jAIFsLgSJSI"
+				},
+				{
+					"id": "youtube-vri_sknGXLc"
+				},
+				{
+					"id": "youtube-qR9I9uOLcUA"
+				},
+				{
+					"id": "youtube-JdezsRsd7zU"
+				},
+				{
+					"id": "youtube-pdFiCZ2tHw4"
+				},
+				{
+					"id": "youtube-fyBvD9FEgTM"
+				},
+				{
+					"id": "youtube-3TcwNl1GG9w"
+				},
+				{
+					"id": "youtube-5qzOx_V8ZmI"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8583333333333333,
+			"caption_bottom": 0.9111111111111111,
+			"refine_bounding_rect": true,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 214,
+	"discourse_topic_slug": "xi-o-huanx-a-little-reunion"
+}

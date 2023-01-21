@@ -1,0 +1,322 @@
+{
+	"name": {
+		"hz": "爱情公寓",
+		"py": "Àiqíng Gōngyù",
+		"en": "iPartment"
+	},
+	"reddit_comments": [
+		"ChineseLanguage/comments/elprs9/chinese_sitcoms_which_are_suitable_for_studying/fdk9lgf"
+	],
+	"date_added": "2022-07-03",
+	"douban": 8.0,
+	"type": "tv",
+	"genres": [
+		"sitcom"
+	],
+	"synopsis": "The \"Friends\" of China",
+	"year": "2009-2020",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"seasons": [
+		{
+			"number": 1,
+			"playlist_id": "PLIN-ht974xkghS7BpJmiyfg5WZXp7ZWEH",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8152777777777778,
+					"caption_bottom": 0.8819444444444444,
+					"start_time": 0,
+					"refine_bounding_rect": true
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-mV0HQj44vtM"
+				},
+				{
+					"id": "youtube-PoxpC5abUc4"
+				},
+				{
+					"id": "youtube-ObyFkBRdq2Q"
+				},
+				{
+					"id": "youtube-yTz66w8SZKo"
+				},
+				{
+					"id": "youtube-WI_mJOvdqPE"
+				},
+				{
+					"id": "youtube-YEfgqVcnxsY"
+				},
+				{
+					"id": "youtube-85bI3yVoq1k"
+				},
+				{
+					"id": "youtube-kVJMFHU5H7I"
+				},
+				{
+					"id": "youtube-VzrJorz67Og"
+				},
+				{
+					"id": "youtube-Go9YeuMXp2Q"
+				},
+				{
+					"id": "youtube-DcNtpEJkqhU"
+				},
+				{
+					"id": "youtube-b-t2bYDVRIM"
+				},
+				{
+					"id": "youtube-ZJV0ZuxPO9Q"
+				},
+				{
+					"id": "youtube-bf4aQ1r06ic"
+				},
+				{
+					"id": "youtube-N5fHNvXudiU"
+				},
+				{
+					"id": "youtube-MKplYYO1_7c"
+				},
+				{
+					"id": "youtube-WIrz1KojTg4"
+				},
+				{
+					"id": "youtube-Q8DCSZ8F7q0"
+				},
+				{
+					"id": "youtube-YLuLCXK6K9s"
+				},
+				{
+					"id": "youtube-OPv1fUuwqkQ"
+				}
+			]
+		},
+		{
+			"number": 2,
+			"playlist_id": "PLIN-ht974xkghS7BpJmiyfg5WZXp7ZWEH",
+			"episodes": [
+				{
+					"id": "youtube-YgFkYXoGtxI"
+				},
+				{
+					"id": "youtube-oGxUEZukdug"
+				},
+				{
+					"id": "youtube-1ujaMC9PD9Y"
+				},
+				{
+					"id": "youtube-nPEc77s2Qho"
+				},
+				{
+					"id": "youtube-J-WAq9PzztU"
+				},
+				{
+					"id": "youtube-rt_m8f7yAAs"
+				},
+				{
+					"id": "youtube-fz7Kh5aWxWo"
+				},
+				{
+					"id": "youtube-xC3vOovvE6A"
+				},
+				{
+					"id": "youtube-MYwhi6u1gqI"
+				},
+				{
+					"id": "youtube-jEwdqECQMnE"
+				},
+				{
+					"id": "youtube-lQAanAeIm64"
+				},
+				{
+					"id": "youtube-oOY4B5u_CzA"
+				},
+				{
+					"id": "youtube-M0pzM8BVMMk"
+				},
+				{
+					"id": "youtube-SMG9cbIbA0g"
+				},
+				{
+					"id": "youtube-JJTbB8CHXZ4"
+				},
+				{
+					"id": "youtube-tm5IfSpzypE"
+				},
+				{
+					"id": "youtube-Xu3sBk9aQxs"
+				},
+				{
+					"id": "youtube-Xo0wNeq2WTw"
+				},
+				{
+					"id": "youtube-TlTVGSCAzrM"
+				},
+				{
+					"id": "youtube-RH96uTlS330"
+				}
+			]
+		},
+		{
+			"number": 3,
+			"playlist_id": "PLIN-ht974xkghS7BpJmiyfg5WZXp7ZWEH",
+			"episodes": [
+				{
+					"id": "youtube-j7PRj2xJrB4"
+				},
+				{
+					"id": "youtube-wwqgCIYjPaI"
+				},
+				{
+					"id": "youtube-Q0WZnEnlxhg"
+				},
+				{
+					"id": "youtube-RWmYjDN_Id4"
+				},
+				{
+					"id": "youtube-2d_sUu7og_c"
+				},
+				{
+					"id": "youtube-RDOKfewXB9M"
+				},
+				{
+					"id": "youtube-KWUM-jEfz0I"
+				},
+				{
+					"id": "youtube-OCj3DlKB9AY"
+				},
+				{
+					"id": "youtube-iETQA8RD41M"
+				},
+				{
+					"id": "youtube-WDVPbyLtflc"
+				},
+				{
+					"id": "youtube-mp5HtbbWeqw"
+				},
+				{
+					"id": "youtube-fAhAFdp_UBc"
+				},
+				{
+					"id": "youtube-BSmfle5JLTs"
+				},
+				{
+					"id": "youtube-9f8yL5beEH4"
+				},
+				{
+					"id": "youtube-1I479t3Com8"
+				},
+				{
+					"id": "youtube-lJaeJZtZWcw"
+				},
+				{
+					"id": "youtube-5C2lL1A2pmg"
+				},
+				{
+					"id": "youtube-t-Wh-9vywnI"
+				},
+				{
+					"id": "youtube-izDGCcf9Z2M"
+				},
+				{
+					"id": "youtube-YRWrnb_n0XA"
+				},
+				{
+					"id": "youtube-rSS4zvYV_ps"
+				},
+				{
+					"id": "youtube-JZ4zS8ZI_ls"
+				},
+				{
+					"id": "youtube-7U5bZMqr55M"
+				},
+				{
+					"id": "youtube-H0fMcGi9_SE"
+				}
+			]
+		},
+		{
+			"number": 4,
+			"playlist_id": "PLIN-ht974xkghS7BpJmiyfg5WZXp7ZWEH",
+			"episodes": [
+				{
+					"id": "youtube-rLvF8G9D9JQ"
+				},
+				{
+					"id": "youtube-92cMyHhh3Ho"
+				},
+				{
+					"id": "youtube-nxSv5foD3Xo"
+				},
+				{
+					"id": "youtube-OHVI1gUg7vA"
+				},
+				{
+					"id": "youtube-JFkrQyIWDK8"
+				},
+				{
+					"id": "youtube-Mgh-yQlJHnM"
+				},
+				{
+					"id": "youtube-Yc0liF-1ns0"
+				},
+				{
+					"id": "youtube-vrWli0C8FK8"
+				},
+				{
+					"id": "youtube-dftbqjgGQIo"
+				},
+				{
+					"id": "youtube-wryzDt4KVq0"
+				},
+				{
+					"id": "youtube-n-K9EsD_2Fg"
+				},
+				{
+					"id": "youtube-3NUsNh_a4fA"
+				},
+				{
+					"id": "youtube-R8yer12WVLE"
+				},
+				{
+					"id": "youtube-YxqKc3aymlE"
+				},
+				{
+					"id": "youtube-zFG-Mkackc0"
+				},
+				{
+					"id": "youtube-qCIfnWvdrRU"
+				},
+				{
+					"id": "youtube-_SGxkbTQgEo"
+				},
+				{
+					"id": "youtube-g9NeKESBeMU"
+				},
+				{
+					"id": "youtube-4SGWzJYFR0E"
+				},
+				{
+					"id": "youtube-0Qn8l1DRmus"
+				},
+				{
+					"id": "youtube-EeKeuh4xHdc"
+				},
+				{
+					"id": "youtube-SaV110wLNSs"
+				},
+				{
+					"id": "youtube-kKW8k_hyOYI"
+				},
+				{
+					"id": "youtube-KTXdmqneOtE"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 208,
+	"discourse_topic_slug": "aiqing-gongyu-ipartment"
+}

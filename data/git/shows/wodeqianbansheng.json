@@ -1,0 +1,155 @@
+{
+  "name": {
+    "hz": "我的前半生",
+    "py": "Wǒ de qián bànshēng",
+    "en": "The First Half of My Life"
+  },
+  "synopsis": "House-wife in her 30s get divorced and try to build a life and career",
+  "douban": 6.5,
+  "year": "2017",
+  "type": "tv",
+  "genres": ["drama"],
+  "caption_source": "hard",
+  "translation_source": "human",
+  "seasons": [
+    {
+      "playlist_id": "PLQqbdnAgoRmZFhKcaeEMvuf_syAYEFxoc",
+      "episodes": [
+        {
+          "id": "youtube-LkY0-_qW8x4"
+        },
+        {
+          "id": "youtube-ldkpaXJGMCQ"
+        },
+        {
+          "id": "youtube-XJEnWsQlu_k"
+        },
+        {
+          "id": "youtube-ekqmWYDMJqc"
+        },
+        {
+          "id": "youtube-ZCBcCj9P23Y"
+        },
+        {
+          "id": "youtube-mH9Sdgjl9cg"
+        },
+        {
+          "id": "youtube-7Yr0oiBADPg"
+        },
+        {
+          "id": "youtube-3ATmGNtrUgI"
+        },
+        {
+          "id": "youtube-VrmHiMMH6o0"
+        },
+        {
+          "id": "youtube-2eW857uStQs"
+        },
+        {
+          "id": "youtube-lA5qIVRFMlQ"
+        },
+        {
+          "id": "youtube-g7eR9UfomJ4"
+        },
+        {
+          "id": "youtube-UVwrScayY5w"
+        },
+        {
+          "id": "youtube-wU9JFQtImzg"
+        },
+        {
+          "id": "youtube-KxxPvoe9rtU"
+        },
+        {
+          "id": "youtube-XIxw8gE0k7A"
+        },
+        {
+          "id": "youtube-h-OB6ma1YAM"
+        },
+        {
+          "id": "youtube-aQj5-DfWjiw"
+        },
+        {
+          "id": "youtube-MaXlTx23GhY"
+        },
+        {
+          "id": "youtube-5JCulINhqtI"
+        },
+        {
+          "id": "youtube-tu7wS8AW-Ts"
+        },
+        {
+          "id": "youtube-tVcihVf09uU"
+        },
+        {
+          "id": "youtube-JJ3f48Ur3A8"
+        },
+        {
+          "id": "youtube-BalRXXeIG_M"
+        },
+        {
+          "id": "youtube-1Qtbjk0RQsk"
+        },
+        {
+          "id": "youtube-1u79NKWyAA4"
+        },
+        {
+          "id": "youtube-YAm_6QOuFuo"
+        },
+        {
+          "id": "youtube-KEJYvINajv4"
+        },
+        {
+          "id": "youtube-uTKb3AqpqOc"
+        },
+        {
+          "id": "youtube-bMoQkI-Zaec"
+        },
+        {
+          "id": "youtube-4z6ap2-Ub14"
+        },
+        {
+          "id": "youtube-WiehS0kiVRk"
+        },
+        {
+          "id": "youtube-A-SKbFYjhpE"
+        },
+        {
+          "id": "youtube-04IEyRq8O8w"
+        },
+        {
+          "id": "youtube-Ucwgx-RzZYc"
+        },
+        {
+          "id": "youtube-kuXMAZyejpQ"
+        },
+        {
+          "id": "youtube-pUvaR0AL6yY"
+        },
+        {
+          "id": "youtube-xiXLfHmeHl4"
+        },
+        {
+          "id": "youtube-qAxkR_rkZtc"
+        },
+        {
+          "id": "youtube-A-G88WnZTt8"
+        },
+        {
+          "id": "youtube-q5XssRMfkRI"
+        },
+        {
+          "id": "youtube-trow7mBOnwA"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.8555555555555555,
+      "caption_bottom": 0.9263888888888889,
+      "start_time": 90
+    }
+  ]
+}

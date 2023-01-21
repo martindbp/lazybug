@@ -1,0 +1,145 @@
+{
+	"name": {
+		"en": "Hikaru no go",
+		"hz": "棋魂",
+		"py": "Qíhún"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.6,
+	"type": "tv",
+	"year": "2020",
+	"synopsis": "Boy summons spirit of Song-dynasty Go master",
+	"genres": [
+		"historical",
+		"drama",
+		"fantasy"
+	],
+	"caption_source": "soft",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLAYWca_88zhEcXiZSGwZsph5d6-Uu-4Gb",
+			"ocr_params": [
+				{
+					"type": "hanzi"
+				},
+				{
+					"type": "english"
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-tARIJSXE4HY"
+				},
+				{
+					"id": "youtube-K1w4F8YCSY8"
+				},
+				{
+					"id": "youtube-a-CsvzZjYMs"
+				},
+				{
+					"id": "youtube-ruI9Ja9ZMd4"
+				},
+				{
+					"id": "youtube-sbIB0clNLy8"
+				},
+				{
+					"id": "youtube-UXQFue2UR5A"
+				},
+				{
+					"id": "youtube-a0353kzMNnQ"
+				},
+				{
+					"id": "youtube-5o789b3ThME"
+				},
+				{
+					"id": "youtube-IDSt5bp2U1E"
+				},
+				{
+					"id": "youtube-OqQRq14SpiU"
+				},
+				{
+					"id": "youtube-O4jkerCEddU"
+				},
+				{
+					"id": "youtube-fPrDwQEfTY0"
+				},
+				{
+					"id": "youtube-f9d11DgHSok"
+				},
+				{
+					"id": "youtube--PKiYbnfINM"
+				},
+				{
+					"id": "youtube-ntNRQ-lPIz4"
+				},
+				{
+					"id": "youtube-QARimRXfzHo"
+				},
+				{
+					"id": "youtube-YIzh0hEgR60"
+				},
+				{
+					"id": "youtube-XCPSBjI5ELw"
+				},
+				{
+					"id": "youtube-quwRdhlRXQk"
+				},
+				{
+					"id": "youtube-dPc7lsXxAcQ"
+				},
+				{
+					"id": "youtube-XRrAVhJZTd0"
+				},
+				{
+					"id": "youtube-135DS6j-JwI"
+				},
+				{
+					"id": "youtube-s8L-gE2qD-Y"
+				},
+				{
+					"id": "youtube-ECwQfAKSfXs"
+				},
+				{
+					"id": "youtube-z-OzeUXVCvQ"
+				},
+				{
+					"id": "youtube-Ura1dUg1yTk"
+				},
+				{
+					"id": "youtube-MeDlp1LhBIk"
+				},
+				{
+					"id": "youtube-al6SaJ8rAM8"
+				},
+				{
+					"id": "youtube-Tp_0zCqyaso"
+				},
+				{
+					"id": "youtube-rXkDSdSADaE"
+				},
+				{
+					"id": "youtube-DBlJvn53jt8"
+				},
+				{
+					"id": "youtube-1qYv-TAora4"
+				},
+				{
+					"id": "youtube-GvmsDIuYLyU"
+				},
+				{
+					"id": "youtube-x8hJF37t_XA"
+				},
+				{
+					"id": "youtube-9fgPdKNT_QA"
+				},
+				{
+					"id": "youtube-dwALGmmX3CI"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 193,
+	"discourse_topic_slug": "qihun-hikaru-no-go"
+}

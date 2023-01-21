@@ -1,0 +1,113 @@
+{
+	"name": {
+		"hz": "大耳朵图图",
+		"py": "Dà ěrduo tútú",
+		"en": "Big Ear Tutu"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.7,
+	"year": "2004-2011",
+	"type": "tv",
+	"genres": [
+		"childrens-cartoon"
+	],
+	"synopsis": "Beloved cartoon for preschool-age kids",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLg0gVW-bweyfDngxBqPjtoq8LTtXwo032",
+			"episodes": [
+				{
+					"id": "youtube-E3fs9Q4ppfk"
+				},
+				{
+					"id": "youtube-dI-cDiXsBWk"
+				},
+				{
+					"id": "youtube-Evy5Br2pzBI"
+				},
+				{
+					"id": "youtube-SXmrYX1fk0k"
+				},
+				{
+					"id": "youtube-WvwBID-t3Qs"
+				},
+				{
+					"id": "youtube-LqKnXpZOF_E"
+				},
+				{
+					"id": "youtube-b7S7fgo6Rhg"
+				},
+				{
+					"id": "youtube-T1nM9quhR8c"
+				},
+				{
+					"id": "youtube-DdJfoblVNmQ"
+				},
+				{
+					"id": "youtube-Wc1a5_9krX8"
+				},
+				{
+					"id": "youtube-vEEcIreKGX0"
+				},
+				{
+					"id": "youtube-Fei3_liQVTU"
+				},
+				{
+					"id": "youtube-_jNea8KI8Ys"
+				},
+				{
+					"id": "youtube-Fns9tj2x-Aw"
+				},
+				{
+					"id": "youtube-V_7NZMZdqRc"
+				},
+				{
+					"id": "youtube-hsyO2pJtph4"
+				},
+				{
+					"id": "youtube-clqsx99vOJI"
+				},
+				{
+					"id": "youtube-lt5MFGQpTv8"
+				},
+				{
+					"id": "youtube-vMH1AP-fuQE"
+				},
+				{
+					"id": "youtube-JslvsIDoBpc"
+				},
+				{
+					"id": "youtube-YaRh8JLAP48"
+				},
+				{
+					"id": "youtube-Lzd37lzQhBM"
+				},
+				{
+					"id": "youtube-aK7TBCYbzvI"
+				},
+				{
+					"id": "youtube-duhN1z0StM4"
+				},
+				{
+					"id": "youtube-7apkV912sIY"
+				},
+				{
+					"id": "youtube-IU0dacqBiPA"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.837696335078534,
+			"caption_bottom": 0.9044502617801047,
+			"start_time": 100
+		}
+	],
+	"discourse_topic_id": 213,
+	"discourse_topic_slug": "da-erduo-tutu-big-ear-tutu"
+}

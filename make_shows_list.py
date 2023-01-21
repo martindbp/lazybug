@@ -33,7 +33,7 @@ def get_video_data(vid):
 
 # Build frequency database for words by using children's cartoons only, weighted by their perceived difficulty (by me)
 
-@task(deps=[FileRef(f) for f in glob.glob('data/remote/public/shows/*.json')])
+@task(deps=[FileRef(f) for f in glob.glob('data/git/shows/*.json')])
 def calc_word_probs():
     word_freqs = defaultdict(lambda: 0)
     weights = {
@@ -43,8 +43,8 @@ def calc_word_probs():
         'daerduotutu': 5,
     }
     #for show_name in ['xiaozhupeiqi', 'yingtaoxiaowanzi', 'hongmaolantu', 'daerduotutu']:
-        #filename = f'data/remote/public/shows/{show_name}.json'
-    for filename in glob.glob('data/remote/public/shows/*.json'):
+        #filename = f'data/git/shows/{show_name}.json'
+    for filename in glob.glob('data/git/shows/*.json'):
         with open(filename, 'r') as f:
             show_name = filename.split('/')[-1].split('.')[0]
             show = json.load(f)
@@ -288,7 +288,7 @@ def make_shows_list():
     bloom_filters = {'shows': {}, 'n': BLOOM_FILTER_N, 'k': BLOOM_FILTER_K}
     unreleased = []
     scores = []
-    for filename in glob.glob('data/remote/public/shows/*.json'):
+    for filename in glob.glob('data/git/shows/*.json'):
         with open(filename, 'r') as f:
             show_name = filename.split('/')[-1].split('.')[0]
             print('Processing', show_name)

@@ -1,0 +1,147 @@
+{
+	"name": {
+		"hz": "軒轅劍之天之痕",
+		"py": "Xuānyuán jiàn zhī tiān zhī hén",
+		"en": "Xuan-Yuan Sword: Scar of Sky"
+	},
+	"date_added": "2022-08-28",
+	"douban": 6.6,
+	"type": "tv",
+	"genres": [
+		"historical",
+		"wuxia",
+		"fantasy",
+		"romance"
+	],
+	"synopsis": "An adaptation of the Xuan-Yuan Sword role playing game",
+	"year": "2012",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLU39TFGUKRrNsnlv2Z_a6uBrZTOqM5srv",
+			"episodes": [
+				{
+					"id": "youtube-ur_SPi4XE7M",
+					"start_time": 120
+				},
+				{
+					"id": "youtube-C1ls69oBKxE"
+				},
+				{
+					"id": "youtube-sjvDlbRcvQw"
+				},
+				{
+					"id": "youtube-rqbdmkvzJrI"
+				},
+				{
+					"id": "youtube-NSa7StSCQqI"
+				},
+				{
+					"id": "youtube-mtGtoGQvkak"
+				},
+				{
+					"id": "youtube-wx2lUVxQ9HQ"
+				},
+				{
+					"id": "youtube-KEnbIRJzXB4"
+				},
+				{
+					"id": "youtube-9qP5IrWRees"
+				},
+				{
+					"id": "youtube-v9GTc6Og4bw"
+				},
+				{
+					"id": "youtube-4qYGxAOBgAA"
+				},
+				{
+					"id": "youtube-AvKkaOVIOMA"
+				},
+				{
+					"id": "youtube-loSu3pSZchE"
+				},
+				{
+					"id": "youtube-2vagucR9oHQ"
+				},
+				{
+					"id": "youtube-cpIVMCEGlbw"
+				},
+				{
+					"id": "youtube-uddT_C_RItI"
+				},
+				{
+					"id": "youtube-xKzYC_mk_SA"
+				},
+				{
+					"id": "youtube-07jEueZHIXQ"
+				},
+				{
+					"id": "youtube-n-KVDEoPjx8"
+				},
+				{
+					"id": "youtube-43PN9oIiVio"
+				},
+				{
+					"id": "youtube-HwsvyYfre7c"
+				},
+				{
+					"id": "youtube-WsT2WAJWyBs"
+				},
+				{
+					"id": "youtube-1NxGlBEgAXg"
+				},
+				{
+					"id": "youtube-0NTwjNG2g3Q"
+				},
+				{
+					"id": "youtube-ETRzw7XXnrs"
+				},
+				{
+					"id": "youtube-oE3zuc-80aA"
+				},
+				{
+					"id": "youtube-BBr-4eWxCcs"
+				},
+				{
+					"id": "youtube-qY3bEKp-Kpc"
+				},
+				{
+					"id": "youtube-N3YBjVXdC-s"
+				},
+				{
+					"id": "youtube-sT95XPk3jwU"
+				},
+				{
+					"id": "youtube-mYNyyZ1T3tE"
+				},
+				{
+					"id": "youtube-m8XpHkBgc4E"
+				},
+				{
+					"id": "youtube-7s26ivBg_p4"
+				},
+				{
+					"id": "youtube-IwENgQcZOs8"
+				},
+				{
+					"id": "youtube-qZiWV_F1KpQ"
+				},
+				{
+					"id": "youtube-vHjC0YWwPxs"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8291666666666667,
+			"caption_bottom": 0.8986111111111111,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 228,
+	"discourse_topic_slug": "xuanyuan-jian-zhi-tian-zhi-hen-xuan-yuan-sword-scar-of-sky"
+}

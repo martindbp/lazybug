@@ -1,0 +1,158 @@
+{
+	"name": {
+		"hz": "红楼梦",
+		"py": "Hónglóumèng",
+		"en": "The Dream of the Red Mansions"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.7,
+	"type": "tv",
+	"synopsis": "Best adaptation of the famous novel",
+	"genres": [
+		"historical",
+		"drama",
+		"novel-adaptation",
+		"classic"
+	],
+	"year": "1987",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLVaBj_ofjBM8fRGxe04NFpG7TleOlOkV_",
+			"episodes": [
+				{
+					"id": "youtube-XmUcy2AAj48"
+				},
+				{
+					"id": "youtube-BTMyHoC5-y8"
+				},
+				{
+					"id": "youtube-I7jtXHSK2ls"
+				},
+				{
+					"id": "youtube-ldKmi1r5P0w"
+				},
+				{
+					"id": "youtube-7iuoFzitj14"
+				},
+				{
+					"id": "youtube-gDcwuDhuNZY"
+				},
+				{
+					"id": "youtube-FHlVI9wWzVY"
+				},
+				{
+					"id": "youtube-fT-0UNNt2Aw"
+				},
+				{
+					"id": "youtube--uDaq7WnZ1s"
+				},
+				{
+					"id": "youtube-bYPj2vlGWIc"
+				},
+				{
+					"id": "youtube-uBxx3sMdfDE"
+				},
+				{
+					"id": "youtube-LaMmOnDQ3w8"
+				},
+				{
+					"id": "youtube-nuJnha1xefo"
+				},
+				{
+					"id": "youtube-bUyjZNksBoo"
+				},
+				{
+					"id": "youtube-cU4iMAZn4sE"
+				},
+				{
+					"id": "youtube-eqE_uMGFS0Q"
+				},
+				{
+					"id": "youtube-eF3_ArrUYlk"
+				},
+				{
+					"id": "youtube-aVvSAZKynMg"
+				},
+				{
+					"id": "youtube--EQpyp9ssGg"
+				},
+				{
+					"id": "youtube-pojXAV0-2oA"
+				},
+				{
+					"id": "youtube-amub-khFDZ8"
+				},
+				{
+					"id": "youtube-hM7dKozZrns"
+				},
+				{
+					"id": "youtube-F7r_huVPwd0"
+				},
+				{
+					"id": "youtube-tfZzKnvD4Q4"
+				},
+				{
+					"id": "youtube-FdeT7s1QBP0"
+				},
+				{
+					"id": "youtube-Dw_FGi94D8E"
+				},
+				{
+					"id": "youtube-GYcFNPAm3Ik"
+				},
+				{
+					"id": "youtube-w5TKbKBiZKc"
+				},
+				{
+					"id": "youtube-Du_hSV8TrAo"
+				},
+				{
+					"id": "youtube-Nd4z5xztaR0",
+					"ocr_params": [
+						{
+							"start_time": 300
+						}
+					]
+				},
+				{
+					"id": "youtube-Rab36hCeORc"
+				},
+				{
+					"id": "youtube-PRCtOk_Wljk"
+				},
+				{
+					"id": "youtube-zL_mYI1n9f4"
+				},
+				{
+					"id": "youtube-ebUWv3yyHO4"
+				},
+				{
+					"id": "youtube-b4KhQvXbIGU"
+				},
+				{
+					"id": "youtube-QkzkKryeOYs",
+					"ocr_params": [
+						{
+							"start_time": 320
+						}
+					]
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8390052356020943,
+			"caption_bottom": 0.8900523560209425,
+			"refine_bounding_rect": true,
+			"fade_in_out": true,
+			"start_time": 180
+		}
+	],
+	"discourse_topic_id": 197,
+	"discourse_topic_slug": "hongloumeng-the-dream-of-the-red-mansions"
+}

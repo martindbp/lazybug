@@ -1,0 +1,278 @@
+{
+	"name": {
+		"hz": "武林外传",
+		"py": "Wǔlín wàizhuàn",
+		"en": "My Own Swordsman"
+	},
+	"date_added": "2022-07-12",
+	"type": "tv",
+	"genres": [
+		"comedy",
+		"historical"
+	],
+	"synopsis": "Comedy in a historical setting with martial arts",
+	"douban": 9.6,
+	"year": "2006",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLLRWTf0yzFQaqeaehgSO-hzCZLVze7oM3",
+			"episodes": [
+				{
+					"id": "youtube-8rcFoN1Ding"
+				},
+				{
+					"id": "youtube-IstU4uhe6fQ"
+				},
+				{
+					"id": "youtube-bg-ngY9ozuo"
+				},
+				{
+					"id": "youtube-IlEJ_1WS63g"
+				},
+				{
+					"id": "youtube-oxF5rF5x3Ug"
+				},
+				{
+					"id": "youtube-z_zCQNArRcY"
+				},
+				{
+					"id": "youtube-lA6UH766xKg"
+				},
+				{
+					"id": "youtube-VSesXzrzfVw"
+				},
+				{
+					"id": "youtube-71rLg8_EMpk"
+				},
+				{
+					"id": "youtube-3KW3O0YD7KA"
+				},
+				{
+					"id": "youtube-p2oPnWzWPmI"
+				},
+				{
+					"id": "youtube-NKmIaLC3Bcw"
+				},
+				{
+					"id": "youtube-tbF7JD-dzo4"
+				},
+				{
+					"id": "youtube-Fs0Zc-Yi7Jc"
+				},
+				{
+					"id": "youtube-EeGdEPzI32g"
+				},
+				{
+					"id": "youtube-tZ-Xvrl09e0"
+				},
+				{
+					"id": "youtube-LZl2HSjSaLY"
+				},
+				{
+					"id": "youtube-G6ZJIwLQaIg"
+				},
+				{
+					"id": "youtube-bWVV6jPUrAo"
+				},
+				{
+					"id": "youtube-TQRP0Izap30"
+				},
+				{
+					"id": "youtube-wibs858Zbm0"
+				},
+				{
+					"id": "youtube-dE9CFg6pb50"
+				},
+				{
+					"id": "youtube-fdYQFAZ1g7Q"
+				},
+				{
+					"id": "youtube-Jf39SMLODyg"
+				},
+				{
+					"id": "youtube-bzm6Hiy93UI"
+				},
+				{
+					"id": "youtube-mJ2S6_4KQf0"
+				},
+				{
+					"id": "youtube-JvSAqrW9KJ0"
+				},
+				{
+					"id": "youtube-Leo4mG037e8"
+				},
+				{
+					"id": "youtube-dn4UovpT3bo"
+				},
+				{
+					"id": "youtube-xyyWCh7S7RQ"
+				},
+				{
+					"id": "youtube-7u6jyBU7n0w"
+				},
+				{
+					"id": "youtube-59KLnNwE7Zs"
+				},
+				{
+					"id": "youtube-gDMmLxSELvc"
+				},
+				{
+					"id": "youtube-FAs9TvGfWFc"
+				},
+				{
+					"id": "youtube-34R-Ywm_qjQ"
+				},
+				{
+					"id": "youtube-Wy3AFtgafPQ"
+				},
+				{
+					"id": "youtube-IROLSJ-QTTU"
+				},
+				{
+					"id": "youtube-ISbqeVSB5IQ"
+				},
+				{
+					"id": "youtube-Z7nzCOF-SWo"
+				},
+				{
+					"id": "youtube-PRn6N5PUb1Q"
+				},
+				{
+					"id": "youtube-kmLw3GxSmR4"
+				},
+				{
+					"id": "youtube-aYoweEquq-c"
+				},
+				{
+					"id": "youtube-0palScyx7Ng"
+				},
+				{
+					"id": "youtube-5focg6pWDhc"
+				},
+				{
+					"id": "youtube-TuxMAzOXs90"
+				},
+				{
+					"id": "youtube-jEGU_HEshgg"
+				},
+				{
+					"id": "youtube-3ams8Zyy14I"
+				},
+				{
+					"id": "youtube-NeypdebEMSg"
+				},
+				{
+					"id": "youtube-iGdxzX1tSPk"
+				},
+				{
+					"id": "youtube-iHSTb0MsX4k"
+				},
+				{
+					"id": "youtube-gHk9V163coc"
+				},
+				{
+					"id": "youtube-QS8BQL7O_JA"
+				},
+				{
+					"id": "youtube-AFID7LMSOZA"
+				},
+				{
+					"id": "youtube-RzkoR36-6Sg"
+				},
+				{
+					"id": "youtube-_4Y30IpLm6s"
+				},
+				{
+					"id": "youtube-amEuDQfXRDU"
+				},
+				{
+					"id": "youtube-Zf0lXW4D0VY"
+				},
+				{
+					"id": "youtube-g0mdgY1fQvY"
+				},
+				{
+					"id": "youtube-emhHjO6yI-w"
+				},
+				{
+					"id": "youtube-2wKNIpZV_18"
+				},
+				{
+					"id": "youtube-QfT4aJoMT6U"
+				},
+				{
+					"id": "youtube-sK9aj1OM9Hk"
+				},
+				{
+					"id": "youtube-X9irjuO_BMM"
+				},
+				{
+					"id": "youtube-hbKlbMBCS0I"
+				},
+				{
+					"id": "youtube-MRtvcfY6GRk"
+				},
+				{
+					"id": "youtube-tZuGsMGgq-w"
+				},
+				{
+					"id": "youtube-gLavrxCD-og"
+				},
+				{
+					"id": "youtube-jJ8rVK25yGM"
+				},
+				{
+					"id": "youtube-Hjk9oyAHT8U"
+				},
+				{
+					"id": "youtube-WMEFahJ5UQs"
+				},
+				{
+					"id": "youtube-1_ATPc42jo0"
+				},
+				{
+					"id": "youtube-mMJjWKd_MG4"
+				},
+				{
+					"id": "youtube-IoHYfmnjSFQ"
+				},
+				{
+					"id": "youtube-TlDS2-6ERpI"
+				},
+				{
+					"id": "youtube-IeUP6BBzNVA"
+				},
+				{
+					"id": "youtube-D8XYDtn2Q7Q"
+				},
+				{
+					"id": "youtube-z7ee_Yyr9nw"
+				},
+				{
+					"id": "youtube-9kTVSGJIFPY"
+				},
+				{
+					"id": "youtube-5eGTFQTjB5g"
+				},
+				{
+					"id": "youtube-Rrj3pn9VM0s"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8324607329842932,
+			"caption_bottom": 0.8861256544502618,
+			"refine_bounding_rect": true,
+			"fade_in_out": true,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 227,
+	"discourse_topic_slug": "w-lin-waizhuan-my-own-swordsman"
+}

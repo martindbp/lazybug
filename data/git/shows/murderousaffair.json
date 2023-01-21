@@ -1,0 +1,85 @@
+{
+	"name": {
+		"en": "A Murderous Affair in Horizon Tower",
+		"hz": "摩天大楼",
+		"py": "Mótiān dàlóu"
+	},
+	"date_added": "2022-07-03",
+	"type": "tv",
+	"genres": [
+		"crime",
+		"drama"
+	],
+	"synopsis": "Woman is murdered in condominium tower",
+	"douban": 8.0,
+	"year": "2020",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLrft65fJ0IqNYDkvCc9sS7WJMan8cqvA6",
+			"episodes": [
+				{
+					"id": "youtube-RRczNO40Zww"
+				},
+				{
+					"id": "youtube-_Fmp5RMnA7w"
+				},
+				{
+					"id": "youtube-iypKGa4JqeI"
+				},
+				{
+					"id": "youtube-WsK18q_u5v0"
+				},
+				{
+					"id": "youtube-ICAiGWTUv9U"
+				},
+				{
+					"id": "youtube-3jW_Dc_cVNY"
+				},
+				{
+					"id": "youtube-oHdn6gsT3QY"
+				},
+				{
+					"id": "youtube-T4J4kWr0Pi0"
+				},
+				{
+					"id": "youtube-gdnuvWs6oqU"
+				},
+				{
+					"id": "youtube-D93QeGlE4fM"
+				},
+				{
+					"id": "youtube-JBsxHkDLerU"
+				},
+				{
+					"id": "youtube-20zkzVJ2vV8"
+				},
+				{
+					"id": "youtube-arIJXWB0tuk"
+				},
+				{
+					"id": "youtube-Tt7gli4_mM8"
+				},
+				{
+					"id": "youtube-_4r9rcRLSBQ"
+				},
+				{
+					"id": "youtube-qK7yGoxRhEM"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.9122486288848264,
+			"caption_bottom": 0.9670932358318098,
+			"start_time": 112,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 194,
+	"discourse_topic_slug": "motian-dalou-a-murderous-affair-in-horizon-tower"
+}

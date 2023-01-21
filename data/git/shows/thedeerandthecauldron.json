@@ -1,0 +1,172 @@
+{
+	"name": {
+		"hz": "鹿鼎记",
+		"py": "Lùdǐngjì",
+		"en": "The Deer and the Cauldron"
+	},
+	"year": "2014",
+	"type": "tv",
+	"genres": [
+		"comedy",
+		"drama",
+		"historical"
+	],
+	"synopsis": "Can a hero with no combat abilities still save the empire? Described as \"pretty funny\"",
+	"date_added": "2022-09-05",
+	"douban": 6.6,
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLkvG4EWPDB0mBZKmWx4v5d3gaW_B5Bxbb",
+			"episodes": [
+				{
+					"id": "youtube-xPXZJVgYBbw"
+				},
+				{
+					"id": "youtube-UI6UIUNfQj4"
+				},
+				{
+					"id": "youtube-gbJ6pSqtrLY"
+				},
+				{
+					"id": "youtube-ij1FLe7f-Wk"
+				},
+				{
+					"id": "youtube-m2kCzHlQ6h0"
+				},
+				{
+					"id": "youtube-mZ8DWKtLKYY"
+				},
+				{
+					"id": "youtube-eB4C7JcXjic"
+				},
+				{
+					"id": "youtube-4XliQfJgrCA"
+				},
+				{
+					"id": "youtube-dMemhVW6950"
+				},
+				{
+					"id": "youtube-UKaZ2o24wAE"
+				},
+				{
+					"id": "youtube-sS56kJR4E4M"
+				},
+				{
+					"id": "youtube-MTX5Dt_Uk80"
+				},
+				{
+					"id": "youtube-xxEhkX9DnyU"
+				},
+				{
+					"id": "youtube-MMV2ae7GGn4"
+				},
+				{
+					"id": "youtube-qTOW0c0X6v0"
+				},
+				{
+					"id": "youtube-m3eUhPlAv3k"
+				},
+				{
+					"id": "youtube-jl7zUQpZsIs"
+				},
+				{
+					"id": "youtube-tQy7Bj9Ej4I"
+				},
+				{
+					"id": "youtube-EdixCEnuXi8"
+				},
+				{
+					"id": "youtube-Kp-d5rHrYFA"
+				},
+				{
+					"id": "youtube-mdSr6P54y8k"
+				},
+				{
+					"id": "youtube-foRnRKWzvi0"
+				},
+				{
+					"id": "youtube-J37hhQbLTi0"
+				},
+				{
+					"id": "youtube-VVzuIHYDdfM"
+				},
+				{
+					"id": "youtube-WYrUCIlUwy0"
+				},
+				{
+					"id": "youtube-VYi8gcm1gAs"
+				},
+				{
+					"id": "youtube-7vbFeBGzoVs"
+				},
+				{
+					"id": "youtube-gP9VofyFtlk"
+				},
+				{
+					"id": "youtube-O5E8PwU2lSk"
+				},
+				{
+					"id": "youtube-gpCe_TM31Bs"
+				},
+				{
+					"id": "youtube-kptWODalxPI"
+				},
+				{
+					"id": "youtube-x--GCmBauuI"
+				},
+				{
+					"id": "youtube-VFfL8fc3BBA"
+				},
+				{
+					"id": "youtube-ox_3etUVkY0"
+				},
+				{
+					"id": "youtube-Ip_QRbQZR64"
+				},
+				{
+					"id": "youtube-w5sJTjub0lo"
+				},
+				{
+					"id": "youtube-mBHMi-0Sbkw"
+				},
+				{
+					"id": "youtube-zEFNlMg2zjU"
+				},
+				{
+					"id": "youtube-lKij6ZOVrF8"
+				},
+				{
+					"id": "youtube-OCc7Ci_gQ_w"
+				},
+				{
+					"id": "youtube-U6L07vV1GH8"
+				},
+				{
+					"id": "youtube-zTspufLk79U"
+				},
+				{
+					"id": "youtube-b_IwKrZAbnY"
+				},
+				{
+					"id": "youtube-e-wzjGqINwI"
+				},
+				{
+					"id": "youtube-FE7Pw6CYo2I"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8666666666666667,
+			"caption_bottom": 0.9305555555555556,
+			"start_time": 90
+		}
+	],
+	"discourse_topic_id": 230,
+	"discourse_topic_slug": "lud-ngji-the-deer-and-the-cauldron"
+}

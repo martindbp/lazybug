@@ -1,0 +1,159 @@
+{
+	"name": {
+		"hz": "梦华录",
+		"py": "Mèng huá lù",
+		"en": "A Dream of Splendor"
+	},
+	"douban": 8.1,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"historical",
+		"novel-adaptation",
+		"romance",
+		"comedy"
+	],
+	"date_added": "2022-09-05",
+	"synopsis": "Real Feminist Drama with Mature Romantic Comedy",
+	"year": "2022",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLMX26aiIvX5rcYjAW7p_bguZDB-imN_4u",
+			"episodes": [
+				{
+					"id": "youtube-rqsJnjYm4KI"
+				},
+				{
+					"id": "youtube-uPpFqFQft9E"
+				},
+				{
+					"id": "youtube-ysMKPuWo2Cg"
+				},
+				{
+					"id": "youtube-5cRBilHIh0Y"
+				},
+				{
+					"id": "youtube-Gzao01kq1WM"
+				},
+				{
+					"id": "youtube-1DHchODpILI"
+				},
+				{
+					"id": "youtube-2uw-xA4JCWY"
+				},
+				{
+					"id": "youtube-UOziMuJLKLE"
+				},
+				{
+					"id": "youtube-9wTdAVzXNk8"
+				},
+				{
+					"id": "youtube-Lao59oCgj1o"
+				},
+				{
+					"id": "youtube-E2OCipe9SwM"
+				},
+				{
+					"id": "youtube-ucJyA7lxNQc"
+				},
+				{
+					"id": "youtube-06Ro-r3HzaM"
+				},
+				{
+					"id": "youtube-PwOrkSTGPHA"
+				},
+				{
+					"id": "youtube-kMmU8vQFKYo"
+				},
+				{
+					"id": "youtube-Q01EgyZlufI"
+				},
+				{
+					"id": "youtube-yq6_w0aatr4"
+				},
+				{
+					"id": "youtube-skCrt7Auwg0"
+				},
+				{
+					"id": "youtube-yBW4vXRMKyM"
+				},
+				{
+					"id": "youtube-BVO1qtApu2Y"
+				},
+				{
+					"id": "youtube-1KFALy8p5I0"
+				},
+				{
+					"id": "youtube-8jK1PF8X1jI"
+				},
+				{
+					"id": "youtube-bBi9nohaetA"
+				},
+				{
+					"id": "youtube-8YQ5H_iI854"
+				},
+				{
+					"id": "youtube-QAg2f8TsRk0"
+				},
+				{
+					"id": "youtube-ve_-K6elDg8"
+				},
+				{
+					"id": "youtube-uUjy08OPVNY"
+				},
+				{
+					"id": "youtube-ZKK8W7CHEYc"
+				},
+				{
+					"id": "youtube-jTDltTJW1nE"
+				},
+				{
+					"id": "youtube-X4zQsmCJ5Q4"
+				},
+				{
+					"id": "youtube-U4nKoeu6SHM"
+				},
+				{
+					"id": "youtube-midxa1WtQc0"
+				},
+				{
+					"id": "youtube-JsE94EftD1k"
+				},
+				{
+					"id": "youtube-V3LQ2fITB6s"
+				},
+				{
+					"id": "youtube-PUq4whkMUhA"
+				},
+				{
+					"id": "youtube-1xkS0PKyaXM"
+				},
+				{
+					"id": "youtube-fvRboBxSfC8"
+				},
+				{
+					"id": "youtube-nRRfDnRK2tA"
+				},
+				{
+					"id": "youtube-DR2JVPYAJr0"
+				},
+				{
+					"id": "youtube-cIFk5uCN6UU"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8055555555555556,
+			"caption_bottom": 0.8541666666666666,
+			"start_time": 145
+		}
+	],
+	"discourse_topic_id": 229,
+	"discourse_topic_slug": "meng-hua-lu-a-dream-of-splendor"
+}

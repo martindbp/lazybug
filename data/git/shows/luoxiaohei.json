@@ -1,0 +1,105 @@
+{
+  "name": "Luo Xiao Hei",
+  "description": "",
+  "seasons": [
+    {
+      "name": "罗小黑战记 新篇章正在周更！（每周六）",
+      "playlist_id": "PLWJWeJT_v21uucMrB6Q_kcB0Tg2hBcoV7",
+      "episodes": [
+        {
+          "id": "youtube-hJa2eABl8MQ"
+        },
+        {
+          "id": "youtube-d4-Gi1MR_og"
+        },
+        {
+          "id": "youtube-DI39ZGOLSYg"
+        },
+        {
+          "id": "youtube-VPRpWWB6cWE"
+        },
+        {
+          "id": "youtube-9d3SbCoSHSI"
+        },
+        {
+          "id": "youtube-l7BvxQB8qAQ"
+        },
+        {
+          "id": "youtube-iDPZqzEE0mM"
+        },
+        {
+          "id": "youtube-d-u2D5vsTGU"
+        },
+        {
+          "id": "youtube-OriODQkTBKo"
+        },
+        {
+          "id": "youtube-rQZ2VBScwug"
+        },
+        {
+          "id": "youtube--4wvItDl-M0"
+        },
+        {
+          "id": "youtube-tDEp_IMhfIE"
+        },
+        {
+          "id": "youtube-z_kJyQvUPy0"
+        },
+        {
+          "id": "youtube-eW2EM6_eVhU"
+        },
+        {
+          "id": "youtube-PJ122wdthr0"
+        },
+        {
+          "id": "youtube-roI_wG_FKi8"
+        },
+        {
+          "id": "youtube-HxiYssFgUCs"
+        },
+        {
+          "id": "youtube-D48dXnQA9n8"
+        },
+        {
+          "id": "youtube-83HXWq5YNAo"
+        },
+        {
+          "id": "youtube-8B_QOxMb96k"
+        },
+        {
+          "id": "youtube-plzEtlnoNPY"
+        },
+        {
+          "id": "youtube-6d3GGXI_DeE"
+        },
+        {
+          "id": "youtube--38K3_NUalU"
+        },
+        {
+          "id": "youtube-HFH_YpmkJbA"
+        },
+        {
+          "id": "youtube-CFxTU_5zkgg"
+        },
+        {
+          "id": "youtube-dmpPe960A00"
+        },
+        {
+          "id": "youtube-h53WfBbP4sM"
+        },
+        {
+          "id": "youtube-nHYprx-L9NM"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.9430555555555555,
+      "caption_bottom": 0.9805555555555555,
+      "start_time": 80
+    }
+  ]
+}
+

@@ -1,0 +1,47 @@
+{
+	"name": {
+		"hz": "罗小黑战记",
+		"py": "Luō Xiǎohēi Zhànjì",
+		"en": "The Legend of Hei"
+	},
+	"date_added": "2022-07-03",
+	"difficulty_manual": 0.5,
+	"type": "movie",
+	"genres": [
+		"donghua"
+	],
+	"synopsis": "Cat spirit has to find new home due to deforestation",
+	"douban": 8.0,
+	"year": "2019",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"description": "In the bustling human world, various demons are hidden and live in peace with humans. Luo Xiaohei, the cat demon, begins his journey of wandering because his forest home is destroyed. On his search for a new home he encounters other demons as well as understanding human allies, leaving Hei in the dilemma of which side will be his true attribution.",
+	"fixed_translations": {
+		"风息": "Wind Breath",
+		"妖精": "spirit",
+		"罗小黑": "Luo Xiao Hei",
+		"无限": "Infinity"
+	},
+	"seasons": [
+		{
+			"playlist_id": null,
+			"episodes": [
+				{
+					"id": "youtube-JL8yQy6xifQ"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8917910447761194,
+			"caption_bottom": 0.9452985074626866,
+			"start_time": 240,
+			"refine_bounding_rect": false
+		}
+	],
+	"discourse_topic_id": 179,
+	"discourse_topic_slug": "luo-xi-ohei-zhanji-the-legend-of-hei"
+}

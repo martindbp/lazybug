@@ -1,0 +1,99 @@
+{
+	"name": {
+		"en": "The Long Night",
+		"hz": "长夜难明",
+		"py": "Chángyè nán míng"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.0,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"crime"
+	],
+	"synopsis": "Prosecutor discovers there is more than meets the eye with open-and-shut case",
+	"year": "2017",
+	"released": true,
+	"caption_source": "soft",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLlCrV9TCfzMYs5BTpsBr--vWx1z_sHk5Z",
+			"episodes": [
+				{
+					"id": "youtube-HqODiKTH8a4"
+				},
+				{
+					"id": "youtube-uKEieP9HLl8"
+				},
+				{
+					"id": "youtube-NrCaBqWiRSw"
+				},
+				{
+					"id": "youtube-jDu5bq9tm2E"
+				},
+				{
+					"id": "youtube-oK8N-Jo8R9A"
+				},
+				{
+					"id": "youtube-sZAHv5olS6Q"
+				},
+				{
+					"id": "youtube-3SYPO4KpDBI"
+				},
+				{
+					"id": "youtube-Sxy2uYF1Qgs"
+				},
+				{
+					"id": "youtube-pX2-wD2LlcE"
+				},
+				{
+					"id": "youtube-HlsOupL3qT8"
+				},
+				{
+					"id": "youtube-FFclBVXkdV8"
+				},
+				{
+					"id": "youtube-4dlnGSW3G9U"
+				},
+				{
+					"id": "youtube-8wWG84-lCCM"
+				},
+				{
+					"id": "youtube-87hNYC0VHFU"
+				},
+				{
+					"id": "youtube-w5hNFWl2O5M"
+				},
+				{
+					"id": "youtube-ojHnYQZPAq4"
+				},
+				{
+					"id": "youtube-tCG39sXgcRQ"
+				},
+				{
+					"id": "youtube-dySt86DHCEA"
+				},
+				{
+					"id": "youtube-SDICm94bWVY"
+				},
+				{
+					"id": "youtube-4LX5VGe1NzY"
+				},
+				{
+					"id": "youtube-7pWMLvT_HW0"
+				},
+				{
+					"id": "youtube-cUg5wjCeeUs"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi"
+		}
+	],
+	"discourse_topic_id": 200,
+	"discourse_topic_slug": "changye-nan-ming-the-long-night"
+}

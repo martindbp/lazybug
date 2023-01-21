@@ -1,0 +1,138 @@
+{
+	"name": {
+		"hz": "舌尖上的中国",
+		"py": "Shéjiān shàng de zhōngguó",
+		"en": "A Bite of China"
+	},
+	"date_added": "2022-07-03",
+	"synopsis": "A documentary about food from different regions of China",
+	"type": "tv",
+	"douban": 9.4,
+	"year": "2012",
+	"genres": [
+		"documentary"
+	],
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"name": "S03",
+			"playlist_id": "PLGVMvawTidCwq39Jk9xDvN5IqOXik33Ex",
+			"episodes": [
+				{
+					"id": "youtube-KLcvFT8WGRI"
+				},
+				{
+					"id": "youtube-LDl0Q-XmiSk"
+				},
+				{
+					"id": "youtube-0fkAs8HKh3c"
+				},
+				{
+					"id": "youtube-zdGCiiFTu4U"
+				},
+				{
+					"id": "youtube-KxLOpM2eSd4"
+				},
+				{
+					"id": "youtube-YRK5Iu6MjfY"
+				},
+				{
+					"id": "youtube-oSy7bHIXmWI"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8666666666666667,
+					"caption_bottom": 0.9361111111111111,
+					"caption_left": 0.066796875,
+					"caption_right": 0.703515625,
+					"start_time": 50,
+					"refine_bounding_rect": true
+				}
+			]
+		},
+		{
+			"name": "S02",
+			"playlist_id": "PLGVMvawTidCwq39Jk9xDvN5IqOXik33Ex",
+			"episodes": [
+				{
+					"id": "youtube-sgarBDvbYCk"
+				},
+				{
+					"id": "youtube-aJzfy44Gwrc"
+				},
+				{
+					"id": "youtube-dVo-4VdsWcA"
+				},
+				{
+					"id": "youtube-tNTz4BqV5LI"
+				},
+				{
+					"id": "youtube-gRSOJQCMQ6Q"
+				},
+				{
+					"id": "youtube-K5fIAUxL8H0"
+				},
+				{
+					"id": "youtube-YTmq2eY5fIQ"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8930555555555556,
+					"caption_bottom": 0.9472222222222222,
+					"caption_left": 0.0,
+					"caption_right": 0.754296875,
+					"start_time": 50,
+					"refine_bounding_rect": true
+				}
+			]
+		},
+		{
+			"name": "S01",
+			"playlist_id": "PLGVMvawTidCwq39Jk9xDvN5IqOXik33Ex",
+			"episodes": [
+				{
+					"id": "youtube-kCMIobW62dk"
+				},
+				{
+					"id": "youtube-gTCdJtNxvBQ"
+				},
+				{
+					"id": "youtube-OTDXJFWRrlg"
+				},
+				{
+					"id": "youtube-H-Z0MFCL1Sg"
+				},
+				{
+					"id": "youtube-_e7AzzwpDUM"
+				},
+				{
+					"id": "youtube-9FY1pExFk70"
+				},
+				{
+					"id": "youtube-Nj0BmKpTozI"
+				},
+				{
+					"id": "youtube-W4f26oKLHM8"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8916666666666667,
+					"caption_bottom": 0.9444444444444444,
+					"caption_left": 0.0,
+					"caption_right": 0.743359375,
+					"start_time": 80
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 216,
+	"discourse_topic_slug": "shejian-shang-de-zhongguo-a-bite-of-china"
+}

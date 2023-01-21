@@ -1,0 +1,79 @@
+{
+	"name": {
+		"hz": "爸爸去哪儿",
+		"py": "Bàba qù nǎ'er",
+		"en": "Where Are We Going, Dad?"
+	},
+	"reddit_comments": [
+		"ChineseLanguage/comments/eqfavd/just_started_watching_a_show_called_%E7%88%B8%E7%88%B8%E5%8E%BB%E5%93%AA%E5%84%BF_im/"
+	],
+	"embeddable": false,
+	"date_added": "2022-07-03",
+	"year": "2013-present",
+	"type": "tv",
+	"genres": [
+		"reality-show"
+	],
+	"synopsis": "Celebrity dads go on trips with their kids",
+	"douban": 9.1,
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLgzwepVFOAJqMl_gwPNUb5qT3g3Hl4cXO",
+			"episodes": [
+				{
+					"id": "youtube-K2NbVsMJ5To"
+				},
+				{
+					"id": "youtube-ceTLBjLXelI"
+				},
+				{
+					"id": "youtube-Ex5clSVOzoU"
+				},
+				{
+					"id": "youtube-1WcVhs1T8xY"
+				},
+				{
+					"id": "youtube-3bj82EuJUvg"
+				},
+				{
+					"id": "youtube-KbzVxwMHGUE"
+				},
+				{
+					"id": "youtube-nD9QvKE73qs"
+				},
+				{
+					"id": "youtube-h0FrG09iYvw"
+				},
+				{
+					"id": "youtube-CFaPgByT58E"
+				},
+				{
+					"id": "youtube-iozi0XkOJG8"
+				},
+				{
+					"id": "youtube-rqPbvT4_ceg"
+				},
+				{
+					"id": "youtube-Pic_ayMVI-I"
+				},
+				{
+					"id": "youtube-9A6sxKs0Z9k"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8472222222222222,
+			"caption_bottom": 0.8972222222222223,
+			"refine_bounding_rect": true,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 212,
+	"discourse_topic_slug": "baba-qu-n-er-where-are-we-going-dad"
+}

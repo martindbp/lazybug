@@ -1,0 +1,80 @@
+{
+	"name": {
+		"en": "Reset",
+		"hz": "开端",
+		"py": "Kāiduān"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.8,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"crime",
+		"sci-fi"
+	],
+	"synopsis": "Ground-hog day + terrorist attack",
+	"year": "2022",
+	"released": true,
+	"caption_source": "soft",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "RDCMUCteBLoijWzlVFSR5BBtS_2Q",
+			"episodes": [
+				{
+					"id": "youtube-0BpqrU3D-TU"
+				},
+				{
+					"id": "youtube-z7aaDLvl5Jg"
+				},
+				{
+					"id": "youtube-LCUQZ0bAtUQ"
+				},
+				{
+					"id": "youtube-L2VNfJcrX6E"
+				},
+				{
+					"id": "youtube-XhvhhVIyYvc"
+				},
+				{
+					"id": "youtube-HhrnDfK8VQs"
+				},
+				{
+					"id": "youtube-zuBBSI-sJfQ"
+				},
+				{
+					"id": "youtube-9zK_8MgH-Yk"
+				},
+				{
+					"id": "youtube-Bm7enF0vpH4"
+				},
+				{
+					"id": "youtube-OFzV6o54k30"
+				},
+				{
+					"id": "youtube-aVs4C-f7I2s"
+				},
+				{
+					"id": "youtube-dF0ZGfadqXo"
+				},
+				{
+					"id": "youtube--TfA6moaSIc"
+				},
+				{
+					"id": "youtube-9Bq-OFQawq0"
+				},
+				{
+					"id": "youtube-WYHZXJg89u4"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"caption_top": 0.8097222222222222,
+			"caption_bottom": 0.8916666666666667
+		}
+	],
+	"discourse_topic_id": 190,
+	"discourse_topic_slug": "kaiduan-reset"
+}

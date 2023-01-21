@@ -1,0 +1,321 @@
+{
+	"name": {
+		"en": "Romance of the Three Kingdoms",
+		"hz": "三国演义",
+		"py": "Sānguó yǎnyì"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.9,
+	"year": "2010",
+	"type": "tv",
+	"genres": [
+		"drama",
+		"historical",
+		"novel-adaptation",
+		"classic"
+	],
+	"synopsis": "The latest adaptation of the famous novel",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLl1tFfNgLYaanNTyzG6J9IfNuRYsm5chP",
+			"episodes": [
+				{
+					"id": "youtube-l6CAK4oXXD0"
+				},
+				{
+					"id": "youtube-tk2HszmcFOA"
+				},
+				{
+					"id": "youtube-g-If2uuHJMY"
+				},
+				{
+					"id": "youtube-9B4yHqbq6EM"
+				},
+				{
+					"id": "youtube-fj6agd0VVeg"
+				},
+				{
+					"id": "youtube-XslrY2rGKHI"
+				},
+				{
+					"id": "youtube-6m59bp7t_H0"
+				},
+				{
+					"id": "youtube-7lTcpdn5Cos"
+				},
+				{
+					"id": "youtube-Ov-hIwds8M4"
+				},
+				{
+					"id": "youtube-B9ZbsgnLzKw"
+				},
+				{
+					"id": "youtube-1VI-II02np0"
+				},
+				{
+					"id": "youtube-yIdTFPFuK3g"
+				},
+				{
+					"id": "youtube-GKhqEyNDBJg"
+				},
+				{
+					"id": "youtube-sgahMpTkzeU"
+				},
+				{
+					"id": "youtube-Up7rPifJ_gY"
+				},
+				{
+					"id": "youtube-xfhRvAh9SyI"
+				},
+				{
+					"id": "youtube-a0bxewg1qm8"
+				},
+				{
+					"id": "youtube-A3ew64cwPfE"
+				},
+				{
+					"id": "youtube-YGWuBKzvkGE"
+				},
+				{
+					"id": "youtube-Qx-iZTjX_Ns"
+				},
+				{
+					"id": "youtube-QzBP4ONWqCY"
+				},
+				{
+					"id": "youtube-ivxTy6Qz-SQ"
+				},
+				{
+					"id": "youtube-ZD9HFqnO74k"
+				},
+				{
+					"id": "youtube-Ald9JC9buM4"
+				},
+				{
+					"id": "youtube-iSFbUfZFQ_0"
+				},
+				{
+					"id": "youtube-vrPtG-Gm6wk"
+				},
+				{
+					"id": "youtube-UZRzceVs-x8"
+				},
+				{
+					"id": "youtube-sOTpEAfLf3c"
+				},
+				{
+					"id": "youtube-Bvmhu2y2eF4"
+				},
+				{
+					"id": "youtube-AdFOyvGfiqk"
+				},
+				{
+					"id": "youtube-DwbC-6mVhpU"
+				},
+				{
+					"id": "youtube-Ozn1AKUgfA4"
+				},
+				{
+					"id": "youtube-dy4t_FMTYDA"
+				},
+				{
+					"id": "youtube-mpPelpdXYRA"
+				},
+				{
+					"id": "youtube-zDUbOlEVM7U"
+				},
+				{
+					"id": "youtube-HBRcWh9bbsw"
+				},
+				{
+					"id": "youtube-rdap_WMf8Ho"
+				},
+				{
+					"id": "youtube-FkoLOubtCjY"
+				},
+				{
+					"id": "youtube-v4pjqB9DXXM"
+				},
+				{
+					"id": "youtube-1k6IjeoBBos"
+				},
+				{
+					"id": "youtube-q_2wEmmCr7g"
+				},
+				{
+					"id": "youtube-T27U0E4-JDY"
+				},
+				{
+					"id": "youtube-grESouNBZCI"
+				},
+				{
+					"id": "youtube-asbmZc91AmY"
+				},
+				{
+					"id": "youtube-5bGJVeR6tZ0"
+				},
+				{
+					"id": "youtube-r0NUrRTxjMM"
+				},
+				{
+					"id": "youtube-p1MfCawOUqI"
+				},
+				{
+					"id": "youtube-SMZ6yM4sFhs"
+				},
+				{
+					"id": "youtube-JzvmM7ofMzg"
+				},
+				{
+					"id": "youtube-FSH8L5kPimQ"
+				},
+				{
+					"id": "youtube-CFocg9Lw6_o"
+				},
+				{
+					"id": "youtube-2gW2KhI9Gu4"
+				},
+				{
+					"id": "youtube-elNqSj1vxiA"
+				},
+				{
+					"id": "youtube-k9zMcJxASuI"
+				},
+				{
+					"id": "youtube-fbMKMgxP5Xw"
+				},
+				{
+					"id": "youtube-7jEoXHuTJfM"
+				},
+				{
+					"id": "youtube-8-QFGpRgAIc"
+				},
+				{
+					"id": "youtube-ynScT4M0Hv8"
+				},
+				{
+					"id": "youtube-z0Q2YaehcAk"
+				},
+				{
+					"id": "youtube-bieEmOZSX7k"
+				},
+				{
+					"id": "youtube-FRI-YtkaZZ0"
+				},
+				{
+					"id": "youtube-xua623OCmvk"
+				},
+				{
+					"id": "youtube-VRBwk0-bVjE"
+				},
+				{
+					"id": "youtube-IZKOjMdU7k0"
+				},
+				{
+					"id": "youtube-2x47DlKvp1I"
+				},
+				{
+					"id": "youtube-PmaW-V4pmnA"
+				},
+				{
+					"id": "youtube-5RFEZb7JnF8"
+				},
+				{
+					"id": "youtube-iOWu7wm-bGg"
+				},
+				{
+					"id": "youtube-Om5T9mCn_s8"
+				},
+				{
+					"id": "youtube-0dZYcAkKHOE"
+				},
+				{
+					"id": "youtube-ZwgnbLcosXs"
+				},
+				{
+					"id": "youtube-CM-t5Al0vqk"
+				},
+				{
+					"id": "youtube-e_oDJsQXJBw"
+				},
+				{
+					"id": "youtube-o4NAxxXwB6w"
+				},
+				{
+					"id": "youtube-AofiJtItoUc"
+				},
+				{
+					"id": "youtube-v-Xg8UjF7IA"
+				},
+				{
+					"id": "youtube-6khHBUmXS44"
+				},
+				{
+					"id": "youtube-XpAzUCQ8LOw"
+				},
+				{
+					"id": "youtube-aDMNYbosZOI"
+				},
+				{
+					"id": "youtube-UCfw_LRwLIc"
+				},
+				{
+					"id": "youtube-7N6jts2To9M"
+				},
+				{
+					"id": "youtube-5v9ZYoZQIKU"
+				},
+				{
+					"id": "youtube-1_VCP1W-DDM"
+				},
+				{
+					"id": "youtube-1unUsuhLT5Q"
+				},
+				{
+					"id": "youtube-paN_29umCNA"
+				},
+				{
+					"id": "youtube-1ECNjz5DKSw"
+				},
+				{
+					"id": "youtube-MXilp_XW0TU"
+				},
+				{
+					"id": "youtube-DeoBfkWl6aM"
+				},
+				{
+					"id": "youtube-c0M-YbjjLM0"
+				},
+				{
+					"id": "youtube-LUZHMyrhrN8"
+				},
+				{
+					"id": "youtube-2ypzSeFkcQQ"
+				},
+				{
+					"id": "youtube-Zr8W1Qv1Afc"
+				},
+				{
+					"id": "youtube-smrc2lpi_a8"
+				},
+				{
+					"id": "youtube-__RhtTmTBIA"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.9053254437869822,
+			"caption_bottom": 0.9556213017751478,
+			"refine_bounding_rect": true,
+			"start_time": 153
+		}
+	],
+	"discourse_topic_id": 182,
+	"discourse_topic_slug": "sanguo-y-nyi-romance-of-the-three-kingdoms"
+}

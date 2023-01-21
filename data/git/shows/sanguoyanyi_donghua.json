@@ -1,0 +1,195 @@
+{
+	"name": {
+		"en": "Romance of the Three Kingdoms (Donghua)",
+		"hz": "三国演义 动画",
+		"py": "Sānguó yǎnyì dònghuà"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.4,
+	"year": "2009",
+	"type": "tv",
+	"genres": [
+		"drama",
+		"historical",
+		"donghua",
+		"novel-adaptation",
+		"classic"
+	],
+	"synopsis": "A Donghua adaptation of the famous novel",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLFhxB3f6oT4CJUtfTNwauqay5NC3OIT0k",
+			"episodes": [
+				{
+					"id": "youtube-p9AC5-fbmzc"
+				},
+				{
+					"id": "youtube--c778wgDKuk"
+				},
+				{
+					"id": "youtube-klPX1JkXzc0"
+				},
+				{
+					"id": "youtube-ZlgCC2pPM-s"
+				},
+				{
+					"id": "youtube-JmON6D3QkSA"
+				},
+				{
+					"id": "youtube-v-OCz-T8Cz0"
+				},
+				{
+					"id": "youtube-2DxCt5JCCls"
+				},
+				{
+					"id": "youtube-3hIlEHguAmQ"
+				},
+				{
+					"id": "youtube-77_uKSl2RRY"
+				},
+				{
+					"id": "youtube-m5CYFLBwl7g"
+				},
+				{
+					"id": "youtube-2f0x9Hr8o6I"
+				},
+				{
+					"id": "youtube-wVyxz5t9jv4"
+				},
+				{
+					"id": "youtube-yeFiD_Ko79k"
+				},
+				{
+					"id": "youtube-rAf8kktLO1U"
+				},
+				{
+					"id": "youtube-LC6TaM0PVpA"
+				},
+				{
+					"id": "youtube-M5ZmzaXOd9s"
+				},
+				{
+					"id": "youtube-Fs0Zba5q_QY"
+				},
+				{
+					"id": "youtube-34WVJ5GyNng"
+				},
+				{
+					"id": "youtube-S4xFBIanWgw"
+				},
+				{
+					"id": "youtube-FPRetS6c1vA"
+				},
+				{
+					"id": "youtube-9gerEJvADs0"
+				},
+				{
+					"id": "youtube-TJZf8u-sn2Y"
+				},
+				{
+					"id": "youtube-tsgOb3G9_6o"
+				},
+				{
+					"id": "youtube-I-nM-BAnYXQ"
+				},
+				{
+					"id": "youtube-l2zS_sqnHM8"
+				},
+				{
+					"id": "youtube-IAFk2Gacaeo"
+				},
+				{
+					"id": "youtube-lcxP6dT2aZ0"
+				},
+				{
+					"id": "youtube-8a5pQJd6l9A"
+				},
+				{
+					"id": "youtube-7AtJ6Fsea6k"
+				},
+				{
+					"id": "youtube-UQJzAnBGoyo"
+				},
+				{
+					"id": "youtube-xsWVdzjxZYo"
+				},
+				{
+					"id": "youtube-lEg0vsqqhPU"
+				},
+				{
+					"id": "youtube-r-O6gXF6siM"
+				},
+				{
+					"id": "youtube-DwwFs8CT0sQ"
+				},
+				{
+					"id": "youtube-acY3dJ_Ttv8"
+				},
+				{
+					"id": "youtube-_GdcXMZoBzc"
+				},
+				{
+					"id": "youtube-VnWoAsqJNMI"
+				},
+				{
+					"id": "youtube-iHh77FYEcgs"
+				},
+				{
+					"id": "youtube-QdFdb8mR_pg"
+				},
+				{
+					"id": "youtube-7VpfYyUk7ZU"
+				},
+				{
+					"id": "youtube-ELJf_vbx1OI"
+				},
+				{
+					"id": "youtube-iPo50wGb-Sg"
+				},
+				{
+					"id": "youtube-XKMOrRJz-rQ"
+				},
+				{
+					"id": "youtube-3Aeb5vAeY9w"
+				},
+				{
+					"id": "youtube-QX8RUhQpfEo"
+				},
+				{
+					"id": "youtube-7gKvwBHJfsc"
+				},
+				{
+					"id": "youtube-fcU8gKohe-g"
+				},
+				{
+					"id": "youtube-A3XXuDc7qhE"
+				},
+				{
+					"id": "youtube-_ePEbyStu7s"
+				},
+				{
+					"id": "youtube-_ZFZvJeC-dc"
+				},
+				{
+					"id": "youtube-DirzfYa2sdM"
+				},
+				{
+					"id": "youtube-XcS-jak84D0"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8680555555555556,
+			"caption_bottom": 0.9222222222222223,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 199,
+	"discourse_topic_slug": "sanguo-y-nyi-donghua-romance-of-the-three-kingdoms-donghua"
+}

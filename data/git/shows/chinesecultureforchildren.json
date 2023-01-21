@@ -1,0 +1,717 @@
+{
+	"name": "Chinese Culture for Kids",
+	"date_added": "2022-07-03",
+	"synopsis": "Tons of animated stories and other educational content aimed at Chinese kids",
+	"genres": [
+		"educational",
+		"childrens-cartoons"
+	],
+	"type": "video",
+	"douban": null,
+	"year": "-",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"name": "Journey to the West",
+			"playlist_id": "PL4OCtlwZvc7ufoVkuskhavyEOs5mIrx5H",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8791666666666667,
+					"caption_bottom": 0.9305555555555556,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-y0Uvc917ZYA"
+				},
+				{
+					"id": "youtube-yMc4m3aL_tk"
+				},
+				{
+					"id": "youtube-CfL6x1MuZyg"
+				},
+				{
+					"id": "youtube-qoXoIpxXmj0"
+				},
+				{
+					"id": "youtube-fIRto36_EGw"
+				},
+				{
+					"id": "youtube-OMuzaGmH0xA"
+				},
+				{
+					"id": "youtube-zEQAdOYkRv4"
+				},
+				{
+					"id": "youtube-BAeNraHrg1o"
+				},
+				{
+					"id": "youtube-GMXNkO-yGKQ"
+				},
+				{
+					"id": "youtube-rCXxNThG6-Q"
+				},
+				{
+					"id": "youtube-NFGnOt5lqIY"
+				},
+				{
+					"id": "youtube-hXwFQ_DcdwY"
+				},
+				{
+					"id": "youtube-iW9racjy5HM"
+				},
+				{
+					"id": "youtube-UOGbDs8JBQE"
+				},
+				{
+					"id": "youtube-JUMRqZH-8Ys"
+				},
+				{
+					"id": "youtube-ARTU_84WHk0"
+				},
+				{
+					"id": "youtube-bVCVIl9n-64"
+				},
+				{
+					"id": "youtube-X-n6jyCih7k"
+				},
+				{
+					"id": "youtube-aAr69K4sHOw"
+				},
+				{
+					"id": "youtube-6CuqgtDt2NA"
+				},
+				{
+					"id": "youtube-9WOJH7tVNQA"
+				},
+				{
+					"id": "youtube-Po_iqB6WdpM"
+				},
+				{
+					"id": "youtube-xRG-HUBXh0I"
+				},
+				{
+					"id": "youtube-_drHSYYLhoc"
+				},
+				{
+					"id": "youtube-5AArRGNi2jw"
+				},
+				{
+					"id": "youtube-HU8KDsLIqSM"
+				},
+				{
+					"id": "youtube-YqAf3Si02rc"
+				},
+				{
+					"id": "youtube-pNua0k63xEw"
+				},
+				{
+					"id": "youtube-Y56IAeR3GzQ"
+				},
+				{
+					"id": "youtube-SRXC7pkKHmY"
+				}
+			]
+		},
+		{
+			"name": "Exploring World Geography: Cities",
+			"playlist_id": "PL4OCtlwZvc7sZ3jRcy43sCQ16zQcRtHnt",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.9055555555555556,
+					"caption_bottom": 0.9472222222222222,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-8A4GjRL13vA"
+				},
+				{
+					"id": "youtube-NUPFXqCB-3E"
+				},
+				{
+					"id": "youtube-ivygepbc91Y"
+				},
+				{
+					"id": "youtube-pIbcqy-xgrg"
+				},
+				{
+					"id": "youtube-bO6JUGxLMHI"
+				},
+				{
+					"id": "youtube-StO2npUDMsU"
+				},
+				{
+					"id": "youtube-NuEjtDSeLAA"
+				},
+				{
+					"id": "youtube-3W88_z58dyc"
+				},
+				{
+					"id": "youtube-XTJ_I6hD-4E"
+				},
+				{
+					"id": "youtube-tTja6urNO7I"
+				},
+				{
+					"id": "youtube-n7DPHi1Jglg"
+				},
+				{
+					"id": "youtube-zVDsM0tzFbM"
+				},
+				{
+					"id": "youtube-5qAVtW7dB3c"
+				},
+				{
+					"id": "youtube-kj6R59_8l60"
+				},
+				{
+					"id": "youtube-Eeu5bENLBrI"
+				},
+				{
+					"id": "youtube-4OXbFo_yJG8"
+				},
+				{
+					"id": "youtube-DjAfbAcQQdU"
+				},
+				{
+					"id": "youtube-QE0Iw929-tQ"
+				},
+				{
+					"id": "youtube-NAvNVHB1VN4"
+				},
+				{
+					"id": "youtube-lFNt4xqCCZA"
+				},
+				{
+					"id": "youtube-lH3wC6qu4dA"
+				},
+				{
+					"id": "youtube-5Yl9k-_EGbo"
+				},
+				{
+					"id": "youtube-N4pgeD4AfUU"
+				},
+				{
+					"id": "youtube-rZYml8fvHjE"
+				},
+				{
+					"id": "youtube-h8Vtn8uH-8c"
+				},
+				{
+					"id": "youtube-izeWU-XLtYI"
+				},
+				{
+					"id": "youtube-7HhDzGuqyuo"
+				},
+				{
+					"id": "youtube-PzzJpL5X4PM"
+				},
+				{
+					"id": "youtube-YLbGxziZK_s"
+				},
+				{
+					"id": "youtube-RJoaavurQxM"
+				}
+			]
+		},
+		{
+			"name": "Idiom stories",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8791666666666667,
+					"caption_bottom": 0.9305555555555556,
+					"start_time": 0
+				}
+			],
+			"playlist_id": "PL4OCtlwZvc7tVul9oDnLmR6UpqfAVV8d4",
+			"episodes": [
+				{
+					"id": "youtube-Adv9Wgi7nbw"
+				},
+				{
+					"id": "youtube-ZvxGc_rvtHM"
+				},
+				{
+					"id": "youtube-qmWdJFPj4M0"
+				},
+				{
+					"id": "youtube-NuOct9dkeNQ"
+				},
+				{
+					"id": "youtube-1w95Vu6bpbA"
+				},
+				{
+					"id": "youtube-PP64QUKpFzE"
+				},
+				{
+					"id": "youtube-Uo8nzIRU55E"
+				},
+				{
+					"id": "youtube-YJHmX4mLHgo"
+				},
+				{
+					"id": "youtube-tZqtNPa1kJ4"
+				},
+				{
+					"id": "youtube-u80gKjdCZOQ"
+				},
+				{
+					"id": "youtube-0vL_KKmKd-U"
+				},
+				{
+					"id": "youtube-g4_gMmPhp7M"
+				},
+				{
+					"id": "youtube-oUuSX1n-tjc"
+				},
+				{
+					"id": "youtube-iKNdv5EuDaM"
+				},
+				{
+					"id": "youtube-gddgQscUKrM"
+				},
+				{
+					"id": "youtube-CXsO9isU9mw"
+				},
+				{
+					"id": "youtube-MZRDxk4P8b0"
+				},
+				{
+					"id": "youtube-ivwjV2hYdF8"
+				},
+				{
+					"id": "youtube-DlEwcqQ1cKY"
+				},
+				{
+					"id": "youtube-IlnWH19ClXI"
+				},
+				{
+					"id": "youtube-5q-FjWYMhRc"
+				},
+				{
+					"id": "youtube-baVrY5MY7gI"
+				},
+				{
+					"id": "youtube-uBKFZuTSeB4"
+				},
+				{
+					"id": "youtube-vC_H6-wGkPI"
+				},
+				{
+					"id": "youtube-YlJB00vtY9g"
+				},
+				{
+					"id": "youtube-ftzH0NAStpY"
+				},
+				{
+					"id": "youtube-aE0sP6VcAkI"
+				},
+				{
+					"id": "youtube-AF74M8Pn9yo"
+				},
+				{
+					"id": "youtube-KY2A-0kAVJE"
+				},
+				{
+					"id": "youtube-u1PgeniKWY8"
+				},
+				{
+					"id": "youtube-14DWLcUYIzw"
+				},
+				{
+					"id": "youtube-BkRzkwuloNE"
+				},
+				{
+					"id": "youtube-rU3c0DFPa84"
+				},
+				{
+					"id": "youtube-yapzZHaR8do"
+				},
+				{
+					"id": "youtube-evZKPJBK7gM"
+				},
+				{
+					"id": "youtube-IPxMA4uH3mg"
+				},
+				{
+					"id": "youtube-2BrLky0pmAk"
+				},
+				{
+					"id": "youtube-SZGC88-sxHw"
+				},
+				{
+					"id": "youtube-QFfUvDdKMl4"
+				},
+				{
+					"id": "youtube-9BTczGBn3Pw"
+				},
+				{
+					"id": "youtube-gZ00J37RHlY"
+				},
+				{
+					"id": "youtube-cRvMH3NgRrM"
+				},
+				{
+					"id": "youtube-4YO7jratUVw"
+				},
+				{
+					"id": "youtube-1J_sS9GXntg"
+				},
+				{
+					"id": "youtube-2DytNmIr6yU"
+				},
+				{
+					"id": "youtube-Uaj52xll7C8"
+				},
+				{
+					"id": "youtube-DtdAzY0IWy8"
+				}
+			]
+		},
+		{
+			"name": "Folk stories",
+			"playlist_id": "PL4OCtlwZvc7voZ4-D1DoqkrPatE7f5g33",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.9041666666666667,
+					"caption_bottom": 0.95,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-ZeNSeDZ73uY"
+				},
+				{
+					"id": "youtube-NWWgVZbWMYU"
+				},
+				{
+					"id": "youtube-UOjcopZj8I0"
+				},
+				{
+					"id": "youtube-Y7NpsKmP_bE"
+				},
+				{
+					"id": "youtube-fuppLGSfWRI"
+				},
+				{
+					"id": "youtube-gtpvpkDa1lU"
+				},
+				{
+					"id": "youtube-75vBeFdexv8"
+				},
+				{
+					"id": "youtube-60c0e9GnF88"
+				},
+				{
+					"id": "youtube-yQrMohvI4mE"
+				},
+				{
+					"id": "youtube-APrwGhQBWhM"
+				}
+			]
+		},
+		{
+			"name": "Water Margin",
+			"playlist_id": "PL4OCtlwZvc7tDrrhvSEkSEHndDaAoi08i",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8805555555555555,
+					"caption_bottom": 0.9319444444444445,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-YOC0VAokdGw"
+				},
+				{
+					"id": "youtube-jPPMhAZv-kk"
+				},
+				{
+					"id": "youtube-6eFiaP8SOQM"
+				},
+				{
+					"id": "youtube-jHLXh5XkAnk"
+				},
+				{
+					"id": "youtube-mJjtIPWYFCA"
+				},
+				{
+					"id": "youtube-g0lyQs1sHv8"
+				},
+				{
+					"id": "youtube-SHkw7eW2PDA"
+				},
+				{
+					"id": "youtube-Rhb1BBEiuJc"
+				},
+				{
+					"id": "youtube-cKEYUlxGPiU"
+				},
+				{
+					"id": "youtube-OYCwhEz2PYs"
+				},
+				{
+					"id": "youtube-knQpKLXipXw"
+				},
+				{
+					"id": "youtube-VO6F-ljnn4g"
+				},
+				{
+					"id": "youtube-80tpeZ6FFuw"
+				},
+				{
+					"id": "youtube-OHTFiCnWYLA"
+				},
+				{
+					"id": "youtube-OHegBaHblbU"
+				},
+				{
+					"id": "youtube-aY2FZ2AM3M8"
+				},
+				{
+					"id": "youtube-f7k_aosdhFs"
+				},
+				{
+					"id": "youtube-Lz_bh07KRzw"
+				},
+				{
+					"id": "youtube-udk1Tgxrseg"
+				},
+				{
+					"id": "youtube-yhFHRwmtMSw"
+				},
+				{
+					"id": "youtube-YsX3CV9fxWQ"
+				},
+				{
+					"id": "youtube-vGLjiOAlBEA"
+				},
+				{
+					"id": "youtube-EYxgy-ZM5Pg"
+				},
+				{
+					"id": "youtube-HfrpsTCmyiY"
+				},
+				{
+					"id": "youtube-bQ_yTarB_BA"
+				},
+				{
+					"id": "youtube-vPW1MKF-tio"
+				},
+				{
+					"id": "youtube-PyZESyGJlrI"
+				},
+				{
+					"id": "youtube-9r8SPFd9rGM"
+				},
+				{
+					"id": "youtube-6VksUY1oX3k"
+				},
+				{
+					"id": "youtube-BwqkxKTshkY"
+				}
+			]
+		},
+		{
+			"name": "Romance of the Three Kindoms",
+			"playlist_id": "PL4OCtlwZvc7sOpMCasRx8C4SUnJNpz0Nq",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8805555555555555,
+					"caption_bottom": 0.9333333333333333,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-JZa88NF_Gdc"
+				},
+				{
+					"id": "youtube-5TnbEkQMGeU"
+				},
+				{
+					"id": "youtube-s42Rkv17rM4"
+				},
+				{
+					"id": "youtube-bn8JH8Irz5Q"
+				},
+				{
+					"id": "youtube-okmc6SZduU8"
+				},
+				{
+					"id": "youtube--8w9ZNCNtQo"
+				},
+				{
+					"id": "youtube-7CD7bFz4U3I"
+				},
+				{
+					"id": "youtube-xn7bgsONyMY"
+				},
+				{
+					"id": "youtube-uRRmI73yok4"
+				},
+				{
+					"id": "youtube-dQ_xlMpB048"
+				},
+				{
+					"id": "youtube-cLCUvmxIaWs"
+				},
+				{
+					"id": "youtube-F_A9QzLMVa8"
+				},
+				{
+					"id": "youtube-lVSjG0Hozxc"
+				},
+				{
+					"id": "youtube-LlCbCq9Dre8"
+				},
+				{
+					"id": "youtube-PyI-7DrJ_8o"
+				},
+				{
+					"id": "youtube-ub7KM7K2jZc"
+				},
+				{
+					"id": "youtube-IPngq0Uz3lE"
+				},
+				{
+					"id": "youtube-J578AgpejSA"
+				},
+				{
+					"id": "youtube-Y0cyyG2oeN0"
+				},
+				{
+					"id": "youtube-w2oTnKwZRWg"
+				},
+				{
+					"id": "youtube-JSYlo2tUOhI"
+				},
+				{
+					"id": "youtube-erj9dHGrrrg"
+				},
+				{
+					"id": "youtube-llOp4xPaGWU"
+				},
+				{
+					"id": "youtube-DAOs9WO7pAw"
+				}
+			]
+		},
+		{
+			"name": "Chinese History",
+			"playlist_id": "PL4OCtlwZvc7ue_cECE1FHI5zV4Ioa-KF4",
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8791666666666667,
+					"caption_bottom": 0.9305555555555556,
+					"start_time": 0
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-BGPpLW3wYN4"
+				},
+				{
+					"id": "youtube-Dx0wGZUPp0g"
+				},
+				{
+					"id": "youtube-E10mJV_RKSY"
+				},
+				{
+					"id": "youtube-Ca3d8ZeIvss"
+				},
+				{
+					"id": "youtube-nTo9N2-bmV0"
+				},
+				{
+					"id": "youtube-_5yxGQ19Gjc"
+				},
+				{
+					"id": "youtube-6I3N7mrYUgY"
+				},
+				{
+					"id": "youtube-6Bs3u66uIhQ"
+				},
+				{
+					"id": "youtube-8TO58UU6iBM"
+				},
+				{
+					"id": "youtube-26NSll6Qm50"
+				},
+				{
+					"id": "youtube-OIC-PK15hxA"
+				},
+				{
+					"id": "youtube-O2zjcwXYLS4"
+				},
+				{
+					"id": "youtube-WSJxVwvlGqo"
+				},
+				{
+					"id": "youtube-MtfACEl25EI"
+				},
+				{
+					"id": "youtube-h8Utflbr2xg"
+				},
+				{
+					"id": "youtube-S50-A82hY1Y"
+				},
+				{
+					"id": "youtube-xesmsB5zvoo"
+				},
+				{
+					"id": "youtube-eR2HXs6jq_c"
+				},
+				{
+					"id": "youtube-ySue3Lkb_ak"
+				},
+				{
+					"id": "youtube-WBq6vKzztXU"
+				},
+				{
+					"id": "youtube--T3ISJbbBd0"
+				},
+				{
+					"id": "youtube-QfOeibcU--0"
+				},
+				{
+					"id": "youtube-o5jNfe2qb4E"
+				},
+				{
+					"id": "youtube-f6AoxwbSlLE"
+				},
+				{
+					"id": "youtube-Bq-DAXKhqWA"
+				},
+				{
+					"id": "youtube-MqmT293W0y4"
+				},
+				{
+					"id": "youtube-87ZW1_Q7Ic0"
+				},
+				{
+					"id": "youtube-tBdnDTu7TnM"
+				},
+				{
+					"id": "youtube-dtuibOs0y8E"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 223,
+	"discourse_topic_slug": "chinese-culture-for-kids"
+}

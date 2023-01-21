@@ -1,0 +1,231 @@
+{
+    "name": {
+        "hz": "三十而已",
+        "py": "Sānshí éryǐ",
+        "en": "Nothing but thirty"
+    },
+    "description": "",
+    "seasons": [
+        {
+            "playlist_id": "PLpghCOjR4Qqon5cXWN-zpOY8hO73fZ1JT",
+            "episodes": [
+                {
+                    "id": "youtube-ALcr22A-RLc",
+                    "ocr_params": [
+                        {
+                            "type": "english",
+                            "start_time": 0
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": -1.193117
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-8ZYjLB0b18w",
+                    "ocr_params": [
+                        {
+                            "type": "english"
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": -3.936068
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-zEgla1kmo1U",
+                    "ocr_params": [
+                        {
+                            "type": "english"
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": 0.246603
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-zWGXBU3Zjyg",
+                    "ocr_params": [
+                        {
+                            "type": "english"
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": -0.2989559999999756
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-gYJUTQM6B6U",
+                    "ocr_params": [
+                        {
+                            "type": "english"
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": -10.962788000000046
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-ZT9y1-khPu4",
+                    "ocr_params": [
+                        {
+                            "type": "english"
+                        },
+                        {
+                            "type": "hanzi",
+                            "timing_offset": -0.13164299999999685
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-gvQuNFifsTA"
+                },
+                {
+                    "id": "youtube-SnCKVe_MrHA"
+                },
+                {
+                    "id": "youtube-sKRQ74TPq50"
+                },
+                {
+                    "id": "youtube-1Ps0I-oldWk"
+                },
+                {
+                    "id": "youtube-fLHyrvPuexo"
+                },
+                {
+                    "id": "youtube-ZvewjcmDjbo"
+                },
+                {
+                    "id": "youtube-IyMVHlElxaE"
+                },
+                {
+                    "id": "youtube-c8DQNnHty-Q"
+                },
+                {
+                    "id": "youtube-HfvqiVVVtHM"
+                },
+                {
+                    "id": "youtube-ICSJmpbWFU8"
+                },
+                {
+                    "id": "youtube-UhjL92xdqDI"
+                },
+                {
+                    "id": "youtube-h9c1s_9WaiE"
+                },
+                {
+                    "id": "youtube-MIoBrHT0gm4"
+                },
+                {
+                    "id": "youtube-loVWNNq2ZVQ",
+                    "ocr_params": [
+                        {
+                            "type": "english",
+                            "caption_top": 0.9152777777777777,
+                            "caption_bottom": 0.9638888888888889
+                        }
+                    ]
+                },
+                {
+                    "id": "youtube-pjjUCLFLE-4"
+                },
+                {
+                    "id": "youtube-ofl6TZhBySs"
+                },
+                {
+                    "id": "youtube-l6VwqYvjzuE"
+                },
+                {
+                    "id": "youtube-JCUsM6EXq0M"
+                },
+                {
+                    "id": "youtube-uqeCyAKxFtE"
+                },
+                {
+                    "id": "youtube-DFHyVjnwTLo"
+                },
+                {
+                    "id": "youtube-7Du0dC3edsc"
+                },
+                {
+                    "id": "youtube-5IgPL9AdDCk"
+                },
+                {
+                    "id": "youtube-GYtOvAa646o"
+                },
+                {
+                    "id": "youtube-JrWNJ-SQ4nE"
+                },
+                {
+                    "id": "youtube-HnzgorOLR2M"
+                },
+                {
+                    "id": "youtube-rkP3Bzbx0NA"
+                },
+                {
+                    "id": "youtube-68nbhLBrrSk"
+                },
+                {
+                    "id": "youtube-90HLkeKYzDU"
+                },
+                {
+                    "id": "youtube-VohvEjJkaKk"
+                },
+                {
+                    "id": "youtube-oRVyqGCBemQ"
+                },
+                {
+                    "id": "youtube-ov6S6-NrxLs"
+                },
+                {
+                    "id": "youtube-pIH951w3SZQ"
+                },
+                {
+                    "id": "youtube-Gmv1e3RBiDQ"
+                },
+                {
+                    "id": "youtube-SiY-OeDS5UI"
+                },
+                {
+                    "id": "youtube-KpoxNfgmykE"
+                },
+                {
+                    "id": "youtube-_od18K1P4zM"
+                },
+                {
+                    "id": "youtube-jVVxZ2a1jrI"
+                }
+            ]
+        }
+    ],
+    "ocr_params": [
+        {
+            "type": "english",
+            "id": "english-bottom",
+            "ocr_engine": "easyocr",
+            "caption_top": 0.8722222222222222,
+            "caption_bottom": 0.9305555555555556,
+            "start_time": 90,
+            "end_time": -120.0
+        },
+        {
+            "type": "english",
+            "id": "english-top",
+            "depends_on": "english-bottom",
+            "ocr_engine": "easyocr",
+            "caption_top": 0.8125,
+            "caption_bottom": 0.8680555555555556,
+            "start_time": 90,
+            "end_time": -120.0
+        },
+        {
+            "type": "hanzi",
+            "offset_time": 0.0
+        }
+    ]
+}

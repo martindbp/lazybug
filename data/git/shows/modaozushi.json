@@ -1,0 +1,86 @@
+{
+  "name": "Módào zǔshī",
+  "released": false,
+  "description": "",
+  "seasons": [
+    {
+      "playlist_id": "PLMX26aiIvX5rWjEqareJBmoX-_uTFtemk",
+      "episodes": [
+        {
+          "id": "youtube-m346FShZ5Dc"
+        },
+        {
+          "id": "youtube-6G3K5NrOdfE"
+        },
+        {
+          "id": "youtube-m-_qloHuey4"
+        },
+        {
+          "id": "youtube-yo6xawYQ200"
+        },
+        {
+          "id": "youtube-pSeDiQmmZb4"
+        },
+        {
+          "id": "youtube-Zu6F8ZoGVJ8"
+        },
+        {
+          "id": "youtube-vit33xThqAE"
+        },
+        {
+          "id": "youtube-P2iwWRIqxHQ"
+        },
+        {
+          "id": "youtube-d-vX0F4Jr7I"
+        },
+        {
+          "id": "youtube-BGtSDe1oqXE"
+        },
+        {
+          "id": "youtube-jkz2p_C_vJ0"
+        },
+        {
+          "id": "youtube-qxiRXzONWn0"
+        },
+        {
+          "id": "youtube-IgWvTM5WDro"
+        },
+        {
+          "id": "youtube-G9FHkNmOcWM"
+        },
+        {
+          "id": "youtube-2GFL2P4i2jg"
+        },
+        {
+          "id": "youtube-Owrqq9_dIwE"
+        },
+        {
+          "id": "youtube--hvnnADeRSQ"
+        },
+        {
+          "id": "youtube-Jo7a1Q42VoA"
+        },
+        {
+          "id": "youtube-po61oZ9SMOw"
+        },
+        {
+          "id": "youtube-kecNbTuar1Y"
+        },
+        {
+          "id": "youtube-zzgdx6wt7VY"
+        },
+        {
+          "id": "youtube-g16-Ozii_xc"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.9144629080118695,
+      "caption_bottom": 0.9623916913946587,
+      "start_time": 420
+    }
+  ]
+}

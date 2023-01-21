@@ -1,0 +1,131 @@
+{
+	"name": {
+		"hz": "亮剑",
+		"py": "Liàngjiàn",
+		"en": "Drawing Sword"
+	},
+	"year": "2005",
+	"date_added": "2022-07-12",
+	"douban": 9.5,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"historical",
+		"war"
+	],
+	"synopsis": "Drama based on a book set in During the Second Sino-Japanese War",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLTdGeL3bw18c4_Zdsy3Yl1PqSjWw30enK",
+			"episodes": [
+				{
+					"id": "youtube-UOOhqN3r2tw"
+				},
+				{
+					"id": "youtube-to9aKQpEV3c"
+				},
+				{
+					"id": "youtube-NO1OSd8G_2M"
+				},
+				{
+					"id": "youtube-bzwObdBmtro"
+				},
+				{
+					"id": "youtube-fJOVKz19IGA"
+				},
+				{
+					"id": "youtube-z3UOyLC0NyQ"
+				},
+				{
+					"id": "youtube-z3UOyLC0NyQ"
+				},
+				{
+					"id": "youtube-skPqFdrp4nY"
+				},
+				{
+					"id": "youtube-6VsP9qUCTwI"
+				},
+				{
+					"id": "youtube-2P15swQ_QVE"
+				},
+				{
+					"id": "youtube-wrkd1M7Wu6Y"
+				},
+				{
+					"id": "youtube-_KTqSHUopBA"
+				},
+				{
+					"id": "youtube-ED84o1TH99A"
+				},
+				{
+					"id": "youtube--MUTIUcT8KE"
+				},
+				{
+					"id": "youtube-CO766M8idHc"
+				},
+				{
+					"id": "youtube-FYF2eu9Ss1c"
+				},
+				{
+					"id": "youtube-aKRdfioAcpQ"
+				},
+				{
+					"id": "youtube-uFiUFP5N2yI"
+				},
+				{
+					"id": "youtube-GrwD2s8DQd0"
+				},
+				{
+					"id": "youtube-kcLgkNdc92U"
+				},
+				{
+					"id": "youtube-q1flbQNL3QM"
+				},
+				{
+					"id": "youtube-TY7HuRyGD9Y"
+				},
+				{
+					"id": "youtube-xuKKXj_sX7s"
+				},
+				{
+					"id": "youtube-pgCjmQjh0Ek"
+				},
+				{
+					"id": "youtube-76NKqz0Xmt0"
+				},
+				{
+					"id": "youtube-446cjcpfm-g"
+				},
+				{
+					"id": "youtube-sgJepQis8Zs"
+				},
+				{
+					"id": "youtube-hP3zRzc-11k"
+				},
+				{
+					"id": "youtube-Q155qv_PG9A"
+				},
+				{
+					"id": "youtube-5eQerxgZKk8"
+				},
+				{
+					"id": "youtube-Y8vfYpOhI8E"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8729166666666667,
+			"caption_bottom": 0.93125,
+			"start_time": 90,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 217,
+	"discourse_topic_slug": "liangjian-drawing-sword"
+}

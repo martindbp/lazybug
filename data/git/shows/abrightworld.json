@@ -1,0 +1,139 @@
+{
+	"name": {
+		"en": "A Bright World",
+		"hz": "世界青年说",
+		"py": "Shìjiè qīngnián shuō"
+	},
+	"reddit_comments": [
+		"ChineseLanguage/comments/86lknx/great_chinese_show_for_intermediate_to_advanced",
+		"ChineseLanguage/comments/8ifld5/any_good_nonmonkey_king_movies_or_tv_series_you/dyrsfyv"
+	],
+	"date_added": "2022-07-03",
+	"type": "tv",
+	"released": true,
+	"genres": [
+		"variety-show"
+	],
+	"synopsis": "Talk-show with panel of expats talk about social and cultural topics",
+	"douban": 7.8,
+	"year": "2015",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLtAiBhiVU_fcsBXBHtF_6KxiSftfUQ6Va",
+			"episodes": [
+				{
+					"id": "youtube--4Gx4oPljpE"
+				},
+				{
+					"id": "youtube-X3UQT4rYB78"
+				},
+				{
+					"id": "youtube-5PPIwfCpQa4"
+				},
+				{
+					"id": "youtube-xS2KvwUr-hk"
+				},
+				{
+					"id": "youtube-O_IyP625rJY"
+				},
+				{
+					"id": "youtube-f4tWIrRkmQo"
+				},
+				{
+					"id": "youtube-VRmaE8wVaII"
+				},
+				{
+					"id": "youtube-EEiMT2cGAgQ"
+				},
+				{
+					"id": "youtube-pvaO1iww1CA"
+				},
+				{
+					"id": "youtube-pvd96UcPzWs"
+				},
+				{
+					"id": "youtube-EOl5a97NgfM"
+				},
+				{
+					"id": "youtube-6ADwEcYwPw0"
+				},
+				{
+					"id": "youtube-3hgBkO_olUw"
+				},
+				{
+					"id": "youtube-dHpi7XB31t8"
+				},
+				{
+					"id": "youtube-jcMUlrjt9K8"
+				},
+				{
+					"id": "youtube-y-Bdb2eqFD0"
+				},
+				{
+					"id": "youtube-VaBpJBy68Fk"
+				},
+				{
+					"id": "youtube-XI6yiynnoaQ"
+				},
+				{
+					"id": "youtube-V0MKytbtQS4"
+				},
+				{
+					"id": "youtube-9kf6DAb1hns"
+				},
+				{
+					"id": "youtube-JRd8FAI439g"
+				},
+				{
+					"id": "youtube-0uoEHsPAQfo"
+				},
+				{
+					"id": "youtube-mLNphVHV9u0"
+				},
+				{
+					"id": "youtube-hPQ7eP-fpCE"
+				},
+				{
+					"id": "youtube-qWwdx3NS8TM"
+				},
+				{
+					"id": "youtube-hwgLrrmJaxo"
+				},
+				{
+					"id": "youtube-aK3on3ZVzYE"
+				},
+				{
+					"id": "youtube-aK3on3ZVzYE"
+				},
+				{
+					"id": "youtube-_unE5rKTlkw"
+				},
+				{
+					"id": "youtube-4Fe41-yimtQ"
+				},
+				{
+					"id": "youtube-Jp94ZQQ1Frw"
+				},
+				{
+					"id": "youtube-Ix-T7ZFUpWs"
+				},
+				{
+					"id": "youtube-oAhHf9Ro2OQ"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8944444444444445,
+			"caption_bottom": 0.9555555555555556,
+			"refine_bounding_rect": true,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 221,
+	"discourse_topic_slug": "shijie-qingnian-shuo-a-bright-world"
+}

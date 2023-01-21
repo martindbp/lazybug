@@ -1,0 +1,174 @@
+{
+	"name": {
+		"hz": "三十而已",
+		"py": "Sānshí éryǐ",
+		"en": "Nothing but thirty"
+	},
+	"date_added": "2022-07-03",
+	"douban": 6.6,
+	"type": "tv",
+	"genres": [
+		"drama"
+	],
+	"synopsis": "Follow three women as they enter their thirties",
+	"year": "2020",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLkvG4EWPDB0lfJhiP-M9JYlW-IRph5RI7",
+			"episodes": [
+				{
+					"id": "youtube-F4zhJHw-BpA",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"caption_top": 0.9185185185185185,
+							"caption_bottom": 0.9574074074074074,
+							"start_time": 0
+						}
+					]
+				},
+				{
+					"id": "youtube-MDRVkGgBIe0"
+				},
+				{
+					"id": "youtube-zti66JLVvR0"
+				},
+				{
+					"id": "youtube-v9i8AsMhv4k"
+				},
+				{
+					"id": "youtube-tkR9uAPcI3U"
+				},
+				{
+					"id": "youtube-CoCzj1mRoGU"
+				},
+				{
+					"id": "youtube-RM-sED4LLhU"
+				},
+				{
+					"id": "youtube-hGOnrs7EYU4"
+				},
+				{
+					"id": "youtube-TJrr1f_Icn8"
+				},
+				{
+					"id": "youtube-rn4TTfLMgPg"
+				},
+				{
+					"id": "youtube-qlEw1HOGVFw"
+				},
+				{
+					"id": "youtube-dhODI2uQBoM"
+				},
+				{
+					"id": "youtube-2poFc4H7-LM"
+				},
+				{
+					"id": "youtube-g2gvrTuhmZI"
+				},
+				{
+					"id": "youtube-Hv9488deOxw"
+				},
+				{
+					"id": "youtube-FLgrBKa7TM4"
+				},
+				{
+					"id": "youtube-x0qXTL1n4fw"
+				},
+				{
+					"id": "youtube-QZmsKGpbGsM"
+				},
+				{
+					"id": "youtube-5JTxR_hNoAM"
+				},
+				{
+					"id": "youtube-JstJIZEz3ns"
+				},
+				{
+					"id": "youtube-L1lIdx5wGNk"
+				},
+				{
+					"id": "youtube-WpEOD4Ipnjw"
+				},
+				{
+					"id": "youtube-cSugBPwXWZM"
+				},
+				{
+					"id": "youtube-o9sVSerUjKg"
+				},
+				{
+					"id": "youtube-S_bODfSG7ks"
+				},
+				{
+					"id": "youtube-F3smxnlTjH0"
+				},
+				{
+					"id": "youtube-8oFBSJy-SR4"
+				},
+				{
+					"id": "youtube-ELbL5QKzaj8"
+				},
+				{
+					"id": "youtube-Le123hiE_xI"
+				},
+				{
+					"id": "youtube-R8l28EXvJuI"
+				},
+				{
+					"id": "youtube-z19RFu8eFpk"
+				},
+				{
+					"id": "youtube-RH3iBBKxxpk"
+				},
+				{
+					"id": "youtube-8xj41jAb6sw"
+				},
+				{
+					"id": "youtube-4ByxKufISUw"
+				},
+				{
+					"id": "youtube-eTD54U8hCXQ"
+				},
+				{
+					"id": "youtube-2_0jtMq4mPA"
+				},
+				{
+					"id": "youtube-JX0Gny_4SeE"
+				},
+				{
+					"id": "youtube-ISHBNVeqXtE"
+				},
+				{
+					"id": "youtube-l7s3z_zbIJw"
+				},
+				{
+					"id": "youtube-tIEDFrFRP5s"
+				},
+				{
+					"id": "youtube-wkeUB-6ViaM"
+				},
+				{
+					"id": "youtube-dmYWbTABrYY"
+				},
+				{
+					"id": "youtube-XbFf1pg4Hxs"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.9180555555555555,
+			"caption_bottom": 0.9555555555555556,
+			"start_time": 93,
+			"end_time": -120,
+			"refine_bounding_rect": false
+		}
+	],
+	"discourse_topic_id": 198,
+	"discourse_topic_slug": "sanshi-ery-nothing-but-thirty"
+}

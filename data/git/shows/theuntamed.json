@@ -1,0 +1,187 @@
+{
+	"name": {
+		"en": "The Untamed",
+		"hz": "陈情令",
+		"py": "Chén Qíng Lìng"
+	},
+	"date_added": "2022-07-03",
+	"douban": 7.7,
+	"type": "tv",
+	"genres": [
+		"drama",
+		"cultivation",
+		"fantasy"
+	],
+	"synopsis": "Two soulmate adventurers travel to solve a series of mysteries",
+	"year": "2019",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLMQ0lvZ3plNNgy_kbwm7Zh0C3T0F2SaKe",
+			"episodes": [
+				{
+					"id": "youtube-BfKhREVFLkQ"
+				},
+				{
+					"id": "youtube-bohaJwUECcY"
+				},
+				{
+					"id": "youtube-3dL5SB8b2TQ"
+				},
+				{
+					"id": "youtube-pfbWLfd1IPk"
+				},
+				{
+					"id": "youtube-nq-HjJuWuO0"
+				},
+				{
+					"id": "youtube-sCwJaqV23Xc"
+				},
+				{
+					"id": "youtube-LIJboa3vbV0"
+				},
+				{
+					"id": "youtube-01kSLS4raBE"
+				},
+				{
+					"id": "youtube-Kp3FET2lYa4"
+				},
+				{
+					"id": "youtube-SRhtlA4bd_U"
+				},
+				{
+					"id": "youtube-Itzake4uUoI"
+				},
+				{
+					"id": "youtube-J-1N40ELTQE"
+				},
+				{
+					"id": "youtube-9pljqMhjAo4"
+				},
+				{
+					"id": "youtube-1dQjG8cNeSc"
+				},
+				{
+					"id": "youtube-rJbLci0Ngow"
+				},
+				{
+					"id": "youtube-VznRRKrg7-M"
+				},
+				{
+					"id": "youtube-g4eEAs6baAM"
+				},
+				{
+					"id": "youtube-ROJKnm5YVE8"
+				},
+				{
+					"id": "youtube-ohG-zsSkPI8"
+				},
+				{
+					"id": "youtube-givtaahIG-0"
+				},
+				{
+					"id": "youtube-v0u6k9mwDV8"
+				},
+				{
+					"id": "youtube-wsRrIKYTsV4"
+				},
+				{
+					"id": "youtube-m3YQX51sE60"
+				},
+				{
+					"id": "youtube-X9Ub_h0CRlE"
+				},
+				{
+					"id": "youtube-GgI5jcFfhDk"
+				},
+				{
+					"id": "youtube-ke4Heqip8DM"
+				},
+				{
+					"id": "youtube-2kkK9bM9gvE"
+				},
+				{
+					"id": "youtube-SPI0xkirNgU"
+				},
+				{
+					"id": "youtube-wkaD_6QWkGs"
+				},
+				{
+					"id": "youtube-OTaj04BCn-I"
+				},
+				{
+					"id": "youtube-t9DSwDfk4gQ"
+				},
+				{
+					"id": "youtube-3Rk6T0kOGrI"
+				},
+				{
+					"id": "youtube-jq_hutoPfYc"
+				},
+				{
+					"id": "youtube-0It_OgRv78Q"
+				},
+				{
+					"id": "youtube-48cKaU2TtNk"
+				},
+				{
+					"id": "youtube-jB5QOPqCmsg"
+				},
+				{
+					"id": "youtube-iLcj5i1UKZg"
+				},
+				{
+					"id": "youtube-xbiCjLUx40w"
+				},
+				{
+					"id": "youtube-bRHAXHq3cqo"
+				},
+				{
+					"id": "youtube-gVkEBt_oQHs"
+				},
+				{
+					"id": "youtube-4QwMvg5aLpo"
+				},
+				{
+					"id": "youtube-IWNjDZ3oir0"
+				},
+				{
+					"id": "youtube-t6VszgYZYsI"
+				},
+				{
+					"id": "youtube-LPQxdhIG0Ns"
+				},
+				{
+					"id": "youtube-l1AwdfmA1Yo"
+				},
+				{
+					"id": "youtube-tPy6JzKR7cs"
+				},
+				{
+					"id": "youtube-ZTVcEAilZJ8"
+				},
+				{
+					"id": "youtube-09IJwPgB0EE"
+				},
+				{
+					"id": "youtube-jQqfL9otHoI"
+				},
+				{
+					"id": "youtube-yyBkKooh9Qk"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8805555555555555,
+			"caption_bottom": 0.9361111111111111,
+			"start_time": 120
+		}
+	],
+	"discourse_topic_id": 196,
+	"discourse_topic_slug": "chen-qing-ling-the-untamed"
+}

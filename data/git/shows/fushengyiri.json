@@ -1,0 +1,214 @@
+{
+	"name": {
+		"hz": "浮生一日",
+		"py": "Fúshēng yī rì",
+		"en": "A day in the life of"
+	},
+	"date_added": "2022-07-03",
+	"year": null,
+	"released": true,
+	"type": "vlog",
+	"douban": null,
+	"genres": [
+		"documentary"
+	],
+	"synopsis": "\"Day-in-the-life-of\" Beijing workers",
+	"description": "Vlog documenting real daily life of 'Bei Piao' - migrant workers living and working in Beijing.",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PL1olD8T9UQS8Vm_JHf1v3IgnWSVPfTnUZ",
+			"episodes": [
+				{
+					"id": "youtube-QZ_15G3mndQ"
+				},
+				{
+					"id": "youtube--oVjLmHNZRQ"
+				},
+				{
+					"id": "youtube-3ztDEHzKzG0"
+				},
+				{
+					"id": "youtube-Uf8wULIqZxU"
+				},
+				{
+					"id": "youtube-1WO1u2CrJeg"
+				},
+				{
+					"id": "youtube-PJhJZtjpp94"
+				},
+				{
+					"id": "youtube-x2jl2PRlh0w"
+				},
+				{
+					"id": "youtube-adGtmItk4Ag"
+				},
+				{
+					"id": "youtube-HqAmdnV_144",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8819444444444444,
+							"caption_bottom": 0.9236111111111112
+						}
+					]
+				},
+				{
+					"id": "youtube-9L2a_3VCebI",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8902777777777777,
+							"caption_bottom": 0.9375
+						}
+					]
+				},
+				{
+					"id": "youtube-Plk7_W-XKFU",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.9041666666666667,
+							"caption_bottom": 0.9513888888888888
+						}
+					]
+				},
+				{
+					"id": "youtube-EACfv3lGjAQ",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.9041666666666667,
+							"caption_bottom": 0.9513888888888888
+						}
+					]
+				},
+				{
+					"id": "youtube-kawKClTta04",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"caption_top": 0.8819444,
+							"caption_bottom": 0.92916666
+						}
+					]
+				},
+				{
+					"id": "youtube-_auRrZsKeZg",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8805555555555555,
+							"caption_bottom": 0.9347222222222222
+						}
+					]
+				},
+				{
+					"id": "youtube-d6J88fJoeYw",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8638888888888889,
+							"caption_bottom": 0.9263888888888889
+						}
+					]
+				},
+				{
+					"id": "youtube-Ed3-0m8W7Xs",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8708333333333333,
+							"caption_bottom": 0.9194444444444444
+						}
+					]
+				},
+				{
+					"id": "youtube-SgOG1kFg1-8",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8708333333333333,
+							"caption_bottom": 0.9180555555555555
+						}
+					]
+				},
+				{
+					"id": "youtube-d3325-29Bg4",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8708333333333333,
+							"caption_bottom": 0.9180555555555555
+						}
+					]
+				},
+				{
+					"id": "youtube-nx0QLNuHjdU",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8694444444444445,
+							"caption_bottom": 0.9263888888888889
+						}
+					]
+				},
+				{
+					"id": "youtube-ReLL64jmxWg",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8555555555555555,
+							"caption_bottom": 0.9069444444444444
+						}
+					]
+				},
+				{
+					"id": "youtube-cAx5OWg-u88",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": false,
+							"caption_top": 0.9,
+							"caption_bottom": 0.9541666666666667
+						}
+					]
+				},
+				{
+					"id": "youtube-LDIY3qQbIWg",
+					"ocr_params": [
+						{
+							"type": "hanzi",
+							"refine_bounding_rect": true,
+							"caption_top": 0.8986111111111111,
+							"caption_bottom": 0.9527777777777777
+						}
+					]
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"refine_bounding_rect": true,
+			"caption_top": 0.8819444444444444,
+			"caption_bottom": 0.9319444444444445,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 189,
+	"discourse_topic_slug": "fusheng-yi-ri-a-day-in-the-life-of"
+}

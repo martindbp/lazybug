@@ -1,0 +1,174 @@
+{
+	"name": {
+		"py": "Dōu tǐng hǎo",
+		"hz": "都挺好",
+		"en": "All Is Well"
+	},
+	"embeddable": false,
+	"date_added": "2022-07-03",
+	"douban": 7.7,
+	"type": "tv",
+	"genres": [
+		"drama"
+	],
+	"synopsis": "Conflicts between family members brews as the matriarch pass away",
+	"year": "2019",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLQqbdnAgoRmYhfPJgYB9YQxDsNQ-ErQBd",
+			"episodes": [
+				{
+					"id": "youtube-YtzqsA-a8MM"
+				},
+				{
+					"id": "youtube-8b0TGFqHJ4E"
+				},
+				{
+					"id": "youtube-OiP9UIZ9r5A"
+				},
+				{
+					"id": "youtube-q3e-M2vD_HY"
+				},
+				{
+					"id": "youtube-8hwA66iHVi4"
+				},
+				{
+					"id": "youtube-mM2CCm8eTdo"
+				},
+				{
+					"id": "youtube-FU1YAs93wKM"
+				},
+				{
+					"id": "youtube-sGxNFVNnnbk"
+				},
+				{
+					"id": "youtube-jxbeqbrGo0Y"
+				},
+				{
+					"id": "youtube-QqNWf5OYZ3Y"
+				},
+				{
+					"id": "youtube-vGRjC48N4W4"
+				},
+				{
+					"id": "youtube-Ho_luvchNMU"
+				},
+				{
+					"id": "youtube-1QvQCM96up4"
+				},
+				{
+					"id": "youtube-bsZ_WYirBVQ"
+				},
+				{
+					"id": "youtube-77okCk5tKVY"
+				},
+				{
+					"id": "youtube-kEjV0Pd9L38"
+				},
+				{
+					"id": "youtube-kQ8Fjrh-7YI"
+				},
+				{
+					"id": "youtube-WaV9l_xXMW4"
+				},
+				{
+					"id": "youtube-Lb_cZCoy8zg"
+				},
+				{
+					"id": "youtube-kiFXK2z1oN4"
+				},
+				{
+					"id": "youtube-eq4UQ-jG3qc"
+				},
+				{
+					"id": "youtube-ha-jyX9yhGU"
+				},
+				{
+					"id": "youtube-Pw5HIxYYIMk"
+				},
+				{
+					"id": "youtube-cDmXaQ8Yn5Q"
+				},
+				{
+					"id": "youtube-xyPVjXRnQfk"
+				},
+				{
+					"id": "youtube-CYIclK_-K0s"
+				},
+				{
+					"id": "youtube-xIYzbOfkvTI"
+				},
+				{
+					"id": "youtube-NscR5Yrazlo"
+				},
+				{
+					"id": "youtube-3Iqn1A84C9k"
+				},
+				{
+					"id": "youtube-DFHHWOfonho"
+				},
+				{
+					"id": "youtube-eBjYlZiJu4Q"
+				},
+				{
+					"id": "youtube-ZyyCVklgxlM"
+				},
+				{
+					"id": "youtube-D9lsZEhDTcw"
+				},
+				{
+					"id": "youtube-MeJeuk1Rwjg"
+				},
+				{
+					"id": "youtube-zsuwih9z2Pk"
+				},
+				{
+					"id": "youtube-wEozfA7GjGc"
+				},
+				{
+					"id": "youtube-yLYgLUzudqg"
+				},
+				{
+					"id": "youtube-enSwHgXhgAU"
+				},
+				{
+					"id": "youtube-C2MyYKalFbQ"
+				},
+				{
+					"id": "youtube-WFhl8bIjbqA"
+				},
+				{
+					"id": "youtube-AmvkYWnxUKU"
+				},
+				{
+					"id": "youtube-ftU0akMmmQ4"
+				},
+				{
+					"id": "youtube-8Drd8rebBtU"
+				},
+				{
+					"id": "youtube-Opxz3Cvsnrk"
+				},
+				{
+					"id": "youtube-PkgmoDQKnEU"
+				},
+				{
+					"id": "youtube-AXDjTbtHb2Y"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8379,
+					"caption_bottom": 0.899,
+					"start_time": 50
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 187,
+	"discourse_topic_slug": "dou-t-ng-h-o-all-is-well"
+}

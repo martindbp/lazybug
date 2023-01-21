@@ -6,7 +6,7 @@ from wrapped_json import json
 show_name = sys.argv[1]
 
 video_ids = []
-with open(f'data/remote/public/shows/{show_name}.json') as f:
+with open(f'data/git/shows/{show_name}.json') as f:
     data = json.load(f)
     for season in data['seasons']:
         for episode in season['episodes']:

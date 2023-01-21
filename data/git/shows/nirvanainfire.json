@@ -1,0 +1,199 @@
+{
+	"name": {
+		"en": "Nirvana In Fire",
+		"hz": "琅琊榜",
+		"py": "Lángyá bǎng"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.4,
+	"type": "tv",
+	"genres": [
+		"historical",
+		"drama"
+	],
+	"synopsis": "Game of Thrones without the sex, dragons, and zombies",
+	"year": "2015",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": "PLtt_YYUGi1gXRt2XVJZrHDBkZECcfmuAJ",
+			"episodes": [
+				{
+					"id": "youtube-x-gVdZAVNUA"
+				},
+				{
+					"id": "youtube-l1iheZ_mOdU"
+				},
+				{
+					"id": "youtube-q26eT1ZWIhs"
+				},
+				{
+					"id": "youtube-NKKO51Sg_jI"
+				},
+				{
+					"id": "youtube-ehzMTp_afsU"
+				},
+				{
+					"id": "youtube--xRsUXH4QjM"
+				},
+				{
+					"id": "youtube-NYFSa1mCxbo"
+				},
+				{
+					"id": "youtube-s6QCGGYAn84"
+				},
+				{
+					"id": "youtube-luntCH07AXs"
+				},
+				{
+					"id": "youtube-7V5-iYu3fYM"
+				},
+				{
+					"id": "youtube-FmSwrjbmacU"
+				},
+				{
+					"id": "youtube-h6tq6MbHMWE"
+				},
+				{
+					"id": "youtube-BwTHSPgGOxo"
+				},
+				{
+					"id": "youtube-CmsfoAArDZs"
+				},
+				{
+					"id": "youtube-K4s0ZmfAOkw"
+				},
+				{
+					"id": "youtube-wnk1PfNSeYY"
+				},
+				{
+					"id": "youtube-qyyWwBRo13s"
+				},
+				{
+					"id": "youtube-56aeBrdyt-0"
+				},
+				{
+					"id": "youtube-s-0VI96rJsg"
+				},
+				{
+					"id": "youtube-VzynXpdUheQ"
+				},
+				{
+					"id": "youtube-31xCZSLbrqk"
+				},
+				{
+					"id": "youtube-qp3sBd_Qxvs"
+				},
+				{
+					"id": "youtube-srimi6FpqiY"
+				},
+				{
+					"id": "youtube-LnQR85FpK4c"
+				},
+				{
+					"id": "youtube-2YZC_IAjx2U"
+				},
+				{
+					"id": "youtube-I8VW7V414hw"
+				},
+				{
+					"id": "youtube-Xc9bq0u6r20"
+				},
+				{
+					"id": "youtube-PTClnsEQljI"
+				},
+				{
+					"id": "youtube-JO1V0BRT8MA"
+				},
+				{
+					"id": "youtube-DuqVkKSMPOk"
+				},
+				{
+					"id": "youtube-ZfnGZZlulqw"
+				},
+				{
+					"id": "youtube-6vPBeqBQ6Wk"
+				},
+				{
+					"id": "youtube-ILMmXzF0pFY"
+				},
+				{
+					"id": "youtube-jDvJdt04bEc"
+				},
+				{
+					"id": "youtube-xYUPblY-h3M"
+				},
+				{
+					"id": "youtube-Rzywd1Xsv48"
+				},
+				{
+					"id": "youtube-c6faGPAIU94"
+				},
+				{
+					"id": "youtube-xrEozETBEPE"
+				},
+				{
+					"id": "youtube-UxAx9ki8xug"
+				},
+				{
+					"id": "youtube-ZOuAxi0VeZ8"
+				},
+				{
+					"id": "youtube-ilTqFwWI1RQ"
+				},
+				{
+					"id": "youtube-TkaaNFekw4g"
+				},
+				{
+					"id": "youtube-SHOfq8UE-p8"
+				},
+				{
+					"id": "youtube-tMfCHAQiLFo"
+				},
+				{
+					"id": "youtube-bHCw28Qi38c"
+				},
+				{
+					"id": "youtube-Xky6inI2AZA"
+				},
+				{
+					"id": "youtube-5Fvha64y-YI"
+				},
+				{
+					"id": "youtube-ZEJsE4Yyb94"
+				},
+				{
+					"id": "youtube-IEaBwH79XuI"
+				},
+				{
+					"id": "youtube-sWXd7uY6EFQ"
+				},
+				{
+					"id": "youtube-I9D_bUXCCx4"
+				},
+				{
+					"id": "youtube-acSttA3wFIU"
+				},
+				{
+					"id": "youtube-7GAOmcKGM0g"
+				},
+				{
+					"id": "youtube-b5zx5fO02KM"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8791666666666667,
+			"caption_bottom": 0.9375,
+			"start_time": 93,
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 201,
+	"discourse_topic_slug": "langya-b-ng-nirvana-in-fire"
+}

@@ -1,0 +1,39 @@
+{
+	"name": {
+		"hz": "一人之下",
+		"py": "Yīrén zhī xià",
+		"en": "Under One Person"
+	},
+	"embeddable": false,
+	"date_added": "2022-07-03",
+	"year": "2016",
+	"type": "tv",
+	"genres": [
+		"donghua"
+	],
+	"synopsis": "Donghua based on a web comic",
+	"douban": 8.8,
+	"difficulty_manual": 0.7,
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8432835820895522,
+			"caption_bottom": 0.9011194029850746,
+			"start_time": 0
+		}
+	],
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-3vOaGaF-R6o"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 210,
+	"discourse_topic_slug": "yiren-zhi-xia-under-one-person"
+}

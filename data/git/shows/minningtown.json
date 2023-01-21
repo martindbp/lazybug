@@ -1,0 +1,104 @@
+{
+	"name": {
+		"hz": "山海情",
+		"py": "Shānhǎi qíng",
+		"en": "Minning Town"
+	},
+	"date_added": "2022-07-03",
+	"type": "tv",
+	"genres": [
+		"drama"
+	],
+	"synopsis": "Migrants build a new town together",
+	"douban": 9.2,
+	"year": "2021",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLUg6CGAXr7pktTjLdLYzBtgpjUMgUfkaZ",
+			"episodes": [
+				{
+					"id": "youtube-SpZqeVqtMKk"
+				},
+				{
+					"id": "youtube-QJb3PNe_XCA"
+				},
+				{
+					"id": "youtube-0c0DKBkjaSo"
+				},
+				{
+					"id": "youtube-ZB4B5arN75s"
+				},
+				{
+					"id": "youtube-aTUz4kupqPE"
+				},
+				{
+					"id": "youtube-dXzpn5F2ADU"
+				},
+				{
+					"id": "youtube-GZCOZKcVdc8"
+				},
+				{
+					"id": "youtube-ZGHj0_txuyE"
+				},
+				{
+					"id": "youtube--6jCvwn85Fo"
+				},
+				{
+					"id": "youtube-6K40j75NaSw"
+				},
+				{
+					"id": "youtube-C5NV-Ls-e6U"
+				},
+				{
+					"id": "youtube-3bTpZ1DTX48"
+				},
+				{
+					"id": "youtube-o6NpsJwuOtk"
+				},
+				{
+					"id": "youtube-8iLynHPIRio"
+				},
+				{
+					"id": "youtube-qrlQFSEn9rs"
+				},
+				{
+					"id": "youtube-CFOjxpHHi-8"
+				},
+				{
+					"id": "youtube-AKCjC4yluEE"
+				},
+				{
+					"id": "youtube-WoxeMTag9JM"
+				},
+				{
+					"id": "youtube-JAk4LgdMP7E"
+				},
+				{
+					"id": "youtube-Ek_CVJHsC2s"
+				},
+				{
+					"id": "youtube-WNFt0tUnIvw"
+				},
+				{
+					"id": "youtube-VrzjRWCF5zA"
+				},
+				{
+					"id": "youtube-UxufALev9Qo"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.82421875,
+			"caption_bottom": 0.89453125,
+			"start_time": 88
+		}
+	],
+	"discourse_topic_id": 203,
+	"discourse_topic_slug": "shanh-i-qing-minning-town"
+}

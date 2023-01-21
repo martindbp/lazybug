@@ -1,0 +1,89 @@
+{
+	"name": {
+		"hz": "大理寺日志",
+		"py": "Dàlǐ sì rìzhì",
+		"en": "White Cat Legend"
+	},
+	"released": true,
+	"date_added": "2022-08-11",
+	"douban": 8.2,
+	"type": "tv",
+	"genres": [
+		"donghua",
+		"historical",
+		"action",
+		"comedy"
+	],
+	"synopsis": "official investigators led by a white cat solve cases",
+	"year": "2020",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PL5IPEswJlznUpXJIRVV2hZaVJXL4kVK1q",
+			"episodes": [
+				{
+					"id": "youtube-sgu1QjJb4pU"
+				},
+				{
+					"id": "youtube-ObudcrH6LMw"
+				},
+				{
+					"id": "youtube-kw2wwDHtjIo"
+				},
+				{
+					"id": "youtube-gD_B4dQ9vKI"
+				},
+				{
+					"id": "youtube-ruU01WVVa9I"
+				},
+				{
+					"id": "youtube-F6bIaWslsAg"
+				},
+				{
+					"id": "youtube-9eyrnRxeYPg"
+				},
+				{
+					"id": "youtube-fE83kkbHjkI"
+				},
+				{
+					"id": "youtube-scPSoAQOh98"
+				},
+				{
+					"id": "youtube-fP-mIOIwAt0"
+				},
+				{
+					"id": "youtube-5zBngCma5Ig"
+				},
+				{
+					"id": "youtube-FPLmyG36Tlk"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"id": "hanzi-top",
+			"caption_top": 0.8916666666666667,
+			"caption_bottom": 0.9361111111111111,
+			"start_time": 0,
+			"refine_bounding_rect": true
+		},
+		{
+			"type": "english",
+			"id": "english-bottom",
+			"caption_top": 0.9486111111111111,
+			"caption_bottom": 0.9819444444444444,
+			"start_time": 0,
+			"ocr_engine": "easyocr",
+			"depends_on": "hanzi-top",
+			"action": {
+				"type": "assign"
+			},
+			"refine_bounding_rect": true
+		}
+	],
+	"discourse_topic_id": 226,
+	"discourse_topic_slug": "dal-si-rizhi-white-cat-legend"
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Beijing Interviews",
+  "released": false,
+  "description": "",
+  "youtube_channel": "UCGWPmyU1DpZfxNQRonvSFJw",
+  "seasons": [
+    {
+      "name": "I do well in this business",
+      "playlist_id": "PLY59VFjgIv70kzHLuNfdof8mP191XuSqs",
+      "episodes": [
+        {
+          "id": "youtube-V0dtJuodS4M"
+        },
+        {
+          "id": "youtube-f5u16FvPJQc"
+        },
+        {
+          "id": "youtube-2xaAhBgKE1M"
+        },
+        {
+          "id": "youtube-xzp5D5leo7o"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": null,
+      "caption_bottom": null,
+      "start_time": 0
+    }
+  ]
+}

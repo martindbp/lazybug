@@ -1,0 +1,40 @@
+{
+	"name": {
+		"hz": "饮食男女",
+		"py": "Yǐnshí nánnǚ",
+		"en": "Eat Drink Man Woman"
+	},
+	"date_added": "2022-07-03",
+	"type": "movie",
+	"released": true,
+	"douban": 9.2,
+	"genres": [
+		"drama",
+		"romance",
+		"comedy"
+	],
+	"year": "1994",
+	"synopsis": "One of Ang Lee's earlier movies",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-FQikrXhuOCU"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.9,
+			"caption_bottom": 0.9472222222222222,
+			"refine_bounding_rect": true,
+			"start_time": 265
+		}
+	],
+	"discourse_topic_id": 222,
+	"discourse_topic_slug": "y-nshi-nann-eat-drink-man-woman"
+}

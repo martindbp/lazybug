@@ -1,0 +1,181 @@
+{
+	"name": {
+		"en": "The Longest Day in Chang'an",
+		"hz": "长安十二时辰",
+		"py": "Cháng'ān shí'èr shíchén"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.2,
+	"type": "tv",
+	"genres": [
+		"historical",
+		"crime",
+		"thriller"
+	],
+	"synopsis": "Former detective tries to stop terror act in ancient Chang'an",
+	"year": "2019",
+	"released": true,
+	"caption_source": "soft",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"playlist_id": "PLcHRE_huWMAwn-5xeW8ol4EfZ5vMqyn6l",
+			"episodes": [
+				{
+					"id": "youtube-JwCpTmgF2Nc"
+				},
+				{
+					"id": "youtube-S2eQRX4IDV0"
+				},
+				{
+					"id": "youtube-yTuuhQVIQgo"
+				},
+				{
+					"id": "youtube-UuExdPic_dU"
+				},
+				{
+					"id": "youtube-pzcGw1QhvWk"
+				},
+				{
+					"id": "youtube-TnnjyaQSN5Y"
+				},
+				{
+					"id": "youtube-7qPb-4DQY-I"
+				},
+				{
+					"id": "youtube-SwlSVL8tFjg"
+				},
+				{
+					"id": "youtube-eDcUpO_W4Jg"
+				},
+				{
+					"id": "youtube-pV8-kULR2fs"
+				},
+				{
+					"id": "youtube-yLVYM9oZ2TQ"
+				},
+				{
+					"id": "youtube-lHZ3ETZoSjo"
+				},
+				{
+					"id": "youtube-LViRDD6OJps"
+				},
+				{
+					"id": "youtube-EgZC5PS6eFg"
+				},
+				{
+					"id": "youtube-Z7fCJrdoSRI"
+				},
+				{
+					"id": "youtube-WGjJZVUIXWc"
+				},
+				{
+					"id": "youtube-CmBprKukghw"
+				},
+				{
+					"id": "youtube-MC_v2WEo1gc"
+				},
+				{
+					"id": "youtube-SIx7JVRzXL8"
+				},
+				{
+					"id": "youtube-jRJTlZlJ2rY"
+				},
+				{
+					"id": "youtube-qNTaP7yyqgI"
+				},
+				{
+					"id": "youtube-iciziugxZ-Y"
+				},
+				{
+					"id": "youtube-8j_aLiCD2-4"
+				},
+				{
+					"id": "youtube-ctKveDqTxAE"
+				},
+				{
+					"id": "youtube-4k4TjAmnha0"
+				},
+				{
+					"id": "youtube-r0rXgV7wcuY"
+				},
+				{
+					"id": "youtube-qQQpT79YRWk"
+				},
+				{
+					"id": "youtube-WMrybBaaPAk"
+				},
+				{
+					"id": "youtube-YmD5Yt2IiKY"
+				},
+				{
+					"id": "youtube-we7koDBhS5E"
+				},
+				{
+					"id": "youtube-sL9r-6xf2KY"
+				},
+				{
+					"id": "youtube-LFcpJvbaAEA"
+				},
+				{
+					"id": "youtube-xbEpd-ahK2k"
+				},
+				{
+					"id": "youtube-eqmKw1i5qgs"
+				},
+				{
+					"id": "youtube-NroNhoMXXUY"
+				},
+				{
+					"id": "youtube-VegMXV3RLrc"
+				},
+				{
+					"id": "youtube-w-gxIUX-EEY"
+				},
+				{
+					"id": "youtube-JIdlt4Ykmgk"
+				},
+				{
+					"id": "youtube-MUxli8EyAyo"
+				},
+				{
+					"id": "youtube-aByjUcnCjBE"
+				},
+				{
+					"id": "youtube-7D88wz0sh38"
+				},
+				{
+					"id": "youtube-aw0KwTLhEK4"
+				},
+				{
+					"id": "youtube-uLy2qfGuWbM"
+				},
+				{
+					"id": "youtube-1gODIkQaddc"
+				},
+				{
+					"id": "youtube-0FF0Pp9YTIs"
+				},
+				{
+					"id": "youtube-Z3cHq9Qh69M"
+				},
+				{
+					"id": "youtube-QcUn27gP9p8"
+				},
+				{
+					"id": "youtube-12Xz8b2CTHk"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi"
+		},
+		{
+			"type": "english"
+		}
+	],
+	"discourse_topic_id": 184,
+	"discourse_topic_slug": "changan-shier-shichen-the-longest-day-in-changan"
+}

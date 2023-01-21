@@ -1,0 +1,239 @@
+{
+	"name": {
+		"hz": "樱桃小丸子",
+		"py": "Yīngtáo xiǎo wánzi",
+		"en": "Chibi Maruko-chan"
+	},
+	"date_added": "2022-07-03",
+	"douban": 9.1,
+	"type": "tv",
+	"genres": [
+		"childrens-cartoon"
+	],
+	"synopsis": "Beloved everyday-life Japanese cartoon translated to Chinese",
+	"year": "1990",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"fixed_translations": {
+		"樱桃小丸子": "Yingtao Xiao Wanzi",
+		"小丸子": "Xiao Wanzi",
+		"丸子": "Wanzi"
+	},
+	"seasons": [
+		{
+			"playlist_id": "PLQGFvBFre_B3sTKh8hrPOp9RU40o7TweR",
+			"episodes": [
+				{
+					"id": "youtube-9y9FGfDrRy4"
+				},
+				{
+					"id": "youtube-HX5bFZzWFx4"
+				},
+				{
+					"id": "youtube-1F3bDChw7U0"
+				},
+				{
+					"id": "youtube-Kh1xuldqsH0"
+				},
+				{
+					"id": "youtube-SLJQx3hfegY"
+				},
+				{
+					"id": "youtube-uvxIHchUC4Y"
+				},
+				{
+					"id": "youtube-ijb0DODlQ2A"
+				},
+				{
+					"id": "youtube-cNQh-Bm3TAY"
+				},
+				{
+					"id": "youtube-82C2JCo9ER4"
+				},
+				{
+					"id": "youtube-faeBm2xz7Lg"
+				},
+				{
+					"id": "youtube-dO5CAKCuiR0"
+				},
+				{
+					"id": "youtube-zISPDGD-qWE"
+				},
+				{
+					"id": "youtube-3nyyXJ-1sYc"
+				},
+				{
+					"id": "youtube-lShwcOe7qXw"
+				},
+				{
+					"id": "youtube-HHCeHZ2s2Gc"
+				},
+				{
+					"id": "youtube-_dEHEf2t-Uc"
+				},
+				{
+					"id": "youtube-9I3kEh3ahcs"
+				},
+				{
+					"id": "youtube-GDIYVsNPJnE"
+				},
+				{
+					"id": "youtube-tAGtTIAggds"
+				},
+				{
+					"id": "youtube-EbnqSC2BPnk"
+				},
+				{
+					"id": "youtube-VCv_R_W-2ms"
+				},
+				{
+					"id": "youtube-qYxZ1JO6ty0"
+				},
+				{
+					"id": "youtube-nBUbJ05GE6M"
+				},
+				{
+					"id": "youtube-dfKrQvfzPl8"
+				},
+				{
+					"id": "youtube-e8gjNw-FgnA"
+				},
+				{
+					"id": "youtube-5M0rbIJSnMk"
+				},
+				{
+					"id": "youtube-xk2RIRUwUpk"
+				},
+				{
+					"id": "youtube-3B2hlaf-yFE"
+				},
+				{
+					"id": "youtube-2BvsDRiuwe0"
+				},
+				{
+					"id": "youtube-FqqWq0OpxwA"
+				},
+				{
+					"id": "youtube--Oo8qe9NN7o"
+				},
+				{
+					"id": "youtube-Fo9V75Kblg8"
+				},
+				{
+					"id": "youtube-gtHyI0vb16w"
+				},
+				{
+					"id": "youtube-RDIPWoCzXVY"
+				},
+				{
+					"id": "youtube-aBHnTtCrICY"
+				},
+				{
+					"id": "youtube-k6gXO3PMHWg"
+				},
+				{
+					"id": "youtube-m_8G-IFduUw"
+				},
+				{
+					"id": "youtube-y-RnJHpkPoA"
+				},
+				{
+					"id": "youtube-JjHHQ8uNn5M"
+				},
+				{
+					"id": "youtube-z9kFnULI1HE"
+				},
+				{
+					"id": "youtube-8ku3GZAWSj8"
+				},
+				{
+					"id": "youtube-HBpZk90ve3g"
+				},
+				{
+					"id": "youtube-GcLqNRbeNBk"
+				},
+				{
+					"id": "youtube-mCWF9N4kF3c"
+				},
+				{
+					"id": "youtube-de8d3ohogwU"
+				},
+				{
+					"id": "youtube-WsYlBlhcjlg"
+				},
+				{
+					"id": "youtube-YsEF6F0AsT0"
+				},
+				{
+					"id": "youtube-T79XqkGVYp0"
+				},
+				{
+					"id": "youtube-p_rJO9nPVGo"
+				},
+				{
+					"id": "youtube-o0a3KiznzT4"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"id": "hanzi-bottom",
+					"caption_top": 0.8625,
+					"caption_bottom": 0.925,
+					"start_time": 95,
+					"refine_bounding_rect": true
+				},
+				{
+					"type": "hanzi",
+					"id": "hanzi-top",
+					"depends_on": "hanzi-bottom",
+					"action": {
+						"type": "prepend",
+						"join": " "
+					},
+					"caption_top": 0.805,
+					"caption_bottom": 0.8655,
+					"start_time": 95,
+					"refine_bounding_rect": true
+				}
+			]
+		},
+		{
+			"playlist_id": "PLQGFvBFre_B3sTKh8hrPOp9RU40o7TweR",
+			"episodes": [
+				{
+					"id": "youtube-aTo_ysPttH0"
+				},
+				{
+					"id": "youtube-E9dfGGHdQjI"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"id": "hanzi-bottom",
+					"caption_top": 0.8208333333333333,
+					"caption_bottom": 0.8791666666666667,
+					"start_time": 95,
+					"refine_bounding_rect": true
+				},
+				{
+					"type": "hanzi",
+					"id": "hanzi-top",
+					"depends_on": "hanzi-bottom",
+					"action": {
+						"type": "prepend",
+						"join": " "
+					},
+					"caption_top": 0.8895833333333333,
+					"caption_bottom": 0.9479166666666666,
+					"start_time": 95,
+					"refine_bounding_rect": true
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 192,
+	"discourse_topic_slug": "yingtao-xi-o-wanzi-chibi-maruko-chan"
+}

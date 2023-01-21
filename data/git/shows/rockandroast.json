@@ -1,0 +1,85 @@
+{
+  "name": {
+    "hz": "脱口秀大会",
+    "py": "Tuōkǒu xiù dàhuì",
+    "en": "Rock & Roast"
+  },
+  "seasons": [
+    {
+      "number": 4,
+      "playlist_id": "PLj_FQtvyEQOXnUnOvrml-S2lnMwn4gYNv",
+      "episodes": [
+        {
+          "id": "youtube-iBY5BD6so34"
+        },
+        {
+          "id": "youtube-2UF4vu-_ShI"
+        },
+        {
+          "id": "youtube-G--d9PNReFA"
+        },
+        {
+          "id": "youtube-5p-t6qDa2Vw"
+        },
+        {
+          "id": "youtube-qcxf4DyVd1E"
+        },
+        {
+          "id": "youtube-jMDxhFwkbMU"
+        },
+        {
+          "id": "youtube-CBJLvudB-7c"
+        },
+        {
+          "id": "youtube-srdRclbOvZM"
+        },
+        {
+          "id": "youtube-dTsgXOCSeRc"
+        },
+        {
+          "id": "youtube-JFWt_cipskQ"
+        },
+        {
+          "id": "youtube-8J_w0dmxAPc"
+        },
+        {
+          "id": "youtube-ACQxXNpQZYY"
+        },
+        {
+          "id": "youtube-bj5S3wY38M0"
+        },
+        {
+          "id": "youtube-1FSdBpCejnw"
+        },
+        {
+          "id": "youtube-YFuPwfFmNNM"
+        },
+        {
+          "id": "youtube-VO3037-8Tmc"
+        },
+        {
+          "id": "youtube-IxjNzkrDXpM"
+        },
+        {
+          "id": "youtube-YF_VjSJHeho"
+        },
+        {
+          "id": "youtube-oYznH-6K0_o"
+        },
+        {
+          "id": "youtube-DTjBBvjY2YI"
+        }
+      ]
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.8430555555555556,
+      "caption_bottom": 0.9069444444444444,
+      "caption_left": 0.105859375,
+      "caption_right": 0.821484375,
+      "start_time": 60
+    }
+  ]
+}

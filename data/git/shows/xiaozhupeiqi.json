@@ -1,0 +1,85 @@
+{
+	"name": {
+		"hz": "小猪配器",
+		"py": "Xiǎo zhū pèiqí",
+		"en": "Peppa Pig"
+	},
+	"date_added": "2022-07-03",
+	"year": "2004–2018",
+	"type": "tv",
+	"genres": [
+		"childrens-cartoon",
+		"foreign"
+	],
+	"synopsis": "Charming British cartoon translated to Chinese",
+	"difficulty_manual": null,
+	"released": true,
+	"douban": null,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"fixed_translations": {
+		"小猪佩奇": "Peppa Pig",
+		"乔治": "George",
+		"猪妈妈": "Mommy Pig",
+		"猪爸爸": "Daddy Pig",
+		"兔先生": "Mr. Rabbit",
+		"兔小姐": "Miss Rabbit",
+		"羚羊夫人": "Madame Gazelle",
+		"羚羊": "Gazelle",
+		"亚历山大": "Alexander",
+		"小马佩德罗": "Pedro Pony",
+		"佩德罗": "Pedro",
+		"克洛伊": "Chloe",
+		"猪奶奶": "Grandma Pig",
+		"猪爷爷": "Grandpa Pig",
+		"小狗丹尼": "Danny Dog",
+		"丹尼": "Danny",
+		"小羊苏西": "Susie Sheep",
+		"苏西": "Susie",
+		"小兔瑞贝卡": "Rebecca Rabbit",
+		"瑞贝卡": "Rebecca",
+		"大象艾米丽": "Emily Elephant",
+		"艾米丽": "Emily",
+		"小猫坎迪": "Candy Cat",
+		"坎迪": "Candy",
+		"斑马佐伊": "Zoe Zebra",
+		"佐伊": "Zoe",
+		"狐狸弗雷迪": "Freddy Fox",
+		"弗雷迪": "Freddy",
+		"小狼温蒂": "Wendy Wolf",
+		"温蒂": "Wendy",
+		"长颈鹿杰拉德": "Girrade Giraffe",
+		"杰拉德": "Girrade",
+		"鼹鼠茉莉": "Molly Mole",
+		"茉莉": "Molly",
+		"熊猫佩吉": "Peggy Panda",
+		"佩吉": "Peggy",
+		"熊猫潘多拉": "Pandora Panda",
+		"潘多拉": "Pandora",
+		"老鼠曼迪": "Mandy Mouse",
+		"曼迪": "Mandy"
+	},
+	"seasons": [
+		{
+			"number": 7,
+			"episodes": [
+				{
+					"id": "youtube-_LJ6DcWwc4s"
+				},
+				{
+					"id": "youtube-O0JKbFSRRBU"
+				}
+			],
+			"ocr_params": [
+				{
+					"type": "hanzi",
+					"caption_top": 0.8805555555555555,
+					"caption_bottom": 0.9458333333333333,
+					"start_time": 0
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 191,
+	"discourse_topic_slug": "xi-o-zhu-peiqi-peppa-pig"
+}

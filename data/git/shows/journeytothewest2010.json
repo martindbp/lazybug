@@ -1,0 +1,375 @@
+{
+	"name": {
+		"hz": "西游记",
+		"py": "Xīyóu jì",
+		"en": "Journey to the west"
+	},
+	"date_added": "2022-07-03",
+	"year": "2010",
+	"type": "tv",
+	"douban": 5.8,
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "human",
+	"genres": [
+		"classic",
+		"novel-adaptation",
+		"adventure",
+		"classic"
+	],
+	"synopsis": "The 2010 adaptation of the classic novel",
+	"seasons": [
+		{
+			"playlist_id": "PLSIJismKOisETsHhPq4Lg5tLB5L9pdRmP",
+			"episodes": [
+				{
+					"id": "youtube-vO4IefEMb0U"
+				},
+				{
+					"id": "youtube-KiyiHkBRPBc"
+				},
+				{
+					"id": "youtube-WwZgyRJgm7w"
+				},
+				{
+					"id": "youtube-ozOEx76GJKs"
+				},
+				{
+					"id": "youtube-iN1rSpRNPAg"
+				},
+				{
+					"id": "youtube-VXIqbZCoH9k"
+				},
+				{
+					"id": "youtube-bPu_5mrLsC4"
+				},
+				{
+					"id": "youtube-4eBR9ARV0gU"
+				},
+				{
+					"id": "youtube-5hfXmin20rw"
+				},
+				{
+					"id": "youtube-Uq98J6BCPFg"
+				},
+				{
+					"id": "youtube-VjOMKVQDDOc"
+				},
+				{
+					"id": "youtube-p3FshWdcolE"
+				},
+				{
+					"id": "youtube-vBxED4AgUU4"
+				},
+				{
+					"id": "youtube-dF8d7MgeyIU"
+				},
+				{
+					"id": "youtube-p5nPPtS-Ib8"
+				},
+				{
+					"id": "youtube-91JNFS4-7io"
+				},
+				{
+					"id": "youtube-1ABLqaCy8Jk"
+				},
+				{
+					"id": "youtube-CzsAs1zA0oM"
+				},
+				{
+					"id": "youtube-gSIQ-lgmPAg"
+				},
+				{
+					"id": "youtube-apjMpmY1Qyc"
+				},
+				{
+					"id": "youtube-cJyP3vrKRDM"
+				},
+				{
+					"id": "youtube-cy-K1nXgf0k"
+				},
+				{
+					"id": "youtube-Qf6cLolClX8"
+				},
+				{
+					"id": "youtube-hZTx00NvKAo"
+				},
+				{
+					"id": "youtube-DwP8cXyu2bY"
+				},
+				{
+					"id": "youtube-c085CBBnFNE"
+				},
+				{
+					"id": "youtube-ysvalko25_I"
+				},
+				{
+					"id": "youtube-ELrdvGhiLaQ"
+				},
+				{
+					"id": "youtube-PDROzT5yJuQ"
+				},
+				{
+					"id": "youtube-WP_uO--IFv4"
+				},
+				{
+					"id": "youtube-9RUAlFT2Djo"
+				},
+				{
+					"id": "youtube-6jHSxciyvyw"
+				},
+				{
+					"id": "youtube-JfIn83Sqrt4"
+				},
+				{
+					"id": "youtube-6Xk8tr_KrQQ"
+				},
+				{
+					"id": "youtube-BS4dwnh-guc"
+				},
+				{
+					"id": "youtube-mH1Wv-Cuvog"
+				},
+				{
+					"id": "youtube-4Ztr00S6DFQ"
+				},
+				{
+					"id": "youtube-geR4RZfmTsw"
+				},
+				{
+					"id": "youtube-xteB0PBipQ8"
+				},
+				{
+					"id": "youtube-pID5ptCtlVU"
+				},
+				{
+					"id": "youtube-vwO8L8BH_o0"
+				},
+				{
+					"id": "youtube-jHW7izabSNM"
+				},
+				{
+					"id": "youtube-446wRZ3s2GM"
+				},
+				{
+					"id": "youtube-5m99kLlzznw"
+				},
+				{
+					"id": "youtube-VfmLJ9tkC3M"
+				},
+				{
+					"id": "youtube-2BKYW82cQ5I"
+				},
+				{
+					"id": "youtube-EkuqtbS3GPM"
+				},
+				{
+					"id": "youtube-K1guiIlO7Eo"
+				},
+				{
+					"id": "youtube-b207OFYE8MY"
+				},
+				{
+					"id": "youtube-vEmJ-awLXO4"
+				},
+				{
+					"id": "youtube-n135HzJjuwQ"
+				},
+				{
+					"id": "youtube-Z1GI9nv1MsE"
+				},
+				{
+					"id": "youtube-ynNnr45vsAI"
+				},
+				{
+					"id": "youtube-OEDUTDxr5Dg"
+				},
+				{
+					"id": "youtube-0hSh_xKEy2o"
+				},
+				{
+					"id": "youtube-rJ757Hex6R0"
+				},
+				{
+					"id": "youtube--6t3v4Teljs"
+				},
+				{
+					"id": "youtube-JHnNzCPt-ao"
+				},
+				{
+					"id": "youtube-pDzkWg79DZU"
+				},
+				{
+					"id": "youtube-6hh7fEMYivo"
+				},
+				{
+					"id": "youtube-hllpFKrhFEc"
+				},
+				{
+					"id": "youtube-IMxqWjkjuss"
+				},
+				{
+					"id": "youtube-VJGZ_IAM2kE"
+				},
+				{
+					"id": "youtube-2q4pLD0hSrY"
+				},
+				{
+					"id": "youtube-0WVnTh_edR4"
+				},
+				{
+					"id": "youtube-6Mers6B6UnM"
+				},
+				{
+					"id": "youtube-CJyjIY6V_kk"
+				},
+				{
+					"id": "youtube-zx6rCjANVyI"
+				},
+				{
+					"id": "youtube-g-R8F8KG2qE"
+				},
+				{
+					"id": "youtube-AOE6r3xnVtc"
+				},
+				{
+					"id": "youtube-Wjhhzl7R0yg"
+				},
+				{
+					"id": "youtube-jeL04gSHWhA"
+				},
+				{
+					"id": "youtube--LoIYB6n1ZI"
+				},
+				{
+					"id": "youtube-fm5cEp0G_YA"
+				},
+				{
+					"id": "youtube-ywodzVDtUjk"
+				},
+				{
+					"id": "youtube-126ORYC9H6Y"
+				},
+				{
+					"id": "youtube-fUHqYmlvyXI"
+				},
+				{
+					"id": "youtube-r9fwY44QHVo"
+				},
+				{
+					"id": "youtube-O5oedoQR4aA"
+				},
+				{
+					"id": "youtube-6cfCyEMYLmM"
+				},
+				{
+					"id": "youtube-ZN-fxk3O0e0"
+				},
+				{
+					"id": "youtube-5NhWheZWM2A"
+				},
+				{
+					"id": "youtube-lwyimHw1oUo"
+				},
+				{
+					"id": "youtube-vjoZHXK5-Kg"
+				},
+				{
+					"id": "youtube-AoETv-7SUtI"
+				},
+				{
+					"id": "youtube-6VJorfglNIw"
+				},
+				{
+					"id": "youtube-lw9JeATG3WM"
+				},
+				{
+					"id": "youtube-3zUcf0pguq4"
+				},
+				{
+					"id": "youtube-xQVThVBiLOE"
+				},
+				{
+					"id": "youtube-asa6zd39VwA"
+				},
+				{
+					"id": "youtube-FcdEejcoeQY"
+				},
+				{
+					"id": "youtube-3xz-9HQwPqU"
+				},
+				{
+					"id": "youtube-rsZMd8cNDXM"
+				},
+				{
+					"id": "youtube-wMvCCJPCyBM"
+				},
+				{
+					"id": "youtube-X5Q5ZR9YElE"
+				},
+				{
+					"id": "youtube-glVXeTaQN5Q"
+				},
+				{
+					"id": "youtube-MJrHQA1nkNQ"
+				},
+				{
+					"id": "youtube-SVUxc9RFoAA"
+				},
+				{
+					"id": "youtube-2NdwBTQGjhs"
+				},
+				{
+					"id": "youtube-rxqDnI0K5YM"
+				},
+				{
+					"id": "youtube-Q02AtHsTfb4"
+				},
+				{
+					"id": "youtube-OAJ7R0UhcOA"
+				},
+				{
+					"id": "youtube-fyZmZ89KD6o"
+				},
+				{
+					"id": "youtube-osp_HelOCK8"
+				},
+				{
+					"id": "youtube-1yht3CGmuyU"
+				},
+				{
+					"id": "youtube-ZYmAPP6hEmc"
+				},
+				{
+					"id": "youtube-H04-iM7rQmY"
+				},
+				{
+					"id": "youtube-naah_FGcJhg"
+				},
+				{
+					"id": "youtube-fIqY7AQlSDk"
+				},
+				{
+					"id": "youtube-N1Ju_As6DTE"
+				},
+				{
+					"id": "youtube-nB39HFIzVSs"
+				},
+				{
+					"id": "youtube-lUNa7XxDuFI"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8986111111111111,
+			"caption_bottom": 0.9666666666666667,
+			"refine_bounding_rect": true,
+			"start_time": 180
+		}
+	],
+	"discourse_topic_id": 220,
+	"discourse_topic_slug": "xiyou-ji-journey-to-the-west"
+}

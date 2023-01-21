@@ -1,0 +1,136 @@
+{
+	"name": {
+		"hz": "再见爱人",
+		"en": "See you again",
+		"py": "Zàijiàn àirén"
+	},
+	"date_added": "2022-07-03",
+	"type": "tv",
+	"genres": [
+		"reality-show"
+	],
+	"synopsis": "Couples who are facing divorce go on a trip together",
+	"douban": 8.9,
+	"year": "2021",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"playlist_id": "PLFWb0yQpTocPcVjiiOID2kTscjKfUtlj6",
+			"episodes": [
+				{
+					"id": "youtube-dVLA6GG-QaM"
+				},
+				{
+					"id": "youtube-sAhp9Oj7U2w"
+				},
+				{
+					"id": "youtube-G_w8AyFL4N4"
+				},
+				{
+					"id": "youtube-R0AWxLQwc-Q"
+				},
+				{
+					"id": "youtube-FNmf-GMf4Fs"
+				},
+				{
+					"id": "youtube-S4tLP-K9Byw"
+				},
+				{
+					"id": "youtube-lr83Hh_XYjQ"
+				},
+				{
+					"id": "youtube-COYVHp3Vysg"
+				},
+				{
+					"id": "youtube-i4DTf6am0WE"
+				},
+				{
+					"id": "youtube-X9wDyY7zbks"
+				},
+				{
+					"id": "youtube-S61eO30D1Ak"
+				},
+				{
+					"id": "youtube-knckr6se9NY"
+				},
+				{
+					"id": "youtube-FC5VQvwA5eI"
+				},
+				{
+					"id": "youtube-6-4WYu0gaZo"
+				},
+				{
+					"id": "youtube-2DLWOhYoDcg"
+				},
+				{
+					"id": "youtube-B3f_xdRHI84"
+				},
+				{
+					"id": "youtube-XU9Ym3HBJdU"
+				},
+				{
+					"id": "youtube-mM9zADLBz3w"
+				},
+				{
+					"id": "youtube-tAzrxMMoEk8"
+				},
+				{
+					"id": "youtube-8c8fNhObWs8"
+				},
+				{
+					"id": "youtube-kA_cyZhizQg"
+				},
+				{
+					"id": "youtube-X-W_fKSdy2I"
+				},
+				{
+					"id": "youtube-DeGbCB6m1JY"
+				},
+				{
+					"id": "youtube-LjdevnZK8Hs"
+				},
+				{
+					"id": "youtube-CoEY6I-hv2M"
+				},
+				{
+					"id": "youtube-49AHuipNVh0"
+				},
+				{
+					"id": "youtube-DSP1waGLvVQ"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"id": "hanzi-right",
+			"caption_top": 0.8902777777777777,
+			"caption_bottom": 0.9236111111111112,
+			"caption_left": 0.38984375,
+			"caption_right": 0.709375,
+			"start_time": 43,
+			"height_buffer_px": 15,
+			"refine_bounding_rect": true
+		},
+		{
+			"type": "hanzi",
+			"id": "hanzi-left",
+			"depends_on": "hanzi-right",
+			"action": {
+				"type": "prepend",
+				"join": ": "
+			},
+			"caption_top": 0.8888888888888888,
+			"caption_bottom": 0.9277777777777778,
+			"caption_left": 0.29375,
+			"caption_right": 0.37734375,
+			"height_buffer_px": 15,
+			"start_time": 43
+		}
+	],
+	"discourse_topic_id": 202,
+	"discourse_topic_slug": "zaijian-airen-see-you-again"
+}

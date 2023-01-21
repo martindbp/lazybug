@@ -1,0 +1,109 @@
+{
+	"name": {
+		"en": "With You",
+		"hz": "最好的我们",
+		"py": "Zuì hǎo de wǒmen"
+	},
+	"date_added": "2022-07-03",
+	"douban": 8.9,
+	"type": "tv",
+	"genres": [
+		"romance",
+		"coming-of-age"
+	],
+	"synopsis": "High-school, coming of age",
+	"year": "2016",
+	"difficulty_manual": 0.7,
+	"released": true,
+	"caption_source": "soft",
+	"translation_source": "human",
+	"seasons": [
+		{
+			"ocr_params": [
+				{
+					"type": "hanzi"
+				},
+				{
+					"type": "english"
+				}
+			],
+			"playlist_id": "PLlCrV9TCfzMYuRnJCftmxE4qOJqUtxiDt",
+			"episodes": [
+				{
+					"id": "youtube-LI1yfUOfDck"
+				},
+				{
+					"id": "youtube-nEhqogWFvSw"
+				},
+				{
+					"id": "youtube-KTdlJMnRue0"
+				},
+				{
+					"id": "youtube-dbwpWAcNbZQ"
+				},
+				{
+					"id": "youtube-Alqdc6Tq_-g"
+				},
+				{
+					"id": "youtube-pRFqUn2o8gU"
+				},
+				{
+					"id": "youtube-IFK7LpNC19w"
+				},
+				{
+					"id": "youtube-QNpFIMuCTfc"
+				},
+				{
+					"id": "youtube-IHNr-ZCkDl4"
+				},
+				{
+					"id": "youtube-K8e2T2ukSeI"
+				},
+				{
+					"id": "youtube-wOvz-aoqRgo"
+				},
+				{
+					"id": "youtube-ihi9issm8vw"
+				},
+				{
+					"id": "youtube-IRdnU7tWReg"
+				},
+				{
+					"id": "youtube-ELl46zdn9RA"
+				},
+				{
+					"id": "youtube-uaIVujL2oYg"
+				},
+				{
+					"id": "youtube-s3TlbTo2dyU"
+				},
+				{
+					"id": "youtube-H3I9MLg1EXs"
+				},
+				{
+					"id": "youtube-bSd1uahZlfw"
+				},
+				{
+					"id": "youtube-NgbOgb1yUHc"
+				},
+				{
+					"id": "youtube-Q6Dos8JVPsM"
+				},
+				{
+					"id": "youtube-cBpHc-JXvdM"
+				},
+				{
+					"id": "youtube-WjqaoSbOO64"
+				},
+				{
+					"id": "youtube-qEsS6IbQibc"
+				},
+				{
+					"id": "youtube-JEk9-izjALA"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 205,
+	"discourse_topic_slug": "zui-h-o-de-w-men-with-you"
+}
