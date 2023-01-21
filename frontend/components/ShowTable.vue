@@ -36,6 +36,7 @@
                     <span v-else>
                         {{ props.cols[0].value }}
                     </span>
+                    <q-badge style="margin-left: 5px" v-if="props.row.is_new" :color="mapToColor('new')">new</q-badge>
                 </q-td>
                 <q-td key="difficulty" :props="props">
                     <q-badge :color="mapDifficultyToColor(props.cols[1].value)">
@@ -96,6 +97,10 @@
 var roundToScale = function(n, scale) {
     return parseFloat((Math.round(n / scale) * scale).toFixed(1));
 };
+
+function isNew(date) {
+    return ((Date.now() - Date.parse(date)) < 1000*3600*24*30)  // within 30 days
+}
 
 export default {
     mixins: [mixin],
@@ -245,12 +250,21 @@ export default {
                 });
             }
 
-            // Add in the % known
+            // Add in the % known and isNew properties
             rows = rows.map(row => {
                 const val = showPercentKnown[row.showId];
                 row.percent_known_vocab = val === undefined ? 0 : val;
+                row.is_new = isNew(row.date_added);
                 return row;
             });
+
+            // If there are no filters, sort by "is_new"
+            if (filters === null && this.searchFilter.length === 0) {
+                rows = rows.sort((a, b) => {
+                    return b.is_new - a.is_new;
+                });
+            }
+
             return rows;
         },
         columnFilters: function() {
@@ -302,6 +316,7 @@ export default {
                 else if (val === 'movie') return 'red';
                 else return 'green';
             }
+            else if (type === 'new') return 'blue';
             else if (type === 'free') {
                 return val ? 'green' : 'red';
             }
