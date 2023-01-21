@@ -1,39 +1,47 @@
 {
-  "name": {
-    "hz": "三体",
-    "py": "Sān tǐ",
-    "en": "Three-Body (Tencent)"
-  },
-  "date_added": "2023-01-15",
-  "douban": 8.3,
-  "year": "2023",
-  "type": "tv",
-  "genres": ["sci-fi", "space"],
-  "synopsis": "Astrophysicist receives signals from outer space",
-  "caption_source": "hard",
-  "translation_source": "human",
-  "released": false,
-  "seasons": [
-    {
-      "episodes": [
-        {
-          "id": "youtube-YrLompD6e_k"
-        },
-        {
-          "id": "youtube-cmjjeOsBNfk"
-        },
-        {
-          "id": "youtube-euvTxWf7mLk"
-        }
-      ]
-    }
-  ],
-  "ocr_params": [
-    {
-      "type": "hanzi",
-      "caption_top": 0.7845934379457917,
-      "caption_bottom": 0.8273894436519258,
-      "start_time": 60
-    }
-  ]
+	"name": {
+		"hz": "三体",
+		"py": "Sān tǐ",
+		"en": "Three-Body (Tencent)"
+	},
+	"date_added": "2023-01-15",
+	"douban": 8.0,
+	"year": "2023",
+	"type": "tv",
+	"genres": [
+		"sci-fi",
+		"space"
+	],
+	"synopsis": "Astrophysicist receives signals from outer space",
+	"caption_source": "hard",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-YrLompD6e_k"
+				},
+				{
+					"id": "youtube-cmjjeOsBNfk"
+				},
+				{
+					"id": "youtube-euvTxWf7mLk"
+				},
+				{
+					"id": "youtube-TYyH3yrGUvw"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.7845934379457917,
+			"caption_bottom": 0.8273894436519258,
+			"start_time": 60
+		}
+	],
+	"discourse_topic_id": 232,
+	"discourse_topic_slug": "san-t-three-body-tencent"
 }
