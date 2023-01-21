@@ -231,7 +231,7 @@ export default {
                     if (typeof(row.name) === 'object') {
                         if (row.name.hz) targetStrings.push(row.name.hz.toLowerCase().replace(' ', ''));
                         if (row.name.py) targetStrings.push(removeDiacritics(row.name.py).toLowerCase().replace(' ', ''));
-                        if (row.name.en) targetStrings.push(row.name.en.toLowerCase().replace(' ', ''));
+                        if (row.name.en) targetStrings.push(row.name.en.toLowerCase().replace(/[^A-Za-z0-9 ]/, ''));
                     }
                     else {
                         targetStrings.push(row.name.toLowerCase().replace(' ', ''))

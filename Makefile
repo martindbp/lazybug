@@ -24,12 +24,11 @@ zip-ext:
 
 .PHONY: pre-public-sync
 pre-public-sync:
-	make show-list
 	make show-list-full
 	make video-list
 	make cedict
 	make public-cedict
-	make names-list
+	#make names-list
 	make hsk-words
 	make simple-chars
 	make strings
