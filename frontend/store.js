@@ -556,6 +556,7 @@ function fetchInitialResources() {
     let numFetched = 0;
     for (const [filename, errorName, mutation] of FETCH_PUBLIC_RESOURCES) {
         fetchVersionedResource(filename, function (data) {
+            numFetched++;
             if (data === 'error') {
                 store.commit('setResourceFetchError', errorName);
             }
@@ -565,10 +566,9 @@ function fetchInitialResources() {
 
                 let $el = document.querySelector('.loading-text');
                 if ($el) {
-                    $el.innerText = `Loaded ${filename}`;
+                    $el.innerText = 'Loading' +'.'.repeat(numFetched);
                 }
             }
-            numFetched++;
             if (numFetched == FETCH_PUBLIC_RESOURCES.length) {
                 store.commit('setFetchedAllPublicResources');
             }
