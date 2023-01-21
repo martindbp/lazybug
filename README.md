@@ -74,6 +74,72 @@ This project consists of a number of different high-level parts:
 2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content. The frontend is written in JS and Vue.js, the backend in Python.
 3. A browser extension for viewing videos that cannot be embedded into the web app. The codebase is shared with the JS web app.
 
+# Processing Videos and Subtitles
+
+The processing pipeline for a video can vary depending on:
+
+* The platform: Youtube videos can be downloaded, but not others
+* Videos may have Chinese hard subs or soft subs
+* Videos may have English hard subs or soft subs, or no English subs
+
+As of writing, the code only supports Youtube videos that can be downloaded, with or without Chinese/English subtitles, but implementation of a way to process any video accessible in the browser is under way.
+
+Here is what the rough process for a Youtube video with hard subs
+
+The general process to process videos (a show) with OCR is roughly as follows:
+
+1. Using the browser extension devtool, create a caption bounding box which will be used for processing, as well as a JSON file with meta data and ids of all episodes
+2. Download the videos and any subtitles using provided script
+3. Extract captions from all the videos using provided script
+4. Process translations for all Chinese sentences (using deepl.com and browser extension). This has to be done even if show already has English subs.
+5. Using Chinese and English subs, run a script to segment Chinese sentences and determine individual word meaning
+6. The final subtitle file is uploaded to Backblaze
+
+Here I'll detail each of these steps
+
+## Show JSON and Caption Bounding Boxes
+
+Each show (or movie) is defined in a JSON file in `data/git/shows`.
+
+
+JSON file format:
+
+* `name` - the name of the show, if a dict then English/Hanzi/Pinyin variants all specified
+* `date_added` - used to sort new shows on the front end
+* `type` - "tv" or "movie"
+* `genres` - list of genre strings such as "drama", "sci-fi" etc
+* `synopsis` - very short description
+* `year` - year released
+* `caption_source` - "soft" or "hard"
+* `translation_source` - "human" or "machine"
+* `douban` - Douban score
+* `released` - if false, this show is a work in progress and will not be included when baking the final shows file 
+* `discourse_topic_id` and `discourse_topic_slug` - these are added by another processing step when creating Discourse topics for the show
+* `ocr_params` - caption bounding box(es) applied to all seasons and episodes
+    * `type` - "hanzi", "english" or "pinyin"
+    * `caption_top` - top y value (e.g 0.9 = 90% down from top)
+    * `caption_bottom` - bottom y value
+    * `caption_left` [optional] - left x value, can set this to speed up processing
+    * `caption_right` [optional] - right x value
+    * `start_time` [optional] - time in seconds when to start processing
+    * `end_time` [optional] - time in seconds when to end processing
+    * `refine_bounding_rect` [optional] - if true will first do a refining pass to improve caption bounding box (expensive)
+    * `filter_out_too_many_low_prob_chars` [optional] - use if there are many noisy lines
+    * `ocr_engine` [optional] - "cnocr" (default) or "easyocr"
+    * `use_bert_prior` [optional] - if true uses a Chinese BERT model as word prior to correct errors
+    * `height_buffer_px` [optional] - useful if caption moves around vertically by some small amount
+    * `id` [optional] - an id for this specific caption (for dependent captions), e.g. "hanzi-top"/"hanzi-bottom"
+    * `depends_on` [optional] - id of other caption this one depends on, if set, OCR will only be done on this bounding box when there is another caption 
+    * `action` [optional] - action to take if `depends_on` caption happens
+        * `type` - "append", "prepend" or "assign"
+        * `join` - string to join dependee and dependent if type is "append" or "prepend"
+* `seasons` - a list of seasons, if movie it has just one virtual season
+    * `playlist_id` [optional] - if this season has a playlist (e.g. Youtube)
+    * `ocr_params` - same as above, overwrites values for all videos below in hierarchy
+    * `episodes` - list of episodes
+        * `id` - the caption id, e.g. "youtube-RRczNO40Zww"
+        * `ocr_params` - same as above, overwrites values for this video if set above
+
 # Code and development details
 
 ## Backend server
