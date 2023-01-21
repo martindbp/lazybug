@@ -4,7 +4,7 @@
            <q-header v-if="isMobile" elevated class="bg-blue">
                <q-toolbar>
                    <q-btn flat @click="drawer = !drawer" round dense icon="menu" />
-                   <q-toolbar-title>Lazybug - {{pageTitle}}</q-toolbar-title>
+                   <q-toolbar-title>{{pageTitle}}</q-toolbar-title>
                </q-toolbar>
            </q-header>
 
