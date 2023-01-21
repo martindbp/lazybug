@@ -2,6 +2,7 @@
     "youtube": {
         "AVElementSelector": "#primary video, #player-theater-container video",
         "AVElementParentSelector": ".html5-video-player",
+        "playlistLinkSelector": "ytd-playlist-panel-renderer a.ytd-playlist-panel-video-renderer",
         "videoMenuSelector": ".ytp-chrome-bottom",
         "idRegexp": "(?:https?:\\/{2})?(?:w{3}\\.)?youtu(?:be)?\\.(?:com|be)(?:\\/watch\\?v=|\\/)([^\\s&]+)",
         "urlTemplates": {

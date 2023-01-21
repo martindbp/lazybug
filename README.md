@@ -6,6 +6,8 @@ The project consists of algorithms for extracting subtitles from video and proce
 
 The app (and browser extension) works more like a mobile app than a web app in that it stores all data locally in the browser and only syncs to the cloud on the user's request. The app is fully functional without a backend server, except in the cloud syncing functionality and forum. In the future the app will also be usable offline.
 
+![App Screenshot](https://cdn.lazybug.ai/file/lazybug-public/docs/app.png?)
+
 ## Project Principles
 
 1. Remain free and open source by minimizing hosting costs
@@ -19,21 +21,17 @@ Do as much processing as possible on the front-end rather on servers. For exampl
 
 Supporting multiple languages creates a "Jack of all trades, master of none" kind of situation. Chinese is vastly different from any other language out there and requires very specific solutions that in general cannot be generalized to others.
 
-3. Single Purpose
-
-This project is for learning Chinese from TV and movies. While other functionality might grow out of it, this is priority number one. Things like learning how to write is best left for other apps.
-
-4. Open Data and Format
+3. Open Data and Format
 
 The user should own their data, it should be easily exported.
 
 Work towards an open data format for Chinese learning activity (impressions and SRS) to enable interoperability between apps. Today, a major inefficiency for learners is splitting their data between apps. A unified format/place for data would enable much more efficient scheduling for Spaced Repetition Systems, ranking of content etc.
 
-5. Works Offline
+4. Works Offline
 
 The parts of the app that don't depend on a network (e.g. viewing videos) should work offline.
 
-6. Copyright
+5. Copyright
 
 This project provides content based on fair use doctrine:
 
@@ -99,10 +97,25 @@ Here I'll detail each of these steps
 
 ## Show JSON and Caption Bounding Boxes
 
-Each show (or movie) is defined in a JSON file in `data/git/shows`.
+Each show (or movie) is defined in a JSON file in `data/git/shows/{show_id}.json` that contains meta data and info about all seasons, episodes and caption bounding boxes
 
+To help produce the JSON file, you can use the dev-tool in the [browser extension](#extension). Once the extension is installed, go to a Youtube video or playlist and press `<ctrl>+<shift>+<alt>`. This should open up a menu at the top of the screen.
 
-JSON file format:
+### Caption Bounding Boxes
+
+In the dev-tool you can create bounding boxes around embedded hard captions. To do this, find a place in the video where a hard caption is visible and pause, then click "Add Caption", the click and drag a box around the text. It's important that the top and bottom edges follow the top and bottom of the Chinese characters as closely as possible, see image below:
+
+![How to set bounding box](https://cdn.lazybug.ai/file/lazybug-public/docs/caption_bbox.png)
+
+The left and right edges are optional and can be removed before processing (then it will process the whole width of the video), but can be set smaller to make processing faster.
+
+### Importing episodes and playlists
+
+The "Import Playlist" button uses the playlist query selector specified in the input box and populates a new season with new episodes and their ids.
+
+The "Import Episode" creates a new episode and adds the current video id as its id.
+
+### JSON file format
 
 * `name` - the name of the show, if a dict then English/Hanzi/Pinyin variants all specified
 * `date_added` - used to sort new shows on the front end
@@ -138,7 +151,8 @@ JSON file format:
     * `ocr_params` - same as above, overwrites values for all videos below in hierarchy
     * `episodes` - list of episodes
         * `id` - the caption id, e.g. "youtube-RRczNO40Zww"
-        * `ocr_params` - same as above, overwrites values for this video if set above
+        * `ocr_params` [optional] - same as above, overwrites values for this video if set above
+        * `timings` [optional] - synced timings between recorded video and actual video (only for manually recorded videos)
 
 # Code and development details
 
@@ -171,8 +185,13 @@ These environment variables need to be set for the server if not LOCAL is set:
 1. DISCOURSE_SECRET: for Discourse SSO. Secret is created in the UI when setting up DiscordConnect
 2. B2_ENDPOINT, B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY: keys for integrating with Backblaze B2, for creating upload and download links for personal data
 
+<a name="extension"></a>
+## Browser Extension
+
+After having built the frontend with `make frontend` or `make local`, you can install the extension in Chrome by going to "Manage Extensions", enabling "Developer mode" and then clicking "Load unpacked", pointing it to the `{lazybug_dir}/frontend/dist` folder. Note that every time you make a change and rebuild the frontend (including the extension) you have to reload the extension in Chrome. This is easiest done by right clicking on the extension icon -> Manage Extension -> click Update button.
+
 <a name="localfrontend"></a>
-## Local SSL cert for Browser Extension development
+### Local SSL cert for Browser Extension development
 
 In order to use the local backend server with the browser extension, you need a self-signed certificate for SSL. The reason for this is that in the browser extension we inject an iframe pointing at `https://localhost/static/iframe.html`. We then communicate with this iframe using message passing in order to load and save data. This way we don't have a syncronization problem between the extension and the website when the user uses both.
 
@@ -191,6 +210,7 @@ make local
 # This runs the server for local development, in SSL mode
 make run-server-local
 ```
+
 
 ## Data (Backblaze B2 and Cloudflare CDN)
 
