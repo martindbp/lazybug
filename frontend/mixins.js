@@ -497,6 +497,13 @@ const mixin = {
         showInfo: function() {
             return getShowInfo(this.$store);
         },
+        showName: function() {
+            if (! this.showInfo.name) return null;
+            if (typeof this.showInfo.name === 'object') {
+                return `${this.showInfo.name.hz} - ${this.showInfo.name.en}`;
+            }
+            return this.showInfo.name;
+        },
         season: {
             get: function() { return this.$store.state.playingSeason; },
             set: function(val) { this.$store.commit('setPlayingSeason', val); },

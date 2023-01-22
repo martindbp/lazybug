@@ -231,6 +231,7 @@ export default {
             set: function(val) { this.$store.commit('setPage', val); },
         },
         pageTitle: function() {
+            if (this.page === 'player') return this.showName;
             return this.page[0].toUpperCase() + this.page.substring(1);
         },
         showNonEmbeddableDialog: {
