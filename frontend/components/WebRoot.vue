@@ -162,9 +162,30 @@ export default {
     data: function() { return {
         drawer: this.isDesktop,
         iframeLoaded: false,
+        inactivityTimer: null,
     }},
     mounted: function() {
-        $q = this.$q; // global variable in shared.js
+        const self = this;
+
+        // Set up timers to sync data if we've been inactive for a long time
+        window.onfocus = function() {
+            if (self.inactivityTimer) {
+                clearTimeout(self.inactivityTimer);
+                self.inactivityTimer = null;
+            }
+        }
+        window.onblur = function() {
+            if (self.inactivityTimer) {
+                clearTimeout(self.inactivityTimer);
+                self.inactivityTimer = null;
+            }
+
+            self.inactivityTimer = setTimeout(function() {
+                if (self.$store.state.needSync && self.$store.state.accountEmail) {
+                    self.showModalAndSync();
+                }
+            }, 60*60*1000); // 1 hour
+        }
     },
     methods: {
         onIframeLoaded: function() {
