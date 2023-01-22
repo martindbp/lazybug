@@ -331,7 +331,7 @@ export default {
                 this.applyState(type, i, StateStarred, StateStarred);
 
                 const self = this;
-                $q.notify({
+                self.$q.notify({
                     type: 'positive',
                     message: `"${content}" starred`,
                     actions: [
