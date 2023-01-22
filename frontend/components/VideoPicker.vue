@@ -216,7 +216,7 @@ export default {
     -webkit-overflow-scrolling: touch;
     will-change: scroll-position;
     overflow: auto;
-    height: 500px;
+    height: auto;
 }
 
 .episodeselector .q-fab__actions .q-btn {
