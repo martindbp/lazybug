@@ -171,7 +171,7 @@ export default {
             if (this.iframeLoaded) return;
             this.iframeLoaded = true;
             // Reload iframe since the first time we could be stuck in "You've logged out", and SSO is never initiated
-            this.$refs.discourseIframe.src = DISCOURSE_URL;
+            this.$refs.discourseIframe.src = DISCOURSE_LOGIN_URL;
         },
         clickAbout: function() {
             window.open('https://github.com/martindbp/lazybug#readme', '_blank');
@@ -181,15 +181,7 @@ export default {
             if (this.isMobile) this.drawer = false; // close after tap if on mobile
         },
         clickDiscuss: function() {
-            const self = this;
-            if (this.$store.state.accessToken === null) {
-                this.showAccountModalWithCallback(function() {
-                    document.location = DISCOURSE_URL;
-                });
-            }
-            else {
-                document.location = DISCOURSE_URL;
-            }
+            window.open(DISCOURSE_URL, '_blank');
         },
     },
     computed: {

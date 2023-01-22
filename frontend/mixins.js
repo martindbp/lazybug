@@ -31,8 +31,7 @@ const mixin = {
         showInfo: function(newData, oldData) { // fetch Discourse comments for show
             if (
                 this.$store.state.playingSeason === null ||
-                this.$store.state.playingEpisode === null ||
-                [null, undefined].includes(this.$store.state.accountEmail) // need to be logged in
+                this.$store.state.playingEpisode === null
             ) {
                 return;
             }

@@ -1,4 +1,5 @@
 const DISCOURSE_URL = 'https://discourse.lazybug.ai';
+const DISCOURSE_LOGIN_URL = 'https://discourse.lazybug.ai/login';
 const DISCOURSE_COMMENTS_URL = `${DISCOURSE_URL}/t`;
 const CDN_URL = LOCAL ? "/cdn/" : "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;

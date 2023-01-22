@@ -38,22 +38,7 @@
             </q-fab>
         </div>
         <div v-if="$store.state.playingCaptionIdx !== null">
-            <div v-if="[null, undefined].includes($store.state.accountEmail) || numComments === null">
-                <q-fab
-                    ref="commentselector"
-                    class="commentselector"
-                    icon="chat"
-                    color="accent"
-                    disable
-                    padding="s"
-                >
-                </q-fab>
-                <q-tooltip>
-                    You need to be logged in to see comments and participate
-                </q-tooltip>
-            </div>
             <q-fab
-                v-else
                 ref="commentselector"
                 class="commentselector"
                 icon="chat"
@@ -76,7 +61,7 @@
                 <q-fab-action
                     color="secondary"
                     paddings="xs"
-                    label="Ask Question"
+                    label="Comment"
                     @click.stop.prevent="askQuestion()"
                 />
             </q-fab>
@@ -102,6 +87,9 @@ export default {
         manuallyClosedComments: false,
     }},
     computed: {
+        needLogin: function() {
+            return [null, undefined].includes(this.$store.state.accountEmail) || this.numComments === null;
+        },
         hasMultipleSeasons: function() {
             if (this.showInfo) return this.showInfo.seasons.length > 1;
             else return false;
