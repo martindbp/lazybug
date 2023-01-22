@@ -11,14 +11,16 @@
           <q-drawer
             v-model="drawer"
             show-if-above
-            bordered
             :behavior="mobile"
             :width="200"
-            style="text-align: left;"
-            class="bg-grey-3"
+            style="text-align: left; overflow: hidden !important"
+            :class="{ 'bg-grey-3': !mini, 'bg-grey-10': mini }"
+            :mini="mini"
+            :mini-to-overlay="! this.isMobile && page === 'player'"
+            @mouseover="mouseOverDrawer = true"
+            @mouseout="mouseOverDrawer = false"
           >
-              <q-scroll-area style="border-right: 1px solid #ddd">
-              <q-img src="/static/images/lazybug_sanstext.svg" width="250" style="margin-top: 15px; margin-bottom: 15px; margin-left: -25px; vertical-align: middle; filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5))" />
+              <q-img src="/static/images/lazybug_sanstext.svg" :style="{height: '140px', width: (mini ? 0 : 250), marginTop: '15px', marginBottom: '15px', marginLeft: '-25px', verticalAlign: 'middle', filter: 'drop-shadow(5px 5px 5px rgba(0,0,0,0.5))'}" />
               <q-list padding>
                 <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
@@ -91,12 +93,9 @@
                 </q-item>
 
                 <q-item v-if="$store.state.accessToken && $store.state.needSync">
-                    <q-btn color="green" flat @click="showModalAndSync">Sync Changes</q-btn>
+                    <q-btn color="green" flat @click="showModalAndSync">{{ mini ? 'Sync' : 'Sync Changes' }}</q-btn>
                 </q-item>
               </q-list>
-
-
-            </q-scroll-area>
           </q-drawer>
 
           <q-page-container :class="{nopadding: page === 'player' && isMobile}" >
@@ -163,6 +162,7 @@ export default {
         drawer: this.isDesktop,
         iframeLoaded: false,
         inactivityTimer: null,
+        mouseOverDrawer: false,
     }},
     mounted: function() {
         const self = this;
@@ -205,7 +205,27 @@ export default {
             window.open(DISCOURSE_URL, '_blank');
         },
     },
+    watch: {
+        mini: {
+            immediate: true,
+            handler: function() {
+                if (this.mini) {
+                    let $body = document.querySelector('body');
+                    $body.classList.remove('body--light');
+                    $body.classList.add('body--dark');
+                }
+                else {
+                    let $body = document.querySelector('body');
+                    $body.classList.remove('body--dark');
+                    $body.classList.add('body--light');
+                }
+            }
+        }
+    },
     computed: {
+        mini: function() {
+            return ! this.isMobile && ! this.mouseOverDrawer && this.page === 'player';
+        },
         page: {
             get: function() { return this.$store.state.page; },
             set: function(val) { this.$store.commit('setPage', val); },
