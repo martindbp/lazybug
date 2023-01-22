@@ -1,6 +1,6 @@
 # Introduction
 
-[Lazybug](lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible to beginners and intermediate learners. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
+[Lazybug](https://lazybug.ai) is a free and open source project for learning Chinese from TV and movies. Massive comprehensible (and compelling) input is one of the best ways to learn a language. Beginner material is rarely massive nor compelling, and TV is compelling and massive but not always comprehensible to beginners and intermediate learners. This project aims to make TV more comprehensible through interactive subtitles tailored to the individual learner, and aims to make all video available for study, no matter which website it's on.
 
 The project consists of algorithms for extracting subtitles from video and processing the text, as well as a web app and browser extension for viewing and customaizing them, and saving/exporting vocabulary. In the future exercises and SRS (Spaced Repetition System) will be integrated.
 
