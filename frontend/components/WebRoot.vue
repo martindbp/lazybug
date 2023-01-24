@@ -182,7 +182,7 @@ export default {
 
             self.inactivityTimer = setTimeout(function() {
                 if (self.$store.state.needSync && self.$store.state.accountEmail) {
-                    self.showModalAndSync();
+                    self.showModalAndSync(true);
                 }
             }, 60*60*1000); // 1 hour
         }
@@ -245,5 +245,9 @@ export default {
 <style>
 .q-page-container.nopadding {
     padding-top: 0px !important;
+}
+
+.body--dark .q-card {
+    background: #212121 !important;
 }
 </style>
