@@ -438,7 +438,7 @@ export default {
         },
         filterStarEvents: function(sessions) {
             const events = [];
-            if (sessions === null) return events;
+            if (sessions === null || this.$store.state.showList === null) return events;
 
             for (const session of sessions) {
                 for (let i = 0; i < session.eventIds.length; i++) {
