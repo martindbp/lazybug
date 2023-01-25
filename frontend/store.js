@@ -549,22 +549,23 @@ const FETCH_PUBLIC_RESOURCES = [
 function fetchInitialResources() {
     let numFetched = 0;
     let numRequired = FETCH_PUBLIC_RESOURCES.reduce((acc, r) => acc + (r[3] ? 1 : 0), 0);
-    for (const [filename, errorName, mutation, required_for_loading] of FETCH_PUBLIC_RESOURCES) {
+    for (const [filename, errorName, mutation, requiredForLoading] of FETCH_PUBLIC_RESOURCES) {
         fetchVersionedResource(filename, function (data) {
-            if (required_for_loading) {
+            if (requiredForLoading) {
                 numFetched++;
             }
             if (data === 'error') {
                 store.commit('setResourceFetchError', errorName);
             }
             else {
+                if (requiredForLoading) {
+                    let $el = document.querySelector('.loading-text');
+                    if ($el) {
+                        $el.innerText = 'Loading' +'.'.repeat(numFetched);
+                    }
+                }
                 store.commit('resetResourceFetchError', errorName);
                 store.commit(mutation, data);
-
-                let $el = document.querySelector('.loading-text');
-                if ($el) {
-                    $el.innerText = 'Loading' +'.'.repeat(numFetched);
-                }
             }
             if (numFetched == numRequired) {
                 store.commit('setFetchedAllPublicResources');
