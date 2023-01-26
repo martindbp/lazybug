@@ -20,7 +20,12 @@
             @mouseover="mouseOverDrawer = true"
             @mouseout="mouseOverDrawer = false"
           >
-              <q-img src="/static/images/lazybug_sanstext.svg" :style="{height: '140px', width: (mini ? 0 : 250), marginTop: '15px', marginBottom: '15px', marginLeft: '-25px', verticalAlign: 'middle', filter: 'drop-shadow(5px 5px 5px rgba(0,0,0,0.5))'}" />
+              <q-img
+                  @click="clickPage('content')"
+                  src="/static/images/lazybug_sanstext.svg"
+                  class="logoimg"
+                  :width="mini ? 0 : 250"
+              />
               <q-list padding>
                 <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
@@ -249,5 +254,15 @@ export default {
 
 .body--dark .q-card {
     background: #212121 !important;
+}
+
+.logoimg {
+    height: 140px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: -25px;
+    vertical-align: middle;
+    filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5));
+    cursor: pointer;
 }
 </style>
