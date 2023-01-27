@@ -8,7 +8,15 @@ The app (and browser extension) works more like a mobile app than a web app in t
 
 ![App Screenshot](https://cdn.lazybug.ai/file/lazybug-public/docs/app.png?)
 
-## Project Principles
+## Table of Contents
+
+1. [Project Principles](#principles)
+2. [Contributing](#contributing)
+2. [Video Processing](#processing)
+3. [Development Details](#dev)
+
+<a name="principles"></a>
+# Project Principles
 
 1. Remain free and open source by minimizing hosting costs
 
@@ -48,7 +56,8 @@ This project provides content based on fair use doctrine:
 
 If you own the copyright to content hosted on lazybug.ai and it is being used inappropriately, please notify us at martin@lazybug.ai.
 
-## Contributing
+<a name="contributing"></a>
+# Contributing
 
 If you're interested in contributing to the project, here are some possible areas:
 
@@ -72,6 +81,7 @@ This project consists of a number of different high-level parts:
 2. A web app to watch videos, interact with and learn vocabulary, discuss and ask questions about content. The frontend is written in JS and Vue.js, the backend in Python.
 3. A browser extension for viewing videos that cannot be embedded into the web app. The codebase is shared with the JS web app.
 
+<a name="processing"></a>
 # Processing Videos and Subtitles
 
 The processing pipeline for a video can vary depending on:
@@ -154,6 +164,69 @@ The "Import Episode" creates a new episode and adds the current video id as its 
         * `ocr_params` [optional] - same as above, overwrites values for this video if set above
         * `timings` [optional] - synced timings between recorded video and actual video (only for manually recorded videos)
 
+## Download the videos
+
+Once you've specified a show on Youtube in the above JSON format, you can use this command to download all the episodes and their soft-subs (if they exists):
+```
+make download-yt show=$SHOW_ID out=../videos
+```
+this assumes there's a folder above in the filetree to put the videos. This command and further processing requires Python 3.9 and the packages listed in requirements.txt. You can install them with the command `pip install -r requirements.txt`.
+
+## Video Processing
+
+The first step in the processing is extracting the hard captions from the video using these command:
+```
+make pull-models
+make process-video-captions show=$SHOW_ID videos=../videos
+```
+The first commands downloads the pre-trained segmentation model from storage.
+
+After this you need to translate all the Chinese captions to English. This is needed no matter whether the video has soft subs in English or not, because it's used for matching word translations and soft subs may differ significantly from the Chinese captions in content. We use deepl.com to translate sentences as it's currently the highest quality translation service. Instead of copy-pasting the script for each show into the web UI, you can use the [browser extension](#extension) to automate this. For this you need to build and install the extensionlocally (not from the Chrome store). Once you've installed the extension, run this command to push episode scripts to the it:
+
+```
+make process-translations show=$SHOW_ID
+```
+
+Note that while deepl.com is free to use, it has usage limits which makes it difficult to use for this purpose unless you pay for a subscription. If you plan to process whole shows, be sure to support deepl.com by buying a subscription.
+
+Next it's time to run segmentation and alignment processing. This segments the Chinese sentences into separate words and attempts to find in-context translations for them given the full sentence translation
+
+```
+make process-segmentation-alignments show=$SHOW_ID
+```
+
+This command pushes another script to be translated by deepl.com specifically for word translation disambiguation. Sentences are segmented and fed in like this:
+```
+怎么就这么走了
+1. 怎么 2. 就 3. 这么 4. 走
+```
+This tricks deepl into translating each word in-context.
+
+Finally, for words that an in-context translation has not been found, they are passed through deepl individually.
+
+Finished subtitles are saved in `data/remote/public/subtitles/`
+
+## Uploading data to Backblaze
+
+NOTE: For now this step can only be taken by an approved developer since you need API keys to upload.
+
+First run
+```
+make pre-public-sync
+```
+This creates:
+
+* A file containing show metadata for all shows that is used by the frontend
+* A video list containing all the video ids that have been processed. The extension checks against this list to determine if a video has processed subtitles
+* A cedict dictionary file for frontend consumption
+* Versioned files for various resources such as HSK words
+
+This syncs the public files to Backblaze
+```
+make push-public
+```
+
+<a name="dev"></a>
 # Code and development details
 
 ## Backend server
