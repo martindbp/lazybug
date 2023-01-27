@@ -26,7 +26,7 @@ zip-ext:
 pre-public-sync:
 	make show-list-full
 	make video-list
-	make cedict
+	#make cedict
 	make public-cedict
 	#make names-list
 	make hsk-words
@@ -58,6 +58,10 @@ pull-private:
 .PHONY: pull-private-essentials
 pull-private-essentials:
 	b2 sync b2://lazybug-private data/remote/private --skipNewer --excludeRegex '.*caption_data.*'
+
+.PHONY: pull-public
+pull-models:
+	b2 sync b2://lazybug-public/models data/remote/public/models --skipNewer
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID

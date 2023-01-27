@@ -1571,12 +1571,12 @@ def get_video_paths(show_name=None, from_folder=None, videos_path=None, file_typ
 
 
 def _store_cedict(cedict_with_freqs):
-    cedict_with_freqs >> 'data/remote/private/cedict_with_freqs.json'
+    cedict_with_freqs >> 'data/remote/public/models/cedict_with_freqs.json'
 
 
 def make_pinyin_db_classifiers():
     pinyin_freq_db = make_pinyin_freq_db()
-    pinyin_freq_db >> 'data/remote/private/pinyin_freqs.json'
+    pinyin_freq_db >> 'data/remote/public/models/pinyin_freqs.json'
     pinyin_classifiers = train_pinyin_classifiers(pinyin_freq_db)
     pinyin_classifiers >> 'data/git/pinyin_classifiers.py'
     cedict_with_freqs = make_cedict(freqs=pinyin_freq_db)
@@ -1585,7 +1585,7 @@ def make_pinyin_db_classifiers():
 
 
 def make_cedict_db():
-    pinyin_freq_db = Future.from_file('data/remote/private/pinyin_freqs.json')
+    pinyin_freq_db = Future.from_file('data/remote/public/models/pinyin_freqs.json')
     cedict_with_freqs = make_cedict(freqs=pinyin_freq_db)
     _store_cedict(cedict_with_freqs)
     return cedict_with_freqs
@@ -1730,7 +1730,7 @@ def make_names_list():
         all_names.append(names)
 
     names = _sum(all_names)
-    names >> 'data/remote/private/names.json'
+    names >> 'data/remote/public/models/names.json'
     return names
 
 
@@ -1797,8 +1797,8 @@ def process_segmentation_alignment(show_name=None, *, force_redo=False, video_id
 
     videos = get_video_paths(show_name=show_name, from_folder='data/remote/private/caption_data/captions_all_translations/', file_type=None)
     show_fixed_translations = _get_show_fixed_translations(show_name)
-    pinyin_freq_db = Future.from_file('data/remote/private/pinyin_freqs.json')
-    global_known_names = Future.from_file('data/remote/private/names.json')
+    pinyin_freq_db = Future.from_file('data/remote/public/models/pinyin_freqs.json')
+    global_known_names = Future.from_file('data/remote/public/models/names.json')
 
     out = []
     for vid, file_path, params in videos:

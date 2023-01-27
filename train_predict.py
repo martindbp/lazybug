@@ -75,8 +75,8 @@ def train_pipeline():
     images_dir, masks_dir, characters = generate_dataset.pipeline(corpus, 40000, 1024, 80, seed=seed, invert=False, fill_with_synthetic=True)
 
     net = train_unet(images_dir, masks_dir)
-    net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
-    net.on_completed = partial(write_hash_file, filename='data/remote/private/text_segmentation_model.pth.hash', hash=net.hash)
+    net >> f'data/remote/public/models/text_segmentation_model-{net.hash}.pth'
+    net.on_completed = partial(write_hash_file, filename='data/remote/public/models/text_segmentation_model.pth.hash', hash=net.hash)
 
     return net
 
@@ -88,18 +88,18 @@ def finetune_pipeline():
 
     net = _get_latest_net()
     net = train_unet(images_dir, masks_dir, epochs=6, lr=0.0007, net=net)
-    net >> f'data/remote/private/text_segmentation_model-{net.hash}.pth'
-    net.on_completed = partial(write_hash_file, filename='data/remote/private/text_segmentation_model.pth.hash', hash=net.hash)
+    net >> f'data/remote/public/models/text_segmentation_model-{net.hash}.pth'
+    net.on_completed = partial(write_hash_file, filename='data/remote/public/models/text_segmentation_model.pth.hash', hash=net.hash)
 
     return net
 
 imread = task(outs=1)(cv2.imread)
 
 def _get_latest_net():
-    with open('data/remote/private/text_segmentation_model.pth.hash', 'r') as f:
+    with open('data/remote/public/models/text_segmentation_model.pth.hash', 'r') as f:
         net_hash = f.read().strip()
 
-    net = Future.from_file(f'data/remote/private/text_segmentation_model-{net_hash}.pth')
+    net = Future.from_file(f'data/remote/public/models/text_segmentation_model-{net_hash}.pth')
     return net
 
 def predict_pipeline_path(img_path, net=None):

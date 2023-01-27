@@ -112,7 +112,7 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_t
 
     deepl_dict = {}
     if len(empty_translations) > 0:
-        with open('data/remote/private/deepl_dict.json', 'r') as f:
+        with open('data/git/deepl_dict.json', 'r') as f:
             deepl_dict = json.load(f)
 
         deepl_empty_translations = []
@@ -120,7 +120,7 @@ def add_segmentation_and_alignment(caption_data, alignment_translations, fixed_t
             if empty_hz not in deepl_dict:
                 deepl_dict[empty_hz] = get_translations([empty_hz]).eval()[0].lower()
 
-        with open('data/remote/private/deepl_dict.json', 'w') as f:
+        with open('data/git/deepl_dict.json', 'w') as f:
             json.dump(deepl_dict, f)
 
     all_line_alignments = []
