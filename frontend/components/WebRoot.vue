@@ -107,8 +107,8 @@
             <q-page :padding="page !== 'player' && isDesktop">
                 <PlayerPage v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ShowTable v-show="page === 'content'" />
-                <HistoryPage v-show="page === 'history'" />
-                <WordTable v-show="page === 'words'" />
+                <HistoryPage v-if="page === 'history'" />
+                <WordTable v-if="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
             </q-page>
           </q-page-container>
