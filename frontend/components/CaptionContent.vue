@@ -735,7 +735,7 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation) .cardcontent {
-    color: rgb(180, 180, 180);
+    color: rgb(100, 100, 100) !important;
 }
 
 .captioncard.autopeek.hiddenstate .cardcontent {
