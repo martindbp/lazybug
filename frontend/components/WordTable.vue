@@ -100,18 +100,20 @@
                         </q-card-actions>
                     </q-tab-panel>
                     <q-tab-panel name="advanced">
-                        <q-card-section v-if="editAnkiCards" class="row items-center">
-                            <div class="q-pa-md q-gutter-y-sm column">
-                                <q-input v-model="ankiCardsEditText" filled type="textarea" />
-                                <q-btn flat label="Done" color="primary" @click="doneEditAnkiCards" />
-                            </div>
-                        </q-card-section>
-                        <q-card-section v-else class="row items-center">
-                            <div class="q-pa-md q-gutter-y-sm column">
-                                <q-toggle v-for="(card, idx) in ankiCardsAdvanced" :label="card" v-model="ankiCardsAdvancedToggled[idx]" @update:model-value="updateAnkiCardsAdvancedToggled"/>
-                                <q-btn flat label="Edit Cards" color="primary" @click="startEditAnkiCards"/>
-                            </div>
-                        </q-card-section>
+                        <q-scroll-area style="height: 200px">
+                            <q-card-section v-if="editAnkiCards" class="row items-center">
+                                <div class="q-pa-md q-gutter-y-sm column">
+                                    <q-input v-model="ankiCardsEditText" filled type="textarea" />
+                                    <q-btn flat label="Done" color="primary" @click="doneEditAnkiCards" />
+                                </div>
+                            </q-card-section>
+                            <q-card-section v-else class="row items-center">
+                                <div class="q-pa-md q-gutter-y-sm column">
+                                    <q-toggle v-for="(card, idx) in ankiCardsAdvanced" :label="card" v-model="ankiCardsAdvancedToggled[idx]" @update:model-value="updateAnkiCardsAdvancedToggled"/>
+                                    <q-btn flat label="Edit Cards" color="primary" @click="startEditAnkiCards"/>
+                                </div>
+                            </q-card-section>
+                        </q-scroll-area>
 
                         <q-card-actions align="right">
                             <q-btn flat label="Cancel" color="primary" v-close-popup />
