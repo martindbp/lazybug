@@ -10,7 +10,8 @@
 	"type": "tv",
 	"genres": [
 		"sci-fi",
-		"space"
+		"space",
+        "novel-adaptation"
 	],
 	"synopsis": "Astrophysicist receives signals from outer space",
 	"caption_source": "hard",
