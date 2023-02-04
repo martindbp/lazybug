@@ -171,7 +171,19 @@ const mixin = {
                             self.$store.commit('addSyncProgress', 'No new local data to merge');
                             self.$store.commit('setIsSyncing', false);
                             self.$store.commit('setLastSyncDate', serverLastSyncDateString);
-                            return callback();
+
+                            self.$store.commit('addSyncProgress', 'Importing server version');
+                            importDatabaseJson(remoteData, self.$store, function(error) {
+                                if (error) {
+                                    self.$store.commit('setSyncError', error);
+                                    self.$store.commit('setIsSyncing', false);
+                                    return callback(error);
+                                }
+
+                                self.$store.commit('addSyncProgress', 'Server version successfully imported');
+                                return callback();
+                            });
+                            return;
                         }
 
                         // Get local database json
@@ -259,7 +271,6 @@ const mixin = {
                             self.$store.commit('addSyncProgress', `Merged ${mergedStates} states, added ${remoteOnlyStates} new states from remote`);
                             self.$store.commit('addSyncProgress', 'Merge done, importing merged database');
 
-                            // Upload
                             importDatabaseJson(localData, self.$store, function(error) {
                                 if (error) {
                                     self.$store.commit('setSyncError', error);
@@ -269,6 +280,7 @@ const mixin = {
 
                                 self.$store.commit('addSyncProgress', 'Uploading merged database');
                                 const data = JSON.stringify(localData);
+                                // Upload
                                 self.getLinkAndUploadData(data, function(error) {
                                     if (error) {
                                         self.$store.commit('setSyncError', error);
