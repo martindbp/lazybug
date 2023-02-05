@@ -115,6 +115,7 @@ store = new Vuex.Store({
         syncProgress: [],
         syncError: null,
         options: Vue.ref({
+            referrer: document.referrer, // store this to see where user came from when registering
             autoPause: 'off', // 'off', 'basic' or 'WPS'
             WPSThreshold: 2.0,
             characterSet: 'sm',
