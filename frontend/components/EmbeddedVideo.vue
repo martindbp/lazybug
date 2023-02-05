@@ -1,6 +1,6 @@
 <template>
     <div :class="{ iframecontainer: true, docked: $store.state.captionDocked }">
-        <div class="videocontainer">
+        <div ref="videocontainer" class="videocontainer">
             <div v-show="!playerReady" class="videoloading" />
             <div v-if="$store.state.isMovingCaption && !$store.state.isLocal" class="dragsurface" />
             <div ref="player" :id="playerID" class="player">
@@ -37,6 +37,7 @@ export default {
             // Mock variables are used if LOCAL is true (i.e. no youtube available)
             mockPlaying: false,
             mockTime: 0.0,
+            resizeObserver: null,
         };
     },
     mounted: function(){
@@ -59,6 +60,14 @@ export default {
                 }
             }, MOCK_CLOCK_SPEED * 1000);
         }
+
+        this.resizeObserver = new ResizeObserver(function() {
+            self.$nextTick(function () {
+                const captionRect = self.$refs.embeddedcaption.$el.getBoundingClientRect();
+                self.$refs.videocontainer.style.height = `calc(100% - ${captionRect.height}px)`;
+            });
+        });
+        this.resizeObserver.observe(this.$refs.embeddedcaption.$el);
     },
     beforeUnmount: function() {
         this.destroyYoutube();
@@ -235,11 +244,6 @@ export default {
 <style>
 .iframecontainer {
     position: relative;
-}
-
-.iframecontainer.docked {
-    display: flex;
-    flex-flow: column;
     height: 100%;
 }
 
@@ -278,7 +282,4 @@ export default {
     color: white;
 }
 
-.docked .videocontainer {
-  flex: 1 1 auto;
-}
 </style>
