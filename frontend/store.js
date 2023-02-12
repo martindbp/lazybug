@@ -77,6 +77,7 @@ store = new Vuex.Store({
             devtools: false,
             sync: false,
             embeddable: false,
+            intro: false,
         }),
         peekStates: Vue.ref({
             py: [],
@@ -116,6 +117,7 @@ store = new Vuex.Store({
         syncError: null,
         options: Vue.ref({
             referrer: document.referrer, // store this to see where user came from when registering
+            doneIntro: false,
             autoPause: 'off', // 'off', 'basic' or 'WPS'
             WPSThreshold: 2.0,
             characterSet: 'sm',
@@ -315,10 +317,10 @@ store = new Vuex.Store({
             }
         },
         setShowDialog(state, val) {
-            state.showDialog[val.dialog] = val.val;
+            state.showDialog[val.dialog] = val.value;
         },
         setShowDictionary(state, val) {
-            if (! [null, undefined].includes(val.val)) state.showDialog.dictionary = val.val;
+            if (! [null, undefined].includes(val.val)) state.showDialog.dictionary = val.value;
             if (val.range) {
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
@@ -574,7 +576,12 @@ function fetchInitialResources() {
         });
     }
 
-    fetchPersonalDataToStore(store);
+    fetchPersonalDataToStore(store, function(success) {
+        // Show the intro
+        if (! store.state.options.doneIntro) {
+            store.commit('setShowDialog', { dialog: 'intro', value: true });
+        }
+    });
 }
 
 store.commit('setURL', document.location); // initial

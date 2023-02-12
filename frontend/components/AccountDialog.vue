@@ -71,7 +71,7 @@ export default {
                 return this.$store.state.showDialog.account !== false;
             },
             set: function(val) {
-                this.$store.commit('setShowDialog', {dialog: 'account', val: val});
+                this.$store.commit('setShowDialog', {dialog: 'account', value: val});
             },
         },
     },

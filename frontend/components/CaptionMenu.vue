@@ -113,11 +113,11 @@ export default {
             this.$store.commit('setCaptionDocked', val);
         },
         showOptions: function(event) {
-            this.$store.commit('setShowDialog', {dialog: 'options', val: true});
+            this.$store.commit('setShowDialog', {dialog: 'options', value: true});
         },
         showDictionary: function(event) {
             if (this.data) {
-                this.$store.commit('setShowDictionary', {val: true});
+                this.$store.commit('setShowDictionary', {value: true});
             }
         },
         moveMouseDown: function(event) {

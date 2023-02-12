@@ -110,7 +110,7 @@ export default {
         },
         show: {
             get: function() { return this.$store.state.showDialog.devtools; },
-            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'devtools', val: val}); },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'devtools', value: val}); },
         },
         AVElementSelector: function() {
             return this.getSiteString('AVElementSelector');

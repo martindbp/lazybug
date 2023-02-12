@@ -11,7 +11,7 @@
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
-                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', val: true})">Show Sync Log</q-btn>
+                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', value: true})">Show Sync Log</q-btn>
                     <q-btn color="red" flat @click="logout">Logout</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
@@ -45,6 +45,17 @@
                     <q-btn color="red" flat @click="confirmClearPersonalData = true" :disabled="clickedClearPersonalData">Clear Personal Data</q-btn>
                 </q-card-actions>
             </q-card>
+            <q-card class="accountcard">
+                <q-card-section>
+                    <div class="text-h6">Intro</div>
+                </q-card-section>
+
+                <q-separator />
+
+                <q-card-actions vertical>
+                    <q-btn color="primary" flat @click="showIntro">Show Intro</q-btn>
+                </q-card-actions>
+            </q-card>
         </div>
         <q-dialog seamless v-model="confirmClearPersonalData">
             <q-card>
@@ -71,6 +82,9 @@ export default {
         clickedClearPersonalData: false,
     }},
     methods: {
+        showIntro: function() {
+            this.$store.commit('setShowDialog', { dialog: 'intro', value: true });
+        },
         clearCache: function() {
             clearCache();
             this.clickedClearCache = true;
@@ -97,13 +111,13 @@ export default {
             });
         },
         register: function() {
-            this.$store.commit('setShowDialog', {dialog: 'account', val: 'register'});
+            this.$store.commit('setShowDialog', {dialog: 'account', value: 'register'});
         },
         login: function() {
             const self = this;
             this.clearDataThenCall(function(confirm) {
                 if (confirm) {
-                    self.$store.commit('setShowDialog', {dialog: 'account', val: 'login'});
+                    self.$store.commit('setShowDialog', {dialog: 'account', value: 'login'});
                 }
             });
         },

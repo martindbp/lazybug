@@ -19,17 +19,7 @@
                         Select the HSK level for the words you want to hide automatically
                         <q-item dense>
                             <q-item-section>
-                                <q-slider
-                                    color="teal"
-                                    v-model="hideWordsLevel"
-                                    :min="0"
-                                    :max="7"
-                                    :step="1"
-                                    :label-value="hideWordsLevel < 7 ? hideWordsLevel : 'all'"
-                                    label
-                                    snap
-                                    markers
-                                />
+                                <HSKLevelSlider />
                             </q-item-section>
                         </q-item>
                     </q-card>
@@ -194,8 +184,12 @@
 </template>
 
 <script>
+import HSKLevelSlider from './HSKLevelSlider.vue'
+
 export default {
-    components: { },
+    components: {
+        HSKLevelSlider,
+    },
     data: function() { return {
         tab: Vue.ref('knowledge'),
         shortcuts: [
@@ -221,15 +215,11 @@ export default {
     computed: {
         show: {
             get: function() { return this.$store.state.showDialog.options; },
-            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'options', val: val}); },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'options', value: val}); },
         },
         timingOffset: {
             get: function() { return this.$store.state.timingOffset; },
             set: function(val) { this.$store.commit('setTimingOffset', val); },
-        },
-        hideWordsLevel: {
-            get: function() { return this.$store.state.options.hideWordsLevel; },
-            set: function(val) { this.$store.commit('setOption', {key: 'hideWordsLevel', value: val}); },
         },
         pinPysLevel: {
             get: function() { return this.$store.state.options.pinLevels.py; },

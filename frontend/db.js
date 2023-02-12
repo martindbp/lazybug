@@ -53,7 +53,19 @@ const PERSONAL_DB_VERSIONS = {
                 item.episodeName = episodeName;
             });
         });
-    }
+    },
+    '4': function(personalDb) {
+        // Add "doneIntro" flag store in options, default is "false"
+        personalDb.version(4).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.doneIntro = false;
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null) {

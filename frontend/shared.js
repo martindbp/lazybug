@@ -180,7 +180,7 @@ function importDatabaseJson(data, store, callback) {
     });
 }
 
-function fetchPersonalDataToStore(store) {
+function fetchPersonalDataToStore(store, callback = null) {
     getIndexedDbData('states', null, function (data) {
         if (data) {
             const dict = {};
@@ -192,11 +192,13 @@ function fetchPersonalDataToStore(store) {
     });
 
     getIndexedDbData('other', ['options'], function (data) {
-        if (data !== 'error' && data[0]) store.commit('setOptions', data[0]);
+        const success = data !== 'error' && data[0];
+        if (success) store.commit('setOptions', data[0]);
         else {
             // No options, so we set the default
             setIndexedDbData('other', ['options'], [store.state.options], function() {});
         }
+        if (callback) callback(success);
     }, false); // don't notify failure since it's to be expected
 }
 

@@ -74,7 +74,7 @@ export default {
         },
         show: {
             get: function() { return this.$store.state.showDialog.dictionary; },
-            set: function(val) { this.$store.commit('setShowDictionary', {val: val}); },
+            set: function(val) { this.$store.commit('setShowDictionary', {value: val}); },
         },
         showRange: {
             get: function() { return this.$store.state.showDictionaryRange; },

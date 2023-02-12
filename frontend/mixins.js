@@ -69,11 +69,11 @@ const mixin = {
             return getEpisodeName(this.showInfo, this.season, i);
         },
         showAccountModalWithCallback: function(callback = null) {
-            this.$store.commit('setShowDialog', {dialog: 'account', val: 'login'});
+            this.$store.commit('setShowDialog', {dialog: 'account', value: 'login'});
             this.accountCallback = callback;
         },
         showModalAndSync: function(closeAfterDone = false, callback = null) {
-            this.$store.commit('setShowDialog', {dialog: 'sync', val: true});
+            this.$store.commit('setShowDialog', {dialog: 'sync', value: true});
             const self = this;
             this.syncDatabase(function(error) {
                 if (! error && closeAfterDone) {
@@ -81,7 +81,7 @@ const mixin = {
                     if (self.$store.state.syncError) return; // don't close if there's an error
 
                     setTimeout(function() {
-                        self.$store.commit('setShowDialog', {dialog: 'sync', val: false});
+                        self.$store.commit('setShowDialog', {dialog: 'sync', value: false});
                     }, 500);
                 }
                 if (callback) callback(error);
@@ -324,7 +324,7 @@ const mixin = {
             this.$store.commit('setPlayingShowId', showId);
             if (this.showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
-                this.$store.commit('setShowDialog', {dialog: 'embeddable', val: true});
+                this.$store.commit('setShowDialog', {dialog: 'embeddable', value: true});
                 return;
             }
             this.$store.commit('setPlayingSeason', seasonIdx);
@@ -347,7 +347,7 @@ const mixin = {
             this.$store.commit('setNonEmbeddableVideoSelected', null);
             this.$store.commit('setPlayingSeason', null);
             this.$store.commit('setPlayingEpisode', null);
-            this.$store.commit('setShowDialog', {dialog: 'embeddable', val: false});
+            this.$store.commit('setShowDialog', {dialog: 'embeddable', value: false});
         },
         getVideoURL: function(seasonIdx, episodeIdx) {
             const captionId = this.showInfo.seasons[seasonIdx].episodes[episodeIdx].id;

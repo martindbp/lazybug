@@ -166,7 +166,7 @@ export default {
         },
         showComments: function() {
             this.commentsAreOpen = false;
-            this.$store.commit('setShowDialog', {dialog: 'comments', val: true});
+            this.$store.commit('setShowDialog', {dialog: 'comments', value: true});
         },
         showComment: function(comment) {
             this.commentsAreOpen = false;

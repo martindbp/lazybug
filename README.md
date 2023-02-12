@@ -261,7 +261,7 @@ These environment variables need to be set for the server if not LOCAL is set:
 <a name="extension"></a>
 ## Browser Extension
 
-After having built the frontend with `make frontend` or `make local`, you can install the extension in Chrome by going to "Manage Extensions", enabling "Developer mode" and then clicking "Load unpacked", pointing it to the `{lazybug_dir}/frontend/dist` folder. Note that every time you make a change and rebuild the frontend (including the extension) you have to reload the extension in Chrome. This is easiest done by right clicking on the extension icon -> Manage Extension -> click Update button.
+After having built the frontend with `make frontend-clean` or `make local`, you can install the extension in Chrome by going to "Manage Extensions", enabling "Developer mode" and then clicking "Load unpacked", pointing it to the `{lazybug_dir}/frontend/dist` folder. Note that every time you make a change and rebuild the frontend (including the extension) you have to reload the extension in Chrome. This is easiest done by right clicking on the extension icon -> Manage Extension -> click Update button.
 
 <a name="localfrontend"></a>
 ### Local SSL cert for Browser Extension development
@@ -277,7 +277,7 @@ After this command you need to import the CA.pem in the browser you use. In Chro
 
 To run a local only version of the frontend and server, run:
 ```
-# this, like `make frontend` builds the browser extension and web frontend,
+# this, like `make frontend-clean` builds the browser extension and web frontend,
 # but with URLs pointing to localhost and other online features turned off
 make local
 # This runs the server for local development, in SSL mode

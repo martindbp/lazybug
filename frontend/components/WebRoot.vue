@@ -128,6 +128,7 @@
         </q-dialog>
         <AccountDialog />
         <SyncDialog />
+        <IntroDialog />
 
         <!--
             Add an iframe to Discourse if we log in to automatically log in there as well
@@ -151,6 +152,7 @@ import PlayerPage from './PlayerPage.vue'
 import HistoryPage from './HistoryPage.vue'
 import AccountDialog from './AccountDialog.vue'
 import SyncDialog from './SyncDialog.vue'
+import IntroDialog from './IntroDialog.vue'
 
 export default {
     mixins: [mixin],
@@ -162,6 +164,7 @@ export default {
         HistoryPage,
         AccountDialog,
         SyncDialog,
+        IntroDialog,
     },
     data: function() { return {
         drawer: this.isDesktop,
@@ -262,7 +265,7 @@ export default {
     margin-bottom: 15px;
     margin-left: -25px;
     vertical-align: middle;
-    filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
     cursor: pointer;
 }
 </style>

@@ -22,7 +22,7 @@ export default {
     computed: {
         show: {
             get: function() { return this.$store.state.showDialog.comments; },
-            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'comments', val: val}); },
+            set: function(val) { this.$store.commit('setShowDialog', {dialog: 'comments', value: val}); },
         },
     }
 }

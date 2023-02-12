@@ -308,7 +308,7 @@ export default {
             }
             else if (action === 'options') {
                 this.$store.commit('setOptionsHighlightSection', `knowledge-${type}-lvl`);
-                this.$store.commit('setShowDialog', {dialog: 'options', val: true});
+                this.$store.commit('setShowDialog', {dialog: 'options', value: true});
                 return;
             }
 
@@ -345,7 +345,7 @@ export default {
 
             if (action === 'dict') {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
-                this.$store.commit('setShowDictionary', {val: true, range: [startIdx, endIdx]});
+                this.$store.commit('setShowDictionary', {value: true, range: [startIdx, endIdx]});
             }
             else if (action === 'copy') {
                 if (type === 'translation') {
