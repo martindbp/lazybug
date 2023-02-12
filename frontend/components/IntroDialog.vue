@@ -14,7 +14,7 @@
                 padding
                 arrows
                 height="600px"
-                class="bg-white shadow-1 rounded-borders"
+                class="rounded-borders"
             >
                 <q-carousel-slide name="welcome" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
@@ -24,7 +24,7 @@
                         <p>There's a unique and growing selection available thanks to advanced OCR subtitle extraction</p>
                     </div>
                 </q-carousel-slide>
-                <q-carousel-slide name="subtitles1" class="column no-wrap flex-center">
+                <q-carousel-slide name="subtitles" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Interactive Subtitles</h5>
                         <p>The subtitles are interactive and adapt to your skill level. Hide words you know. Peek at the minimum information you need to understand, this will allow you to learn the fastest</p>
@@ -106,4 +106,11 @@ export default {
 </script>
 
 <style>
+body.body--dark .q-carousel {
+    background-color: rgb(33, 33, 33) !important;
+}
+
+body.body--light .q-carousel {
+    background-color: #fff;
+}
 </style>
