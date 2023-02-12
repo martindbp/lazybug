@@ -11,6 +11,7 @@
                 next-icon="arrow_right"
                 swipeable
                 navigation
+                keep-alive
                 padding
                 arrows
                 height="600px"
@@ -49,6 +50,13 @@
                         <q-img src="https://cdn.lazybug.ai/file/lazybug-public/images/export.png" />
                     </div>
                 </q-carousel-slide>
+                <q-carousel-slide name="extension" class="column no-wrap flex-center">
+                    <div class="q-mt-md text-center">
+                        <h5>Browser Extension Coming Soon</h5>
+                        <p>For shows other than Youtube that can't be embedded </p>
+                        <q-img width="424px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
+                    </div>
+                </q-carousel-slide>
                 <q-carousel-slide name="last" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Account</h5>
@@ -58,7 +66,7 @@
                 </q-carousel-slide>
             </q-carousel>
             <q-card-actions align="right">
-                <q-btn flat :label="slide === 'last' ? 'OK' : 'Skip'" color="primary" @click="done" v-close-popup />
+                <q-btn flat :label="slide === 'last' ? 'OK' : 'Skip'" color="primary" @click="skip" />
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -91,9 +99,16 @@ export default {
                 }
             });
         },
-        done: function() {
-            this.$store.commit('setOption', { key: 'doneIntro', value: true });
-            this.askPersist();
+        skip: function() {
+            // Terminate, or skip to last slide (which shows important account info)
+            if (this.slide === 'last') {
+                this.$store.commit('setShowDialog', { dialog: 'intro', value: false });
+                this.$store.commit('setOption', { key: 'doneIntro', value: true });
+                this.askPersist();
+            }
+            else {
+                this.slide = 'last';
+            }
         },
         clickRegister: function() {
             this.$store.commit('setOption', { key: 'doneIntro', value: true });
