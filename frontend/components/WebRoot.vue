@@ -1,5 +1,5 @@
 <template>
-    <div v-show="applicationReady">
+    <div v-if="applicationReady">
         <q-layout view="lHh Lpr lff" container class="shadow-2 rounded-borders">
            <q-header v-if="isMobile" elevated class="bg-blue">
                <q-toolbar>

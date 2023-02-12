@@ -177,6 +177,8 @@ export default {
         getLogRows(function(numRows) {
             self.numRows = numRows;
             self.numPages = Math.ceil(numRows / ROWS_PER_PAGE);
+            console.log('numRows', numRows);
+            console.log('numPages', self.numPages);
         });
     },
     computed: {
@@ -284,9 +286,13 @@ export default {
             console.log('Fetching', offset, limit);
             this.loading = true;
             getLog(offset, limit, function(data) {
+                console.log('Got log data', data);
                 self.starEvents = self.filterStarEvents(data);
+                console.log('Star events', self.starEvents);
                 self.rows = self.starEventsToRows(self.starEvents);
+                console.log('Rows', self.rows);
                 self.pagination.rowsPerPage = self.rows.length;
+                console.log('rowsPerPage', self.pagination.rowsPerPage);
                 self.loading = false;
             });
         },
