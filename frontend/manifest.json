@@ -51,7 +51,6 @@
                 "quasar.umd.prod.js",
                 "shared.js",
                 "store.js",
-                "devtools.js",
                 "mixins.js",
                 "ExtensionCaption.umd.js",
                 "ext.js"
