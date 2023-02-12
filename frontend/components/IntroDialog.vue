@@ -67,13 +67,30 @@ export default {
         slide: 'welcome',
     }},
     methods: {
+        askPersist: function() {
+            isStoragePersisted().then(async isPersisted => {
+                if (isPersisted) {
+                    console.log("Storage is successfully persisted");
+                } else {
+                    console.log("Storage is not persisted");
+                    console.log("Trying to persist");
+                    if (await persist()) {
+                        console.log("We successfully turned the storage to be persisted");
+                    } else {
+                        console.log("Failed to make storage persisted");
+                    }
+                }
+            });
+        },
         done: function() {
             this.$store.commit('setOption', { key: 'doneIntro', value: true });
+            this.askPersist();
         },
         clickRegister: function() {
             this.$store.commit('setOption', { key: 'doneIntro', value: true });
             this.$store.commit('setShowDialog', { dialog: 'intro', value: false });
             this.$store.commit('setShowDialog', { dialog: 'account', value: 'register' });
+            this.askPersist();
         },
     }
 };

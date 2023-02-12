@@ -31,6 +31,17 @@ function getShowInfo(store, state = null) {
     return state.showList[state.playingShowId || state.captionData.show_name];
 }
 
+// For persisting IndexedDB (see https://dexie.org/docs/StorageManager)
+async function persist() {
+    return await navigator.storage && navigator.storage.persist &&
+        navigator.storage.persist();
+}
+
+async function isStoragePersisted() {
+    return await navigator.storage && navigator.storage.persisted &&
+        navigator.storage.persisted();
+}
+
 store = new Vuex.Store({
     state: {
         cssLoaded: false,
