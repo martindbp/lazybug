@@ -113,8 +113,7 @@ const mixin = {
                     self.$store.commit('addSyncProgress', 'Getting uploaded timestamp');
                     getDatabaseLastModifiedDate(accessToken, function(serverLastSyncDateString, error) {
                         if (error) {
-                            self.$store.commit('setSyncError', error);
-                            self.$store.commit('setIsSyncing', false);
+                            self.$store.commit('setSyncDone', error);
                             callback(error);
                             return;
                         }
@@ -151,32 +150,28 @@ const mixin = {
             this.$store.commit('setIsSyncing', true);
             getDatabaseLastModifiedDate(accessToken, function(serverLastSyncDateString, error) {
                 if (error) {
-                    self.$store.commit('setSyncError', error);
-                    self.$store.commit('setIsSyncing', false);
+                    self.$store.commit('setSyncDone', error);
                     callback(error);
                     return;
                 }
-                self.$store.commit('addSyncProgress', `Modified ${serverLastSyncDateString}`);
+                self.$store.commit('addSyncProgress', `Server last modified ${serverLastSyncDateString}`);
                 const serverLastSyncDate = serverLastSyncDateString === null ? null : Date.parse(serverLastSyncDateString);
                 if (serverLastSyncDate !== null && (serverLastSyncDate > lastSyncDate || lastSyncDate === null)) {
                     // Server version is newer, download, merge and upload
                     self.$store.commit('addSyncProgress', `Server version is newer (local = ${lastSyncDateString})`);
                     self.downloadDatabase(function(remoteData, error) {
                         if (error) {
-                            self.$store.commit('setSyncError', error);
-                            self.$store.commit('setIsSyncing', false);
+                            self.$store.commit('setSyncDone', error);
                             return callback(error);
                         }
                         if (! self.$store.state.needSync) {
                             self.$store.commit('addSyncProgress', 'No new local data to merge');
-                            self.$store.commit('setIsSyncing', false);
                             self.$store.commit('setLastSyncDate', serverLastSyncDateString);
 
                             self.$store.commit('addSyncProgress', 'Importing server version');
                             importDatabaseJson(remoteData, self.$store, function(error) {
+                                self.$store.commit('setSyncDone', error);
                                 if (error) {
-                                    self.$store.commit('setSyncError', error);
-                                    self.$store.commit('setIsSyncing', false);
                                     return callback(error);
                                 }
 
@@ -273,8 +268,7 @@ const mixin = {
 
                             importDatabaseJson(localData, self.$store, function(error) {
                                 if (error) {
-                                    self.$store.commit('setSyncError', error);
-                                    self.$store.commit('setIsSyncing', false);
+                                    self.$store.commit('setSyncDone', error);
                                     return callback(error);
                                 }
 
@@ -283,12 +277,11 @@ const mixin = {
                                 // Upload
                                 self.getLinkAndUploadData(data, function(error) {
                                     if (error) {
-                                        self.$store.commit('setSyncError', error);
-                                        self.$store.commit('setIsSyncing', false);
+                                        self.$store.commit('setSyncDone', error);
                                         return callback(error);
                                     }
 
-                                    self.$store.commit('setIsSyncing', false);
+                                    self.$store.commit('setSyncDone', null);
                                     return callback();
                                 });
                             });
@@ -300,21 +293,20 @@ const mixin = {
                 else if (serverLastSyncDate !== null && serverLastSyncDate === lastSyncDate && ! self.$store.state.needSync) {
                     // The server version is the same as local, don't upload
                     self.$store.commit('addSyncProgress', 'Server version is is same as local data and no local changes, not uploading');
-                    self.$store.commit('setIsSyncing', false);
+                    self.$store.commit('setSyncDone', null);
                     return callback();
                 }
                 else {
                     // Server version is older or same as previously synced (or doesn't exist), 
                     // or we have new local changes, so just upload
-                    self.$store.commit('addSyncProgress', `Server version is older (local=${lastSyncDateString}), uploading our local data`);
+                    self.$store.commit('addSyncProgress', `Server version is same or older (or doesn't exist) (local=${lastSyncDateString}), uploading our local data`);
                     self.exportUploadDatabase(function(error) {
                         if (error) {
-                            self.$store.commit('setSyncError', error);
-                            self.$store.commit('setIsSyncing', false);
+                            self.$store.commit('setSyncDone', error);
                             return callback(error);
                         }
 
-                        self.$store.commit('setIsSyncing', false);
+                        self.$store.commit('setSyncDone', null);
                         return callback();
                     });
                 }

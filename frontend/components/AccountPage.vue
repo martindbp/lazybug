@@ -11,12 +11,13 @@
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
-                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', value: true})">Show Sync Log</q-btn>
                     <q-btn color="red" flat @click="logout">Logout</q-btn>
+                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', value: true})">Show Sync Log</q-btn>
                 </q-card-actions>
                 <q-card-actions v-else>
                     <q-btn color="primary" flat @click="register">Register</q-btn>
                     <q-btn flat @click="login">Login</q-btn>
+                    <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', value: true})">Show Sync Log</q-btn>
                 </q-card-actions>
             </q-card>
             <q-card class="accountcard">
@@ -175,6 +176,8 @@ export default {
                                 });
                             }
                             else {
+                                self.$store.commit('setLastSyncDate', null);
+                                self.$store.commit('setNeedSync', true);
                                 self.$q.dialog({
                                     title: 'Success',
                                     message: 'Database successfully imported from file',

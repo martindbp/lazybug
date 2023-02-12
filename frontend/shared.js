@@ -174,7 +174,6 @@ function importDatabaseJson(data, store, callback) {
         if (error) callback(error);
         else {
             fetchPersonalDataToStore(store);
-            store.commit('setNeedSync', true);
             callback();
         }
     });

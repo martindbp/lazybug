@@ -17,6 +17,7 @@ if (LOCAL) {
 const TRANSLATION_URL = 'http://localhost:8001';
 
 function clearIndexedDb() {
+    console.log('Clearing personal and cache IndexedDB');
     personalDb.delete();
     cacheDb.delete();
     personalDb = initPersonalDb();
@@ -24,10 +25,12 @@ function clearIndexedDb() {
 }
 
 function backgroundClearCache() {
+    console.log('Clearing IndexedDB cache');
     cacheDb.network.clear();
 }
 
 function backgroundClearPersonalData() {
+    console.log('Clearing personal data in IndexedDB');
     personalDb.delete();
     personalDb = initPersonalDb();
 }

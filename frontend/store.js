@@ -200,6 +200,11 @@ store = new Vuex.Store({
             state.captionDocked = val;
             localStorage.setItem('captionDocked', val);
         },
+        setSyncDone(state, error) {
+            state.isSyncing = false;
+            state.needSync = false;
+            state.syncError = error;
+        },
         setIsSyncing(state, val) {
             state.isSyncing = val;
         },
@@ -221,7 +226,6 @@ store = new Vuex.Store({
         setLogin(state, val) {
             state.accessToken = val.accessToken;
             state.accountEmail = val.email;
-            state.needSync = true;
             state.loggedInThisSession = true;
             setCookie('jwt', val.accessToken, 365);
             setCookie('email', val.email, 365);
@@ -231,6 +235,7 @@ store = new Vuex.Store({
             state.accountEmail = null;
             eraseCookie('jwt');
             eraseCookie('email');
+            this.commit('setLastSyncDate', null);
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
