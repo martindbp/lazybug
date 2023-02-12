@@ -14,10 +14,11 @@ const DEFAULT_SHORTCUTS = {
     pausePlay: 'Space', // already a shortcut, but is applied outside the video in Web
 }
 
-
 function syncOptions(state) {
     setIndexedDbData('other', ['options'], [state.options], function() {});
 }
+
+const syncOptionsDebounced = debounce((state) => syncOptions(state));
 
 function getShowInfo(store, state = null) {
     if (state === null) state = store.state;
@@ -177,6 +178,9 @@ store = new Vuex.Store({
         }),
     },
     mutations: {
+        setBloomFilter(state, val) {
+            state.bloomFilter = val;
+        },
         setFetchedAllPublicResources(state) {
             state.fetchedAllPublicResources = true;
         },
@@ -291,7 +295,7 @@ store = new Vuex.Store({
         },
         setSimpleCharsList(state, val) {
             state.SIMPLE_CHARS = val;
-            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+            createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setStringsList(state, val) {
             state.STRINGS = val;
@@ -349,7 +353,7 @@ store = new Vuex.Store({
         },
         setStates(state, states) {
             state.states = states;
-            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+            createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setBloomFilters(state, filters) {
             for (const key of Object.keys(filters.shows)) {
@@ -414,47 +418,47 @@ store = new Vuex.Store({
         },
         setBlur(state, val) {
             state.options.blurCaptions = val;
-            syncOptions(state);
+            syncOptionsDebounced(state);
             appendSessionLog(this, [eventsMap['EVENT_BLUR'], val]);
         },
         setOptions(state, options) {
             state.options = options;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setOption(state, option) {
             state.options[option.key] = option.value;
-            syncOptions(state);
+            syncOptionsDebounced(state);
             if (option.key === 'hideWordsLevel') {
-                state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+                createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
             }
         },
         setDeepOption(state, option) {
             state.options[option.key][option.key2] = option.value;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setDict(state, dict) {
             state.DICT = dict;
-            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+            createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setHskWords(state, words) {
             state.HSK_WORDS = words;
-            state.bloomFilter = createBloomFilter(state, BLOOM_FILTER_N, BLOOM_FILTER_K);
+            createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
         setAnkiAdvancedCards(state, val) {
             state.options.anki.advancedCards = val;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setAnkiCardsAdvancedToggled(state, val) {
             state.options.anki.advancedToggled = val;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setAnkiCardsBasicToggled(state, val) {
             state.options.anki.basicToggled = val;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setAnkiCardsClozeIncludeHint(state, val) {
             state.options.anki.clozeIncludeHint = val;
-            syncOptions(state);
+            syncOptionsDebounced(state);
         },
         setPage(state, val) {
             let url = '/' + val;

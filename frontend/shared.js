@@ -917,6 +917,20 @@ function createBloomFilter(state, n, k) {
     return bloom;
 }
 
+function createSetBloomFilter(store, state, n, k) {
+    store.commit('setBloomFilter', createBloomFilter(state, n, k));
+}
+
+function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+const createSetBloomFilterDebounced = debounce((store, state, n, k) => createSetBloomFilter(store, state, n, k), 2000);
+
 // SVG icons from css.gg
 const ICON_SVG = {
     'play-track-next': '<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none"><path d="M6 17L14 12L6 7V17Z" fill="currentColor"/><path d="M18 7H15V12V17H18V7Z" fill="currentColor"/></svg>',
