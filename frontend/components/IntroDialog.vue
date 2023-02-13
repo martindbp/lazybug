@@ -112,6 +112,7 @@ export default {
         },
         clickRegister: function() {
             this.$store.commit('setOption', { key: 'doneIntro', value: true });
+            this.$store.commit('setPage', 'account');
             this.$store.commit('setShowDialog', { dialog: 'intro', value: false });
             this.$store.commit('setShowDialog', { dialog: 'account', value: 'register' });
             this.askPersist();
