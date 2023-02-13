@@ -340,12 +340,12 @@ store = new Vuex.Store({
             state.showDialog[val.dialog] = val.value;
         },
         setShowDictionary(state, val) {
-            if (! [null, undefined].includes(val.val)) state.showDialog.dictionary = val.value;
+            if (! [null, undefined].includes(val.value)) state.showDialog.dictionary = val.value;
             if (val.range) {
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
                     appendSessionLog(
-                        state,
+                        this,
                         [eventsMap['EVENT_SHOW_DICTIONARY_RANGE'], val.range[0], val.range[1]]
                     );
                 }
