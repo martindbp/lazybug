@@ -212,7 +212,7 @@ export default {
             this.data.seasons.push([episode]);
         },
         download: function() {
-            download('show.json', this.data);
+            download('show.json', JSON.stringify(this.data, null, 2));
         },
         processInputFill: function(e) {
             if (e.keyCode === 9 && this.inputShadowText !== null) {
