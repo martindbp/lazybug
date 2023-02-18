@@ -18,6 +18,56 @@ function syncOptions(state) {
     setIndexedDbData('other', ['options'], [state.options], function() {});
 }
 
+const OPTIONS_DEFAULT = {
+    referrer: document.referrer, // store this to see where user came from when registering
+    doneIntro: false,
+    autoPause: 'off', // 'off', 'basic' or 'WPS'
+    WPSThreshold: 2.0,
+    characterSet: 'sm',
+    blurCaptions: true,
+    pin: {
+        hz: false,
+        py: false,
+        tr: false,
+        translation: false,
+    },
+    pinLevels: {
+        hz: 0,
+        py: 0,
+        tr: 0,
+        translation: 0,
+    },
+    displayTranslation: 0, // index into [human, machine][min(idx, length)]
+    hideWordsLevel: 0,
+    peekAfterAutoHide: true,
+    keyboardShortcutsToggle: true,
+    keyboardShortcuts: DEFAULT_SHORTCUTS,
+    anki: {
+        advancedCards: [
+            "Cloze word hanzi + pinyin",
+            "Cloze word translation",
+            "Cloze whole word",
+            "Basic produce Chinese",
+            "Basic produce translation",
+            "Basic produce Hanzi",
+        ],
+        advancedToggled: [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+        ],
+        basicToggled: [
+            false,
+            false,
+            false,
+        ],
+        clozeIncludeHint: false,
+    },
+};
+
 const syncOptionsDebounced = debounce((state) => syncOptions(state));
 
 function getShowInfo(store, state = null) {
@@ -127,55 +177,7 @@ store = new Vuex.Store({
         isSyncing: false,
         syncProgress: [],
         syncError: null,
-        options: Vue.ref({
-            referrer: document.referrer, // store this to see where user came from when registering
-            doneIntro: false,
-            autoPause: 'off', // 'off', 'basic' or 'WPS'
-            WPSThreshold: 2.0,
-            characterSet: 'sm',
-            blurCaptions: true,
-            pin: {
-                hz: false,
-                py: false,
-                tr: false,
-                translation: false,
-            },
-            pinLevels: {
-                hz: 0,
-                py: 0,
-                tr: 0,
-                translation: 0,
-            },
-            displayTranslation: 0, // index into [human, machine][min(idx, length)]
-            hideWordsLevel: 0,
-            peekAfterAutoHide: true,
-            keyboardShortcutsToggle: true,
-            keyboardShortcuts: DEFAULT_SHORTCUTS,
-            anki: {
-                advancedCards: [
-                    "Cloze word hanzi + pinyin",
-                    "Cloze word translation",
-                    "Cloze whole word",
-                    "Basic produce Chinese",
-                    "Basic produce translation",
-                    "Basic produce Hanzi",
-                ],
-                advancedToggled: [
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                ],
-                basicToggled: [
-                    false,
-                    false,
-                    false,
-                ],
-                clozeIncludeHint: false,
-            },
-        }),
+        options: Vue.ref(OPTIONS_DEFAULT),
     },
     mutations: {
         setCloseAllDialogs(state) {
@@ -244,7 +246,15 @@ store = new Vuex.Store({
             state.accountEmail = null;
             eraseCookie('jwt');
             eraseCookie('email');
+            // Reset everything that is tied to the previous logged in user
             this.commit('setLastSyncDate', null);
+            this.commit('setOptions', JSON.parse(JSON.stringify(OPTIONS_DEFAULT)));
+            this.commit('setStates', {});
+            this.commit('setPlayingShowId', null);
+            this.commit('setPlayingSeason', null);
+            this.commit('setPlayingEpisode', null);
+            this.commit('setPlayingCaptionIdx', null);
+            this.commit('setNavigateToCaptionIdx', null);
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
