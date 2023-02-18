@@ -16,7 +16,7 @@
 	"year": "2019-2020",
 	"caption_source": "hard",
 	"translation_source": "machine",
-	"released": true,
+	"released": false,
 	"ocr_params": [
 		{
 			"type": "hanzi",
