@@ -54,7 +54,7 @@
                     <div class="q-mt-md text-center">
                         <h5>Browser Extension Coming Soon</h5>
                         <p>For shows other than Youtube that can't be embedded </p>
-                        <q-img width="424px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
+                        <q-img width="300px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="last" class="column no-wrap flex-center">
