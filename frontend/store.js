@@ -178,6 +178,11 @@ store = new Vuex.Store({
         }),
     },
     mutations: {
+        setCloseAllDialogs(state) {
+            for (const key of Object.keys(state.showDialog)) {
+                state.showDialog[key] = false;
+            }
+        },
         setBloomFilter(state, val) {
             state.bloomFilter = val;
         },
@@ -467,6 +472,7 @@ store = new Vuex.Store({
             }
             window.history.pushState(null, '', url);
             state.page = val;
+            this.commit('setCloseAllDialogs'); // close any open dialogs since we're navigating away
         },
         setURL(state, url) {
             state.url = {href: url.href, pathname: url.pathname};
@@ -494,8 +500,8 @@ store = new Vuex.Store({
                 // Website Routing Logic
                 //
                 const parts = url.pathname.split('/').filter((s) => s.length > 0);
-                if (parts.length === 0) state.page = 'content'; // default
-                else state.page = parts[0];
+                if (parts.length === 0) this.commit('setPage', 'content'); // default
+                else this.commit('setPage', parts[0]);
 
                 if (parts[0] === 'player') {
                     const showId = parts[1];
