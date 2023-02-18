@@ -52,12 +52,11 @@ function backgroundImportDatabaseJson(data, callback) {
         type: "application/json;charset=utf-8"
     });
 
-    // Deleting curent
-    personalDb.delete();
-    personalDb = initPersonalDb();
     DexieExportImport.peakImportFile(blob).then(function(fileMeta) {
         const version = fileMeta.data.databaseVersion;
 
+        // Deleting curent
+        console.log('Deleting personal data before importing');
         personalDb.delete();
         personalDb = initPersonalDb(version);
 
