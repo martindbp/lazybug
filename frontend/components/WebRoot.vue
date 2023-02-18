@@ -174,11 +174,7 @@ export default {
     }},
     mounted: function() {
         const self = this;
-
         // Set up timers to sync data if we've been inactive for a long time
-        // NOTE: turning this off for now, may be a bug where a failed sync wipes the local database
-        // Also focus/blur events don't seem to trigger correctly
-        /*
         window.onfocus = function() {
             if (self.inactivityTimer) {
                 clearTimeout(self.inactivityTimer);
@@ -197,7 +193,6 @@ export default {
                 }
             }, 60*60*1000); // 1 hour
         }
-        */
     },
     methods: {
         onIframeLoaded: function() {
