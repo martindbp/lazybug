@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused, docked: $store.state.captionDocked}">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused, docked: $store.state.captionDocked, mobile: isMobile}">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -170,5 +170,9 @@ export default {
     height: 5px;
     background-color: green;
     border-radius: 3px;
+}
+
+.lazybugcaptiondiv.mobile:not(.paused) .captioncontent {
+    display: none;
 }
 </style>
