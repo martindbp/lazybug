@@ -33,6 +33,8 @@
                         <q-input ref="registerEmail" v-model="email" filled type="email" hint="Email" @keydown.enter.prevent="submit" />
                         <br>
                         <q-input ref="registerPassword" v-model="password" filled type="password" hint="Password" @keydown.enter.prevent="submit" />
+                        <br>
+                        <q-checkbox v-model="okReceiveEmails" label="OK to receive occasional email updates" />
                         <div class="accounterror" v-if="error">{{ error }}</div>
                     </form>
                 </q-tab-panel>
@@ -42,11 +44,13 @@
                     <q-btn v-if="!sentPasswordResetEmail" :loading="loading === 'forgot'" flat color="deep-orange" label="Forgot Password" @click="clickForgotPassword"></q-btn>
                     <q-btn v-if="sentPasswordResetEmail" :loading="loading === 'reset'" flat color="primary" label="Reset Password" @click="clickResetPassword"></q-btn>
                 </div>
+
                 <q-btn flat label="Close" v-close-popup></q-btn>
                 <div v-if="tab === 'login'">
                     <q-btn v-if="sentPasswordResetEmail === false" :loading="loading === 'login'" flat color="primary" label="Login" @click="clickLogin"></q-btn>
                 </div>
                 <q-btn v-else :loading="loading === 'register'" flat color="primary" label="Register" @click="clickRegister"></q-btn>
+
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -72,6 +76,14 @@ export default {
             },
             set: function(val) {
                 this.$store.commit('setShowDialog', {dialog: 'account', value: val});
+            },
+        },
+        okReceiveEmails: {
+            get: function() {
+                return this.$store.state.options.okReceiveEmails;
+            },
+            set: function(val) {
+                this.$store.commit('setOption', {key: 'okReceiveEmails', value: val});
             },
         },
     },

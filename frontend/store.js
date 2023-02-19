@@ -20,6 +20,7 @@ function syncOptions(state) {
 
 const OPTIONS_DEFAULT = {
     referrer: document.referrer, // store this to see where user came from when registering
+    okReceiveEmails: true,
     doneIntro: false,
     autoPause: 'off', // 'off', 'basic' or 'WPS'
     WPSThreshold: 2.0,
@@ -439,6 +440,7 @@ store = new Vuex.Store({
         setOptions(state, options) {
             state.options = options;
             syncOptionsDebounced(state);
+            this.commit('setNeedSync', true);
         },
         setOption(state, option) {
             state.options[option.key] = option.value;
@@ -446,6 +448,7 @@ store = new Vuex.Store({
             if (option.key === 'hideWordsLevel') {
                 createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
             }
+            this.commit('setNeedSync', true);
         },
         setDeepOption(state, option) {
             state.options[option.key][option.key2] = option.value;

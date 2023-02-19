@@ -4,10 +4,10 @@
             <q-card class="accountcard">
                 <q-card-section>
                     <div class="text-h6">Account</div>
-                    <div v-if="$store.state.accountEmail" class="text-subtitle2">{{ $store.state.accountEmail }}</div>
                 </q-card-section>
 
                 <q-separator />
+                <div v-if="$store.state.accountEmail" class="text-subtitle2">{{ $store.state.accountEmail }}</div>
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
@@ -19,42 +19,35 @@
                     <q-btn flat @click="login">Login</q-btn>
                     <q-btn v-if="$store.state.syncProgress.length > 0" color="gray" flat @click="$store.commit('setShowDialog', {dialog: 'sync', value: true})">Show Sync Log</q-btn>
                 </q-card-actions>
-            </q-card>
-            <q-card class="accountcard">
-                <q-card-section>
-                    <div class="text-h6">Backup or Restore</div>
-                    <div class="text-subtitle2">Download data file or restore from file</div>
-                </q-card-section>
 
                 <q-separator />
 
                 <q-card-actions vertical>
+                    <q-checkbox v-model="okReceiveEmails" label="OK to receive occasional email updates" />
+                </q-card-actions>
+
+                <q-separator />
+
+                <q-card-actions vertical>
+                    <q-btn color="primary" flat @click="showIntro">Show Intro</q-btn>
+                </q-card-actions>
+            </q-card>
+            <q-card class="accountcard">
+                <q-card-section>
+                    <div class="text-h6">Local Data</div>
+                </q-card-section>
+
+                <q-separator />
+                <q-card-actions vertical>
                     <q-btn color="green" flat @click="exportDb">Download</q-btn>
                     <q-btn flat @click="importDb">Restore from File</q-btn>
                 </q-card-actions>
-            </q-card>
-
-            <q-card class="accountcard">
-                <q-card-section>
-                    <div class="text-h6">Clear Local Data</div>
-                </q-card-section>
 
                 <q-separator />
 
                 <q-card-actions vertical>
                     <q-btn color="orange" flat @click="clearCache" :disabled="clickedClearCache" >Clear Cache</q-btn>
                     <q-btn color="red" flat @click="confirmClearPersonalData = true" :disabled="clickedClearPersonalData">Clear Personal Data</q-btn>
-                </q-card-actions>
-            </q-card>
-            <q-card class="accountcard">
-                <q-card-section>
-                    <div class="text-h6">Intro</div>
-                </q-card-section>
-
-                <q-separator />
-
-                <q-card-actions vertical>
-                    <q-btn color="primary" flat @click="showIntro">Show Intro</q-btn>
                 </q-card-actions>
             </q-card>
         </div>
@@ -82,6 +75,16 @@ export default {
         confirmClearPersonalData: false,
         clickedClearPersonalData: false,
     }},
+    computed: {
+        okReceiveEmails: {
+            get: function() {
+                return this.$store.state.options.okReceiveEmails;
+            },
+            set: function(val) {
+                this.$store.commit('setOption', {key: 'okReceiveEmails', value: val});
+            },
+        },
+    },
     methods: {
         showIntro: function() {
             this.$store.commit('setShowDialog', { dialog: 'intro', value: true });
