@@ -4,7 +4,7 @@
 		"py": "Sān tǐ",
 		"en": "Three-Body (Tencent)"
 	},
-	"date_added": "2023-01-15",
+	"date_added": "2023-02-15",
 	"douban": 8.0,
 	"year": "2023",
 	"type": "tv",
@@ -17,33 +17,103 @@
 	"caption_source": "hard",
 	"translation_source": "human",
 	"released": true,
-	"seasons": [
-		{
-			"episodes": [
-				{
-					"id": "youtube-YrLompD6e_k"
-				},
-				{
-					"id": "youtube-cmjjeOsBNfk"
-				},
-				{
-					"id": "youtube-euvTxWf7mLk"
-				},
-				{
-					"id": "youtube-TYyH3yrGUvw"
-				},
-                {
-                    "id": "youtube-6Z3OJqAbEx0"
-                },
-                {
-                    "id": "youtube-Yg0o47hLQ_A"
-                },
-                {
-                    "id": "youtube-TONQ01_IIDw"
-                }
-			]
-		}
-	],
+    "seasons": [
+        {
+          "playlist_id": "PLMX26aiIvX5rFSYPXtcqda3tWd6pGVD5Q",
+          "episodes": [
+            {
+              "id": "youtube-YrLompD6e_k"
+            },
+            {
+              "id": "youtube-cmjjeOsBNfk"
+            },
+            {
+              "id": "youtube-euvTxWf7mLk"
+            },
+            {
+              "id": "youtube-TYyH3yrGUvw"
+            },
+            {
+              "id": "youtube-6Z3OJqAbEx0"
+            },
+            {
+              "id": "youtube-Yg0o47hLQ_A"
+            },
+            {
+              "id": "youtube-TONQ01_IIDw"
+            },
+            {
+              "id": "youtube-wlS35aldVE0"
+            },
+            {
+              "id": "youtube-B9hFl9lhAPo"
+            },
+            {
+              "id": "youtube-FPTnXE4IpTM"
+            },
+            {
+              "id": "youtube-SJ3yKGw5Z4A"
+            },
+            {
+              "id": "youtube-VpOpXbDlVxI"
+            },
+            {
+              "id": "youtube-qtXn2Xm9kUU"
+            },
+            {
+              "id": "youtube-oOCE0c-kEyU"
+            },
+            {
+              "id": "youtube-FjvnqX-3rJ4"
+            },
+            {
+              "id": "youtube-zNL3MQX_nBA"
+            },
+            {
+              "id": "youtube-2VJl3t80Caw"
+            },
+            {
+              "id": "youtube-72jg1h9zhFg"
+            },
+            {
+              "id": "youtube-hpfO77cD_9A"
+            },
+            {
+              "id": "youtube-Lkdxz4J_9CQ"
+            },
+            {
+              "id": "youtube-FkBx7SmjNDs"
+            },
+            {
+              "id": "youtube-ZMkI7tOgqBs"
+            },
+            {
+              "id": "youtube-oTIspfvYTJ0"
+            },
+            {
+              "id": "youtube-JI_-jxTwY8U"
+            },
+            {
+              "id": "youtube-Sd6pYCuayPo"
+            },
+            {
+              "id": "youtube-jr93mNRc7Q8"
+            },
+            {
+              "id": "youtube-UnZZWrgXrjA"
+            },
+            {
+              "id": "youtube-9y0NmKUnG08"
+            },
+            {
+              "id": "youtube-ZejD5DnfWmY"
+            },
+            {
+              "id": "youtube-uynVpHc1NEA"
+            }
+          ]
+        }
+    ],
 	"ocr_params": [
 		{
 			"type": "hanzi",
