@@ -17,6 +17,11 @@
 	"caption_source": "hard",
 	"translation_source": "human",
 	"released": true,
+    "fixed_translations": {
+        "三体星系": "Trisolaris System",
+        "三体星": "Trisolaris",
+        "三体": "Three Body"
+    },
     "seasons": [
         {
           "playlist_id": "PLMX26aiIvX5rFSYPXtcqda3tWd6pGVD5Q",
