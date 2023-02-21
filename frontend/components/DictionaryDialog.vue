@@ -60,7 +60,17 @@ export default {
             '#4169E1', // blue
             'gray'
         ],
+        keyboardListener: null,
     }},
+    mounted: function() {
+        const self = this;
+        this.keyboardListener = window.addEventListener("keydown", function(event) {
+            if(event.key === "Escape") self.show = false;
+        }, {capture: false});
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('keydown', this.keyboardListener);
+    },
     computed: {
         text: function() {
             return this.texts.tr;

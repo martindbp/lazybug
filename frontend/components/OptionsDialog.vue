@@ -211,7 +211,17 @@ export default {
             { label: 'After fast subtitles', value: 'WPS' },
         ],
         autoPause: 'off',
+        keyboardListener: null,
     }},
+    mounted: function() {
+        const self = this;
+        this.keyboardListener = window.addEventListener("keydown", function(event) {
+            if(event.key === "Escape") self.show = false;
+        }, {capture: false});
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('keydown', this.keyboardListener);
+    },
     computed: {
         show: {
             get: function() { return this.$store.state.showDialog.options; },
