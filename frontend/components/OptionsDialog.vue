@@ -15,16 +15,16 @@
 
             <q-tab-panels dark v-model="tab">
                 <q-tab-panel class="no-scroll" name="knowledge" style="width: 400px">
-                    <q-card dark>
+                    <div>
                         Select the HSK level for the words you want to hide automatically
                         <q-item dense>
                             <q-item-section>
                                 <HSKLevelSlider />
                             </q-item-section>
                         </q-item>
-                    </q-card>
+                    </div>
 
-                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
+                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
                         When pinyin is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
@@ -41,9 +41,9 @@
                                 />
                             </q-item-section>
                         </q-item>
-                    </q-card>
+                    </div>
 
-                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
+                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
                         When hanzi is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
@@ -60,9 +60,9 @@
                                 />
                             </q-item-section>
                         </q-item>
-                    </q-card>
+                    </div>
 
-                    <q-card dark :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
+                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
                         When word translation is pinned, which HSK level and above should be shown?
                         <q-item dense>
                             <q-item-section>
@@ -79,7 +79,7 @@
                                 />
                             </q-item-section>
                         </q-item>
-                    </q-card>
+                    </div>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
                     <q-item-label header>Chinese characters</q-item-label>
