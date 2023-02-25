@@ -153,17 +153,6 @@ store = new Vuex.Store({
                 translation: false,
             }
         }),
-        autoPeekStates: Vue.ref({
-            py: [],
-            hz: [],
-            tr: [],
-            rows: {
-                py: false,
-                tr: false,
-                hz: false,
-                translation: false,
-            }
-        }),
         optionsHighlightSection: null,
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
@@ -391,22 +380,21 @@ store = new Vuex.Store({
             state.captionOffset = offset;
         },
         setPeekState(state, val) {
-            const states = val.auto ? state.autoPeekStates : state.peekStates;
             if ([undefined, null].includes(val.i)) {
                 if (val.type === 'translation') {
-                    states[val.type] = true;
-                    states.rows[val.type] = true;
+                    state.peekStates[val.type] = val.value;
+                    state.peekStates.rows[val.type] = val.value;
                 }
                 else {
-                    states.rows[val.type] = true;
+                    state.peekStates.rows[val.type] = val.value;
                     // Set peek state for all words
-                    for (let i = 0; i < states[val.type].length; i++) {
-                        states[val.type][i] = true;
+                    for (let i = 0; i < state.peekStates[val.type].length; i++) {
+                        state.peekStates[val.type][i] = val.value;
                     }
                 }
             }
             else {
-                states[val.type][val.i] = true;
+                state.peekStates[val.type][val.i] = val.value;
             }
         },
         resetPeekStates(state, val) {
@@ -427,7 +415,6 @@ store = new Vuex.Store({
                     state.peekStates[type].push(false);
                 }
             }
-            state.autoPeekStates = JSON.parse(JSON.stringify(state.peekStates));
         },
         setPeekStates(state, val) {
             state.peekStates = val;

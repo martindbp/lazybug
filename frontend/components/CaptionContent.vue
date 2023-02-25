@@ -26,7 +26,7 @@
                         class="cardcontent"
                         :style="{opacity: hiddenAndNotPeeking.py[i] ? 0 : 1}"
                     >
-                        {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
+                        {{ hiddenAndNotPeeking.py[i] && ! hiddenAfterTemporaryPeek.py[i] ? '-' : py }}
                     </span>
                 </td>
             </tr>
@@ -98,7 +98,7 @@
                         :title="!hiddenAndNotPeeking.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
                         :style="{opacity: hiddenAndNotPeeking.tr[i] ? 0 : 1}"
                     >
-                        {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
+                        {{ (tr !== null && !hiddenAndNotPeeking.tr[i]) || hiddenAfterTemporaryPeek.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
                 </td>
             </tr>
@@ -174,7 +174,6 @@ export default {
         hideIcon: getIconSvg("hide", 18),
         unpinIcon: getIconSvg("unpin", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
-        autoPeeked: null,
     }},
     computed: {
         tdStyle: function() {
@@ -222,6 +221,15 @@ export default {
             for (let i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
                     states[type][i] = this.hiddenStates[type][i] && ! this.purePeekStates[type][i];
+                }
+            }
+            return states;
+        },
+        hiddenAfterTemporaryPeek: function() {
+            const states = {'py': [], 'hz': [], 'tr': []};
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                for (var type of ['hz', 'py', 'tr']) {
+                    states[type][i] = this.$store.state.peekStates[type][i] === 'hiddenAfterTemporaryPeek';
                 }
             }
             return states;
@@ -274,7 +282,8 @@ export default {
                 starred: i !== null && this.starredStates.words[i],
                 hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
                 peekrow: i === null,
-                autopeek: i !== null && this.$store.state.autoPeekStates[type][i],
+                temporarypeek: i !== null && this.$store.state.peekStates[type][i] === 'temporaryPeek',
+                hiddenaftertemporarypeek: i !== null && this.hiddenAfterTemporaryPeek[type][i],
                 pinned: this.$store.state.options.pin[type],
                 nonhanzirow: type !== 'hz' && ! isPeekRow,
             };
@@ -284,7 +293,7 @@ export default {
             return wordDataStateKey(this.wordData, type, i);
         },
         clickPeekRow: function(type) {
-            this.$store.commit('setPeekState', {'type': type});
+            this.$store.commit('setPeekState', {'type': type, value: true});
             this.appendSessionLog([getEvent('peek_row', type)]);
         },
         clickRowContextMenu(action, type) {
@@ -311,7 +320,7 @@ export default {
             this.$store.commit('setDeepOption', {key: 'pin', key2: type, value: action === 'pin'});
             this.appendSessionLog([getEvent('pin_row', type), action === 'pin']);
             if (action === 'pin') {
-                this.$store.commit('setPeekState', {'type': type});
+                this.$store.commit('setPeekState', {'type': type, value: true});
                 this.appendSessionLog([getEvent('peek_row', type)]);
             }
         },
@@ -398,7 +407,7 @@ export default {
             this.videoAPI.pause();
             if (type === 'translation') {
                 if (this.hiddenAndNotPeeking[type] === true) {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
+                    this.$store.commit('setPeekState', {'type': type, 'i': i, value: true});
                     this.applyState(type, i, StateHidden, StateNone);
                 }
                 return;
@@ -407,21 +416,25 @@ export default {
             if (this.wordData.pys[i] === null) return;
 
             if (this.hiddenStates[type][i]) {
+                let peekValue = null;
                 if (this.purePeekStates[type][i]) {
                     this.applyState('word', i, StateHidden, StateNone); // Pin it
+                    peekValue = false;
                 }
                 else {
                     this.appendSessionLog([getEvent('peek', 'word'), i]);
-                    for (const t of ['py', 'hz', 'tr']) {
-                        this.$store.commit('setPeekState', {'type': t, 'i': i});
-                    }
+                    peekValue = true;
+                }
+
+                for (const t of ['py', 'hz', 'tr']) {
+                    this.$store.commit('setPeekState', {'type': t, 'i': i, value: peekValue});
                 }
             }
             else {
                 this.applyState('word', i, StateHidden, StateHidden); // Hide it
                 // Also peek all three. This makes it more intuitive that if you click again you pin it back
                 for (const t of ['py', 'hz', 'tr']) {
-                    this.$store.commit('setPeekState', {'type': t, 'i': i});
+                    this.setTemporaryHiddenPeekState(t, i);
                 }
             }
         },
@@ -436,8 +449,7 @@ export default {
             this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
             if (this.$store.state.options.peekAfterAutoHide) {
                 for (const type of ['py', 'hz', 'tr']) {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
-                    this.$store.commit('setPeekState', {'type': type, 'i': i, 'auto': true});
+                    this.setTemporaryHiddenPeekState(type, i);
                 }
                 this.appendSessionLog([getEvent('peek', 'word'), i]);
             }
@@ -478,8 +490,7 @@ export default {
                         getState(this.pinLevelStates[type], key, StateHidden, StateNone) !== StateHidden // this word+type should be pinned
                     ) {
                         console.log('Auto pinning', type, key);
-                        this.$store.commit('setPeekState', {'type': type, 'i': i});
-                        this.$store.commit('setPeekState', {'type': type, 'i': i, 'auto': true});
+                        this.setTemporaryHiddenPeekState(type, i);
                         this.appendSessionLog([getEvent('peek', type), i]);
                     }
                 }
@@ -487,10 +498,32 @@ export default {
 
             // Peek full translation
             if (this.$store.state.options.pin.translation) {
-                this.$store.commit('setPeekState', {'type': 'translation'});
-                this.$store.commit('setPeekState', {'type': 'translation', 'auto': true});
+                this.$store.commit('setPeekState', {'type': 'translation', value: true});
                 this.appendSessionLog([getEvent('peek', 'translation')]);
             }
+        },
+        setTemporaryHiddenPeekState: function(type, i) {
+            // We clicked to hide a word, or it was auto hidden // Now we want
+            // to peek the word, wait a second, set as temporary peek, wait 2
+            // seconds and finally set as hidden
+            if (this.$store.state.peekStates[type][i] !== false) {
+                return; // already hidden, or in temporary peek state
+            }
+            this.$store.commit('setPeekState', {'type': type, 'i': i, value: true});
+            const self = this;
+            const currIdx = this.currentCaptionIdx;
+            setTimeout(function() {
+                // Check that word is still hidden
+                if ((! self.hiddenStates[type][i]) || self.currentCaptionIdx !== currIdx) return;
+
+                self.$store.commit('setPeekState', {'type': type, 'i': i, value: 'temporaryPeek'});
+                setTimeout(function() {
+                    // Check that word is still hidden
+                    if ((! self.hiddenStates[type][i]) || self.currentCaptionIdx !== currIdx) return;
+
+                    self.$store.commit('setPeekState', {'type': type, 'i': i, value: 'hiddenAfterTemporaryPeek'});
+                }, 1000);
+            }, 1000);
         },
         applyComponents: function() {
             // If user hides 你好, we should hide 你 and 好 separately, but not other way around.
@@ -737,8 +770,16 @@ export default {
     color: rgb(100, 100, 100) !important;
 }
 
-.captioncard.autopeek.hiddenstate .cardcontent {
-    color: rgb(100, 100, 100) !important;
+.captioncard.temporarypeek.hiddenstate .cardcontent {
+    /* Make text invisible slowly */
+    color: rgba(100, 100, 100, 0) !important;
+    transition: color 1s;
+}
+
+.centerrow .captioncard.temporarypeek.hiddenstate {
+    border: 1px dashed white;
+    border-radius: 3px;
+    transition: border 0.2s 0.8s;
 }
 
 .captioncard.pinned.hiddenstate .cardcontent {

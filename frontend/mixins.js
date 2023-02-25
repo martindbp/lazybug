@@ -584,11 +584,12 @@ const mixin = {
             return wordStats;
         },
         purePeekStates: function() {
-            const states = this.$store.state.peekStates;
+            // We might have set a peek state on an item that is not hidden (e.g. peek row), filter these out
+            const states = JSON.parse(JSON.stringify(this.$store.state.peekStates));
             states['translation'] = states['translation'] && this.hiddenStates['translation'];
             for (var i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = states[type][i] && this.hiddenStates[type][i];
+                    states[type][i] = [true, 'temporaryPeek'].includes(states[type][i]) && this.hiddenStates[type][i];
                 }
             }
             return states;
