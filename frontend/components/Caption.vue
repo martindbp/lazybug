@@ -62,6 +62,7 @@ export default {
             minHeight: null,
             captionFontSize: null,
             seeked: false,
+            seekedFromMenu: false,
             prevCaption: null,
             currCaption: null,
             nextCaption: null,
@@ -298,7 +299,7 @@ export default {
             self.currentTimeInterval = setInterval(() => {
                 if (self.$store.state.captionData == null) return;
                 const newTime = self.videoAPI.getCurrentTime();
-                if (self.paused && self.automaticallyPausedThisCaption && ! self.seeked && ! self.seekedFromMenu) {
+                if (self.paused && self.automaticallyPausedThisCaption && ! (self.seeked || self.seekedFromMenu)) {
                     return;
                 }
 
@@ -320,6 +321,10 @@ export default {
                     ! self.seeked &&
                     ! self.seekedFromMenu
                 );
+
+                if (self.seekedFromMenu) {
+                    self.seekedFromMenu = false; // need to reset
+                }
 
                 if (self.options.autoPause === 'basic' && canPause) {
                     self.automaticallyPausedThisCaption = true;
