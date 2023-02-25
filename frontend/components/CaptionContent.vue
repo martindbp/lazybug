@@ -18,7 +18,6 @@
                 </td>
                 <td
                     :class="getClasses('py', i)"
-                    @click.stop.prevent="click('py', i)"
                     v-for="(py, i) in wordData.py"
                     :key="i"
                     :style="tdStyle"
@@ -29,7 +28,6 @@
                     >
                         {{ hiddenAndNotPeeking.py[i] ? '-' : py }}
                     </span>
-                    <span v-if="hiddenAndNotPeeking.py[i]" class="iconcard peek" v-html="eyecon"></span>
                 </td>
             </tr>
             <tr class="centerrow">
@@ -91,7 +89,6 @@
                 </td>
                 <td
                     :class="getClasses('tr', i)"
-                    @click.stop.prevent="click('tr', i)"
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
                     :style="tdStyle"
@@ -103,7 +100,6 @@
                     >
                         {{ tr !== null && !hiddenAndNotPeeking.tr[i] ? (tr.substring(0, truncateTrLengths[i]) + (tr.length > truncateTrLengths[i] ? '...' : '')) : '-' }}
                     </span>
-                    <span v-if="hiddenAndNotPeeking.tr[i]" class="iconcard peek" v-html="eyecon"></span>
                 </td>
             </tr>
         </table>
@@ -398,6 +394,7 @@ export default {
             };
         },
         click: function(type, i = null) {
+            // type in ['hz', 'translation']
             this.videoAPI.pause();
             if (type === 'translation') {
                 if (this.hiddenAndNotPeeking[type] === true) {
@@ -409,16 +406,18 @@ export default {
 
             if (this.wordData.pys[i] === null) return;
 
-            if (this.hiddenStates[type][i] === true) {
-                if (! this.purePeekStates[type][i]) {
-                    this.$store.commit('setPeekState', {'type': type, 'i': i});
-                    this.appendSessionLog([getEvent('peek', 'tr'), i]);
-                }
-                else if (type === 'hz') {
+            if (this.hiddenStates[type][i]) {
+                if (this.purePeekStates[type][i]) {
                     this.applyState('word', i, StateHidden, StateNone); // Pin it
                 }
+                else {
+                    this.appendSessionLog([getEvent('peek', 'word'), i]);
+                    for (const t of ['py', 'hz', 'tr']) {
+                        this.$store.commit('setPeekState', {'type': t, 'i': i});
+                    }
+                }
             }
-            else if (type === 'hz') {
+            else {
                 this.applyState('word', i, StateHidden, StateHidden); // Hide it
                 // Also peek all three. This makes it more intuitive that if you click again you pin it back
                 for (const t of ['py', 'hz', 'tr']) {
@@ -704,15 +703,15 @@ export default {
     border-radius: 5px;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)) {
+.captioncard:not(.nonhanzi):not(.nonhanzirow) {
     cursor: pointer;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)):hover {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):hover {
     background-color: gray;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow:not(.captioncardhidden)):active {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):active {
     background-color: lightgray;
 }
 
