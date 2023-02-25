@@ -118,7 +118,7 @@
         <q-dialog seamless v-model="showNonEmbeddableDialog">
             <q-card>
                 <q-card-section class="row items-center">
-                    <span class="q-ml-sm">This show can't be embedded in this web app</span>
+                    <span class="q-ml-sm">This show requires the browser extension since it can't be embedded. The extension will be published soon, stay tuned.</span>
                 </q-card-section>
 
                 <q-card-actions align="right">
