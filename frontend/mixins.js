@@ -488,6 +488,10 @@ const mixin = {
         },
     },
     computed: {
+        currentCaptionIdx: function() {
+            const idx = this.$store.state.playingCaptionIdx;
+            return Array.isArray(idx) ? idx[0] : idx;
+        },
         site: function() {
             if (this.$store.state.STRINGS === null) return null;
             return this.$store.state.STRINGS.urls[document.location.hostname];
@@ -589,7 +593,10 @@ const mixin = {
             states['translation'] = states['translation'] && this.hiddenStates['translation'];
             for (var i = 0; i < this.wordData.hz.length; i++) {
                 for (var type of ['hz', 'py', 'tr']) {
-                    states[type][i] = [true, 'temporaryPeek'].includes(states[type][i]) && this.hiddenStates[type][i];
+                    states[type][i] = (
+                        ([true, 'temporaryPeek'].includes(states[type][i]) || states.rows[type])
+                        && this.hiddenStates[type][i]
+                    );
                 }
             }
             return states;

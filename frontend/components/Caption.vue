@@ -7,7 +7,6 @@
             :style="{ fontSize: $store.state.captionFontSize+'px !important' }"
             v-bind:isLoading="isLoading"
             v-bind:isLikelyAnAd="isLikelyAnAd"
-            v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
@@ -356,7 +355,7 @@ export default {
                 this.$refs.blurroot.updateStyle();
             }
         },
-        getCurrentCaptionIdx: function(withTimingOffset) {
+        getCurrentCaptionIdxRange: function(withTimingOffset) {
             const captionData = this.$store.state.captionData;
             if (captionData === null) return null;
 
@@ -435,10 +434,10 @@ export default {
             return this.$store.state.captionData['frame_size'];
         },
         currentCaptionIdx: function() {
-            return this.getCurrentCaptionIdx(true); // with offset if any
+            return this.getCurrentCaptionIdxRange(true); // with offset if any
         },
         currentBlurCaptionIdx: function() {
-            return this.getCurrentCaptionIdx(false); // without offsets
+            return this.getCurrentCaptionIdxRange(false); // without offsets
         },
     },
 };

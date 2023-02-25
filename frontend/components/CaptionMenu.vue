@@ -52,7 +52,7 @@ export default {
             }
 
             if (
-                self.$store.state.showOptions ||
+                self.$store.state.showDialog.options ||
                 ! self.$store.state.options.keyboardShortcutsToggle ||
                 ! self.$store.state.captionData ||
                 ! self.$store.state.extensionOn
@@ -92,16 +92,16 @@ export default {
                 self.showDictionary();
             }
             else if (shortcut === 'peekFullTr') {
-                self.$store.commit('setPeekState', {type: 'translation'});
+                self.$store.commit('setPeekState', {type: 'translation', value: true});
             }
             else if (shortcut === 'peekPy') {
-                self.$store.commit('setPeekState', {type: 'py'});
+                self.$store.commit('setPeekState', {type: 'py', value: true});
             }
             else if (shortcut === 'peekHz') {
-                self.$store.commit('setPeekState', {type: 'hz'});
+                self.$store.commit('setPeekState', {type: 'hz', value: true});
             }
             else if (shortcut === 'peekTr') {
-                self.$store.commit('setPeekState', {type: 'tr'});
+                self.$store.commit('setPeekState', {type: 'tr', value: true});
             }
         }, {capture: true});
     },

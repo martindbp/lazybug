@@ -380,6 +380,7 @@ store = new Vuex.Store({
             state.captionOffset = offset;
         },
         setPeekState(state, val) {
+            console.assert([true, false, 'temporaryPeek', 'hiddenAfterTemporaryPeek'].includes(val.value));
             if ([undefined, null].includes(val.i)) {
                 if (val.type === 'translation') {
                     state.peekStates[val.type] = val.value;
@@ -387,10 +388,6 @@ store = new Vuex.Store({
                 }
                 else {
                     state.peekStates.rows[val.type] = val.value;
-                    // Set peek state for all words
-                    for (let i = 0; i < state.peekStates[val.type].length; i++) {
-                        state.peekStates[val.type][i] = val.value;
-                    }
                 }
             }
             else {

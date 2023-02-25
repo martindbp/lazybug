@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused, docked: $store.state.captionDocked, mobile: isMobile}">
+    <div @mouseover="mouseOver" @mouseout="mouseOut" :class="{lazybugcaptiondiv: true, moving: $store.state.isMovingCaption, paused: paused, docked: $store.state.captionDocked, mobile: isMobile, fadeout: fadeOut }">
         <CaptionMenu
             ref="menu"
             :class="{ show: showMenu }"
@@ -34,10 +34,9 @@
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
         </div>
         <CaptionContent
-            :class="{ showpeekall: showMenu, fadeout: fadeOut }"
             v-else
             v-bind:data="showData"
-            v-bind:currentCaptionIdx="currentCaptionIdx"
+            v-bind:currentCaptionIdx="currIdx"
             v-bind:videoAPI="videoAPI"
         />
         <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>
