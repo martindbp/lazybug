@@ -21,6 +21,7 @@
             @mouseout="mouseOverDrawer = false"
           >
               <q-img
+                  loading="eager"
                   @click="clickPage('content')"
                   src="/static/images/lazybug_sanstext.svg"
                   class="logoimg"

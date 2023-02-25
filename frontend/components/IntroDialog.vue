@@ -21,7 +21,7 @@
                     <div class="q-mt-md text-center">
                         <h5>Welcome to Lazybug</h5>
                         <p>Lazybug is a free and open-source app for learning Chinese the lazy way, by watching TV and movies</p>
-                        <q-img src="https://cdn.lazybug.ai/file/lazybug-public/images/selection.png" />
+                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/selection.png" />
                         <p>There's a unique and growing selection available thanks to advanced OCR subtitle extraction</p>
                     </div>
                 </q-carousel-slide>
@@ -29,7 +29,7 @@
                     <div class="q-mt-md text-center">
                         <h5>Interactive Subtitles</h5>
                         <p>The subtitles are interactive and adapt to your skill level. Hide words you know. Peek at the minimum information you need to understand, this will allow you to learn the fastest</p>
-                        <q-img src="https://cdn.lazybug.ai/file/lazybug-public/images/caption1.png" />
+                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/caption1.png" />
                         <p>Click words to hide them. Click hidden words to peek. Click again to pin them back</p>
                     </div>
                 </q-carousel-slide>
@@ -45,16 +45,16 @@
                     <div class="q-mt-md text-center">
                         <h5>Star/Export Words</h5>
                         <p>You can save words for later by clicking the star button</p>
-                        <q-img width="200px" src="https://cdn.lazybug.ai/file/lazybug-public/images/star.png" />
+                        <q-img loading="eager" width="200px" src="https://cdn.lazybug.ai/file/lazybug-public/images/star.png" />
                         <p>From the <i>Words</i> page you can export words for use in Spaced Repetition Systems like Anki</p>
-                        <q-img src="https://cdn.lazybug.ai/file/lazybug-public/images/export.png" />
+                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/export.png" />
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="extension" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Browser Extension Coming Soon</h5>
                         <p>For shows other than Youtube that can't be embedded </p>
-                        <q-img width="300px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
+                        <q-img loading="eager" width="300px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="last" class="column no-wrap flex-center">
