@@ -513,8 +513,6 @@ store = new Vuex.Store({
                 // Website Routing Logic
                 //
                 const parts = url.pathname.split('/').filter((s) => s.length > 0);
-                if (parts.length === 0) this.commit('setPage', 'content'); // default
-                else this.commit('setPage', parts[0]);
 
                 if (parts[0] === 'player') {
                     const showId = parts[1];
@@ -547,6 +545,9 @@ store = new Vuex.Store({
                 else if (state.accountEmail === null && parts[0] === 'account' && parts.length === 2 && ['register', 'login'].includes(parts[1])) {
                     state.showDialog.account = parts[1];
                 }
+
+                if (parts.length === 0) this.commit('setPage', 'content'); // default
+                else this.commit('setPage', parts[0]);
             }
         },
     },
