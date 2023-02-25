@@ -34,11 +34,9 @@
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
         </div>
         <CaptionContent
-            :class="{ showpeekall: showMenu }"
+            :class="{ showpeekall: showMenu, fadeout: fadeOut }"
             v-else
             v-bind:data="showData"
-            v-bind:fadeOut="fadeOut"
-            v-bind:currTime="currTime"
             v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:videoAPI="videoAPI"
         />

@@ -1,5 +1,5 @@
 <template>
-    <div ref="captioncontent" :class="{captioncontent: true, fadeout: fadeOut}">
+    <div ref="captioncontent" :class="{captioncontent: true}">
         <table class="contenttable" ref="wordcontent">
             <tr class="toprow">
                 <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" :style="tdStyle" >
@@ -163,8 +163,6 @@ export default {
     },
     props: {
         data: { default: null },
-        currTime: { default: null },
-        fadeOut: { default: false },
         currentCaptionIdx: { default: null },
         videoAPI: { default: null },
     },
