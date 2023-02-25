@@ -545,7 +545,8 @@ const mixin = {
         showPercentKnown: function() {
             const personalFilter = this.$store.state.bloomFilter;
             const showBloomFilters = this.$store.state.showBloomFilters;
-            if (this.$store.state.accessToken === null || personalFilter === null || showBloomFilters === null) return {};
+            if (this.$store.state.accessToken === null) return null
+            if (personalFilter === null || showBloomFilters === null) return 0;
             const percentKnown = {};
             for (const key of Object.keys(showBloomFilters.shows)) {
                 const show = showBloomFilters.shows[key];

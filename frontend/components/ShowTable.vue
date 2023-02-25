@@ -45,7 +45,7 @@
                 </q-td>
                 <q-td key="percent_known_vocab" :props="props">
                     <q-linear-progress v-if="[null, undefined].includes(props.cols[2].value)" query />
-                    <q-linear-progress color="green" instant-feedback v-else :value="props.cols[2].value" />
+                    <q-linear-progress v-else color="green" instant-feedback :value="props.cols[2].value" />
                 </q-td>
                 <q-td key="douban" :props="props">
                     <span v-if="props.cols[3].value === 'N/A'">N/A</span>
@@ -252,8 +252,11 @@ export default {
 
             // Add in the % known and isNew properties
             rows = rows.map(row => {
-                const val = showPercentKnown[row.showId];
-                row.percent_known_vocab = val === undefined ? 0 : val;
+                let val = null;
+                if (showPercentKnown === 0) val = null;
+                else if (showPercentKnown === null) val = 0;
+                else val = showPercentKnown[row.showId];
+                row.percent_known_vocab = val;
                 row.is_new = isNew(row.date_added);
                 return row;
             });
