@@ -316,6 +316,7 @@ const mixin = {
             this.$store.commit('setPlayingShowId', showId);
             if (this.showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
+                this.$store.commit('setPlayingShowId', null);
                 this.$store.commit('setShowDialog', {dialog: 'embeddable', value: true});
                 return;
             }
@@ -330,15 +331,13 @@ const mixin = {
         },
         goExternal: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
-            const captionId = showInfo.seasons[this.$store.state.playingSeason || 0].episodes[this.$store.state.playingEpisode || 0].id;
+            const captionId = showInfo.seasons[0].episodes[0].id;
             const videoId = videoIdFromCaptionId(captionId);
             const site = siteFromCaptionId(captionId);
             const template = this.$store.state.STRINGS.site[site].urlTemplates.videoId;
             const url = template.replace('${id}', videoId);
             window.open(url, '_blank').focus();
             this.$store.commit('setNonEmbeddableVideoSelected', null);
-            this.$store.commit('setPlayingSeason', null);
-            this.$store.commit('setPlayingEpisode', null);
             this.$store.commit('setShowDialog', {dialog: 'embeddable', value: false});
         },
         getVideoURL: function(seasonIdx, episodeIdx) {
