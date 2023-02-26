@@ -4,10 +4,10 @@
             <q-card class="accountcard">
                 <q-card-section>
                     <div class="text-h6">Account</div>
+                    <span v-if="$store.state.accountEmail" class="text-subtitle2 text-left">{{ $store.state.accountEmail }}</span>
                 </q-card-section>
 
                 <q-separator />
-                <div v-if="$store.state.accountEmail" class="text-subtitle2">{{ $store.state.accountEmail }}</div>
 
                 <q-card-actions vertical v-if="$store.state.accessToken">
                     <q-btn color="green" flat @click="showModalAndSync()">Sync Cloud</q-btn>
