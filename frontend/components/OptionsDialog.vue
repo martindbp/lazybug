@@ -48,6 +48,7 @@
                         ]"
                     />
                     <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
+                    <!--
                     <div class="q-gutter-sm">
                         <br>
                         <q-item-label>Auto Pause</q-item-label>
@@ -61,6 +62,7 @@
                         </div>
                     </div>
                     <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
+                    -->
                     <div class="q-gutter-sm">
                         <q-checkbox v-model="blurCaptions" label="Blur Captions" />
                     </div>
