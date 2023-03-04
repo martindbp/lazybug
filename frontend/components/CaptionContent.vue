@@ -178,7 +178,6 @@ export default {
         tdStyle: function() {
             return {
                 fontSize: this.$store.state.captionFontSize+'px !important',
-                padding: 0,
             };
         },
         wordStats: function() {
@@ -745,26 +744,35 @@ export default {
 }
 
 .captioncard:not(.nonhanzi):not(.nonhanzirow):hover {
-    background-color: gray;
+    background-color: gray !important;
 }
 
 .captioncard:not(.nonhanzi):not(.nonhanzirow):active {
-    background-color: lightgray;
+    background-color: lightgray !important;
 }
 
-.captioncard.peeking:not(.fulltranslation) {
+.captioncard:not(.fulltranslation) {
     padding-left: 2px;
     padding-right: 2px;
 }
 
-.centerrow .captioncardhidden:not(.pinned) {
-    border: 1px dashed white;
-    border-radius: 3px;
+.centerrow .captioncardhidden:not(.nonhanzi):not(.peekrow) {
+    background-color: rgb(30, 30, 30);
 }
 
 .centerrow .captioncardhidden.starred:not(.pinned)  {
-    border: 1px dashed darkorange !important;
+    border: 1px solid darkorange !important;
 }
+
+.centerrow .captioncard {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.centerrow .captioncard.temporarypeek.hiddenstate:not(.pinned) {
+    transition: background-color 0.1s 0.5s;
+}
+
 
 .cardcontent {
     position: relative;
@@ -778,12 +786,6 @@ export default {
     /* Make text invisible slowly */
     color: rgba(100, 100, 100, 0) !important;
     transition: color 1s;
-}
-
-.centerrow .captioncard.temporarypeek.hiddenstate:not(.pinned) {
-    border: 1px dashed white;
-    border-radius: 3px;
-    transition: border 0.05s 0.5s;
 }
 
 .captioncard.pinned.hiddenstate .cardcontent {
@@ -872,7 +874,7 @@ export default {
 }
 
 .captioncard .statsbadge {
-    margin-top: -5px;
+    margin-top: -6px;
     margin-right: -5px;
 }
 
@@ -885,7 +887,7 @@ export default {
 }
 
 .captioncard .starbadge {
-    margin-top: -5px;
+    margin-top: -6px;
     margin-right: -10px;
 }
 

@@ -155,6 +155,7 @@ export default {
         currentCaptionIdx: function(newIdx, oldIdx) {
             if (newIdx === oldIdx) return;
             this.$store.commit('setPlayingCaptionIdx', newIdx);
+            console.log('IDX', newIdx, this.currTime);
 
             const captionData = this.$store.state.captionData;
 
@@ -344,6 +345,9 @@ export default {
                     }, self.pauseDuration * 1000);
                 }
                 else {
+                    if (newTime < self.currTime) {
+                        console.log(self.currTime, newTime);
+                    }
                     self.currTime = newTime;
                 }
                 self.seeked = false;
