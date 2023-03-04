@@ -232,7 +232,7 @@ make push-public
 ## Backend server
 
 The Python backend is meant to be simple and do mainly lightweight work in order to keep costs down. It's used for few things:
-1. Serve the static frontend files (js, html and images). These files are then cached on Cloudflare CDN until updated.
+1. Serve the static frontend files (js, html and images)
 2. User accounts and authentication
 3. Managing the syncing of personal data to Backblaze B2
 4. Discourse Single Sign On
