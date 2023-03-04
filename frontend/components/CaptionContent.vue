@@ -283,7 +283,7 @@ export default {
                 captioncardhidden: i !== null && this.hiddenAndNotPeeking[type][i],
                 nonhanzi: i !== null && this.wordData.pys[i] === null,
                 starred: i !== null && this.starredStates.words[i],
-                hiddenstate: i !== null && this.hiddenStates[type][i] && ! this.starredStates.words[i],
+                hiddenstate: i !== null && this.hiddenStates[type][i],
                 peekrow: i === null,
                 temporarypeek: i !== null && this.$store.state.peekStates[type][i] === 'temporaryPeek',
                 hiddenaftertemporarypeek: i !== null && this.hiddenAfterTemporaryPeek[type][i],
@@ -461,7 +461,7 @@ export default {
                 const tr = this.wordData.tr[i];
                 const key = this.stateKey('word', i);
                 if (
-                    getState(k, key, StateHidden, StateNone) === StateNone &&
+                    getState(k, key, StateHidden, null) === null &&
                     (
                         getState(this.hideWordsLevelStates, key, StateHidden, StateNone) === StateHidden ||
                         this.$store.state.options.hideWordsLevel === 7 || // all
@@ -663,7 +663,7 @@ export default {
                 }
 
                 if (allHidden) {
-                    if (getState(k, this.stateKey('word', i), StateHidden, StateNone) === StateNone) {
+                    if (getState(k, this.stateKey('word', i), StateHidden, null) === null) {
                         console.log('applySimpleCompounds', 'word', hz, pys);
                         this.autoHideWord(i);
                         applyState(d, k, 'word', hz, pys, tr, null, StateHidden, StateHidden, false, true);
