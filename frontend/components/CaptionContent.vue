@@ -264,6 +264,7 @@ export default {
                     this.timeouts = [];
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     this.applyLvlStates();
+                    this.applyPinnedRows();
                     this.applyComponents();
                     this.applyCompoundWordsNotInDict();
                     this.applySimpleCompounds();
@@ -475,23 +476,9 @@ export default {
                     applyState(d, k, 'word', hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
 
                 }
-
-                // Peek the ones that are pinned
-                let peeked = false;
-                for (const type of ['py', 'hz', 'tr']) {
-                    if (
-                        getState(k, key, StateHidden, StateHidden) && // the word is hidden
-                        this.$store.state.options.pin[type] && // pin for this type is on
-                        getState(this.pinLevelStates[type], key, StateHidden, StateNone) !== StateHidden // this word+type should be pinned
-                    ) {
-                        console.log('Auto pinning', type, key);
-                        // Don't set peek state here, we set it on whole row
-                        this.appendSessionLog([getEvent('peek', type), i]);
-                    }
-                }
             }
-
-            // Peek pinned rows
+        },
+        applyPinnedRows: function() {
             for (const type of ['translation', 'py', 'hz', 'tr']) {
                 if (this.$store.state.options.pin[type]) {
                     this.$store.commit('setPeekState', {'type': type, value: true});
