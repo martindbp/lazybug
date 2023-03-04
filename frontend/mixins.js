@@ -562,13 +562,6 @@ const mixin = {
         hideWordsLevelStates: function() {
             return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
         },
-        pinLevelStates: function() {
-            return {
-                py: this.getLvlStates('py', false, this.$store.state.options.pinLevels.py),
-                hz: this.getLvlStates('hz', false, this.$store.state.options.pinLevels.hz),
-                tr: this.getLvlStates('tr', false, this.$store.state.options.pinLevels.tr),
-            }
-        },
         videoWordStats: function() {
             if (this.$store.state.captionData === null) return {};
             const wordStats = {};

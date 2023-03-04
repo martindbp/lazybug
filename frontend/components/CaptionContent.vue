@@ -12,7 +12,7 @@
                         :pin="showPinRow('py')"
                         :unpin="!showPinRow('py')"
                         :copy="true"
-                        :options="true"
+                        :options="false"
                         :click="clickRowContextMenu"
                     />
                 </td>
@@ -41,7 +41,7 @@
                         :pin="showPinRow('hz')"
                         :unpin="!showPinRow('hz')"
                         :copy="true"
-                        :options="true"
+                        :options="false"
                         :click="clickRowContextMenu"
                     />
                 </td>
@@ -83,7 +83,7 @@
                         type="tr"
                         :pin="showPinRow('tr')"
                         :unpin="!showPinRow('tr')"
-                        :options="true"
+                        :options="false"
                         :click="clickRowContextMenu"
                     />
                 </td>
@@ -315,7 +315,6 @@ export default {
                 return;
             }
             else if (action === 'options') {
-                this.$store.commit('setOptionsHighlightSection', `knowledge-${type}-lvl`);
                 this.$store.commit('setShowDialog', {dialog: 'options', value: true});
                 return;
             }

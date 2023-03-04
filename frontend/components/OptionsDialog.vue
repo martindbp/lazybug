@@ -23,63 +23,6 @@
                             </q-item-section>
                         </q-item>
                     </div>
-
-                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-py-lvl' ? 'highlight' : ''">
-                        When pinyin is pinned, which HSK level and above should be shown?
-                        <q-item dense>
-                            <q-item-section>
-                                <q-slider
-                                    color="teal"
-                                    v-model="pinPysLevel"
-                                    :min="0"
-                                    :max="7"
-                                    :step="1"
-                                    :label-value="pinPysLevel < 7 ? pinPysLevel : 'none'"
-                                    label
-                                    snap
-                                    markers
-                                />
-                            </q-item-section>
-                        </q-item>
-                    </div>
-
-                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-hz-lvl' ? 'highlight' : ''">
-                        When hanzi is pinned, which HSK level and above should be shown?
-                        <q-item dense>
-                            <q-item-section>
-                                <q-slider
-                                    color="teal"
-                                    v-model="pinHzsLevel"
-                                    :min="0"
-                                    :max="7"
-                                    :step="1"
-                                    :label-value="pinHzsLevel < 7 ? pinHzsLevel : 'none'"
-                                    label
-                                    snap
-                                    markers
-                                />
-                            </q-item-section>
-                        </q-item>
-                    </div>
-
-                    <div :class="this.$store.state.optionsHighlightSection === 'knowledge-tr-lvl' ? 'highlight' : ''">
-                        When word translation is pinned, which HSK level and above should be shown?
-                        <q-item dense>
-                            <q-item-section>
-                                <q-slider
-                                    color="teal"
-                                    v-model="pinTrsLevel"
-                                    :min="0"
-                                    :max="7"
-                                    :step="1"
-                                    :label-value="pinTrsLevel < 7 ? pinTrsLevel : 'none'"
-                                    label
-                                    snap
-                                    markers
-                                />
-                            </q-item-section>
-                        </q-item>
-                    </div>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
                     <q-item-label header>Chinese characters</q-item-label>
@@ -231,18 +174,6 @@ export default {
             get: function() { return this.$store.state.timingOffset; },
             set: function(val) { this.$store.commit('setTimingOffset', val); },
         },
-        pinPysLevel: {
-            get: function() { return this.$store.state.options.pinLevels.py; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'py', value: val}); },
-        },
-        pinHzsLevel: {
-            get: function() { return this.$store.state.options.pinLevels.hz; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'hz', value: val}); },
-        },
-        pinTrsLevel: {
-            get: function() { return this.$store.state.options.pinLevels.tr; },
-            set: function(val) { this.$store.commit('setDeepOption', {key: 'pinLevels', key2: 'tr', value: val}); },
-        },
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },
             set: function(val) { this.$store.commit('setOption', {key: 'characterSet', value: val}); },
@@ -279,7 +210,6 @@ export default {
                 dialog.classList.remove('lazybugquasardialog');
             }
             this.show = false;
-            this.$store.commit('setOptionsHighlightSection', null);
         },
         clickShortcut: function(shortcut) {
             this.choosingShortcut = shortcut;
