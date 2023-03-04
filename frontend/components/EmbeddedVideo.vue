@@ -22,6 +22,7 @@
 import EmbeddedCaption from './EmbeddedCaption.vue'
 
 const MOCK_CLOCK_SPEED = 0.01; // s
+let lastT = null;
 
 export default {
     props: ['captionId', 'width', 'height'],
@@ -192,7 +193,19 @@ export default {
         getCurrentTime: function() {
             if (! this.playerReady) return 0;
             if (LOCAL) return this.mockTime;
-            return this.player.getCurrentTime();
+
+            let t = this.player.getCurrentTime();
+
+            // The youtube embed API doesn't return reliable timings
+            // After pausing and playing again (and at other points in time) it
+            // tends to return a time that is in the past, within 200ms, so
+            // if that happens we just return the last known time until the difference is
+            // larger than 200 ms
+            if (lastT !== null && t < lastT && lastT - t < 0.2) {
+                return lastT;
+            }
+            lastT = t;
+            return t;
         },
         setCurrentTime: function(t) {
             if (! this.playerReady) return;
