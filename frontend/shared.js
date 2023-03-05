@@ -887,7 +887,7 @@ function createBloomFilter(state, n, k) {
     if (state.SIMPLE_CHARS === null || state.HSK_WORDS === null || state.DICT === null) return null;
     let allWords = state.SIMPLE_CHARS.pre.concat(state.SIMPLE_CHARS.post).concat(state.SIMPLE_CHARS.pre_post).concat(state.SIMPLE_CHARS.middle);
 
-    for (let level = 1; level <= state.options.hideWordsLevel; level++) {
+    for (let level = 1; level <= Math.min(state.options.hideWordsLevel, 6); level++) {
         for (const word of state.HSK_WORDS[level-1]) allWords.push(word);
     }
 
