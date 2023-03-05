@@ -72,7 +72,7 @@ const mixin = {
             this.$store.commit('setShowDialog', {dialog: 'account', value: 'login'});
             this.accountCallback = callback;
         },
-        showModalAndSync: function(closeAfterDone = false, callback = null) {
+        showModalAndSync: function(closeAfterDone = false, callback = null, syncIsAfterLogin = false) {
             this.$store.commit('setShowDialog', {dialog: 'sync', value: true});
             const self = this;
             this.syncDatabase(function(error) {
@@ -85,7 +85,7 @@ const mixin = {
                     }, 500);
                 }
                 if (callback) callback(error);
-            });
+            }, syncIsAfterLogin);
         },
         exportUploadDatabase: function(callback) {
             const self = this;
@@ -139,7 +139,7 @@ const mixin = {
                 });
             });
         },
-        syncDatabase: function(callback) {
+        syncDatabase: function(callback, syncIsAfterLogin = false) {
             const self = this;
             const accessToken = this.$store.state.accessToken;
             let lastSyncDateString = this.$store.state.lastSyncDate;
@@ -199,7 +199,7 @@ const mixin = {
                             const numLocalSessionsAfterMerge = localData.data.data[localLogIdx].rows.length;
                             self.$store.commit('addSyncProgress', `Added ${numLocalSessionsAfterMerge - numLocalSessions} sessions from remote`);
 
-                            // For other (like options) take those with newest timestamp
+                            // For other (like options) take those with newest timestamp (if logged in)
                             const localOtherIdx = localData.data.tables.map((table) => table.name).indexOf('other');
                             const remoteOtherIdx = remoteData.data.tables.map((table) => table.name).indexOf('other');
                             const localOther = localData.data.data[localOtherIdx].rows;
@@ -207,7 +207,7 @@ const mixin = {
                             const other = {};
                             localData.data.data[localOtherIdx].rows.forEach((row) => other[row.id] = row);
                             remoteData.data.data[remoteOtherIdx].rows.forEach((row) => {
-                                if (other[row.id] && row.timestamp < other[row.id].timestamp) {
+                                if (!syncIsAfterLogin && other[row.id] && row.timestamp < other[row.id].timestamp) {
                                     self.$store.commit('addSyncProgress', `Kept more recent local data for other ${row.id} data`);
                                     return; // keep local
                                 }

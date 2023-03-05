@@ -201,7 +201,7 @@ export default {
                     self.$store.commit('setLogin', {accessToken: res.access_token, email: self.email });
                     self.show = false;
                     self.password = '';
-                    self.showModalAndSync(true);
+                    self.showModalAndSync(true, null, true);
                 }
             });
 
