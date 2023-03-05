@@ -76,6 +76,7 @@ export default {
 
             const self = this;
             getViewingHistory(0, null, function(data) {
+                data = data.filter((row) => row.seasonIdx !== null);  // bogus data that was probably added because of a bug
                 for (const row of data) {
                     const showId = row.showId;
                     row.showInfo = self.showList[showId];
