@@ -15,13 +15,20 @@
 
             <q-tab-panels dark v-model="tab">
                 <q-tab-panel class="no-scroll" name="knowledge" style="width: 400px">
-                    <div>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="useSmartSubtitles" label="Use Smart Subtitles" />
+                    </div>
+                    <div v-if="useSmartSubtitles">
                         Select the HSK level for the words you want to hide automatically
                         <q-item dense>
                             <q-item-section>
                                 <HSKLevelSlider />
                             </q-item-section>
                         </q-item>
+                    </div>
+                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="blurCaptions" label="Blur Captions" />
                     </div>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
@@ -175,6 +182,10 @@ export default {
         timingOffset: {
             get: function() { return this.$store.state.timingOffset; },
             set: function(val) { this.$store.commit('setTimingOffset', val); },
+        },
+        useSmartSubtitles: {
+            get: function() { return this.$store.state.options.useSmartSubtitles; },
+            set: function(val) { this.$store.commit('setOption', {key: 'useSmartSubtitles', value: val}); },
         },
         characterSet: {
             get: function() { return this.$store.state.options.characterSet; },

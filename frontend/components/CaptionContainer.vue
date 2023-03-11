@@ -62,7 +62,10 @@ export default {
         'isLikelyAnAd',
         'pauseDuration',
     ],
-    components: {CaptionContent, CaptionMenu},
+    components: {
+        CaptionContent,
+        CaptionMenu,
+    },
     data: function() { return {
         showMenu: false,
         showData: null,

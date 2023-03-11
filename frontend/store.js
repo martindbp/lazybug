@@ -22,6 +22,7 @@ const OPTIONS_DEFAULT = {
     referrer: document.referrer, // store this to see where user came from when registering
     okReceiveEmails: true,
     doneIntro: localStorage.getItem('doneIntro', 'false') === 'true',
+    useSmartSubtitles: true,
     autoPause: 'off', // 'off', 'basic' or 'WPS'
     WPSThreshold: 2.0,
     characterSet: 'sm',

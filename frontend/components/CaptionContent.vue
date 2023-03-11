@@ -1,7 +1,7 @@
 <template>
     <div ref="captioncontent" :class="{captioncontent: true}">
-        <table class="contenttable" ref="wordcontent">
-            <tr class="toprow">
+        <table :class="{contenttable: true, plain: !smart}" ref="wordcontent">
+            <tr class="toprow" v-if="smart">
                 <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" :style="tdStyle" >
                     <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.py" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
@@ -46,6 +46,7 @@
                     />
                 </td>
                 <td
+                    v-if="smart"
                     :class="getClasses('hz', i)"
                     @click.stop.prevent="click('hz', i)"
                     v-for="(hz, i) in wordData.hz"
@@ -73,8 +74,28 @@
                         :copy="true"
                     />
                 </td>
+                <td
+                    v-else
+                    :class="{
+                        captioncard: true,
+                        peeking: purePeekStates.rows.hz,
+                        placeholder: !purePeekStates.rows.hz,
+                        plainhz: true,
+                        showborder: data !== null,
+                    }"
+                    @click.stop.prevent="clickPeekRow('hz')"
+                    :style="tdStyle"
+                >
+                    <span
+                        class="cardcontent"
+                        :style="{opacity: !$store.state.peekStates.rows.hz ? 0 : 1, fontSize: plainFontSize}"
+                    >
+                        {{ wordData.text }}
+                    </span>
+                    <span v-if="!purePeekStates.rows.hz" class="iconcard peek" v-html="eyecon" />
+                </td>
             </tr>
-            <tr class="bottomrow">
+            <tr class="bottomrow" v-if="smart">
                 <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')" :style="tdStyle">
                     <span v-if="! $store.state.options.pin.tr" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.tr" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
@@ -103,8 +124,8 @@
                 </td>
             </tr>
         </table>
-        <br/>
-        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.2em' }" v-if="data !== null">
+        <br v-if="smart">
+        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.2em' }" v-if="data !== null && smart">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
                     
@@ -152,13 +173,11 @@
     </div>
 </template>
 <script>
-import SvgButton from './SvgButton.vue'
 import ContentContextMenu from './ContentContextMenu.vue'
 
 export default {
     mixins: [mixin],
     components: {
-        SvgButton,
         ContentContextMenu,
     },
     props: {
@@ -175,6 +194,16 @@ export default {
         timeouts: [],
     }},
     computed: {
+        plainFontSize: function() {
+            let fontSize = this.$store.state.captionFontSize;
+            if (!this.$store.state.options.useSmartSubtitles) {
+                fontSize = Math.floor(fontSize * 1.7);
+            }
+            return fontSize;
+        },
+        smart: function() {
+            return this.$store.state.options.useSmartSubtitles;
+        },
         tdStyle: function() {
             return {
                 fontSize: this.$store.state.captionFontSize+'px !important',
@@ -240,6 +269,8 @@ export default {
         },
     },
     updated: function() {
+        if (! this.smart) return;
+
         // New text may have changed the size of the caption, so need to update width of full translation table
         const self = this;
         this.$nextTick(function () {
@@ -263,11 +294,13 @@ export default {
                     }
                     this.timeouts = [];
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
-                    this.applyLvlStates();
+                    if (this.$store.state.options.useSmartSubtitles) {
+                        this.applyLvlStates();
+                        this.applyComponents();
+                        this.applyCompoundWordsNotInDict();
+                        this.applySimpleCompounds();
+                    }
                     this.applyPinnedRows();
-                    this.applyComponents();
-                    this.applyCompoundWordsNotInDict();
-                    this.applySimpleCompounds();
                 }
             },
         },
@@ -697,6 +730,10 @@ export default {
     line-height: 1.5em;
 }
 
+.contenttable.plain {
+    margin-top: 10px;
+}
+
 .toprow td:not(:first-child) span {
     font-size: 1em;
 }
@@ -719,21 +756,24 @@ export default {
 
 .captioncard {
     position: relative;
-    user-select: none;
     white-space: nowrap;
     border: 1px solid transparent;
     border-radius: 5px;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow) {
+.captioncard:not(.plainhz.peeking) {
+    user-select: none;
+}
+
+.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking) {
     cursor: pointer;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow):hover {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):hover {
     background-color: gray !important;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow):active {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):active {
     background-color: lightgray !important;
 }
 
@@ -743,6 +783,10 @@ export default {
 }
 
 .centerrow .captioncardhidden:not(.nonhanzi):not(.peekrow) {
+    background-color: rgb(30, 30, 30);
+}
+
+.centerrow .plainhz:not(.peeking) {
     background-color: rgb(30, 30, 30);
 }
 
@@ -765,7 +809,11 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation):not(.pinned) .cardcontent {
-    color: rgb(100, 100, 100) !important;
+    color: rgb(100, 100, 100);
+}
+
+.captioncard.plainhz .cardcontent {
+    color: white !important;
 }
 
 .captioncard.temporarypeek.hiddenstate:not(.pinned) .cardcontent {
@@ -778,7 +826,7 @@ export default {
     color: rgb(160, 160, 160) !important;
 }
 
-.captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)) .cardcontent {
+.captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)):not(.plainhz.peeking) .cardcontent {
     color: rgb(100, 100, 100) !important;
 }
 

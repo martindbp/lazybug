@@ -4,7 +4,7 @@
             id="captionroot"
             ref="captionroot"
             :class="{ docked: $store.state.captionDocked }"
-            :style="{ fontSize: $store.state.captionFontSize+'px !important' }"
+            :style="{ fontSize: $store.state.options.captionFontSize+'px !important' }"
             v-bind:isLoading="isLoading"
             v-bind:isLikelyAnAd="isLikelyAnAd"
             v-bind:firstCaption="firstCaption"
@@ -60,7 +60,6 @@ export default {
             lastPausedAt: null,
             automaticallyPausedThisCaption: false,
             minHeight: null,
-            captionFontSize: null,
             seeked: false,
             seekedFromMenu: false,
             prevCaption: null,
@@ -155,7 +154,6 @@ export default {
         currentCaptionIdx: function(newIdx, oldIdx) {
             if (newIdx === oldIdx) return;
             this.$store.commit('setPlayingCaptionIdx', newIdx);
-            console.log('IDX', newIdx, this.currTime);
 
             const captionData = this.$store.state.captionData;
 

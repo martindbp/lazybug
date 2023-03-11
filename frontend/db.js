@@ -66,6 +66,18 @@ const PERSONAL_DB_VERSIONS = {
             });
         });
     },
+    '5': function(personalDb) {
+        // Add "useSmartSubtitles" flag store in options, default is "true"
+        personalDb.version(5).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.useSmartSubtitles = true;
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null) {
