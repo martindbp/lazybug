@@ -1,6 +1,6 @@
 const BLOOM_FILTER_N = 287552;
 const BLOOM_FILTER_K = 13;
-const DEFAULT_FONT_SIZE = 24;
+const DEFAULT_FONT_SIZE = 35;
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
     prev: 'ArrowLeft',
@@ -125,7 +125,7 @@ store = new Vuex.Store({
         states: Vue.ref({}),
         bloomFilter: null, // bloom filter for known vocab, only for web app
         captionFontScale: 0.5,
-        captionFontSize: 24,
+        captionFontSize: DEFAULT_FONT_SIZE,
         captionOffset: [0, 0],
         isMovingCaption: false,
         showDialog: Vue.ref({

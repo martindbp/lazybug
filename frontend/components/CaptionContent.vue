@@ -2,7 +2,7 @@
     <div ref="captioncontent" :class="{captioncontent: true}">
         <table :class="{contenttable: true, plain: !smart}" ref="wordcontent">
             <tr class="toprow" v-if="smart">
-                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" :style="tdStyle" >
+                <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" >
                     <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.py" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">PY</span>
@@ -31,7 +31,7 @@
                 </td>
             </tr>
             <tr class="centerrow">
-                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')" :style="tdStyle">
+                <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')">
                     <span v-if="! $store.state.options.pin.hz" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.hz" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
                     <span v-else class="cardcontent">HZ</span>
@@ -84,7 +84,6 @@
                         showborder: data !== null,
                     }"
                     @click.stop.prevent="clickPeekRow('hz')"
-                    :style="tdStyle"
                 >
                     <span
                         class="cardcontent"
@@ -124,8 +123,7 @@
                 </td>
             </tr>
         </table>
-        <br v-if="smart">
-        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', marginTop: '0.2em' }" v-if="data !== null && smart">
+        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', display: 'block', marginTop: '-4px' }" v-if="data !== null && smart">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
                     
@@ -696,8 +694,7 @@ export default {
 <style>
 
 .peekrow {
-    width: 1.5em;
-    margin-right: 3em;
+    width: 25px;
 }
 
 .captioncontent {
@@ -705,7 +702,7 @@ export default {
     display: inline-block;
     padding-left: 0.25em !important;
     padding-right: 2em !important;
-    padding-bottom: 0.5em !important;
+    padding-bottom: 0.5 !important;
     opacity: 1;
     text-align: left;
 }
@@ -718,16 +715,16 @@ export default {
 
 .contenttable {
     color: white;
-    font-size: 24px;
+    font-size: 30px;
     display: inline-block;
     text-align: center;
     table-layout: fixed;
-    border-spacing: 0.3em;
+    border-spacing: 10px 0em;
     font-family: sans-serif;
 }
 
 .contenttable tr {
-    line-height: 1.5em;
+    line-height: 1.0em;
 }
 
 .contenttable.plain {
@@ -735,15 +732,15 @@ export default {
 }
 
 .toprow td:not(:first-child) span {
-    font-size: 1em;
+    font-size: 0.4em;
 }
 
 .centerrow td:not(:first-child) {
-    line-height: 1.25em;
+    line-height: 1.em;
 }
 
 .centerrow td:not(:first-child) span {
-    font-size: 1.25em;
+    font-size: 1.0em;
 }
 
 .centerrow {
@@ -751,7 +748,7 @@ export default {
 }
 
 .bottomrow td:not(:first-child) span {
-    font-size: 0.8em;
+    font-size: 0.4em;
 }
 
 .captioncard {
@@ -769,13 +766,22 @@ export default {
     cursor: pointer;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):hover {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):not(.peekrow):hover {
     background-color: gray !important;
 }
 
-.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):active {
+.captioncard:not(.nonhanzi):not(.nonhanzirow):not(.plainhz.peeking):not(.peekrow):active {
     background-color: lightgray !important;
 }
+
+.peekrow:hover .iconcard {
+    background-color: gray !important;
+}
+
+.peekrow:active .iconcard {
+    background-color: lightgray !important;
+}
+
 
 .captioncard:not(.fulltranslation) {
     padding-left: 2px;
@@ -809,7 +815,7 @@ export default {
 }
 
 .captioncard.peeking:not(.fulltranslation):not(.pinned) .cardcontent {
-    color: rgb(100, 100, 100);
+    color: rgb(170, 170, 170);
 }
 
 .captioncard.plainhz .cardcontent {
@@ -831,7 +837,7 @@ export default {
 }
 
 .peekrow .cardcontent {
-    font-size: 0.5em;
+    font-size: 12px;
     color: lightgray;
     position: absolute;
     line-height: 0;
@@ -851,6 +857,7 @@ export default {
     height: 20px;
     visibility: hidden;
     z-index: 999;
+    border-radius: 3px;
 }
 
 .iconcard.peek {
@@ -876,6 +883,10 @@ export default {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     text-align: center;
+}
+
+.fulltranslation .cardcontent {
+    font-size: 0.4em;
 }
 
 .fulltranslation.placeholder {
