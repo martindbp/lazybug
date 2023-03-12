@@ -16,6 +16,9 @@ export default {
     components: {
         Caption,
     },
+    mounted: function() {
+        $q = this.$q; // global variable in shared.js
+    }
 };
 </script>
 
