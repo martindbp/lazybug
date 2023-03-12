@@ -61,7 +61,7 @@
                         <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
-                    <span v-if="hiddenAndNotPeeking.hz[i] || (hiddenStates.hz[i] && ![true, 'temporaryPeek'].includes($store.state.peekStates.hz[i]) && $store.state.peekStates.rows.hz)" class="iconcard peek" v-html="eyecon"></span>
+                    <span v-if="hiddenAndNotPeeking.hz[i] || (hiddenStates.hz[i] && !$store.state.peekStates.hz[i] && $store.state.peekStates.rows.hz)" class="iconcard peek" v-html="eyecon"></span>
                     <span v-else-if="purePeekStates.hz[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-else-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
                     <ContentContextMenu
@@ -316,8 +316,6 @@ export default {
                 starred: i !== null && this.starredStates.words[i],
                 hiddenstate: i !== null && this.hiddenStates[type][i],
                 peekrow: i === null,
-                temporarypeek: i !== null && this.$store.state.peekStates[type][i] === 'temporaryPeek',
-                hiddenaftertemporarypeek: i !== null && this.hiddenAfterTemporaryPeek[type][i],
                 pinned: this.$store.state.peekStates.rows[type],
                 nonhanzirow: type !== 'hz' && ! isPeekRow,
             };
@@ -446,7 +444,7 @@ export default {
 
             if (this.hiddenStates[type][i]) {
                 let peekValue = null;
-                if ([true, 'temporaryPeek'].includes(this.$store.state.peekStates[type][i])) {
+                if (this.$store.state.peekStates[type][i]) {
                     this.applyState('word', i, StateHidden, StateNone); // Pin it
                     peekValue = false;
                 }
@@ -461,8 +459,6 @@ export default {
             }
             else {
                 this.applyState('word', i, StateHidden, StateHidden); // Hide it
-                // Also peek all three. This makes it more intuitive that if you click again you pin it back
-                this.setTemporaryHiddenPeekState(i);
             }
         },
         isHiddenStoreOrLvlStates: function(type, hz, pys) {
@@ -474,10 +470,6 @@ export default {
         },
         autoHideWord: function(i) {
             this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
-            if (this.$store.state.options.peekAfterAutoHide) {
-                this.setTemporaryHiddenPeekState(i);
-                this.appendSessionLog([getEvent('peek', 'word'), i]);
-            }
         },
         applyLvlStates: function() {
             const d = this.$store.state.DICT;
@@ -515,35 +507,6 @@ export default {
                     this.appendSessionLog([getEvent('peek', type)]);
                 }
             }
-        },
-        setTemporaryHiddenPeekState: function(i) {
-            // We clicked to hide a word, or it was auto hidden // Now we want
-            // to peek the word, wait a second, set as temporary peek, wait 2
-            // seconds and finally set as hidden
-            if (this.$store.state.peekStates.hz[i] !== false) {
-                return; // already hidden, or in temporary peek state
-            }
-            for (const type of ['py', 'hz', 'tr']) {
-                this.$store.commit('setPeekState', {'type': type, 'i': i, value: true});
-            }
-            const self = this;
-            const currIdx = this.currentCaptionIdx;
-            // NOTE: since multiple words might set timeouts we need to keep track of them in an array
-            // so that we can clear them when the caption changes
-            const temporaryPeekTimeout = setTimeout(function() {
-                self.timeouts.splice(self.timeouts.indexOf(temporaryPeekTimeout), 1);
-                for (const type of ['py', 'hz', 'tr']) {
-                    self.$store.commit('setPeekState', {'type': type, 'i': i, value: 'temporaryPeek'});
-                }
-                const hiddenAfterTemporaryPeekTimeout = setTimeout(function() {
-                    self.timeouts.splice(self.timeouts.indexOf(hiddenAfterTemporaryPeekTimeout), 1);
-                    for (const type of ['py', 'hz', 'tr']) {
-                        self.$store.commit('setPeekState', {'type': type, 'i': i, value: 'hiddenAfterTemporaryPeek'});
-                    }
-                }, 1000);
-                self.timeouts.push(hiddenAfterTemporaryPeekTimeout);
-            }, 1000);
-            self.timeouts.push(temporaryPeekTimeout);
         },
         applyComponents: function() {
             // If user hides 你好, we should hide 你 and 好 separately, but not other way around.
@@ -805,11 +768,6 @@ export default {
     padding-bottom: 3px;
 }
 
-.centerrow .captioncard.temporarypeek.hiddenstate:not(.pinned) {
-    transition: background-color 0.1s 0.5s;
-}
-
-
 .cardcontent {
     position: relative;
 }
@@ -820,12 +778,6 @@ export default {
 
 .captioncard.plainhz .cardcontent {
     color: white !important;
-}
-
-.captioncard.temporarypeek.hiddenstate:not(.pinned) .cardcontent {
-    /* Make text invisible slowly */
-    color: rgba(100, 100, 100, 0) !important;
-    transition: color 1s;
 }
 
 .captioncard.pinned.hiddenstate .cardcontent {
