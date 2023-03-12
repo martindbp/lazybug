@@ -9,6 +9,7 @@
         <span v-if="unstar" class="contexticon unstar" title="Unstar" v-html="starIcon" @click.stop.prevent="clickButton('unstar')"></span>
         <span v-if="switch" class="contexticon switch" :title="switchlabel" v-html="switchIcon" @click.stop.prevent="clickButton('switch')"></span>
         <span v-if="options" class="contexticon options" title="Options" v-html="optionsIcon" @click.stop.prevent="clickButton('options')"></span>
+        <q-badge class="statsbadge" v-if="stats > 0" align="middle" :color="stats === 1 ? 'red' : 'green'" @click.stop.prevent title="Occurrences in video">{{ stats }}</q-badge>
     </span>
 </template>
 
@@ -25,6 +26,7 @@ export default {
         dict: { default: false },
         copy: { default: false },
         options: { default: false },
+        stats: { default: 0 },
         switch: { default: false },
         switchlabel: { default: '' },
         click: { default: null },
@@ -51,7 +53,7 @@ export default {
 
 <style>
 
-.captioncard:not(.captioncardhidden):not(.placeholder):hover .contextmenu {
+.captioncard:not(.captioncardhidden):not(.placeholder):not(.mousehasnotmovedafterpeeking):hover .contextmenu {
     visibility: visible;
     opacity: 1.0;
 }
@@ -106,6 +108,10 @@ export default {
 
 .nonhanzi .contextmenu {
     display: none;
+}
+
+.statsbadge {
+    margin-top: -3px;
 }
 
 </style>

@@ -49,6 +49,7 @@
                     v-if="smart"
                     :class="getClasses('hz', i)"
                     @click.stop.prevent="click('hz', i)"
+                    @mousemove="mouseMove"
                     v-for="(hz, i) in wordData.hz"
                     :key="i"
                     :style="tdStyle"
@@ -60,9 +61,8 @@
                         {{ sm2tr(hz) }}
                         <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
-                    <q-badge class="statsbadge" :color="wordStats[i] === 1 ? 'red' : 'green'" floating>{{ wordStats[i] }}</q-badge>
                     <span v-if="hiddenAndNotPeeking.hz[i] || (hiddenStates.hz[i] && !$store.state.peekStates.hz[i] && $store.state.peekStates.rows.hz)" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-else-if="purePeekStates.hz[i]" class="iconcard peek" v-html="pinIcon"></span>
+                    <span v-else-if="purePeekStates.hz[i] && !mouseHasNotMovedAfterPeeking" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-else-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
                     <ContentContextMenu
                         type="word"
@@ -72,6 +72,7 @@
                         :dict="true"
                         :click="clickContextMenu"
                         :copy="true"
+                        :stats="wordStats[i]"
                     />
                 </td>
                 <td
@@ -83,11 +84,12 @@
                         plainhz: true,
                         showborder: data !== null,
                     }"
+                    :style="tdStyle"
                     @click.stop.prevent="clickPeekRow('hz')"
                 >
                     <span
                         class="cardcontent"
-                        :style="{opacity: !$store.state.peekStates.rows.hz ? 0 : 1, fontSize: plainFontSize}"
+                        :style="{opacity: !$store.state.peekStates.rows.hz ? 0 : 1}"
                     >
                         {{ wordData.text }}
                     </span>
@@ -123,7 +125,7 @@
                 </td>
             </tr>
         </table>
-        <table class="contenttable" :style="{ fontSize: $store.state.captionFontSize+'px !important', display: 'block', marginTop: '-4px' }" v-if="data !== null && smart">
+        <table class="contenttable fulltranslationtable" :style="{ fontSize: $store.state.captionFontSize+'px !important'}" v-if="data !== null && smart">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
                     
@@ -190,15 +192,9 @@ export default {
         unpinIcon: getIconSvg("unpin", 18),
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         timeouts: [],
+        mouseHasNotMovedAfterPeeking: false,
     }},
     computed: {
-        plainFontSize: function() {
-            let fontSize = this.$store.state.captionFontSize;
-            if (!this.$store.state.options.useSmartSubtitles) {
-                fontSize = Math.floor(fontSize * 1.7);
-            }
-            return fontSize;
-        },
         smart: function() {
             return this.$store.state.options.useSmartSubtitles;
         },
@@ -300,10 +296,18 @@ export default {
                     }
                     this.applyPinnedRows();
                 }
+
+                this.mouseHasNotMovedAfterPeeking = [];
+                for (let i = 0; i < this.wordData.hz.length; i++) this.mouseHasNotMovedAfterPeeking.push(false);
             },
         },
     },
     methods: {
+        mouseMove: function() {
+            for (let i = 0; i < this.mouseHasNotMovedAfterPeeking.length; i++) {
+                this.mouseHasNotMovedAfterPeeking[i] = false;
+            }
+        },
         showPinRow: function(type) {
             return !this.$store.state.options.pin[type];
         },
@@ -318,6 +322,7 @@ export default {
                 peekrow: i === null,
                 pinned: this.$store.state.peekStates.rows[type],
                 nonhanzirow: type !== 'hz' && ! isPeekRow,
+                mousehasnotmovedafterpeeking: this.mouseHasNotMovedAfterPeeking[i],
             };
             return cl;
         },
@@ -440,7 +445,10 @@ export default {
                 return;
             }
 
-            if (this.wordData.pys[i] === null) return;
+            if (this.wordData.pys[i] === null || this.mouseHasNotMovedAfterPeeking[i]) {
+                this.mouseHasNotMovedAfterPeeking[i] = false;
+                return;
+            }
 
             if (this.hiddenStates[type][i]) {
                 let peekValue = null;
@@ -451,6 +459,7 @@ export default {
                 else {
                     this.appendSessionLog([getEvent('peek', 'word'), i]);
                     peekValue = true;
+                    this.mouseHasNotMovedAfterPeeking[i] = true;
                 }
 
                 for (const t of ['py', 'hz', 'tr']) {
@@ -692,6 +701,7 @@ export default {
 
 .contenttable.plain {
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .toprow td:not(:first-child) span {
@@ -751,7 +761,7 @@ export default {
     padding-right: 2px;
 }
 
-.centerrow .captioncardhidden:not(.nonhanzi):not(.peekrow) {
+.centerrow .captioncardhidden:not(.nonhanzi):not(.peekrow):not(.mousehasnotmovedafterpeeking) {
     background-color: rgb(30, 30, 30);
 }
 
@@ -772,7 +782,7 @@ export default {
     position: relative;
 }
 
-.captioncard.peeking:not(.fulltranslation):not(.pinned) .cardcontent {
+.captioncard.peeking:not(.fulltranslation):not(.pinned):not(.mousehasnotmovedafterpeeking) .cardcontent {
     color: rgb(170, 170, 170);
 }
 
@@ -784,8 +794,12 @@ export default {
     color: rgb(160, 160, 160) !important;
 }
 
-.captioncard:hover:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)):not(.plainhz.peeking) .cardcontent {
+.captioncard:not(.nonhanzi):not(.fulltranslation):not(.nonhanzirow:not(.captioncardhidden)):not(.plainhz.peeking):not(.mousehasnotmovedafterpeeking):hover .cardcontent {
     color: rgb(100, 100, 100) !important;
+}
+
+.mousehasnotmovedafterpeeking .cardcontent {
+    cursor: none;
 }
 
 .peekrow .cardcontent {
@@ -830,6 +844,16 @@ export default {
     visibility: visible;
 }
 
+.fulltranslationtable {
+    display: block;
+    margin-top: -4px;
+    margin-bottom: 5px;
+}
+
+.fulltranslationtable tr {
+    line-height: 0.8em;
+}
+
 .fulltranslation {
     margin-left: 2em;
     padding-top: 0.2em;
@@ -856,23 +880,6 @@ export default {
 .fulltranslation > .cardcontent {
     padding-left: 0.3em;
     padding-right: 0.3em;
-}
-
-.captioncardhidden .statsbadge {
-    display: none !important;
-}
-
-.captioncard:not(:hover) .statsbadge {
-    display: none !important;
-}
-
-.nonhanzi .statsbadge {
-    display: none !important;
-}
-
-.captioncard .statsbadge {
-    margin-top: -6px;
-    margin-right: -5px;
 }
 
 .captioncard:hover:not(.fulltranslation):not(.captioncardhidden) .starbadge {
