@@ -7,30 +7,12 @@
               dark
               class="text-white shadow-2"
             >
-                <q-tab dark name="subtitle" label="Subtitle" />
-                <q-tab dark name="knowledge" label="Knowledge" />
+                <q-tab dark name="subtitle" label="Subtitles" />
                 <q-tab dark name="keyboard" label="Keyboard" />
                 <q-tab dark name="other" label="Other" />
             </q-tabs>
 
             <q-tab-panels dark v-model="tab">
-                <q-tab-panel class="no-scroll" name="knowledge" style="width: 400px">
-                    <div class="q-gutter-sm">
-                        <q-checkbox v-model="useSmartSubtitles" label="Use Smart Subtitles" />
-                    </div>
-                    <div v-if="useSmartSubtitles">
-                        Select the HSK level for the words you want to hide automatically
-                        <q-item dense>
-                            <q-item-section>
-                                <HSKLevelSlider />
-                            </q-item-section>
-                        </q-item>
-                    </div>
-                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
-                    <div class="q-gutter-sm">
-                        <q-checkbox v-model="blurCaptions" label="Blur Captions" />
-                    </div>
-                </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
                     <q-item-label header>Chinese characters</q-item-label>
                     <q-btn-toggle
@@ -54,7 +36,22 @@
                             {label: 'Machine', value: 1}
                         ]"
                     />
-                    <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
+                    <q-item-label header>Smart Subtitles</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="useSmartSubtitles" label="Use Smart Subtitles" />
+                    </div>
+                    <div v-if="useSmartSubtitles">
+                        Select the HSK level for the words you want to hide automatically
+                        <q-item dense>
+                            <q-item-section>
+                                <HSKLevelSlider />
+                            </q-item-section>
+                        </q-item>
+                    </div>
+                    <q-item-label header>Other</q-item-label>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="blurCaptions" label="Blur Captions" />
+                    </div>
                     <!--
                     <div class="q-gutter-sm">
                         <br>
@@ -70,9 +67,6 @@
                     </div>
                     <q-separator color="orange" style="margin-top: 10px; margin-bottom: 10px;" />
                     -->
-                    <div class="q-gutter-sm">
-                        <q-checkbox v-model="blurCaptions" label="Blur Captions" />
-                    </div>
                     <!--
                     <div class="q-gutter-sm">
                         <q-item-label header>Timing Offset</q-item-label>
@@ -143,7 +137,7 @@ export default {
         HSKLevelSlider,
     },
     data: function() { return {
-        tab: Vue.ref('knowledge'),
+        tab: Vue.ref('subtitle'),
         shortcuts: [
             ["next", "Next"],
             ["prev", "Previous"],
