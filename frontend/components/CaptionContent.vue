@@ -1,7 +1,7 @@
 <template>
     <div ref="captioncontent" :class="{captioncontent: true}">
-        <table :class="{contenttable: true, plain: !smart}" ref="wordcontent">
-            <tr class="toprow" v-if="smart">
+        <table :class="{contenttable: true, plain: !smart, extrapaddingtop: !$store.state.options.show.py, extrapaddingbottom: !$store.state.options.show.tr && !$store.state.options.show.translation}" ref="wordcontent">
+            <tr class="toprow" v-if="smart && $store.state.options.show.py">
                 <td v-if="data !== null" title="Peek pinyin row" :class="getClasses('py', null, true)" @click="clickPeekRow('py')" >
                     <span v-if="! $store.state.options.pin.py" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.py" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
@@ -30,7 +30,7 @@
                     </span>
                 </td>
             </tr>
-            <tr class="centerrow">
+            <tr class="centerrow" v-if="$store.state.options.show.hz">
                 <td v-if="data !== null" title="Peek hanzi row" :class="getClasses('hz', null, true)" @click="clickPeekRow('hz')">
                     <span v-if="! $store.state.options.pin.hz" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.hz" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
@@ -96,7 +96,7 @@
                     <span v-if="!purePeekStates.rows.hz" class="iconcard peek" v-html="eyecon" />
                 </td>
             </tr>
-            <tr class="bottomrow" v-if="smart">
+            <tr class="bottomrow" v-if="smart && $store.state.options.show.tr">
                 <td v-if="data !== null" title="Peek word translations" :class="getClasses('tr', null, true)" @click="clickPeekRow('tr')" :style="tdStyle">
                     <span v-if="! $store.state.options.pin.tr" class="iconcard peek" v-html="eyecon"></span>
                     <span v-if="$store.state.options.pin.tr" class="iconcard peek cardcontent" v-html="pinIcon" style="visibility: visible !important"></span>
@@ -125,7 +125,7 @@
                 </td>
             </tr>
         </table>
-        <table class="contenttable fulltranslationtable" :style="{ fontSize: $store.state.captionFontSize+'px !important'}" v-if="data !== null && smart">
+        <table class="contenttable fulltranslationtable" :style="{ fontSize: $store.state.captionFontSize+'px !important'}" v-if="data !== null && smart && $store.state.options.show.translation">
             <tr>
                 <td v-if="data !== null" title="Peek sentence translation" :class="getClasses('translation', null, true)" @click="clickPeekRow('translation')" :style="tdStyle">
                     
@@ -268,13 +268,14 @@ export default {
         // New text may have changed the size of the caption, so need to update width of full translation table
         const self = this;
         this.$nextTick(function () {
-            if (! [null, undefined].includes(self.$refs.captioncontent)) {
-                const peekCells = self.$refs.wordcontent.children[0].children;
-                if (peekCells.length > 0) {
-                    const topLeftWidth = peekCells[0].clientWidth;
-                    const totalRowWidth = self.$refs.wordcontent.clientWidth;
-                    self.$refs.fulltranslation.style.minWidth = (totalRowWidth - topLeftWidth) + 'px';
-                }
+            if ([null, undefined].includes(self.$refs.captioncontent) || [null, undefined].includes(self.$refs.fulltranslation)) {
+                return;
+            }
+            const peekCells = self.$refs.wordcontent.children[0].children;
+            if (peekCells.length > 0) {
+                const topLeftWidth = peekCells[0].clientWidth;
+                const totalRowWidth = self.$refs.wordcontent.clientWidth;
+                self.$refs.fulltranslation.style.minWidth = (totalRowWidth - topLeftWidth) + 'px';
             }
         });
     },
@@ -693,6 +694,14 @@ export default {
     table-layout: fixed;
     border-spacing: 10px 0em;
     font-family: sans-serif;
+}
+
+.contenttable.extrapaddingtop {
+    padding-top: 10px;
+}
+
+.contenttable.extrapaddingbottom {
+    padding-bottom: 10px;
 }
 
 .contenttable tr {

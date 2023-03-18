@@ -78,6 +78,23 @@ const PERSONAL_DB_VERSIONS = {
             });
         });
     },
+    '6': function(personalDb) {
+        // Add "show" flags in options, default is "true" for all
+        personalDb.version(6).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.show = {
+                        hz: true,
+                        py: true,
+                        tr: true,
+                        translation: true,
+                    };
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null, name = 'lazybug-personal') {

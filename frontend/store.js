@@ -33,6 +33,12 @@ const OPTIONS_DEFAULT = {
         tr: false,
         translation: false,
     },
+    show: {
+        hz: true,
+        py: true,
+        tr: true,
+        translation: true,
+    },
     displayTranslation: 0, // index into [human, machine][min(idx, length)]
     hideWordsLevel: 0,
     peekAfterAutoHide: true,

@@ -47,6 +47,11 @@
                                 <HSKLevelSlider />
                             </q-item-section>
                         </q-item>
+
+                        <q-checkbox v-model="showPy" label="Show pinyin row" />
+                        <!--<q-checkbox v-model="showHz" label="Show hanzi row" />-->
+                        <q-checkbox v-model="showTr" label="Show translation row" />
+                        <q-checkbox v-model="showTranslation" label="Show full translation" />
                     </div>
                     <q-item-label header>Other</q-item-label>
                     <div class="q-gutter-sm">
@@ -172,6 +177,22 @@ export default {
         show: {
             get: function() { return this.$store.state.showDialog.options; },
             set: function(val) { this.$store.commit('setShowDialog', {dialog: 'options', value: val}); },
+        },
+        showHz: {
+            get: function() { return this.$store.state.options.show.hz; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'hz', value: val}); },
+        },
+        showPy: {
+            get: function() { return this.$store.state.options.show.py; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'py', value: val}); },
+        },
+        showTr: {
+            get: function() { return this.$store.state.options.show.tr; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'tr', value: val}); },
+        },
+        showTranslation: {
+            get: function() { return this.$store.state.options.show.translation; },
+            set: function(val) { this.$store.commit('setDeepOption', {key: 'show', key2: 'translation', value: val}); },
         },
         timingOffset: {
             get: function() { return this.$store.state.timingOffset; },
