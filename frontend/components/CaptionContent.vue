@@ -718,7 +718,7 @@ export default {
 }
 
 .centerrow td:not(:first-child) {
-    line-height: 1.em;
+    line-height: 1.0em;
 }
 
 .centerrow td:not(:first-child) span {
