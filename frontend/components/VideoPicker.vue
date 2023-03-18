@@ -33,7 +33,7 @@
                     :color="e.processed ? 'green' : 'red'"
                     paddings="xs"
                     :label="i+1"
-                    @click.stop.prevent="playEpisode(i)"
+                    @click.stop.prevent="e.processed ? playEpisode(i) : null"
                 />
             </q-fab>
         </div>
