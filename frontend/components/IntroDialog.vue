@@ -21,7 +21,7 @@
                     <div class="q-mt-md text-center">
                         <h5>Welcome to Lazybug</h5>
                         <p>Lazybug is a free and open-source app for learning Chinese the lazy way, by watching TV and movies</p>
-                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/selection.png" />
+                        <q-img loading="eager" :src="urls.selection" />
                         <p>There's a unique and growing selection available thanks to advanced OCR subtitle extraction</p>
                     </div>
                 </q-carousel-slide>
@@ -29,7 +29,7 @@
                     <div class="q-mt-md text-center">
                         <h5>Interactive Subtitles</h5>
                         <p>The subtitles are interactive and adapt to your skill level. Hide words you know. Peek at the minimum information you need to understand, this will allow you to learn the fastest</p>
-                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/caption1.png" />
+                        <q-img loading="eager" :src="urls.caption1" />
                         <p>Click words to hide them. Click hidden words to peek. Click again to pin them back</p>
                     </div>
                 </q-carousel-slide>
@@ -45,16 +45,16 @@
                     <div class="q-mt-md text-center">
                         <h5>Star/Export Words</h5>
                         <p>You can save words for later by clicking the star button</p>
-                        <q-img loading="eager" width="200px" src="https://cdn.lazybug.ai/file/lazybug-public/images/star.png" />
+                        <q-img loading="eager" width="200px" :src="urls.star" />
                         <p>From the <i>Words</i> page you can export words for use in Spaced Repetition Systems like Anki</p>
-                        <q-img loading="eager" src="https://cdn.lazybug.ai/file/lazybug-public/images/export.png" />
+                        <q-img loading="eager" :src="urls.export" />
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="extension" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Browser Extension Coming Soon</h5>
                         <p>For shows other than Youtube that can't be embedded </p>
-                        <q-img loading="eager" width="300px" src="https://cdn.lazybug.ai/file/lazybug-public/images/extension.png" />
+                        <q-img loading="eager" width="400px" :src="urls.extension" />
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="last" class="column no-wrap flex-center">
@@ -82,7 +82,23 @@ export default {
     },
     data: function() { return {
         slide: 'welcome',
+        urls: {
+            selection: 'https://cdn.lazybug.ai/file/lazybug-public/images/selection.png',
+            caption1: 'https://cdn.lazybug.ai/file/lazybug-public/images/caption1.png',
+            star: 'https://cdn.lazybug.ai/file/lazybug-public/images/star.png',
+            export: 'https://cdn.lazybug.ai/file/lazybug-public/images/export.png',
+            extension: 'https://cdn.lazybug.ai/file/lazybug-public/images/extension.png',
+        },
+        images: [],
     }},
+    mounted: function() {
+        // Preload images because carousel doesn't render all panels
+        for (const url of Object.values(this.urls)) {
+            const img = new Image();
+            img.src = url;
+            this.images.push(img);
+        }
+    },
     methods: {
         askPersist: function() {
             isStoragePersisted().then(async isPersisted => {
