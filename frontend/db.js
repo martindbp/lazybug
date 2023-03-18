@@ -80,8 +80,8 @@ const PERSONAL_DB_VERSIONS = {
     },
 };
 
-function initPersonalDb(untilVersion = null) {
-    const personalDb = new Dexie('lazybug-personal');
+function initPersonalDb(untilVersion = null, name = 'lazybug-personal') {
+    const personalDb = new Dexie(name);
     applyDbVersions(personalDb, PERSONAL_DB_VERSIONS, null, untilVersion);
     return personalDb;
 }
@@ -98,6 +98,11 @@ function applyDbVersions(db, dbVersions, fromVersion = null, untilVersion = null
         console.log('Applying database version', version, 'for db', db.name);
         dbVersions[version.toString()](db);
     }
+}
+
+function getLatestDbVersion() {
+    let versionNumbers = Object.keys(PERSONAL_DB_VERSIONS).map((v) => parseInt(v));
+    return Math.max(...versionNumbers);
 }
 
 function initCacheDb() {

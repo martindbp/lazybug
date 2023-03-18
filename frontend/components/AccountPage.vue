@@ -34,7 +34,7 @@
             </q-card>
             <q-card class="accountcard">
                 <q-card-section>
-                    <div class="text-h6">Local Data</div>
+                    <div class="text-h6">Local Data (v{{ latestDbVersion }})</div>
                 </q-card-section>
 
                 <q-separator />
@@ -83,6 +83,9 @@ export default {
             set: function(val) {
                 this.$store.commit('setOption', {key: 'okReceiveEmails', value: val});
             },
+        },
+        latestDbVersion: function() {
+            return getLatestDbVersion();
         },
     },
     methods: {
@@ -151,11 +154,13 @@ export default {
             const self = this;
             clearPersonalData(function() {
                 self.clickedClearPersonalData = true;
+                self.$store.commit('setLastSyncDate', null);
             });
         },
         exportDb: function() {
+            const self = this;
             exportDatabaseJson(function(data) {
-                const filename = `database-v${VERSION}-${(new Date(Date.now())).toISOString().split('T')[0]}.json`;
+                const filename = `database-v${self.latestDbVersion}-${(new Date(Date.now())).toISOString().split('T')[0]}.json`;
                 download(filename, JSON.stringify(data));
             });
         },

@@ -210,7 +210,8 @@ store = new Vuex.Store({
             state.lastSyncDate = val;
             state.needSync = false;
             localStorage.setItem('needSync', false);
-            localStorage.setItem('lastSyncDate', val);
+            if (val === null) localStorage.removeItem('lastSyncDate');
+            else localStorage.setItem('lastSyncDate', val);
         },
         addSyncProgress(state, val) {
             state.syncProgress.push(val);

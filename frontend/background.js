@@ -45,6 +45,52 @@ function backgroundExportDatabaseJson(callback) {
     });
 }
 
+function upgradeDatabase(data, callback) {
+    // Takes a database in JSON format, e.g. downloaded from remote and applies upgrades to it if any are available
+    const TMP_NAME = 'lazybug-tmp';
+    let tmpDatabase = new Dexie(TMP_NAME);
+    tmpDatabase.delete(); // delte any old data if there
+    tmpDatabase = initPersonalDb(data.data.databaseVersion, TMP_NAME); // only apply up to version in data
+    // Change the name of the database in the data (have to do this, or we can't import it into lazybug-tmp
+    data.data.databaseName = TMP_NAME;
+
+    const str = JSON.stringify(data);
+    const bytes = new TextEncoder().encode(str);
+    const blob = new Blob([bytes], {
+        type: "application/json;charset=utf-8"
+    });
+
+    DexieExportImport.peakImportFile(blob).then(function(fileMeta) {
+        tmpDatabase.import(blob, { overwriteValues: true })
+        .then(() => {
+            return tmpDatabase.close();
+        })
+        .then(() => {
+            // Apply all versions
+            applyDbVersions(tmpDatabase, PERSONAL_DB_VERSIONS);
+        })
+        .then(() => {
+            return tmpDatabase.open();
+        })
+        .then(() => {
+            tmpDatabase.export({ prettyJson: true }).then(function(data) {
+                const fr = new FileReader();
+                fr.addEventListener("load", e => {
+                    let upgradedData = JSON.parse(fr.result);
+                    // Change back the database name from lazybug-tmp to lazybug-personal
+                    upgradedData.data.databaseName = 'lazybug-personal';
+                    callback(upgradedData);
+                });
+                fr.readAsText(data);
+                tmpDatabase.delete()
+            });
+        })
+        .catch((error) => {
+            callback(null, error);
+        });
+    })
+}
+
 function backgroundImportDatabaseJson(data, callback) {
     const str = JSON.stringify(data);
     const bytes = new TextEncoder().encode(str);
