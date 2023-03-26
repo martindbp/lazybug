@@ -44,8 +44,9 @@ export default {
     mounted: function(){
         const self = this;
         // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
+        const videoAPI = this.$store.state.videoAPI;
         this.focusInterval = setInterval(function() {
-            if (document.activeElement.tagName === 'IFRAME') {
+            if (document.activeElement.tagName === 'IFRAME' && ! videoAPI.isPaused()) {
                 focus(self.$refs.embeddedcaption);
             }
         }, 100);
