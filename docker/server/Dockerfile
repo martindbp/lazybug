@@ -19,6 +19,6 @@ ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY requirements.txt requirements.txt
 RUN pip --no-cache-dir install -r requirements.txt
-RUN npm install -g vue@next @vue/cli-service @vue/compiler-sfc @vue/cli-init sass
+RUN npm install -g vue@next @vue/cli-service @vue/compiler-sfc @vue/cli-init sass vue-template-compiler
 RUN npm install canvas utfstring
 RUN rm -rf /var/lib/apt/lists/*
