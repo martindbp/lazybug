@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 RUN apt-get update --fix-missing
 RUN apt install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
-RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y tzdata pkg-config curl python3.10 python3-pip
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y tzdata pkg-config curl python3.10 python3-pip libcairo2
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 14.18.1
 RUN mkdir /usr/local/nvm && \
