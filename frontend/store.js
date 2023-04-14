@@ -24,6 +24,7 @@ const OPTIONS_DEFAULT = {
     doneIntro: localStorage.getItem('doneIntro', 'false') === 'true',
     useSmartSubtitles: true,
     autoPause: 'off', // 'off', 'basic' or 'WPS'
+    starWordExercisesOn: true,
     WPSThreshold: 2.0,
     characterSet: 'sm',
     blurCaptions: true,

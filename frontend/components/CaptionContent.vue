@@ -23,6 +23,13 @@
                     :style="tdStyle"
                 >
                     <span
+                        v-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.py[i] && starredStates.words[i]"
+                        class="cardcontent"
+                    >
+                        <q-input @keyup.enter="onEnterPyInput" class="starinput" borderless dark v-model="pyInput" label="" />
+                    </span>
+                    <span
+                        v-else
                         class="cardcontent"
                         :style="{opacity: hiddenAndNotPeeking.py[i] ? 0 : 1}"
                     >
@@ -116,6 +123,13 @@
                     :style="tdStyle"
                 >
                     <span
+                        v-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.tr[i] && starredStates.words[i]"
+                        class="cardcontent"
+                    >
+                        <q-input @keyup.enter="onEnterTrInput" class="starinput" borderless dark v-model="trInput" label="" />
+                    </span>
+                    <span
+                        v-else
                         class="cardcontent"
                         :title="!hiddenAndNotPeeking.tr[i] && tr !== null && tr.length > truncateTrLengths[i] ? tr : null"
                         :style="{opacity: hiddenAndNotPeeking.tr[i] ? 0 : 1}"
@@ -193,6 +207,9 @@ export default {
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         timeouts: [],
         mouseHasNotMovedAfterPeeking: false,
+        exerciseOn: true,
+        pyInput: '',
+        trInput: '',
     }},
     computed: {
         smart: function() {
@@ -280,6 +297,9 @@ export default {
         });
     },
     watch: {
+        pyInput: function() {
+            this.pyInput = normalizedToDiacritical(this.pyInput);
+        },
         data: {
             immediate: true,
             handler: function(newData, oldData) {
@@ -304,6 +324,12 @@ export default {
         },
     },
     methods: {
+        onEnterPyInput: function() {
+
+        },
+        onEnterTrInput: function() {
+
+        },
         mouseMove: function() {
             for (let i = 0; i < this.mouseHasNotMovedAfterPeeking.length; i++) {
                 this.mouseHasNotMovedAfterPeeking[i] = false;
@@ -902,6 +928,11 @@ export default {
 .captioncard .starbadge {
     margin-top: -6px;
     margin-right: -10px;
+}
+
+.starinput input {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
 }
 
 </style>
