@@ -7,7 +7,6 @@ PSOS = PartS Of Speech
 import re
 import os
 from pathlib import Path
-from django.core.management.base import BaseCommand
 import numpy as np
 from sklearn import tree
 from sklearn.preprocessing import OneHotEncoder

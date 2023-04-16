@@ -1,10 +1,10 @@
-merkl==0.4
+merkl
 numpy
 opencv-python==4.5.4.60
 hanziconv
 torchmetrics
 torch
-torchvision
+torchvision==0.10.0
 transformers
 jieba_fast
 mxnet
@@ -21,8 +21,9 @@ ckip_transformers
 yt-dlp
 b2
 pymatting
-easyocr
+easyocr==1.4.1
 pycairo
 pangocairocffi
 scipy
 discourse
+cnocr==1.2.2

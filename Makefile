@@ -62,6 +62,7 @@ pull-private-essentials:
 .PHONY: pull-public
 pull-models:
 	b2 sync b2://lazybug-public/models data/remote/public/models --skipNewer
+	ln -s data/remote/public/models ~/.cnocr
 
 check-cloudflare-env:
 ifndef CLOUDFLARE_ZONE_ID
