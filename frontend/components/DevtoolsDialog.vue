@@ -141,20 +141,23 @@ export default {
         playlistLinkSelector: function() {
             if (this.playlistLinkSelector) this.currentPlaylistLinkSelector = this.playlistLinkSelector;
         },
-        captionRects: function() {
-            if (this.captionRects.length > 0) {
-                this.data["ocr_params"] = this.captionRects.map(function (r) {
-                    return {
-                        "type": "hanzi",
-                        "caption_top": r.top,
-                        "caption_bottom": r.bottom,
-                        "caption_left": r.left,
-                        "caption_right": r.right,
-                        "start_time": 0
-                    }
-                });
-            }
-        },
+        captionRects: {
+            handler: function() {
+                if (this.captionRects.length > 0) {
+                    this.data["ocr_params"] = this.captionRects.map(function (r) {
+                        return {
+                            "type": "hanzi",
+                            "caption_top": r.top,
+                            "caption_bottom": r.bottom,
+                            "caption_left": r.left,
+                            "caption_right": r.right,
+                            "start_time": 0
+                        }
+                    });
+                }
+            },
+            deep: true,
+        }
     },
     mounted: function() {
         const self = this;
@@ -298,15 +301,15 @@ export default {
 
             function stopMeasuring() {
                 console.log('Stop measuring');
-                videoRect = self.AVElement.getBoundingClientRect();
-                captionTopPx = mouseDownClientY - videoRect.top;
-                captionTop = captionTopPx / videoRect.height;
-                captionBottomPx = clientY - videoRect.top;
-                captionBottom = captionBottomPx / videoRect.height;
-                captionLeftPx = mouseDownClientX - videoRect.left;
-                captionLeft = captionLeftPx / videoRect.width;
-                captionRightPx = clientX - videoRect.left;
-                captionRight = captionRightPx / videoRect.width;
+                const videoRect = self.AVElement.getBoundingClientRect();
+                const captionTopPx = mouseDownClientY - videoRect.top;
+                const captionTop = captionTopPx / videoRect.height;
+                const captionBottomPx = clientY - videoRect.top;
+                const captionBottom = captionBottomPx / videoRect.height;
+                const captionLeftPx = mouseDownClientX - videoRect.left;
+                const captionLeft = captionLeftPx / videoRect.width;
+                const captionRightPx = clientX - videoRect.left;
+                const captionRight = captionRightPx / videoRect.width;
                 window.removeEventListener("mousemove", moveHandler);
                 moveHandler = null;
                 if (self.videoMenuElement) self.videoMenuElement.style.visibility = 'visible';
