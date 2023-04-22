@@ -139,7 +139,7 @@ def _get_translations(all_lines, automated=True):
             httpd.serve_forever()
         except KeyboardInterrupt:
             print('Shutdown, have translation: ', translation)
-            input_translation_lines = translation.split('\n')
+            input_translation_lines = [t for t in translation.split('\n') if len(t.strip()) > 0]
 
     else:  # manual copy/paste
         print('\n'.join(all_lines))
