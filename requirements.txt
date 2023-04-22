@@ -5,7 +5,7 @@ hanziconv
 torchmetrics
 torch
 torchvision==0.10.0
-transformers
+transformers==4.8.2
 jieba_fast
 mxnet
 webvtt-py
@@ -14,10 +14,10 @@ wordfreq
 scikit-learn
 jieba
 pyperclip
-sentence-transformers
+sentence-transformers==2.0.0
 iteration_utilities
 word_forms
-ckip_transformers
+ckip_transformers==0.2.7
 yt-dlp
 b2
 pymatting
