@@ -495,7 +495,7 @@ def join_names_present_in_translations(segmentations, pinyins, translations, glo
 def _seg_single(hz):
     global ws_driver
     if ws_driver is None:
-        ws_driver = CkipWordSegmenter(level=3, device=0)
+        ws_driver = CkipWordSegmenter()
     return ws_driver([hz])
 
 
@@ -503,7 +503,7 @@ def _seg_single(hz):
 def _seg_batch(hzs_trad):
     global ws_driver
     if ws_driver is None:
-        ws_driver = CkipWordSegmenter(level=3, device=0)
+        ws_driver = CkipWordSegmenter()
     return ws_driver(hzs_trad, batch_size=16)  # default of 256 was too much memory for my GPU
 
 
@@ -511,7 +511,7 @@ def _seg_batch(hzs_trad):
 def _pos_single(seg):
     global pos_driver
     if pos_driver is None:
-        pos_driver = CkipPosTagger(level=3, device=0)
+        pos_driver = CkipPosTagger()
     return pos_driver([seg])
 
 
@@ -519,7 +519,7 @@ def _pos_single(seg):
 def _pos_batch(segs):
     global pos_driver
     if pos_driver is None:
-        pos_driver = CkipPosTagger(level=3, device=0)
+        pos_driver = CkipPosTagger()
     return pos_driver(segs, batch_size=16)
 
 
@@ -527,7 +527,7 @@ def _pos_batch(segs):
 def _ners_single(hz):
     global ner_driver
     if ner_driver is None:
-        ner_driver = CkipNerChunker(level=3, device=0)
+        ner_driver = CkipNerChunker()
     return ner_driver([hz])
 
 
@@ -535,7 +535,7 @@ def _ners_single(hz):
 def _ners_batch(hzs):
     global ner_driver
     if ner_driver is None:
-        ner_driver = CkipNerChunker(level=3, device=0)
+        ner_driver = CkipNerChunker()
     return ner_driver(hzs, batch_size=16)
 
 BLACKLIST = {
