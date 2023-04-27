@@ -115,7 +115,7 @@ process-video-captions:
 
 .PHONY: process-translations
 process-translations:
-	merkl -v run process_show.process_translations ${show} --force-redo
+	merkl -v run process_show.process_translations ${show}
 
 .PHONY: process-segmentation-alignments
 process-segmentation-alignments:
