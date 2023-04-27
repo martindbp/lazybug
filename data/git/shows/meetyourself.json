@@ -1,151 +1,156 @@
 {
-  "name": {
-    "hz": "去有风的地方",
-    "py": "Qù yǒu fēng dì dìfāng",
-    "en": "Meet Yourself"
-  },
-  "date_added": "2023-04-16",
-  "douban": 8.6,
-  "year": "2023",
-  "type": "tv",
-  "genres": ["romance", "drama"],
-  "synopsis": "Woman moves from city to countryside after tragedy",
-  "caption_source": "machine",
-  "translation_source": "human",
-  "released": false,
-  "seasons": [
-    {
-      "episodes": [
-        {
-          "id": "youtube-Uj__X2BRhyo"
-        },
-        {
-          "id": "youtube-zF9a0-sHajY"
-        },
-        {
-          "id": "youtube-ieGL8XDb0hs"
-        },
-        {
-          "id": "youtube-5zHrA4mCewc"
-        },
-        {
-          "id": "youtube-WEgVnZt5IpU"
-        },
-        {
-          "id": "youtube-09z3tyJC2iI"
-        },
-        {
-          "id": "youtube-yZUQM-PM-bI"
-        },
-        {
-          "id": "youtube-GLR-ya__vYI"
-        },
-        {
-          "id": "youtube-sR9zsdMueWs"
-        },
-        {
-          "id": "youtube-PVlY7gyWkYI"
-        },
-        {
-          "id": "youtube-V8P_hf47O2o"
-        },
-        {
-          "id": "youtube-DTVG1xgQ8-0"
-        },
-        {
-          "id": "youtube-Y-FC8S0sIZQ"
-        },
-        {
-          "id": "youtube-CThX6tjfdCk"
-        },
-        {
-          "id": "youtube-_o84q067Sy0"
-        },
-        {
-          "id": "youtube-KnOcgrY19vM"
-        },
-        {
-          "id": "youtube-BJCnhu9utlY"
-        },
-        {
-          "id": "youtube-uQaUKEdut04"
-        },
-        {
-          "id": "youtube-8_skkXnoAoc"
-        },
-        {
-          "id": "youtube-Wsa84tfd3xg"
-        },
-        {
-          "id": "youtube-8fMekgLq-ho"
-        },
-        {
-          "id": "youtube--wwKGL9Q0yA"
-        },
-        {
-          "id": "youtube-XkJ-aUDXeyU"
-        },
-        {
-          "id": "youtube-TSAsjim4isA"
-        },
-        {
-          "id": "youtube-nA_dkGMcvss"
-        },
-        {
-          "id": "youtube-xtZV_vTkt3s"
-        },
-        {
-          "id": "youtube-ZI-tipThwUI"
-        },
-        {
-          "id": "youtube-F3a_CJS-WDk"
-        },
-        {
-          "id": "youtube-w-131-nGakc"
-        },
-        {
-          "id": "youtube-qkHbhtsKEgw"
-        },
-        {
-          "id": "youtube-6SEYjsNbbwM"
-        },
-        {
-          "id": "youtube--IqJYg-ieKE"
-        },
-        {
-          "id": "youtube-6RMKyzESuJ0"
-        },
-        {
-          "id": "youtube-PFCYZq1JAH4"
-        },
-        {
-          "id": "youtube-jWT0dOtpDO0"
-        },
-        {
-          "id": "youtube-Wk4gCCmObNg"
-        },
-        {
-          "id": "youtube-4pBZpUgFsxE"
-        },
-        {
-          "id": "youtube-h85J4aFZY8E"
-        },
-        {
-          "id": "youtube-1SoIlwgFXis"
-        },
-        {
-          "id": "youtube-RvbTI4lc-F0"
-        }
-      ],
-      "playlist_id": "PLSIJismKOisEd-tT5MYM1391R9nRRI3U5"
-    }
-  ],
-  "ocr_params": [
-    {
-      "type": "hanzi",
-      "caption_top": 0.7972222222222223,
-      "caption_bottom": 0.8611111111111112,
-      "start_time": 85
-    }
-  ]
+	"name": {
+		"hz": "去有风的地方",
+		"py": "Qù yǒu fēng dì dìfāng",
+		"en": "Meet Yourself"
+	},
+	"date_added": "2023-04-16",
+	"douban": 8.6,
+	"year": "2023",
+	"type": "tv",
+	"genres": [
+		"romance",
+		"drama"
+	],
+	"synopsis": "Woman moves from city to countryside after tragedy",
+	"caption_source": "machine",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-Uj__X2BRhyo"
+				},
+				{
+					"id": "youtube-zF9a0-sHajY"
+				},
+				{
+					"id": "youtube-ieGL8XDb0hs"
+				},
+				{
+					"id": "youtube-5zHrA4mCewc"
+				},
+				{
+					"id": "youtube-WEgVnZt5IpU"
+				},
+				{
+					"id": "youtube-09z3tyJC2iI"
+				},
+				{
+					"id": "youtube-yZUQM-PM-bI"
+				},
+				{
+					"id": "youtube-GLR-ya__vYI"
+				},
+				{
+					"id": "youtube-sR9zsdMueWs"
+				},
+				{
+					"id": "youtube-PVlY7gyWkYI"
+				},
+				{
+					"id": "youtube-V8P_hf47O2o"
+				},
+				{
+					"id": "youtube-DTVG1xgQ8-0"
+				},
+				{
+					"id": "youtube-Y-FC8S0sIZQ"
+				},
+				{
+					"id": "youtube-CThX6tjfdCk"
+				},
+				{
+					"id": "youtube-_o84q067Sy0"
+				},
+				{
+					"id": "youtube-KnOcgrY19vM"
+				},
+				{
+					"id": "youtube-BJCnhu9utlY"
+				},
+				{
+					"id": "youtube-uQaUKEdut04"
+				},
+				{
+					"id": "youtube-8_skkXnoAoc"
+				},
+				{
+					"id": "youtube-Wsa84tfd3xg"
+				},
+				{
+					"id": "youtube-8fMekgLq-ho"
+				},
+				{
+					"id": "youtube--wwKGL9Q0yA"
+				},
+				{
+					"id": "youtube-XkJ-aUDXeyU"
+				},
+				{
+					"id": "youtube-TSAsjim4isA"
+				},
+				{
+					"id": "youtube-nA_dkGMcvss"
+				},
+				{
+					"id": "youtube-xtZV_vTkt3s"
+				},
+				{
+					"id": "youtube-ZI-tipThwUI"
+				},
+				{
+					"id": "youtube-F3a_CJS-WDk"
+				},
+				{
+					"id": "youtube-w-131-nGakc"
+				},
+				{
+					"id": "youtube-qkHbhtsKEgw"
+				},
+				{
+					"id": "youtube-6SEYjsNbbwM"
+				},
+				{
+					"id": "youtube--IqJYg-ieKE"
+				},
+				{
+					"id": "youtube-6RMKyzESuJ0"
+				},
+				{
+					"id": "youtube-PFCYZq1JAH4"
+				},
+				{
+					"id": "youtube-jWT0dOtpDO0"
+				},
+				{
+					"id": "youtube-Wk4gCCmObNg"
+				},
+				{
+					"id": "youtube-4pBZpUgFsxE"
+				},
+				{
+					"id": "youtube-h85J4aFZY8E"
+				},
+				{
+					"id": "youtube-1SoIlwgFXis"
+				},
+				{
+					"id": "youtube-RvbTI4lc-F0"
+				}
+			],
+			"playlist_id": "PLSIJismKOisEd-tT5MYM1391R9nRRI3U5"
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.7972222222222223,
+			"caption_bottom": 0.8611111111111112,
+			"start_time": 85
+		}
+	],
+	"discourse_topic_id": 261,
+	"discourse_topic_slug": "qu-y-u-feng-di-difang-meet-yourself"
 }

@@ -1,0 +1,40 @@
+{
+	"name": {
+		"hz": "无双花木兰",
+		"py": "Wúshuāng huā mùlán",
+		"en": "Matchless Mulan"
+	},
+	"date_added": "2023-04-20",
+	"douban": 0,
+	"year": "2020",
+	"type": "movie",
+	"genres": [
+		"action",
+		"historical",
+		"drama"
+	],
+	"synopsis": "Chinese-produced live-action Mulan movie",
+	"caption_source": "human",
+	"translation_source": "human",
+	"released": true,
+	"seasons": [
+		{
+			"playlist_id": null,
+			"ocr_params": [
+				{
+					"type": "hanzi"
+				},
+				{
+					"type": "english"
+				}
+			],
+			"episodes": [
+				{
+					"id": "youtube-LiH8YGFiwtI"
+				}
+			]
+		}
+	],
+	"discourse_topic_id": 264,
+	"discourse_topic_slug": "wushuang-hua-mulan-matchless-mulan"
+}
