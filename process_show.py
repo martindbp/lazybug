@@ -14,7 +14,6 @@ import numpy as np
 
 import mxnet as mx
 from cnocr import CnOcr
-from cnocr.fit.ctc_metrics import CtcMetrics
 from hanziconv import HanziConv
 import torch
 from torch.nn import functional as F
@@ -144,73 +143,155 @@ def _join_predictions(results, alphabet, convert_to_simplified=True):
         return [rect, text, mean_confidence_score, indices, probs]
 
 
+from cnocr.utils import pad_img_seq, to_numpy, gen_length_mask
+from cnocr.models.ocr_model import OcrModel
+from itertools import groupby
+def _predict(self, img_list):
+    img_lengths = torch.tensor([img.shape[2] for img in img_list])
+    imgs = pad_img_seq(img_list)
+    if self._model_backend == 'pytorch':
+        with torch.no_grad():
+            out = self._model(
+                imgs, img_lengths, candidates=self._candidates, return_preds=True
+            )
+    else:  # onnx
+        out = _onnx_predict(self, imgs, img_lengths)
+
+    return out
+
+def _onnx_predict(self, imgs, img_lengths):
+    ort_session = self._model
+    ort_inputs = {
+        ort_session.get_inputs()[0].name: to_numpy(imgs),
+        ort_session.get_inputs()[1].name: to_numpy(img_lengths),
+    }
+    ort_outs = ort_session.run(None, ort_inputs)
+    out = {
+        'logits': torch.from_numpy(ort_outs[0]),
+        'output_lengths': torch.from_numpy(ort_outs[1]),
+    }
+    out['logits'] = OcrModel.mask_by_candidates(
+        out['logits'], self._candidates, self._vocab, self._letter2id
+    )
+
+    preds, char_probs, prob_distributions = ctc_best_path(self, out['logits'], self._vocab, out['output_lengths'])
+    out["preds"] = preds
+    out["char_probs"] = char_probs
+    out["prob_distributions"] = prob_distributions
+    return out
+
+
+def ctc_best_path(
+    self,
+    logits,
+    vocab,
+    input_lengths=None,
+):
+    blank = len(vocab)
+    # compute softmax
+    probs = F.softmax(logits.permute(0, 2, 1), dim=1)
+    # get char indices along best path
+    best_path = torch.argmax(probs, dim=1)  # [N, T]
+
+    if input_lengths is not None:
+        length_mask = gen_length_mask(input_lengths, probs.shape).to(
+                device=probs.device
+                )  # [N, 1, T]
+        probs.masked_fill_(length_mask, 1.0)
+        best_path.masked_fill_(length_mask.squeeze(1), blank)
+
+    orig_probs = probs
+    # define word proba as min proba of sequence
+    probs, _ = torch.max(probs, dim=1)  # [N, T]
+    probs, _ = torch.min(probs, dim=1)  # [N]
+
+    words = []
+    out_prob_distributions = []
+    out_char_probs = []
+    for sequence in best_path:
+        # collapse best path (using itertools.groupby), map to chars, join char list to string
+        collapsed = [vocab[k] for k, _ in groupby(sequence) if k != blank]
+        curr_idx = 0
+        collapsed_char_probs = []
+        collapsed_prob_distributions = []
+        for char_code, char_codes in groupby(sequence):
+            char_codes = list(char_codes)
+            if char_code.item() == blank:
+                curr_idx += len(char_codes)
+                continue
+
+            prob_distribution = orig_probs[0, :, curr_idx].detach().cpu().numpy()
+            char_prob = prob_distribution[char_code.item()]
+            collapsed_prob_distributions.append(prob_distribution)
+            collapsed_char_probs.append(char_prob)
+            curr_idx += len(char_codes)
+
+        assert len(collapsed_prob_distributions) == len(collapsed)
+        out_prob_distributions.append(collapsed_prob_distributions)
+        out_char_probs.append(collapsed_char_probs)
+        words.append(collapsed)
+
+    return list(zip(words, probs.tolist())), np.array(out_char_probs), np.array(out_prob_distributions)
+
+
 cnocr = None
 def ocr_for_single_lines_probs_CnOCR(img, *args):
+    """ This code is pulled from recognizer.py in CnOCR. We modify it to return
+    the probability distributions over each characters since the official API doesn't """
     global cnocr
+    self = cnocr.rec_model
+
+    batch_size = 1
     img_list = [img]
 
     if len(img_list) == 0:
         return []
 
-    img_list = [cnocr._preprocess_img_array(img) for img in img_list]
+    img_list = [self._prepare_img(img) for img in img_list]
+    img_list = [self._transform_img(img) for img in img_list]
 
-    batch_size = len(img_list)
-    img_list, img_widths = cnocr._pad_arrays(img_list)
+    should_sort = batch_size > 1 and len(img_list) // batch_size > 1
 
-    prob = cnocr._predict(mx.nd.array(img_list))
-    # [seq_len, batch_size, num_classes]
-    prob = np.reshape(prob, (-1, batch_size, prob.shape[1]))
+    if should_sort:
+        sorted_idx_list = sorted(
+            range(len(img_list)), key=lambda i: img_list[i].shape[2]
+        )
+        sorted_img_list = [img_list[i] for i in sorted_idx_list]
+    else:
+        sorted_idx_list = range(len(img_list))
+        sorted_img_list = img_list
 
-    if cnocr._cand_alph_idx is not None:
-        prob = prob * cnocr._gen_mask(prob.shape)
+    idx = 0
+    sorted_out = []
+    while idx * batch_size < len(sorted_img_list):
+        imgs = sorted_img_list[idx * batch_size : (idx + 1) * batch_size]
+        try:
+            batch_out = _predict(self, imgs)
+        except Exception as e:
+            batch_out = {'preds': [([''], 0.0)] * len(imgs)}
+        sorted_out.append(batch_out)
+        idx += 1
 
-    max_width = max(img_widths)
+    out = [None] * len(sorted_out)
+    for idx, pred in zip(sorted_idx_list, sorted_out):
+        out[idx] = pred
+
     res = []
     probs = []
     prob_distributions = []
-    for i in range(batch_size):
-        line_prob = prob[:, i, :]
-        class_ids = np.argmax(line_prob, axis=-1)
-        chars, start_end_indices = gen_line_pred_chars(cnocr, line_prob, img_widths[i], max_width)
-        batch_probs = []
-        batch_prob_distributions = []
-        for char, (start, end) in zip(chars, start_end_indices):
-            idx_probs = line_prob[start:end].mean(axis=0)
+    char_probs = []
+    for line in out:
+        prob_distributions.append(line['prob_distributions'][0])
+        char_probs.append(line['char_probs'][0])
+        chars, prob = line['preds'][0]
+        chars = [c if c != '<space>' else ' ' for c in chars]
+        probs.append(prob)
+        res.append(''.join(chars))
 
-            # Smooth out OCR distribution a bit, because it tends to be over confident
-            idx_probs = np.sqrt(idx_probs)
-            idx_probs = idx_probs / idx_probs.sum()
-
-            batch_prob_distributions.append(idx_probs)
-            batch_probs.append(idx_probs[cnocr._alphabet.index(char)])
-
-        probs.append(batch_probs)
-        prob_distributions.append(batch_prob_distributions)
-        res.append(chars)
-
-    return ''.join(res[0]), np.array(probs)[0], prob_distributions[0]
-
-
-def gen_line_pred_chars(ocr, line_prob, img_width, max_img_width):
-    """
-    Get the predicted characters.
-    :param line_prob: with shape of [seq_length, num_classes]
-    :param img_width:
-    :param max_img_width:
-    :return:
-    """
-    class_ids = np.argmax(line_prob, axis=-1)
-
-    if img_width < max_img_width:
-        comp_ratio = ocr._hp.seq_len_cmpr_ratio
-        end_idx = img_width // comp_ratio
-        if end_idx < len(class_ids):
-            class_ids[end_idx:] = 0
-    prediction, start_end_idx = CtcMetrics.ctc_label(class_ids.tolist())
-    alphabet = ocr._alphabet
-    res = [alphabet[p] if alphabet[p] != '<space>' else ' ' for p in prediction]
-
-    return res, start_end_idx
+    text = ''.join(res[0])
+    prob_distribution = prob_distributions[0]
+    char_probs = char_probs[0]
+    return text, char_probs, prob_distribution
 
 
 def ocr_for_single_lines_probs(ocr, alphabet, segmentation, img, smooth_distributions=False):
@@ -278,8 +359,8 @@ def predict_chars(ocr_fn, mask, probs, img, window_buffer=10):
     img_crop_larger = np.zeros((img_crop.shape[0]+2*window_buffer, img_crop.shape[1]+2*window_buffer, 3), 'uint8')
     img_crop_larger[window_buffer:-window_buffer, window_buffer:-window_buffer, :] = img_crop
 
-    res, line_prob, prob_distributions = ocr_fn(probs_larger, img_crop_larger)
-    return res, line_prob, prob_distributions
+    res, char_probs, prob_distributions = ocr_fn(probs_larger, img_crop_larger)
+    return res, char_probs, prob_distributions
 
 
 def jeffrey_div(a, b, eps=0.00001):
@@ -659,6 +740,7 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
     cv2.imshow('frame', frame_copy)
     cv2.imshow('probs', (255*probs).astype('uint8'))
     cv2.waitKey(1)
+
     caption_line = CaptionLine(
         text, frame_t, frame_t, logprob,
         frame, mask > 0, probs,
@@ -700,7 +782,7 @@ def save_caption_data(video_id, caption_line, alphabet):
         for prob_distribution in caption_line.prob_distributions:
             top10_indices = np.argpartition(prob_distribution, -10)[-10:]
             top10_probs = [float(p) for p in prob_distribution[top10_indices]]
-            top10_chars = [alphabet[idx] for idx in top10_indices]
+            top10_chars = [alphabet[idx] if idx < len(alphabet) else '' for idx in top10_indices]
             top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
 
         with open(prob_distributions_path, 'wb') as f:
@@ -762,12 +844,16 @@ def replace_or_add_line(
                     prob_distribution = (last_line.prob_distributions[op.from_idx] + new_line.prob_distributions[op.to_idx]) / 2
                     char_prob = prob_distribution.max()
                     new_char = alphabet[np.argmax(prob_distribution)]
+                    if new_char == '<space>':
+                        new_char = ' '
+
                     if new_char is not None and new_char != '[blank]':
                         new_text += new_char
                         new_char_probs.append(char_prob)
                         new_prob_distributions.append(prob_distribution)
                     inserted = 0
                 elif op.type == OpType.DELETE:
+                    last_line.char_probs[op.from_idx]
                     if last_line.char_probs[op.from_idx] >= HIGH_PROB_CHAR and inserted == 0:
                         # Supposed to delete it, but since it's high probability we keep it anyway
                         new_text += last_line.text[op.from_idx]
@@ -776,6 +862,7 @@ def replace_or_add_line(
                     else:
                         inserted -= 1
                 elif op.type == OpType.INSERT:
+                    new_line.char_probs[op.to_idx]
                     if new_line.char_probs[op.to_idx] >= HIGH_PROB_CHAR:
                         new_text += new_line.text[op.to_idx]
                         new_char_probs.append(new_line.char_probs[op.to_idx])
@@ -784,8 +871,6 @@ def replace_or_add_line(
 
             new_char_probs = np.array(new_char_probs)
             new_logprob = np.sum(np.log(new_char_probs))
-            if new_prob_distributions is None:
-                breakpoint()
             new_line = CaptionLine(
                 new_text, last_line.t0, new_line.t1, new_logprob,
                 new_line.img, new_line.mask, new_line.probs,
@@ -931,7 +1016,7 @@ def extract_video_captions(
         if cnocr is None:
             cnocr = CnOcr()
         ocr_fn = ocr_for_single_lines_probs_CnOCR
-        alphabet = cnocr._alphabet
+        alphabet = cnocr.rec_model._vocab
 
     if screen_recording_video_timings is not None:
         print('Screen recording video timings provided, trying to find sync point')
