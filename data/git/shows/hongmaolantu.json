@@ -4,8 +4,7 @@
 		"py": "Hóngmāo lántù",
 		"en": "Howie & Landau"
 	},
-	"embeddable": false,
-	"date_added": "2022-07-03",
+	"date_added": "2023-05-01",
 	"douban": 9.6,
 	"released": true,
 	"year": "2006",
@@ -18,333 +17,198 @@
 	"translation_source": "machine",
 	"seasons": [
 		{
-			"playlist_id": "PL9jchV6tW2jeZHzQUxbvGGAxflHNf2rgg",
-			"episodes": [
-				{
-					"id": "youtube-R-2h_MX84-w"
-				},
-				{
-					"id": "youtube-yAYLOJ_utEU"
-				},
-				{
-					"id": "youtube-937ZzNYbjYc"
-				},
-				{
-					"id": "youtube-IqrzvXojIPU"
-				},
-				{
-					"id": "youtube-P9TbMlvj5wA"
-				},
-				{
-					"id": "youtube-lvXbxEPMU_8"
-				},
-				{
-					"id": "youtube-FAu8LUh36Kk"
-				},
-				{
-					"id": "youtube-fqIkCUvnBtU"
-				},
-				{
-					"id": "youtube-I8byv5JX3-Q"
-				},
-				{
-					"id": "youtube-37NXz57Xrug"
-				},
-				{
-					"id": "youtube-rsQypTgdxDk"
-				},
-				{
-					"id": "youtube-qeA2WW8aI9E"
-				},
-				{
-					"id": "youtube-RIPQh1WG76M"
-				},
-				{
-					"id": "youtube-clQ19gxrF_s"
-				},
-				{
-					"id": "youtube-laTGtBaFVcE"
-				},
-				{
-					"id": "youtube-aNL30_lLGqw"
-				},
-				{
-					"id": "youtube-SyoLwFfI14o"
-				},
-				{
-					"id": "youtube-krlV-CM9eGs"
-				},
-				{
-					"id": "youtube-uIBJiD1uHUk"
-				},
-				{
-					"id": "youtube-MuM-w5aj7po"
-				},
-				{
-					"id": "youtube-wQD-ctqRP7o"
-				},
-				{
-					"id": "youtube-ZpYth4Y3QHI"
-				},
-				{
-					"id": "youtube-4aUL82S4FPc"
-				},
-				{
-					"id": "youtube-ViIjMk9ivgo"
-				},
-				{
-					"id": "youtube-9rzSTelHTSY"
-				},
-				{
-					"id": "youtube-xvn8_zzhVhM"
-				},
-				{
-					"id": "youtube-N8Oz65rJo04"
-				},
-				{
-					"id": "youtube-8gZw-G5tkAs"
-				},
-				{
-					"id": "youtube-eTUmugL7ApI"
-				},
-				{
-					"id": "youtube-CkZbwWnAuuU"
-				},
-				{
-					"id": "youtube-MvIvIb9SILw"
-				},
-				{
-					"id": "youtube-xGzsWo5PtW0"
-				},
-				{
-					"id": "youtube-i1HNr3DNhaE"
-				},
-				{
-					"id": "youtube-G-D8C39sdAM"
-				},
-				{
-					"id": "youtube-c5ARMgeGM1Q"
-				},
-				{
-					"id": "youtube-6b3ueXprnyg"
-				},
-				{
-					"id": "youtube-cdNyDuXM_90"
-				},
-				{
-					"id": "youtube-ba2ytuqpHCQ"
-				},
-				{
-					"id": "youtube-PIrVTckJhhc"
-				},
-				{
-					"id": "youtube-DqbJPxtMPAs"
-				},
-				{
-					"id": "youtube-P9agE8PokSY"
-				},
-				{
-					"id": "youtube-m7s_al2lvro"
-				},
-				{
-					"id": "youtube-wOdocuc2MQQ"
-				},
-				{
-					"id": "youtube-ptV0NfR0Guw"
-				},
-				{
-					"id": "youtube-H5dLcJq0CFo"
-				},
-				{
-					"id": "youtube-Jf0sdasqkBc"
-				},
-				{
-					"id": "youtube-AAfRVcpUGOQ"
-				},
-				{
-					"id": "youtube-IUBoLCqjhT0"
-				},
-				{
-					"id": "youtube-ph5x-_4Hh-Q"
-				},
-				{
-					"id": "youtube-BBtLc8X_sl4"
-				},
-				{
-					"id": "youtube-2oZ22e2UNNs"
-				},
-				{
-					"id": "youtube-e4_5RJAIYTM"
-				},
-				{
-					"id": "youtube-qCtpCDsjP7Y"
-				},
-				{
-					"id": "youtube-pwqStbSEvVw"
-				},
-				{
-					"id": "youtube-R51_ZxGhPck"
-				},
-				{
-					"id": "youtube-qmL1MoEkQOU"
-				},
-				{
-					"id": "youtube-uUcHvpBf5nk"
-				},
-				{
-					"id": "youtube-kMoqqmqytL0"
-				},
-				{
-					"id": "youtube-5D5Q7Rm3_tk"
-				},
-				{
-					"id": "youtube-iu27QkrcoOs"
-				},
-				{
-					"id": "youtube-MaoLOxPt2sQ"
-				},
-				{
-					"id": "youtube-TmEMNe7GLJw"
-				},
-				{
-					"id": "youtube-rShuozCyp9c"
-				},
-				{
-					"id": "youtube-Y8TRs3-rV30"
-				},
-				{
-					"id": "youtube-Q0Gn4nplYNA"
-				},
-				{
-					"id": "youtube-y8EEipNy8jc"
-				},
-				{
-					"id": "youtube-HMESSaPeWic"
-				},
-				{
-					"id": "youtube-yixetyQtovg"
-				},
-				{
-					"id": "youtube-Dv_Bs0oCn-w"
-				},
-				{
-					"id": "youtube-7enKJBRNwwE"
-				},
-				{
-					"id": "youtube-AH6SYI71nV0"
-				},
-				{
-					"id": "youtube-KVgzzGRdW-Q"
-				},
-				{
-					"id": "youtube-GsAR03EpwB0"
-				},
-				{
-					"id": "youtube-QoWr5jUAyvw"
-				},
-				{
-					"id": "youtube-Pkpg-RBeoHE"
-				},
-				{
-					"id": "youtube-vyUzb0rpV7I"
-				},
-				{
-					"id": "youtube-CW6Ub9FRfxs"
-				},
-				{
-					"id": "youtube-1trMzlbrtCs"
-				},
-				{
-					"id": "youtube-gHErNbj4rc8"
-				},
-				{
-					"id": "youtube--hwcV3BZ5u4"
-				},
-				{
-					"id": "youtube-wO4F39m8LMA"
-				},
-				{
-					"id": "youtube-y3oBlO5Hznw"
-				},
-				{
-					"id": "youtube-2_JfgoaN3ZU"
-				},
-				{
-					"id": "youtube-dVjuvMiePbg"
-				},
-				{
-					"id": "youtube-ALm9ff5DwfI"
-				},
-				{
-					"id": "youtube-vTy1m2UQQ8M"
-				},
-				{
-					"id": "youtube-hDsmZywG_uE"
-				},
-				{
-					"id": "youtube-r6qRZBvwJpw"
-				},
-				{
-					"id": "youtube-ojwI9RDLiYQ"
-				},
-				{
-					"id": "youtube-d_ekjIf9gME"
-				},
-				{
-					"id": "youtube-a-pfujConY8"
-				},
-				{
-					"id": "youtube-wpz3qlw2KgY"
-				},
-				{
-					"id": "youtube-QJmLdHZ6Yhs"
-				},
-				{
-					"id": "youtube-kWeqEB-3W2o"
-				},
-				{
-					"id": "youtube-MlghhNqAyxE"
-				},
-				{
-					"id": "youtube-3EZODcmYxfA"
-				},
-				{
-					"id": "youtube-FK9aNLVIU38"
-				},
-				{
-					"id": "youtube-PEy_inq2DsE"
-				},
-				{
-					"id": "youtube-w1DWNhE_KvA"
-				},
-				{
-					"id": "youtube-3oL2-0XbkZs"
-				},
-				{
-					"id": "youtube-RkxWSm8mIJs"
-				},
-				{
-					"id": "youtube-CM82ne1YKGM"
-				},
-				{
-					"id": "youtube-MzF42LotyA8"
-				},
-				{
-					"id": "youtube-zlCnR3vX9Ls"
-				},
-				{
-					"id": "youtube-WVuPO04rtyM"
-				},
-				{
-					"id": "youtube-d73Ach9qMko"
-				},
-				{
-					"id": "youtube-s8wPBwwTTeE"
-				},
-				{
-					"id": "youtube-5wUjSb8ObWQ"
-				}
-			]
+            "playlist_id": "PLTndZoNJ8JaK4lkSO_4775E3MRKYW_mgI",
+            "episodes": [
+                {
+                    "id": "youtube-7Z0uyfZJoBM"
+                },
+                {
+                    "id": "youtube-viM7mM7eEVc"
+                },
+                {
+                    "id": "youtube-_Hs6XyfnkZI"
+                },
+                {
+                    "id": "youtube-rr_7aWMwrvc"
+                },
+                {
+                    "id": "youtube-YyvEbGW6beQ"
+                },
+                {
+                    "id": "youtube--X-dYLskqFo"
+                },
+                {
+                    "id": "youtube-agX0RcKZWNw"
+                },
+                {
+                    "id": "youtube-dR9nXr_IIIQ"
+                },
+                {
+                    "id": "youtube-LjnXz6RNQDI"
+                },
+                {
+                    "id": "youtube-6qcwwHBSXA8"
+                },
+                {
+                    "id": "youtube-z3-koR8wc50"
+                },
+                {
+                    "id": "youtube-WzlO4tVNglE"
+                },
+                {
+                    "id": "youtube-eQj1e5tzu04"
+                },
+                {
+                    "id": "youtube-Dnrcxb60xlM"
+                },
+                {
+                    "id": "youtube-oJ2m-OmPnAk"
+                },
+                {
+                    "id": "youtube-RiQOKMs9nxg"
+                },
+                {
+                    "id": "youtube-tjoIem2c8zg"
+                },
+                {
+                    "id": "youtube-GP1W5CTUrdY"
+                },
+                {
+                    "id": "youtube-ZYul_WlHuXo"
+                },
+                {
+                    "id": "youtube--AG9EIE2XPU"
+                },
+                {
+                    "id": "youtube-T_gB-dWk3EE"
+                },
+                {
+                    "id": "youtube-YzOt1KuQ8X8"
+                },
+                {
+                    "id": "youtube-eF5pcZcpuc4"
+                },
+                {
+                    "id": "youtube-Pwq5TiIAvPI"
+                },
+                {
+                    "id": "youtube-XZYvLMzLy9s"
+                },
+                {
+                    "id": "youtube-__IhrrP30PE"
+                },
+                {
+                    "id": "youtube-FvYBRI2CzbE"
+                },
+                {
+                    "id": "youtube-7iX4KulQ540"
+                },
+                {
+                    "id": "youtube-L0E7G2HPrFs"
+                },
+                {
+                    "id": "youtube-6q1sHdDrlUo"
+                },
+                {
+                    "id": "youtube-g8SdPCWgzjI"
+                },
+                {
+                    "id": "youtube-2-8MUZ0pJ3s"
+                },
+                {
+                    "id": "youtube-zYTnJM6z-pA"
+                },
+                {
+                    "id": "youtube-Br0Q2TvOazA"
+                },
+                {
+                    "id": "youtube-xoDFLPXZNbE"
+                },
+                {
+                    "id": "youtube-sdVkG7Wh8fk"
+                },
+                {
+                    "id": "youtube-wNB4aaipVTs"
+                },
+                {
+                    "id": "youtube-5LtVUrn3tuU"
+                },
+                {
+                    "id": "youtube-I_zpDCmxOwc"
+                },
+                {
+                    "id": "youtube-XntBuCIVk7A"
+                },
+                {
+                    "id": "youtube-Ty6lwaY1bis"
+                },
+                {
+                    "id": "youtube-K_8kYO_GbxM"
+                },
+                {
+                    "id": "youtube-ReI3RfDnKsk"
+                },
+                {
+                    "id": "youtube-UDfJInbKXPM"
+                },
+                {
+                    "id": "youtube-qmtjLjNEdWg"
+                },
+                {
+                    "id": "youtube-U17AnOM__Ss"
+                },
+                {
+                    "id": "youtube-oyR3epDLI20"
+                },
+                {
+                    "id": "youtube-BIQbAjHTm-4"
+                },
+                {
+                    "id": "youtube-zHKkplX4VOY"
+                },
+                {
+                    "id": "youtube-xIrjGxNN0Bs"
+                },
+                {
+                    "id": "youtube-qZYMqp47kF0"
+                },
+                {
+                    "id": "youtube-mQr9kDWjvOQ"
+                },
+                {
+                    "id": "youtube-7dXdStYUXu4"
+                },
+                {
+                    "id": "youtube-8c3IGTnmviU"
+                },
+                {
+                    "id": "youtube-qcoGDgI0zR8"
+                },
+                {
+                    "id": "youtube-Qk5iIVCjib4"
+                },
+                {
+                    "id": "youtube-i4IAxx6REeM"
+                },
+                {
+                    "id": "youtube-c21v_0XUZdk"
+                },
+                {
+                    "id": "youtube-ShAezMkQmLA"
+                },
+                {
+                    "id": "youtube-6dYW-DjjGOc"
+                },
+                {
+                    "id": "youtube-SfJd2tOi-nE"
+                },
+                {
+                    "id": "youtube-ZdWdJ--JRAA"
+                },
+                {
+                    "id": "youtube-nzdad5oePx0"
+                }
+            ]
 		}
 	],
 	"ocr_params": [

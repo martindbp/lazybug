@@ -109,6 +109,15 @@ download-yt:
 mv-files:
 	cat data/git/shows/$(show).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" | xargs -I {} echo mv "data/remote/private/caption_data/raw_captions/youtube-{}{.json,-hanzi.json}"
 
+
+.PHONY: transfer-show-subtitles
+transfer-show-subtitles:
+	cat data/git/shows/$(from).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" > from_ids.txt
+	cat data/git/shows/$(to).json | grep "\"id\"" | sed -E "s/.*: \"youtube-(.*)\".*$//\1/g" > to_ids.txt
+	# NOTE: use this command from bash, requires `rename` tool from apt
+	paste from_ids.txt to_ids.txt | xargs -l bash -c 'rename "s/$0/$1/g" data/remote/public/subtitles/*'
+
+
 .PHONY: process-video-captions
 process-video-captions:
 	merkl -v run process_show.process_show_captions ${show} ${videos}
