@@ -107,7 +107,7 @@
           <q-page-container :class="{nopadding: page === 'player' && isMobile}" >
             <q-page :padding="page !== 'player' && isDesktop">
                 <PlayerPage class="playerpage" v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
-                <ShowTable v-show="page === 'content'" />
+                <ContentPage v-show="page === 'content'" />
                 <HistoryPage v-if="page === 'history'" />
                 <WordTable v-if="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import ShowTable from './ShowTable.vue'
+import ContentPage from './ContentPage.vue'
 import WordTable from './WordTable.vue'
 import AccountPage from './AccountPage.vue'
 import PlayerPage from './PlayerPage.vue'
@@ -158,7 +158,7 @@ import IntroDialog from './IntroDialog.vue'
 export default {
     mixins: [mixin],
     components: {
-        ShowTable,
+        ContentPage,
         WordTable,
         AccountPage,
         PlayerPage,

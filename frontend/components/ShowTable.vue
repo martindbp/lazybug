@@ -16,7 +16,7 @@
             </q-input>
         </template>
         <template v-slot:header-cell="props">
-            <q-th :props="props">
+            <q-th :props="props" v-if="props.col.name !== 'type'">
                 {{ props.col.label }}
                 <span v-if="columnFilters[props.col.name] !== undefined">
                     <q-badge class="clickablebadge" @click.stop.prevent="removeFilter(...filter)" v-for="filter in columnFilters[props.col.name]" :color="mapToColor(filter[1], filter[2])">{{filter[2]}}</q-badge>
@@ -51,11 +51,6 @@
                     <span v-if="props.cols[3].value === 'N/A'">N/A</span>
                     <q-badge v-else :color="mapDoubanToColor(props.cols[3].value)">
                         {{ props.cols[3].value }}
-                    </q-badge>
-                </q-td>
-                <q-td key="type" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('type', 'type', props.cols[4].value)" :color="mapToColor('type', props.cols[4].value)">
-                        {{ props.cols[4].value }}
                     </q-badge>
                 </q-td>
                 <q-td key="year" :props="props" style="white-space: normal; max-width: 200px;">
@@ -104,6 +99,7 @@ function isNew(date) {
 
 export default {
     mixins: [mixin],
+    props: ['type'],
     data: function() { return {
         searchFilter: '',
         pagination: {
@@ -204,7 +200,7 @@ export default {
             sortable: true
           },
         ],
-        filters: null,
+        filters: [['type', 'type', this.type]],
     }},
     computed: {
         rows: function() {
