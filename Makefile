@@ -118,8 +118,8 @@ transfer-show-subtitles:
 	paste from_ids.txt to_ids.txt | xargs -l bash -c 'rename "s/$0/$1/g" data/remote/public/subtitles/*'
 
 
-.PHONY: process-video-captions
-process-video-captions:
+.PHONY: process-show-captions
+process-show-captions:
 	merkl -v run process_show.process_show_captions ${show} ${videos}
 
 .PHONY: process-translations

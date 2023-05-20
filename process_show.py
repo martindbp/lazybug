@@ -12,8 +12,6 @@ from functools import partial
 import cv2
 import numpy as np
 
-import mxnet as mx
-from cnocr import CnOcr
 from hanziconv import HanziConv
 import torch
 from torch.nn import functional as F
@@ -21,11 +19,12 @@ import webvtt
 
 os.environ["TRANSFORMERS_CACHE"] = "./data/local/huggingface-models/"
 #os.environ["TRANSFORMERS_OFFLINE"] = "1"
-from transformers import AutoTokenizer, AutoModelForMaskedLM
 from easyocr import Reader
-
+from transformers import AutoTokenizer, AutoModelForMaskedLM
 from merkl import task, pipeline, HashMode, FileRef, Future
+
 from wrapped_json import json
+from cnocr_shim import CnOcrShim
 from train_predict import predict_img_pipeline, _get_latest_net
 from process_translations import get_alignment_translations, get_machine_translations
 from word_alignment import add_segmentation_and_alignment
@@ -40,7 +39,7 @@ from collect_names import collect_names
 
 DEBUG = False
 
-easy_ocrs = None
+cnocr = None
 tokenizer = None
 model = None
 
@@ -93,247 +92,6 @@ def caption_lines_to_srt(lines):
     return srt_out
 
 
-def _join_predictions(results, alphabet, convert_to_simplified=True):
-    if len(results) == 0:
-        return None, '', 0, np.array([]), np.array([])
-    else:
-        results = [x for x in results if len(x[1]) > 0]  # only non-empty predictions
-        if len(results) == 0:
-            return None, '', 0, np.array([]), np.array([])
-
-        results = sorted(results, key=lambda x: x[0][0][0]) # sort by x value of upper-left corner
-        ul = [min(x for ((x, _), *_), *_ in results), min(y for ((_, y), *_), *_ in results)]
-        ur = [max(x for (_, (x, _), *_), *_ in results), min(y for (_, (_, y), *_), *_ in results)]
-        dr = [max(x for (_, _, (x, _), _), *_ in results), max(y for (_, _, (_, y), _), *_ in results)]
-        dl = [min(x for (*_, (x, _)), *_ in results), max(y for (*_, (_, y)), *_ in results)]
-        rect = [ul, ur, dr, dl]
-
-        results_with_spaces = []
-        for res in results:
-            if len(results_with_spaces) > 0:
-                indices = np.array([alphabet.index(' ')])
-                probs = np.zeros((1, res[4].shape[1]), float)
-                probs[0, indices[0]] = 1.0
-                results_with_spaces.append((None, ' ', 1.0, indices, probs))
-
-            res = (*res[:3], res[3].numpy(), *res[4:])
-            results_with_spaces.append(res)
-
-        text = ''.join((x[1] for x in results_with_spaces))
-        mean_confidence_score = np.array([x[2] for x in results_with_spaces]).mean()
-
-        indices = np.concatenate([x[3] for x in results_with_spaces])
-        probs = np.concatenate([x[4] for x in results_with_spaces], axis=0)
-
-        if convert_to_simplified:
-            # We convert any traditional chars to simplified in text, update the vocab indices, and the probs
-            text = HanziConv.toSimplified(text)
-            for i, c in enumerate(text):
-                simp_idx = alphabet.index(c)
-                indices[i] = simp_idx
-
-            # We set prob(simplified(char)) = prob(char) + prob(simplified(char)) for all chars in the alphabet, and set prob(char) to 0
-            for i in range(probs.shape[0]):
-                for c in alphabet:
-                    c_simp = HanziConv.toSimplified(c)
-                    if c_simp != c and c_simp in alphabet:
-                        probs[i][alphabet.index(c_simp)] += probs[i][alphabet.index(c)]
-                        probs[i][alphabet.index(c)] = 0
-
-        return [rect, text, mean_confidence_score, indices, probs]
-
-
-from cnocr.utils import pad_img_seq, to_numpy, gen_length_mask
-from cnocr.models.ocr_model import OcrModel
-from itertools import groupby
-def _predict(self, img_list):
-    img_lengths = torch.tensor([img.shape[2] for img in img_list])
-    imgs = pad_img_seq(img_list)
-    if self._model_backend == 'pytorch':
-        with torch.no_grad():
-            out = self._model(
-                imgs, img_lengths, candidates=self._candidates, return_preds=True
-            )
-    else:  # onnx
-        out = _onnx_predict(self, imgs, img_lengths)
-
-    return out
-
-def _onnx_predict(self, imgs, img_lengths):
-    ort_session = self._model
-    ort_inputs = {
-        ort_session.get_inputs()[0].name: to_numpy(imgs),
-        ort_session.get_inputs()[1].name: to_numpy(img_lengths),
-    }
-    ort_outs = ort_session.run(None, ort_inputs)
-    out = {
-        'logits': torch.from_numpy(ort_outs[0]),
-        'output_lengths': torch.from_numpy(ort_outs[1]),
-    }
-    out['logits'] = OcrModel.mask_by_candidates(
-        out['logits'], self._candidates, self._vocab, self._letter2id
-    )
-
-    preds, char_probs, prob_distributions = ctc_best_path(self, out['logits'], self._vocab, out['output_lengths'])
-    out["preds"] = preds
-    out["char_probs"] = char_probs
-    out["prob_distributions"] = prob_distributions
-    return out
-
-
-def ctc_best_path(
-    self,
-    logits,
-    vocab,
-    input_lengths=None,
-):
-    blank = len(vocab)
-    # compute softmax
-    probs = F.softmax(logits.permute(0, 2, 1), dim=1)
-    # get char indices along best path
-    best_path = torch.argmax(probs, dim=1)  # [N, T]
-
-    if input_lengths is not None:
-        length_mask = gen_length_mask(input_lengths, probs.shape).to(
-                device=probs.device
-                )  # [N, 1, T]
-        probs.masked_fill_(length_mask, 1.0)
-        best_path.masked_fill_(length_mask.squeeze(1), blank)
-
-    orig_probs = probs
-    # define word proba as min proba of sequence
-    probs, _ = torch.max(probs, dim=1)  # [N, T]
-    probs, _ = torch.min(probs, dim=1)  # [N]
-
-    words = []
-    out_prob_distributions = []
-    out_char_probs = []
-    for sequence in best_path:
-        # collapse best path (using itertools.groupby), map to chars, join char list to string
-        collapsed = [vocab[k] for k, _ in groupby(sequence) if k != blank]
-        curr_idx = 0
-        collapsed_char_probs = []
-        collapsed_prob_distributions = []
-        for char_code, char_codes in groupby(sequence):
-            char_codes = list(char_codes)
-            if char_code.item() == blank:
-                curr_idx += len(char_codes)
-                continue
-
-            prob_distribution = orig_probs[0, :, curr_idx].detach().cpu().numpy()
-            char_prob = prob_distribution[char_code.item()]
-            collapsed_prob_distributions.append(prob_distribution)
-            collapsed_char_probs.append(char_prob)
-            curr_idx += len(char_codes)
-
-        assert len(collapsed_prob_distributions) == len(collapsed)
-        out_prob_distributions.append(collapsed_prob_distributions)
-        out_char_probs.append(collapsed_char_probs)
-        words.append(collapsed)
-
-    return list(zip(words, probs.tolist())), np.array(out_char_probs), np.array(out_prob_distributions)
-
-
-cnocr = None
-def ocr_for_single_lines_probs_CnOCR(img, *args):
-    """ This code is pulled from recognizer.py in CnOCR. We modify it to return
-    the probability distributions over each characters since the official API doesn't """
-    global cnocr
-    self = cnocr.rec_model
-
-    batch_size = 1
-    img_list = [img]
-
-    if len(img_list) == 0:
-        return []
-
-    img_list = [self._prepare_img(img) for img in img_list]
-    img_list = [self._transform_img(img) for img in img_list]
-
-    should_sort = batch_size > 1 and len(img_list) // batch_size > 1
-
-    if should_sort:
-        sorted_idx_list = sorted(
-            range(len(img_list)), key=lambda i: img_list[i].shape[2]
-        )
-        sorted_img_list = [img_list[i] for i in sorted_idx_list]
-    else:
-        sorted_idx_list = range(len(img_list))
-        sorted_img_list = img_list
-
-    idx = 0
-    sorted_out = []
-    while idx * batch_size < len(sorted_img_list):
-        imgs = sorted_img_list[idx * batch_size : (idx + 1) * batch_size]
-        try:
-            batch_out = _predict(self, imgs)
-        except Exception as e:
-            batch_out = {'preds': [([''], 0.0)] * len(imgs)}
-        sorted_out.append(batch_out)
-        idx += 1
-
-    out = [None] * len(sorted_out)
-    for idx, pred in zip(sorted_idx_list, sorted_out):
-        out[idx] = pred
-
-    res = []
-    probs = []
-    prob_distributions = []
-    char_probs = []
-    for line in out:
-        prob_distributions.append(line['prob_distributions'][0])
-        char_probs.append(line['char_probs'][0])
-        chars, prob = line['preds'][0]
-        chars = [c if c != '<space>' else ' ' for c in chars]
-        probs.append(prob)
-        res.append(''.join(chars))
-
-    text = ''.join(res[0])
-    prob_distribution = prob_distributions[0]
-    char_probs = char_probs[0]
-    return text, char_probs, prob_distribution
-
-
-def ocr_for_single_lines_probs(ocr, alphabet, segmentation, img, smooth_distributions=False):
-    margin = 0.1
-    text_threshold = 0.7
-    min_size = 20
-
-    results = ocr.readtext(segmentation)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-    result = _join_predictions(results, alphabet)
-    if result[0] == None:
-        # Wider margin, lower thresholds seems to be needed for single chars
-        margin = 0.5
-        text_threshold = 0.3
-        min_size = 10
-        results = ocr.readtext(segmentation)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _join_predictions(results, alphabet)
-
-    box, text, confidence, prob_indices, prob_distributions = result
-    """
-    if confidence < 0.6 and len(img) > 0:
-        results = ocr.readtext(img)#, add_margin=margin, min_size=min_size, text_threshold=text_threshold)
-        result = _join_predictions(results, alphabet)
-        img_confidence = result[2]
-        img_text = result[1]
-        print(f"{img_confidence = } {confidence = } {img_text = } {text = }")
-        #cv2.imshow("img", img)
-        #cv2.waitKey()
-        if img_confidence > confidence:
-            box, text, confidence, prob_indices, prob_distributions = result
-    """
-
-    if smooth_distributions:
-        # Smooth out OCR distribution a bit, because it tends to be over confident
-        # NOTE: correction: this was true for CnOCR, but not for EasyOCR
-        for i in range(len(text)):
-            prob_distributions[i, :] = np.sqrt(prob_distributions[i, :])
-            prob_distributions[i, :] = prob_distributions[i, :] / prob_distributions[i, :].sum()
-
-    probs = np.array([prob_distributions[i][idx] for i, idx in enumerate(prob_indices)])
-    return text, probs, prob_distributions
-
-
 def srt_timestamp(t):
     hours = int(t // (60*60))
     t -= hours * 60 * 60
@@ -343,7 +101,7 @@ def srt_timestamp(t):
     return f'{hours:02}:{minutes:02}:{seconds:.3f}'.replace('.', ',')
 
 
-def predict_chars(ocr_fn, mask, probs, img, window_buffer=10):
+def predict_chars(mask, probs, img, window_buffer=10):
     if mask.sum() == 0:
         return '', None, None
     ys, xs = np.where(mask > 0)
@@ -359,7 +117,7 @@ def predict_chars(ocr_fn, mask, probs, img, window_buffer=10):
     img_crop_larger = np.zeros((img_crop.shape[0]+2*window_buffer, img_crop.shape[1]+2*window_buffer, 3), 'uint8')
     img_crop_larger[window_buffer:-window_buffer, window_buffer:-window_buffer, :] = img_crop
 
-    res, char_probs, prob_distributions = ocr_fn(probs_larger, img_crop_larger)
+    res, char_probs, prob_distributions = cnocr.ocr_fn(probs_larger, img_crop_larger)
     return res, char_probs, prob_distributions
 
 
@@ -369,7 +127,7 @@ def jeffrey_div(a, b, eps=0.00001):
     return np.sum((a-b) * (np.log(a) - np.log(b)))
 
 
-def get_BERT_masked_prob_distribution(text, mask_idx_start, mask_idx_end, alphabet):
+def get_BERT_masked_prob_distribution(text, mask_idx_start, mask_idx_end):
     global tokenizer, model
     if tokenizer is None:
         tokenizer = AutoTokenizer.from_pretrained("hfl/chinese-bert-wwm")
@@ -387,7 +145,10 @@ def get_BERT_masked_prob_distribution(text, mask_idx_start, mask_idx_end, alphab
     # TODO: move this out and do it once
     # Translate from BERT vocab to OCR vocab
     ocr_bert_indices = []
-    for ocr_v in alphabet[1:]:
+    for ocr_v in cnocr.alphabet[1:]:
+        if ocr_v is None:
+            ocr_bert_indices.append(0)
+            continue
         idx = tokenizer.encode(ocr_v)[1]
         ocr_bert_indices.append(idx)
 
@@ -402,21 +163,23 @@ def get_BERT_masked_prob_distribution(text, mask_idx_start, mask_idx_end, alphab
     return probs
 
 
-def apply_BERT_prior(line, alphabet, context='', multiply=True):
+def apply_BERT_prior(line, context='', multiply=True):
     if line.char_probs is None or line.prob_distributions is None:
         return
+
+    alphabet = cnocr.alphabet
 
     # Check all the char probs for low prob characters, apply BERT masked probabilities as a kind of prior
     applied = []
     for char_i, (char_prob, prob_distribution) in enumerate(zip(line.char_probs, line.prob_distributions)):
-        if char_prob >= 0.998:
+        print(line.text[char_i], char_prob)
+        if char_prob >= 0.9998:
             continue
 
         bert_distribution = get_BERT_masked_prob_distribution(
             context + line.text,
             len(context) + char_i,
             len(context) + char_i+1,
-            alphabet
         )
         applied += [line.text[char_i]]
 
@@ -460,6 +223,7 @@ def apply_BERT_prior(line, alphabet, context='', multiply=True):
         line.char_probs[char_i] = updated_distribution.max()
 
     if len(applied) > 0:
+        breakpoint()
         print(f'Used BERT prior for {", ".join(applied)} / {line.text}')
 
 
@@ -690,13 +454,13 @@ def find_next_diff(line, buffer_frames, threshold=10, height_buffer_px=0):
 
 net = _get_latest_net()
 
-def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=None, height_buffer_px=0):
+def predict_line(frame, frame_t, font_height, conditional_caption_idx=None, height_buffer_px=0):
     mask, probs = predict_img_pipeline(frame, net)
     mask.cache = None
     probs.cache = None
     mask = mask.eval()
     probs = probs.eval()
-    text, char_probs, prob_distributions = predict_chars(ocr_fn, mask, probs, frame)
+    text, char_probs, prob_distributions = predict_chars(mask, probs, frame)
 
     # Remove the height buffer that was added when extracting the frames from the video
     if height_buffer_px > 0:
@@ -751,7 +515,7 @@ def predict_line(ocr_fn, frame, frame_t, font_height, conditional_caption_idx=No
     return caption_line
 
 
-def save_caption_data(video_id, caption_line, alphabet):
+def save_caption_data(video_id, caption_line):
     h = hashlib.md5()
     h.update(bytes(video_id, 'utf-8'))
     h.update(bytes(caption_line.text, 'utf-8'))
@@ -782,7 +546,7 @@ def save_caption_data(video_id, caption_line, alphabet):
         for prob_distribution in caption_line.prob_distributions:
             top10_indices = np.argpartition(prob_distribution, -10)[-10:]
             top10_probs = [float(p) for p in prob_distribution[top10_indices]]
-            top10_chars = [alphabet[idx] if idx < len(alphabet) else '' for idx in top10_indices]
+            top10_chars = [cnocr.alphabet[idx] if idx < len(cnocr.alphabet) else '' for idx in top10_indices]
             top10_char_probs.append(list(sorted(zip(top10_chars, top10_probs), key=lambda x: x[1], reverse=True)))
 
         with open(prob_distributions_path, 'wb') as f:
@@ -793,7 +557,6 @@ def replace_or_add_line(
     video_id,
     new_line,
     caption_lines,
-    alphabet,
     replace_levenshtein_threshold=1.0,
     zero_out_numpy=True,
     do_save_caption_data=True,
@@ -843,11 +606,11 @@ def replace_or_add_line(
                     #prob_distribution /= prob_distribution.sum()
                     prob_distribution = (last_line.prob_distributions[op.from_idx] + new_line.prob_distributions[op.to_idx]) / 2
                     char_prob = prob_distribution.max()
-                    new_char = alphabet[np.argmax(prob_distribution)]
+                    new_char = cnocr.alphabet[np.argmax(prob_distribution)]
                     if new_char == '<space>':
                         new_char = ' '
 
-                    if new_char is not None and new_char != '[blank]':
+                    if new_char is not None and new_char not in ['[blank]', 'blank']:
                         new_text += new_char
                         new_char_probs.append(char_prob)
                         new_prob_distributions.append(prob_distribution)
@@ -891,7 +654,7 @@ def replace_or_add_line(
         if len(caption_lines) > 0:
             last_line = caption_lines[-1]
             if caption_type == 'hanzi' and use_bert_prior:
-                apply_BERT_prior(last_line, alphabet)
+                apply_BERT_prior(last_line)
             #elif caption_type == 'english':
                 #apply_english_corrections(last_line)
             #elif caption_type == 'pinyin':
@@ -915,7 +678,7 @@ def replace_or_add_line(
             # Need to save the caption data before zeroing out
             if do_save_caption_data:
                 print(f'Saving {len(caption_lines)}')
-                save_caption_data(video_id, caption_lines[-1], alphabet)
+                save_caption_data(video_id, caption_lines[-1])
 
             if zero_out_numpy:
                 print(f'Zeroing out {len(caption_lines)}')
@@ -927,13 +690,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, height_buffer_px=0):
+def extract_lines_from_framebuffer(last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, height_buffer_px=0):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(ocr_fn, frame, frame_t, font_height, height_buffer_px=height_buffer_px)
+        line = predict_line(frame, frame_t, font_height, height_buffer_px=height_buffer_px)
 
     if line.text == '':
         if last_line is None:
@@ -950,9 +713,9 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(ocr_fn, diff_frame, diff_t, font_height, height_buffer_px=height_buffer_px)
+        diff_line = predict_line(diff_frame, diff_t, font_height, height_buffer_px=height_buffer_px)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(ocr_fn, diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
     else:
         # Go backwards from line
         diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold, height_buffer_px=height_buffer_px)
@@ -963,7 +726,7 @@ def extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height,
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(ocr_fn, last_line, frames_left, font_height, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
+        return extract_lines_from_framebuffer(last_line, frames_left, font_height, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
 
 
 @task(deps=[net])
@@ -984,39 +747,21 @@ def extract_video_captions(
     zero_out_numpy=True,
     do_save_caption_data=True,
     caption_type='hanzi',
-    ocr_engine='cnocr',
+    traditional=False,
     use_bert_prior=True,
     conditional_captions=None,
     refine_bounding_rect=False,
     screen_recording_video_timings=None,
 ):
-    global easy_ocrs, cnocr
+    global cnocr
     SUBSAMPLE_SECONDS = 1/3
     print('Processing video', video_path)
 
-    lang = None
-    if caption_type == 'hanzi':
-        lang = ['ch_sim', 'en']
-    elif caption_type == 'english':
-        lang = ['en']
-    elif caption_type == 'pinyin':
+    if caption_type == 'pinyin':
         raise NotImplemented()
 
-    if ocr_engine == 'easyocr':
-        if easy_ocrs is None:
-            easy_ocrs = {
-                'en': Reader(['en']),
-                'ch_sim,en': Reader(['ch_sim', 'en']),
-            }
-
-        ocr = easy_ocrs[','.join(sorted(lang))]
-        alphabet = ocr.converter.character
-        ocr_fn = partial(ocr_for_single_lines_probs, ocr, alphabet)
-    else:
-        if cnocr is None:
-            cnocr = CnOcr()
-        ocr_fn = ocr_for_single_lines_probs_CnOCR
-        alphabet = cnocr.rec_model._vocab
+    if cnocr is None:
+        cnocr = CnOcrShim(traditional=traditional, input_font_height=font_height)
 
     if screen_recording_video_timings is not None:
         print('Screen recording video timings provided, trying to find sync point')
@@ -1056,7 +801,7 @@ def extract_video_captions(
                 if frame_size is None:
                     frame_size = frame.shape[:2]
 
-                line = predict_line(ocr_fn, crop, frame_time, font_height, height_buffer_px=height_buffer_px)
+                line = predict_line(crop, frame_time, font_height, height_buffer_px=height_buffer_px)
                 print(line.text)
                 if (len(filter_text_hanzi(line.text)) > 1 or len(line.text) > 5) and line.bounding_rect is not None:
                     sum_log_prob += line.logprob
@@ -1116,7 +861,7 @@ def extract_video_captions(
                         line = CaptionLine('', cond_start, cond_end, 0, None, None, None, None, None)
                     else:
                         frame_t, frame = frame_buffer[len(frame_buffer) // 2]
-                        line = predict_line(ocr_fn, frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
+                        line = predict_line(frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
 
                     frame_buffer_lines = [line]
 
@@ -1142,7 +887,7 @@ def extract_video_captions(
                 print('diff')
 
                 last_line = caption_lines[-1] if len(caption_lines) > 0 else None
-                frame_buffer_lines = extract_lines_from_framebuffer(ocr_fn, last_line, frame_buffer, font_height, height_buffer_px=height_buffer_px)
+                frame_buffer_lines = extract_lines_from_framebuffer(last_line, frame_buffer, font_height, height_buffer_px=height_buffer_px)
 
             for line in frame_buffer_lines:
                 if line.text != '':
@@ -1179,7 +924,6 @@ def extract_video_captions(
                     video_id,
                     line,
                     caption_lines,
-                    alphabet,
                     replace_levenshtein_threshold,
                     zero_out_numpy,
                     do_save_caption_data,
@@ -1201,7 +945,7 @@ def extract_video_captions(
 
     # Need to save the last caption (the rest are saved in `replace_or_add_line` before zeroing out)
     if caption_lines[-1].text != '' and do_save_caption_data:
-        save_caption_data(video_id, caption_lines[-1], alphabet)
+        save_caption_data(video_id, caption_lines[-1])
 
     return caption_lines, frame_size
 
@@ -1762,7 +1506,7 @@ def process_show_captions(
                 replace_levenshtein_threshold=1.0,
                 filter_out_too_many_low_prob_chars=param.get('filter_out_too_many_low_prob_chars', True),
                 caption_type=param['type'],
-                ocr_engine=param.get('ocr_engine', 'cnocr' if param['type'] == 'hanzi' else 'easyocr'),
+                traditional=param.get('traditional', False),
                 use_bert_prior=param.get('use_bert_prior', False),
                 conditional_captions=conditional_captions,
                 refine_bounding_rect=param.get('refine_bounding_rect', False),

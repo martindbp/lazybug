@@ -20,7 +20,6 @@ ckip_transformers
 yt-dlp
 b2
 pymatting
-easyocr
 pycairo
 pangocairocffi
 scipy
