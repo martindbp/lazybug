@@ -5,7 +5,7 @@
         no-caps
         outside-arrows
         mobile-arrows
-        class="bg-orange text-white shadow-2"
+        class="bg-white text-dark"
     >
         <q-tab name="shows" label="Shows" />
         <q-tab name="movies" label="Movies" />

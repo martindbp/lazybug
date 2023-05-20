@@ -9,18 +9,40 @@
       :class="{showtable: true, mobile: isMobile}"
     >
         <template v-slot:top-left>
-            <q-input borderless dense debounce="300" v-model="searchFilter" placeholder="Search">
-                <template v-slot:prepend>
-                    <q-icon name="search" />
-                </template>
-            </q-input>
+            <q-expansion-item
+                v-model="filtersExpanded"
+                label="Search and Filter"
+            >
+                <div class="q-pa-sm row">
+                    <q-input borderless dense debounce="300" v-model="searchFilter" placeholder="Search">
+                        <template v-slot:prepend>
+                            <q-icon name="search" />
+                        </template>
+                    </q-input>
+                </div>
+                <div class="q-pa-sm row justify-left">
+                    <span
+                        class="q-pr-md q-pb-md"
+                        style="max-width: 600px"
+                        v-for="[propName, propVal] in [['Genres', 'genres'], ['Translation', 'translation_source'], ['Caption', 'caption_source'], ['Free', 'free']]"
+                    >
+                            <div>{{ propName }}</div>
+                            <q-badge
+                                v-for="filterVal in propFilterOptions[propVal]"
+                                :outline="!activeFilterValues.includes(filterVal)"
+                                class="clickablebadge"
+                                @click.stop.prevent="activeFilterValues.includes(filterVal) ? removeFilter(propVal, filterVal) : addFilter(propVal, filterVal, propVal === 'genres')"
+                                :color="mapToColor(propVal, filterVal)"
+                            >
+                                {{filterVal}}
+                            </q-badge>
+                    </span>
+                </div>
+            </q-expansion-item>
         </template>
         <template v-slot:header-cell="props">
             <q-th :props="props" v-if="props.col.name !== 'type'">
                 {{ props.col.label }}
-                <span v-if="columnFilters[props.col.name] !== undefined">
-                    <q-badge class="clickablebadge" @click.stop.prevent="removeFilter(...filter)" v-for="filter in columnFilters[props.col.name]" :color="mapToColor(filter[1], filter[2])">{{filter[2]}}</q-badge>
-                </span>
             </q-th>
         </template>
         <template v-slot:body="props">
@@ -57,7 +79,7 @@
                     {{ props.cols[5].value }}
                 </q-td>
                 <q-td key="genres" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', 'genres', genre)" v-for="genre in props.cols[6].value" :color="mapToColor('genres', genre)">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('genres', genre)" v-for="genre in props.cols[6].value" :color="mapToColor('genres', genre)">
                         {{ genre }}
                     </q-badge>
                 </q-td>
@@ -65,11 +87,11 @@
                     {{ props.cols[7].value }}
                 </q-td>
                 <q-td key="sources" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'caption_source', props.cols[8].value[0])" :color="mapToColor('caption_source', props.cols[8].value[0])">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('caption_source', props.cols[8].value[0])" :color="mapToColor('caption_source', props.cols[8].value[0])">
                         {{ props.cols[8].value[0] }}
                     </q-badge>
                     <br>
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('sources', 'translation_source', props.cols[8].value[1])" :color="mapToColor('translation_source', props.cols[8].value[1])">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('translation_source', props.cols[8].value[1])" :color="mapToColor('translation_source', props.cols[8].value[1])">
                         {{ props.cols[8].value[1] }}
                     </q-badge>
                 </q-td>
@@ -77,7 +99,7 @@
                     {{ props.cols[9].value }}
                 </q-td>
                 <q-td key="free" :props="props" style="white-space: normal; max-width: 200px;">
-                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', 'free', props.cols[10].value)"  :color="mapToColor('free', props.cols[10].value)">
+                    <q-badge class="clickablebadge" @click.stop.prevent="addFilter('free', props.cols[10].value)"  :color="mapToColor('free', props.cols[10].value)">
                         {{ props.cols[10].value ? 'free' : 'paid' }}
                     </q-badge>
                 </q-td>
@@ -101,7 +123,11 @@ export default {
     mixins: [mixin],
     props: ['type'],
     data: function() { return {
+        filtersExpanded: false,
         searchFilter: '',
+        selectedGenre: null,
+        selectedHanziSource: null,
+        selectedTranslationSource: null,
         pagination: {
             rowsPerPage: 25,
         },
@@ -200,18 +226,18 @@ export default {
             sortable: true
           },
         ],
-        filters: [['type', 'type', this.type]],
+        activeFilters: [['type', this.type]],
     }},
     computed: {
         rows: function() {
             if (this.$store.state.showList === null) return [];
             let showPercentKnown = this.showPercentKnown;
             let rows = Object.values(this.$store.state.showList).filter((show) => show.released);
-            let filters = this.filters;
-            if (filters !== null) {
+            let activeFilters = this.activeFilters;
+            if (activeFilters !== null) {
                 rows = rows.filter(row => {
                     let allMatch = true;
-                    for (const [filterCol, filterProp, filterVal] of filters) {
+                    for (const [filterProp, filterVal] of activeFilters) {
                         if (Array.isArray(row[filterProp])) {
                             if (! row[filterProp].includes(filterVal)) allMatch = false;
                         }
@@ -258,7 +284,7 @@ export default {
             });
 
             // If there are no filters, sort by "is_new"
-            if (filters === null && this.searchFilter.length === 0) {
+            if (activeFilters === null && this.searchFilter.length === 0) {
                 rows = rows.sort((a, b) => {
                     return b.is_new - a.is_new;
                 });
@@ -266,15 +292,23 @@ export default {
 
             return rows;
         },
-        columnFilters: function() {
-            let colFilters = {};
-            if (this.filters === null) return colFilters;
+        propFilterOptions: function() {
+            let propOptions = {};
 
-            for (const [col, rowProp, val] of this.filters) {
-                colFilters[col] = colFilters[col] || [];
-                colFilters[col].push([col, rowProp, val]);
+            let rows = Object.values(this.$store.state.showList).filter((show) => show.released);
+            for (const [rowProp, isArray] of [['genres', true], ['caption_source', false], ['translation_source', false], ['free', false]]) {
+                let options = rows.map((row) => row[rowProp]);
+                if (isArray) options = [].concat.apply([], options)
+                propOptions[rowProp] = [...new Set(options)];
             }
-            return colFilters;
+            return propOptions;
+        },
+        activeFilterValues: function() {
+            let values = []
+            for (const filter of this.activeFilters) {
+                values.push(filter[1]);
+            }
+            return values;
         },
         isLoading: function() {
             return this.$store.state.showList === null;
@@ -296,7 +330,7 @@ export default {
         },
         mapToColor: function(type, val) {
             if (type === 'genres') {
-                const colors = ['green', 'blue', 'red', 'orange', 'purple', 'cyan', 'teal', 'light-green', 'amber', 'brown', 'blue-gray', 'indigo'];
+                const colors = ['green', 'blue', 'red', 'orange', 'purple', 'cyan', 'teal', 'light-green', 'amber', 'brown', 'indigo'];
                 let charCodeSum = 0;
                 for (let i = 0; i < val.length; i++) {
                     charCodeSum += val.charCodeAt(i);
@@ -320,23 +354,31 @@ export default {
                 return val ? 'green' : 'red';
             }
         },
-        addFilter: function(column, rowProp, value) {
-            this.removeFilter(column, rowProp, value);
-            if (this.filters === null) {
-                this.filters = [];
+        addFilter: function(rowProp, value, multiselect = false) {
+            if (! multiselect) {
+                // First unselect all
+                for (const val of this.propFilterOptions[rowProp]) {
+                    this.removeFilter(rowProp, val);
+                }
             }
-            this.filters.push([column, rowProp, value]);
+            else {
+                this.removeFilter(rowProp, value);
+            }
+            if (this.activeFilters === null) {
+                this.activeFilters = [];
+            }
+            this.activeFilters.push([rowProp, value]);
         },
-        removeFilter: function(column, rowProp, value) {
-            if (this.filters === null) return;
-            this.filters = this.filters.filter(filter => {
-                if (filter[0] === column && filter[1] === rowProp && filter[2] === value) return false;
+        removeFilter: function(rowProp, value) {
+            if (this.activeFilters === null) return;
+            this.activeFilters = this.activeFilters.filter(filter => {
+                if (filter[0] === rowProp && filter[1] === value) return false;
                 return true;
             });
-            if (this.filters.length === 0) this.filters = null;
+            if (this.activeFilters.length === 0) this.activeFilters = null;
         },
         clearFilters: function() {
-            this.filters = null;
+            this.activeFilters = null;
         },
     }
 };

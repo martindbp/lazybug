@@ -1,0 +1,135 @@
+{
+  "name": {
+    "hz": "",
+    "py": "",
+    "en": "Autumn's Concerto"
+  },
+  "date_added": "",
+  "douban": 0,
+  "year": "",
+  "type": "tv",
+  "genres": [],
+  "synopsis": "",
+  "caption_source": "",
+  "translation_source": "",
+  "released": false,
+  "seasons": [
+    {
+      "episodes": [
+        {
+          "id": "youtube-5cvga1XNKJs"
+        },
+        {
+          "id": "youtube-LKLcqTurgcI"
+        },
+        {
+          "id": "youtube-f5TpveXJwGQ"
+        },
+        {
+          "id": "youtube-pWZeVJkzxr4"
+        },
+        {
+          "id": "youtube-5QpINfFNqSg"
+        },
+        {
+          "id": "youtube-_3VqnPgE4Ng"
+        },
+        {
+          "id": "youtube-kYszCzX3ueY"
+        },
+        {
+          "id": "youtube-HmPl9btXygg"
+        },
+        {
+          "id": "youtube-F26ho4pHMLU"
+        },
+        {
+          "id": "youtube-E9ovnu_0PG4"
+        },
+        {
+          "id": "youtube-W1am15nBIko"
+        },
+        {
+          "id": "youtube-3d2G07OYfuY"
+        },
+        {
+          "id": "youtube-kPJv6I3yTXU"
+        },
+        {
+          "id": "youtube-xT_-oLlYR9g"
+        },
+        {
+          "id": "youtube-bRViEjkdyJQ"
+        },
+        {
+          "id": "youtube-mfTUs9Ji99g"
+        },
+        {
+          "id": "youtube-5_UBEYKooUU"
+        },
+        {
+          "id": "youtube-DpatSqikous"
+        },
+        {
+          "id": "youtube-vYKsfDSA5GE"
+        },
+        {
+          "id": "youtube-siTkv-i_N0g"
+        },
+        {
+          "id": "youtube-zjxHfOJdmjE"
+        },
+        {
+          "id": "youtube-qzWLh7Dgbkk"
+        },
+        {
+          "id": "youtube-8EeA5w2xi3I"
+        },
+        {
+          "id": "youtube-EuNO5gE-I_E"
+        },
+        {
+          "id": "youtube-Pp-1Jn5AfsQ"
+        },
+        {
+          "id": "youtube-qVxmikTYDig"
+        },
+        {
+          "id": "youtube-cq0vAhIzptw"
+        },
+        {
+          "id": "youtube-8fZK-Vh54Pc"
+        },
+        {
+          "id": "youtube-HZ5RypEXW8U"
+        },
+        {
+          "id": "youtube-au0_q5QYO3o"
+        },
+        {
+          "id": "youtube-hEeObGLtGuc"
+        },
+        {
+          "id": "youtube-3wRdlq596fE"
+        },
+        {
+          "id": "youtube-DXg4BNCJfOc"
+        },
+        {
+          "id": "youtube-94tpMf5DU70"
+        }
+      ],
+      "playlist_id": "PLEw7o29YksefmrGWxj3ipqWpWcm2YhNWL"
+    }
+  ],
+  "ocr_params": [
+    {
+      "type": "hanzi",
+      "caption_top": 0.8652777777777778,
+      "caption_bottom": 0.9388888888888889,
+      "start_time": 0,
+      "traditional": true,
+      "use_bert_prior": true
+    }
+  ]
+}
