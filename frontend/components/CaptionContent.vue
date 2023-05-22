@@ -396,14 +396,16 @@ export default {
                     content = `${this.wordData.hz[i]}/${this.wordData.py[i]}`;
                 }
 
+                // Star and hide
                 this.applyState(type, i, StateStarred, StateStarred);
+                this.applyState(type, i, StateHidden, StateHidden);
 
                 const self = this;
                 self.$q.notify({
                     type: 'positive',
-                    message: `"${content}" starred`,
+                    message: `"${content}" added`,
                     actions: [
-                        { label: 'Open starred', color: 'white', handler: function() { self.$store.commit('setPage', 'words'); } }
+                        { label: 'Open words', color: 'white', handler: function() { self.$store.commit('setPage', 'words'); } }
                     ]
                 });
             }

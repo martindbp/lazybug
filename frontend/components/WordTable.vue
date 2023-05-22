@@ -1,7 +1,7 @@
 <template>
     <div>
         <q-table
-            title="Starred Words"
+            title="Words"
             :rows="rows"
             :columns="columns"
             selection="multiple"
@@ -43,7 +43,7 @@
           </template>
 
           <template v-slot:top>
-              <div class="text-h5">Starred Words</div>
+              <div class="text-h5">Words</div>
               <q-btn icon="first_page" color="grey-8" round dense flat :disable="isFirstPage" @click="firstPage" />
               <q-btn icon="chevron_left" color="grey-8" round dense flat :disable="isFirstPage" @click="prevPage" />
               <q-btn icon="chevron_right" color="grey-8" round dense flat :disable="isLastPage" @click="nextPage" />
