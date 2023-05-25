@@ -28,7 +28,7 @@ if (DEVMODE) {
         await sleep(100);
         document.execCommand('insertText', false, message.data);
         lastTranslationTime = Date.now();
-        nextWaitTime = 5*60000 * Math.random(); // Wait somewhere beteen 0 and 5 minutes
+        nextWaitTime = 2*60000 * Math.random(); // Wait somewhere beteen 0 and 2 minutes
         if (message.data.length < 100) nextWaitTime = 10000; // 10 s
 
         const originalValue = outputTextArea.textContent;
