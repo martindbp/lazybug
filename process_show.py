@@ -488,7 +488,7 @@ def predict_line(frame, frame_t, font_height, conditional_caption_idx=None, extr
         max_x = max_y = 0
 
         for contour in contours:
-            (x,y,w,h) = cv2.boundingRect(contour)
+            (x, y, w, h) = cv2.boundingRect(contour)
             min_x, max_x = min(x, min_x), max(x+w, max_x)
             min_y, max_y = min(y, min_y), max(y+h, max_y)
 
@@ -788,11 +788,13 @@ def extract_video_captions(
         caption_top_px = caption_top * frame_size[0]
         caption_bottom_px = caption_bottom * frame_size[0]
         caption_font_height_px = caption_font_height * frame_size[0]
-        resize_image_height = int((caption_bottom_px - caption_top_px) * (ocr_font_height / caption_font_height_px))
+        image_resize_factor = ocr_font_height / caption_font_height_px
+        resize_image_height = int((caption_bottom_px - caption_top_px) * image_resize_factor)
         resize_font_height = resize_image_height
     else:
         resize_font_height = ocr_font_height
         resize_image_height = out_height
+        image_resize_factor = frame_size[1] / out_height
 
     for j in range(iters):
         best_top_bottom = None
@@ -915,16 +917,15 @@ def extract_video_captions(
                 if line.bounding_rect:
                     # Transform bounding rect from local coordinates (in the scaled cropped image fed to OCR), to global
                     padding = (out_height - ocr_font_height) // 2
-                    scale_factor = ocr_font_height / (caption_bottom_px - caption_top_px)
                     min_x, max_x, min_y, max_y = line.bounding_rect
                     min_y -= padding
                     max_y -= padding
 
                     line.bounding_rect = (
-                        int(min_x / scale_factor) + caption_left_px,
-                        int(max_x / scale_factor) + caption_left_px,
-                        int(min_y / scale_factor) + caption_top_px, # Add caption top to get global coordinates
-                        int(max_y / scale_factor) + caption_top_px
+                        int(min_x / image_resize_factor) + caption_left_px,
+                        int(max_x / image_resize_factor) + caption_left_px,
+                        int(min_y / image_resize_factor) + caption_top_px, # Add caption top to get global coordinates
+                        int(max_y / image_resize_factor) + caption_top_px
                     )
 
                     #frame_copy = frame.copy()
