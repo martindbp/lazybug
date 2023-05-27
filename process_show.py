@@ -138,7 +138,7 @@ def get_BERT_masked_prob_distribution(text, mask_idx_start, mask_idx_end):
     output = model(**inputs)
 
     logits = output.logits
-    softmax = F.softmax(logits, dim = -1)
+    softmax = F.softmax(logits, dim=-1)
     mask_index = torch.where(inputs["input_ids"][0] == tokenizer.mask_token_id)
     mask_word = softmax[0, mask_index, :]
 
@@ -606,7 +606,8 @@ def replace_or_add_line(
                     #prob_distribution /= prob_distribution.sum()
                     prob_distribution = (last_line.prob_distributions[op.from_idx] + new_line.prob_distributions[op.to_idx]) / 2
                     char_prob = prob_distribution.max()
-                    new_char = cnocr.alphabet[np.argmax(prob_distribution)]
+                    max_char_idx = np.argmax(prob_distribution)
+                    new_char = cnocr.alphabet[max_char_idx]
                     if new_char == '<space>':
                         new_char = ' '
 

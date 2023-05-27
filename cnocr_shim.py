@@ -4,10 +4,98 @@ import cv2
 import torch
 import numpy as np
 from hanziconv import HanziConv
+from torch.nn import functional as F
 
 from cnocr import CnOcr
 from cnocr.utils import pad_img_seq, to_numpy, gen_length_mask
 from cnocr.models.ocr_model import OcrModel
+
+def _predict(self, img_list):
+    img_lengths = torch.tensor([img.shape[2] for img in img_list])
+    imgs = pad_img_seq(img_list)
+    if self._model_backend == 'pytorch':
+        with torch.no_grad():
+            out = self._model(
+                imgs, img_lengths, candidates=self._candidates, return_preds=True
+            )
+    else:  # onnx
+        out = _onnx_predict(self, imgs, img_lengths)
+
+    return out
+
+def _onnx_predict(self, imgs, img_lengths):
+    ort_session = self._model
+    ort_inputs = {
+        ort_session.get_inputs()[0].name: to_numpy(imgs),
+        ort_session.get_inputs()[1].name: to_numpy(img_lengths),
+    }
+    ort_outs = ort_session.run(None, ort_inputs)
+    out = {
+        'logits': torch.from_numpy(ort_outs[0]),
+        'output_lengths': torch.from_numpy(ort_outs[1]),
+    }
+    out['logits'] = OcrModel.mask_by_candidates(
+        out['logits'], self._candidates, self._vocab, self._letter2id
+    )
+
+    preds, char_probs, prob_distributions = ctc_best_path(self, out['logits'], self._vocab, out['output_lengths'])
+    out["preds"] = preds
+    out["char_probs"] = char_probs
+    out["prob_distributions"] = prob_distributions
+    return out
+
+
+def ctc_best_path(
+    self,
+    logits,
+    vocab,
+    input_lengths=None,
+):
+    blank = len(vocab)
+    # compute softmax
+    probs = F.softmax(logits.permute(0, 2, 1), dim=1)
+    # get char indices along best path
+    best_path = torch.argmax(probs, dim=1)  # [N, T]
+
+    if input_lengths is not None:
+        length_mask = gen_length_mask(input_lengths, probs.shape).to(
+                device=probs.device
+                )  # [N, 1, T]
+        probs.masked_fill_(length_mask, 1.0)
+        best_path.masked_fill_(length_mask.squeeze(1), blank)
+
+    orig_probs = probs
+    # define word proba as min proba of sequence
+    probs, _ = torch.max(probs, dim=1)  # [N, T]
+    probs, _ = torch.min(probs, dim=1)  # [N]
+
+    words = []
+    out_prob_distributions = []
+    out_char_probs = []
+    for sequence in best_path:
+        # collapse best path (using itertools.groupby), map to chars, join char list to string
+        collapsed = [vocab[k] for k, _ in groupby(sequence) if k != blank]
+        curr_idx = 0
+        collapsed_char_probs = []
+        collapsed_prob_distributions = []
+        for char_code, char_codes in groupby(sequence):
+            char_codes = list(char_codes)
+            if char_code.item() == blank:
+                curr_idx += len(char_codes)
+                continue
+
+            prob_distribution = orig_probs[0, :, curr_idx].detach().cpu().numpy()
+            char_prob = prob_distribution[char_code.item()]
+            collapsed_prob_distributions.append(prob_distribution)
+            collapsed_char_probs.append(char_prob)
+            curr_idx += len(char_codes)
+
+        assert len(collapsed_prob_distributions) == len(collapsed)
+        out_prob_distributions.append(collapsed_prob_distributions)
+        out_char_probs.append(collapsed_char_probs)
+        words.append(collapsed)
+
+    return list(zip(words, probs.tolist())), np.array(out_char_probs), np.array(out_prob_distributions)
 
 
 class CnOcrShim(CnOcr):
@@ -63,94 +151,6 @@ class CnOcrShim(CnOcr):
                 probs[i][self.alphabet.index(c)] = 0
 
         return sm_text, probs
-
-    def _predict(self, img_list):
-        img_lengths = torch.tensor([img.shape[2] for img in img_list])
-        imgs = pad_img_seq(img_list)
-        if self._model_backend == 'pytorch':
-            with torch.no_grad():
-                out = self._model(
-                    imgs, img_lengths, candidates=self._candidates, return_preds=True
-                )
-        else:  # onnx
-            out = self._onnx_predict(imgs, img_lengths)
-
-        return out
-
-    def _onnx_predict(self, imgs, img_lengths):
-        ort_session = self._model
-        ort_inputs = {
-            ort_session.get_inputs()[0].name: to_numpy(imgs),
-            ort_session.get_inputs()[1].name: to_numpy(img_lengths),
-        }
-        ort_outs = ort_session.run(None, ort_inputs)
-        out = {
-            'logits': torch.from_numpy(ort_outs[0]),
-            'output_lengths': torch.from_numpy(ort_outs[1]),
-        }
-        out['logits'] = OcrModel.mask_by_candidates(
-            out['logits'], self._candidates, self._vocab, self._letter2id
-        )
-
-        preds, char_probs, prob_distributions = ctc_best_path(self, out['logits'], self._vocab, out['output_lengths'])
-        out["preds"] = preds
-        out["char_probs"] = char_probs
-        out["prob_distributions"] = prob_distributions
-        return out
-
-
-    def ctc_best_path(
-        self,
-        logits,
-        vocab,
-        input_lengths=None,
-    ):
-        blank = len(vocab)
-        # compute softmax
-        probs = F.softmax(logits.permute(0, 2, 1), dim=1)
-        # get char indices along best path
-        best_path = torch.argmax(probs, dim=1)  # [N, T]
-
-        if input_lengths is not None:
-            length_mask = gen_length_mask(input_lengths, probs.shape).to(
-                    device=probs.device
-                    )  # [N, 1, T]
-            probs.masked_fill_(length_mask, 1.0)
-            best_path.masked_fill_(length_mask.squeeze(1), blank)
-
-        orig_probs = probs
-        # define word proba as min proba of sequence
-        probs, _ = torch.max(probs, dim=1)  # [N, T]
-        probs, _ = torch.min(probs, dim=1)  # [N]
-
-        words = []
-        out_prob_distributions = []
-        out_char_probs = []
-        for sequence in best_path:
-            # collapse best path (using itertools.groupby), map to chars, join char list to string
-            collapsed = [vocab[k] for k, _ in groupby(sequence) if k != blank]
-            curr_idx = 0
-            collapsed_char_probs = []
-            collapsed_prob_distributions = []
-            for char_code, char_codes in groupby(sequence):
-                char_codes = list(char_codes)
-                if char_code.item() == blank:
-                    curr_idx += len(char_codes)
-                    continue
-
-                prob_distribution = orig_probs[0, :, curr_idx].detach().cpu().numpy()
-                char_prob = prob_distribution[char_code.item()]
-                collapsed_prob_distributions.append(prob_distribution)
-                collapsed_char_probs.append(char_prob)
-                curr_idx += len(char_codes)
-
-            assert len(collapsed_prob_distributions) == len(collapsed)
-            out_prob_distributions.append(collapsed_prob_distributions)
-            out_char_probs.append(collapsed_char_probs)
-            words.append(collapsed)
-
-        return list(zip(words, probs.tolist())), np.array(out_char_probs), np.array(out_prob_distributions)
-
 
     def ocr_for_single_lines_probs_CnOCR_onnx(self, img, *args):
         model = self.rec_model
@@ -238,7 +238,7 @@ class CnOcrShim(CnOcr):
         while idx * batch_size < len(sorted_img_list):
             imgs = sorted_img_list[idx * batch_size : (idx + 1) * batch_size]
             try:
-                batch_out = model._predict(imgs)
+                batch_out = _predict(model, imgs)
             except Exception as e:
                 batch_out = {'preds': [([''], 0.0)] * len(imgs)}
             sorted_out.append(batch_out)
@@ -253,8 +253,10 @@ class CnOcrShim(CnOcr):
         prob_distributions = []
         char_probs = []
         for line in out:
-            prob_distributions.append(line['prob_distributions'][0])
-            char_probs.append(line['char_probs'][0])
+            prob_distribution = line['prob_distributions'].squeeze(0)
+            prob_distribution = prob_distribution[..., :-1]
+            prob_distributions.append(prob_distribution)
+            char_probs.append(prob_distribution.max(axis=-1))
             chars, prob = line['preds'][0]
             chars = [c if c != '<space>' else ' ' for c in chars]
             probs.append(prob)
