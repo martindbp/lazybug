@@ -1,0 +1,33 @@
+{
+	"name": "SpringAndSummer666",
+	"date_added": "2023-05-24",
+    "year": "2023",
+	"type": "short",
+	"douban": null,
+	"genres": [
+		"humor"
+	],
+	"synopsis": "Sketches",
+	"released": true,
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-uPqNTNW5HN4"
+				}
+			]
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.7642348754448398,
+			"caption_bottom": 0.791814946619217,
+			"start_time": 0
+		}
+	],
+	"discourse_topic_id": 276,
+	"discourse_topic_slug": "springandsummer666"
+}
