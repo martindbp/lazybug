@@ -1,8 +1,10 @@
 from __future__ import annotations
 import math
+import unittest
 from typing import *
-from dataclasses import dataclass, field
 from enum import IntEnum
+from dataclasses import dataclass, field
+
 import numpy as np
 
 
@@ -43,11 +45,7 @@ def weighted_levenshtein(
     from_len, to_len = len(from_seq), len(to_seq)
     d = np.zeros((from_len + 1, to_len + 1), dtype=np.float64)
     for from_idx in range(from_len):
-        if from_idx >= len(to_seq):
-            cost = 0  # we cannot delete more than the whole from sequence
-        else:
-            cost = (1.0 if delete_cost is None else delete_cost(from_seq[from_idx], from_idx))
-
+        cost = (1.0 if delete_cost is None else delete_cost(from_seq[from_idx], from_idx))
         d[from_idx+1, 0] = d[from_idx, 0] + cost
 
     for to_idx in range(to_len):
@@ -56,6 +54,7 @@ def weighted_levenshtein(
     best_ops = np.zeros((from_len + 1, to_len + 1), dtype=np.int64)
     best_ops[1 : from_len + 1, 0] = 1
     best_ops[0, 1 : to_len + 1] = 2
+    print('init best_ops', best_ops)
     for from_idx in range(from_len):
         for to_idx in range(to_len):
             # NOTE: it's less confusing to keep two sets of indices,
@@ -74,7 +73,7 @@ def weighted_levenshtein(
             op_costs = np.array([
                 d[d_from_idx - 1, d_to_idx]     + del_cost,
                 d[d_from_idx, d_to_idx - 1]     + ins_cost,
-                d[d_from_idx - 1, d_to_idx - 1] + subst_cost,
+                (d[d_from_idx - 1, d_to_idx - 1] + subst_cost),
             ])
             min_op = np.argmin(op_costs)
             best_ops[d_from_idx, d_to_idx] = min_op + 1  # +1 to get 1-3 range
@@ -173,3 +172,69 @@ def build_from_ops(ops: List[Op]) -> Sequence:
             pass  # we just don't append it
 
     return seq
+
+
+class TestLevenshtein(unittest.TestCase):
+
+    def test_levenshtein(self):
+        self.assertEqual(weighted_levenshtein('a', 'aaaaa'), 4)
+        self.assertEqual(weighted_levenshtein('aaaaa', 'a'), 4)
+
+        self.assertEqual('foo'.upper(), 'FOO')
+        s1 = 'hello ok world?'
+        s2 = 'we hello world!'
+        dist, ops = weighted_levenshtein(s1, s2, return_ops=True)
+        self.assertEqual(dist, 7)
+        self.assertEqual(''.join(build_from_ops(ops)), s2)
+
+        def _subst_cost(from_val, to_val, *args):
+            if from_val == to_val:
+                return 0.0
+            if from_val == '?' and to_val == '!':
+                return 0.5
+            return 1.0
+
+        dist = weighted_levenshtein(s1, s2, _subst_cost)
+        self.assertEqual(dist, 6.5)
+
+        def _insert_cost(ins_val, *args):
+            if ins_val in ['w', ' ']:
+                return 0.8
+            return 1.0
+
+        dist, ops = weighted_levenshtein(s1, s2, _subst_cost, _insert_cost, return_ops=True)
+        self.assertEqual(''.join(build_from_ops(ops)), s2)
+        self.assertAlmostEqual(dist, 6.1)  # almost for floating point equality
+
+        def _delete_cost(del_val, *args):
+            if del_val == 'k':
+                return 0.7
+            return 1.0
+
+        dist, ops = weighted_levenshtein(s1, s2, _subst_cost, _insert_cost, _delete_cost, return_ops=True)
+        self.assertEqual(''.join(build_from_ops(ops)), s2)
+
+        self.assertAlmostEqual(dist, 5.8)  # almost for floating point equality
+
+
+        # Now let's make the insert operation very expensive, and check that all ops become substitutions
+        def _insane_insert_cost(del_val, *args):
+            return 100.0
+
+        dist, ops = weighted_levenshtein(s1, s2, _subst_cost, _insane_insert_cost, _delete_cost, return_ops=True)
+        for op in ops:
+            self.assertEqual(op.type, OpType.SUBSTITUTE)
+
+
+        # Check that if we set a high substitution cost, all the ops will be insert/delete
+        def _insane_subst_cost(*args):
+            return 100.0
+
+        dist, ops = weighted_levenshtein(s1, s2, _insane_subst_cost, _insert_cost, _delete_cost, return_ops=True)
+        for op in ops:
+            self.assertNotEqual(op.type, OpType.SUBSTITUTE)
+
+
+
+if __name__ == '__main__':
+    unittest.main()
