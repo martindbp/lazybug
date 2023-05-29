@@ -49,7 +49,12 @@ export default {
             const alt = event.getModifierState("Alt");
             if (shift || ctrl || alt) return;
 
-            if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            if (document.activeElement &&
+                (
+                    ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) ||
+                    document.activeElement.isContentEditable
+                )
+            ) {
                 // Turn off shortcuts when we're focused to an input element
                 return;
             }
