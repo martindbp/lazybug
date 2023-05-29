@@ -233,7 +233,6 @@ release:
 	sed -i -E "s/DEVMODE = true/DEVMODE = false/g" frontend/dist/*.js
 	python make_release_manifest.py frontend/manifest.json > frontend/dist/manifest.json
 	rm frontend/dist/deepl_ext.js
-	rm frontend/dist/devtools.js
 	rm frontend/dist/local.html
 	make zip-ext
 
