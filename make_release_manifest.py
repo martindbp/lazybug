@@ -12,11 +12,7 @@ with open(manifest_file, 'r') as f:
     del data['content_scripts'][0]['matches'][file_idx]
 
     # Delete deepl stuff
-    del data['content_scripts'][1]
-
-    # Delete devtools script
-    devtools_idx = data['content_scripts'][0]['js'].index('devtools.js')
-    del data['content_scripts'][0]['js'][devtools_idx]
+    del data['content_scripts'][-1]
 
     # Background worker is only used for deepl
     del data['background']
