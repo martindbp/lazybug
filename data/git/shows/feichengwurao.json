@@ -15,6 +15,9 @@
 	"synopsis": "A dating show where male contestants introduce themselves to a lineup of girls",
 	"caption_source": "hard",
 	"translation_source": "machine",
+    "highlighted": true,
+    "image": "https://cdn.lazybug.ai/file/lazybug-public/show_images/feichengwurao.webp",
+    "description": "Well known dating show where guys present themselves to a jury of girls. The guy is presented through a number of pre-recorded videos, and girls ask questions. Follows a set pattern and full of useful everyday vocabulary.",
 	"seasons": [
 		{
 			"playlist_id": "PLPrQ_Hw1PjlDXcMPQeY6hu_ErWjn6eChw",

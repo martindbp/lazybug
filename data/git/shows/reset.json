@@ -12,7 +12,10 @@
 		"crime",
 		"sci-fi"
 	],
-	"synopsis": "Ground-hog day + terrorist attack",
+    "highlighted": true,
+    "image": "https://cdn.lazybug.ai/file/lazybug-public/show_images/reset.webp",
+    "description": "Great thriller/drama in the spirit of \"Ground-hog Day\" or \"Edge of Tomorrow\". A girl and young man relive a bus trip ending in an explosion over and over, as they try to investigate the cause. The language is not too difficult, and the vocabuly, for obvious reasons, tend to repeat.",
+	"synopsis": "Ground-hog day + bus explosion",
 	"year": "2022",
 	"released": true,
 	"caption_source": "soft",

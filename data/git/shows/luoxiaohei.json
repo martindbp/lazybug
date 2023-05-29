@@ -21,6 +21,9 @@
 		"罗小黑": "Luo Xiao Hei",
 		"无限": "Infinity"
 	},
+    "highlighted": true,
+    "image": "https://cdn.lazybug.ai/file/lazybug-public/show_images/luoxiaohei.webp",
+    "description": "Popular webtoon from 2011 about a cat spirit named Luo Xiaohei. Short episodes lends itself to learning. There is also a movie adaptation from 2019, which is also available here",
 	"seasons": [
 		{
 			"episodes": [
@@ -119,45 +122,6 @@
 				},
 				{
 					"id": "youtube-vSZFdrctsws"
-				},
-				{
-					"id": "youtube-0pDiYDjcEyA"
-				},
-				{
-					"id": "youtube-TYEmhUrrrQM"
-				},
-				{
-					"id": "youtube-MauKVExATmE"
-				},
-				{
-					"id": "youtube-kJlNmJlr5wo"
-				},
-				{
-					"id": "youtube-2vv3kVk48d8"
-				},
-				{
-					"id": "youtube-Ssp0qGom5po"
-				},
-				{
-					"id": "youtube-StiGKp-oY8M"
-				},
-				{
-					"id": "youtube-LhCeNeftNG4"
-				},
-				{
-					"id": "youtube-hM5ST1-btWs"
-				},
-				{
-					"id": "youtube-kTGEVUDBAis"
-				},
-				{
-					"id": "youtube-Lp2l7hgEWDQ"
-				},
-				{
-					"id": "youtube-U27LfvvxyUk"
-				},
-				{
-					"id": "youtube-ajrHJLz5R2E"
 				}
 			],
 			"playlist_id": "PLK-ys7c4EcnrR4UiA9n1hRox8b0EJ88gx"

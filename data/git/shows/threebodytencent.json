@@ -22,6 +22,9 @@
         "三体星": "Trisolaris",
         "三体": "Three Body"
     },
+    "highlighted": true,
+    "image": "https://cdn.lazybug.ai/file/lazybug-public/show_images/threebodytencent.webp",
+    "description": "A well made adaptation of the the first book in the sci-fi trilogy \"Remembrance of Earth's Past\" by Liu Cixin. Difficulty level is high, but this is some of the best sci-fi even internationally.",
     "seasons": [
         {
           "playlist_id": "PLMX26aiIvX5rFSYPXtcqda3tWd6pGVD5Q",

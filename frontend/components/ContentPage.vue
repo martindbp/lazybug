@@ -7,6 +7,7 @@
         mobile-arrows
         class="bg-white text-dark"
     >
+        <q-tab name="highlighted" label="Highlighted" />
         <q-tab name="shows" label="Shows" />
         <q-tab name="movies" label="Movies" />
         <q-tab name="shorts" label="Shorts" />
@@ -14,6 +15,9 @@
 
     </q-tabs>
     <q-tab-panels class="contentpanels" v-model="contentTab">
+        <q-tab-panel name="highlighted">
+            <HighlightTable />
+        </q-tab-panel>
         <q-tab-panel name="shows">
             <ShowTable type="tv" />
         </q-tab-panel>
@@ -32,14 +36,16 @@
 
 <script>
 import ShowTable from './ShowTable.vue'
+import HighlightTable from './HighlightTable.vue'
 
 export default {
     mixins: [mixin],
     components: {
         ShowTable,
+        HighlightTable,
     },
     data: function() { return {
-        contentTab: 'shows',
+        contentTab: 'highlighted',
     }},
 };
 </script>
