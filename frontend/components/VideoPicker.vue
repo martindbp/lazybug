@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showInfo" :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
+    <div v-if="showInfo && season !== null && episode !== null" :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
         <div v-if="!isMovie && hasMultipleSeasons" style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"

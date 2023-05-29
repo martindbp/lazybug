@@ -63,9 +63,21 @@ const mixin = {
     },
     methods: {
         getSeasonName: function(i) {
+            if (
+                this.$store.state.playingSeason === null ||
+                this.$store.state.playingEpisode === null
+            ) {
+                return;
+            }
             return getSeasonName(this.showInfo, i);
         },
         getEpisodeName: function(i) {
+            if (
+                this.$store.state.playingSeason === null ||
+                this.$store.state.playingEpisode === null
+            ) {
+                return;
+            }
             return getEpisodeName(this.showInfo, this.season, i);
         },
         showAccountModalWithCallback: function(callback = null) {

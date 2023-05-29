@@ -515,12 +515,12 @@ store = new Vuex.Store({
 
                 this.commit('setVideoId', extractCurrentVideoId(state.STRINGS, url.href)); // eslint-disable-line
                 this.commit('setCaptionId', extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href));
-                if ([null, undefined].includes(state.captionData) || [null, undefined].includes(state.showInfo)) return;
                 const showInfo = getShowInfo(null, state);
+                if ([null, undefined].includes(state.captionData) || [null, undefined].includes(showInfo)) return;
                 const [season, episode] = findVideoInShowInfo(showInfo, state.captionId);
-                state.playingShowId = showInfo.showId;
-                state.playingSeason = season;
-                state.playingEpisode = episode;
+                this.commit('setPlayingShowId', showInfo.showId);
+                this.commit('setPlayingSeason', season);
+                this.commit('setPlayingEpisode', episode);
             } else {
                 //
                 // Website Routing Logic
