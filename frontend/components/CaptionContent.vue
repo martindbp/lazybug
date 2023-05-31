@@ -785,7 +785,7 @@ export default {
             const tr = i === null ? null : this.wordData.tr[i];
 
             updateCorrect(correct ? 1 : -1, k, type, hz, pys, tr, true);
-            this.appendSessionLog([getEvent('answer', type), correct, i, answer]);
+            this.appendSessionLog([getEvent('answer', type), hz, pys, tr, correct, this.currentCaptionIdx, answer]);
         },
         applyState: function(type, i, stateType, setState) {
             const d = this.$store.state.DICT;

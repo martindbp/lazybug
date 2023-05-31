@@ -56,7 +56,9 @@ const events = [
     'EVENT_UNSTAR_WORD',
     'EVENT_UNSTAR_TRANSLATION',
     'EVENT_BLUR',
-    'EVENT_ANSWER',
+    'EVENT_ANSWER_PY',
+    'EVENT_ANSWER_HZ',
+    'EVENT_ANSWER_TR',
 ];
 
 const eventsMap = {};
