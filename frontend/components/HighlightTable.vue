@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{'row': true, 'justify-center': true, 'mobile': isMobile}">
         <q-carousel
             v-model="slide"
             prev-icon="arrow_left"
@@ -10,26 +10,23 @@
             animated
             keep-alive
             control-color="primary"
+            navigation
+            arrows
             class="highlightedcarousel rounded-borders"
+            style="display: inline-block"
         >
-            <q-carousel-slide v-for="show in highlighted" :name="show.showId" class="column no-wrap flex-center">
-                <div class="q-pa-md text-center">
-                    <q-img loading="eager" class="highlightedimage" :src="show.image" @click="setPlaying(show.showId)">
-                        <div class="absolute-bottom text-subtitle1 text-center">
-                            {{ show.description }}
-                        </div>
-                    </q-img>
+            <q-carousel-slide v-for="group in highlightGroups" :name="group[0].showId" class="column no-wrap flex-center row justify-center">
+                <div class="row fit justify-start items-center q-gutter-xs q-col-gutter no-wrap">
+                    <div v-for="show in group" class="q-pa-md text-center">
+                        <q-img loading="eager" class="highlightedimage" :src="show.image" @click="setPlaying(show.showId)">
+                            <div class="absolute-bottom text-subtitle1 text-center">
+                                {{getShowName(show)}}: {{ show.description }}
+                            </div>
+                        </q-img>
+                    </div>
                 </div>
             </q-carousel-slide>
         </q-carousel>
-
-        <div class="row justify-center">
-            <q-btn-toggle
-                glossy
-                v-model="slide"
-                :options="options"
-            />
-        </div>
     </div>
 </template>
 
@@ -38,9 +35,12 @@
 export default {
     mixins: [mixin],
     data: function() { return {
-        slide: 'threebodytencent',
+        slide: null,
     }},
     computed: {
+        groupN: function() {
+            return this.isMobile ? 1 : 2;
+        },
         highlighted: function() {
             if ([null, undefined].includes(this.$store.state.showList)) return [];
             const highlightedShows = [];
@@ -50,10 +50,24 @@ export default {
             }
             return highlightedShows.sort((show) => show.date_added);
         },
+        highlightGroups: function() {
+            const groups = [];
+
+            let nextGroup = [];
+            for (const show of this.highlighted) {
+                nextGroup.push(show);
+                if (nextGroup.length === this.groupN) {
+                    groups.push(nextGroup);
+                    nextGroup = [];
+                }
+            }
+            if (nextGroup.length > 0) groups.push(nextGroup);
+            return groups;
+        },
         options: function() {
             const options = [];
-            for (let i = 0; i < this.highlighted.length; i++) {
-                options.push({ label: i+1, value: this.highlighted[i].showId });
+            for (let i = 0; i < this.highlightGroups.length; i++) {
+                options.push({ label: i+1, value: this.highlightGroups[i][0].showId });
             }
             return options;
         },
@@ -66,16 +80,28 @@ export default {
             },
         }
     },
+    methods: {
+        getShowName: function(show) {
+            return resolveShowName(show.name);
+        },
+    },
 };
 </script>
 
 <style>
 
 .highlightedimage {
-    min-height: 50vh !important;
-    max-height: 70vh !important;
-    width: 50vh !important;
     cursor: pointer;
+}
+
+.highlightedimage {
+    height: 70vh !important;
+    width: 25vw !important;
+}
+
+.mobile .highlightedimage {
+    height: 60vh !important;
+    width: 70vw !important;
 }
 
 .highlightedcarousel .q-carousel__slide {
@@ -84,5 +110,17 @@ export default {
 
 .highlightedcarousel .q-tab-panel {
     padding: 0;
+}
+
+.highlightedcarousel .q-carousel__navigation--bottom {
+    bottom: -10px;
+}
+
+.highlightedcarousel .q-carousel__next-arrow {
+    right: 0;
+}
+
+.highlightedcarousel .q-carousel__prev-arrow {
+    left: 0;
 }
 </style>

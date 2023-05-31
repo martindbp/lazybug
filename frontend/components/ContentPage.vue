@@ -57,6 +57,6 @@ export default {
 
 .contentpanels .q-panel,
 .contentpanels .q-panel div {
-    height: auto !important;
+    height: auto;
 }
 </style>
