@@ -1,5 +1,8 @@
 <template>
     <div v-if="showInfo && season !== null && episode !== null" :class="{videopicker: true, mobile: isMobile, extension: isExtension}">
+        <div v-if="isExtension" style="margin-bottom: 15px">
+            <img :src="lazybugIconURL" style="width: 55px; cursor: pointer" @click="goLazybug" />
+        </div>
         <div v-if="!isMovie && hasMultipleSeasons" style="margin-bottom: 15px">
             <q-fab
                 ref="seasonselector"
@@ -87,6 +90,9 @@ export default {
         manuallyClosedComments: false,
     }},
     computed: {
+        lazybugIconURL: function() {
+            return chrome.runtime.getURL("images/128.png");
+        },
         needLogin: function() {
             return [null, undefined].includes(this.$store.state.accountEmail) || this.numComments === null;
         },

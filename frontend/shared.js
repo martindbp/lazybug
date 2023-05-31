@@ -1,3 +1,5 @@
+const EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/category/extensions';
+const LAZYBUG_URL = 'https://lazybug.ai';
 const DISCOURSE_URL = 'https://discourse.lazybug.ai';
 const DISCOURSE_LOGIN_URL = 'https://discourse.lazybug.ai/login';
 const DISCOURSE_COMMENTS_URL = `${DISCOURSE_URL}/t`;

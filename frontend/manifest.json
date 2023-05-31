@@ -1,6 +1,6 @@
 {
     "name": "Lazybug",
-    "version": "3.0",
+    "version": "0.1",
     "description": "Free and open-source way to learning Chinese through TV and movies",
     "background": {
         "service_worker": "background.js"
@@ -12,6 +12,10 @@
     "permissions": [
         "storage"
     ],
+    "web_accessible_resources": [{
+      "resources": ["images/128.png"],
+      "matches": ["<all_urls>"]
+    }],
     "action": {
         "default_title": "Toggle",
         "default_icon": {

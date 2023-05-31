@@ -50,11 +50,11 @@
                         <q-img loading="eager" :src="urls.export" />
                     </div>
                 </q-carousel-slide>
-                <q-carousel-slide name="extension" class="column no-wrap flex-center">
+                <q-carousel-slide v-if="! $store.state.hasLazybugExtension" name="extension" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
-                        <h5>Browser Extension Coming Soon</h5>
-                        <p>For shows other than Youtube that can't be embedded </p>
-                        <q-img loading="eager" width="400px" :src="urls.extension" />
+                        <h5>Browser Extension</h5>
+                        <p>Some shows can't be embedded on the site, for those you need the browser extension</p>
+                        <q-btn color="green" @click="goExtensionInstall">Install</q-btn>
                     </div>
                 </q-carousel-slide>
                 <q-carousel-slide name="last" class="column no-wrap flex-center">

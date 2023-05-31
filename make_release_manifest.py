@@ -8,8 +8,8 @@ with open(manifest_file, 'r') as f:
     localhost_idx = data['host_permissions'].index('http://localhost/*')
     del data['host_permissions'][localhost_idx]
 
-    file_idx = data['content_scripts'][0]['matches'].index('file:///*')
-    del data['content_scripts'][0]['matches'][file_idx]
+    #file_idx = data['content_scripts'][0]['matches'].index('file:///*')
+    #del data['content_scripts'][0]['matches'][file_idx]
 
     # Delete deepl stuff
     del data['content_scripts'][-1]

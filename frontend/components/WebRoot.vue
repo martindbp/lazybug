@@ -102,7 +102,7 @@
                     <q-btn color="green" flat @click="showModalAndSync">{{ mini ? 'Sync' : 'Sync Changes' }}</q-btn>
                 </q-item>
                 <q-item v-if="!mini && ! $store.state.hasLazybugExtension" class="row justify-center">
-                    <q-btn color="green">Extension</q-btn>
+                    <q-btn color="green" @click="goExtensionInstall">Extension</q-btn>
                 </q-item>
               </q-list>
           </q-drawer>
@@ -121,11 +121,12 @@
         <q-dialog seamless v-model="showNonEmbeddableDialog">
             <q-card>
                 <q-card-section class="row items-center">
-                    <span class="q-ml-sm">This show requires the browser extension since it can't be embedded. The extension will be published soon, stay tuned.</span>
+                    <span class="q-ml-sm">This show requires the browser extension since it can't be embedded</span>
                 </q-card-section>
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn flat label="Install" color="green" v-close-popup @click="goExtensionInstall" />
                     <q-btn flat label="Go to external video (new tab)" color="green" v-close-popup @click="goExternal" />
                 </q-card-actions>
             </q-card>

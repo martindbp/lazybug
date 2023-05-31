@@ -349,7 +349,12 @@ const mixin = {
             if (this.showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
                 this.$store.commit('setPlayingShowId', null);
-                this.$store.commit('setShowDialog', {dialog: 'embeddable', value: true});
+                if (this.$store.state.hasLazybugExtension) {
+                    this.goExternal();
+                }
+                else {
+                    this.$store.commit('setShowDialog', {dialog: 'embeddable', value: true});
+                }
                 return;
             }
             this.$store.commit('setPlayingSeason', seasonIdx);
@@ -360,6 +365,12 @@ const mixin = {
             else {
                 this.$store.commit('setPage', 'player');
             }
+        },
+        goExtensionInstall: function() {
+            window.open(EXTENSION_INSTALL_URL, '_blank').focus();
+        },
+        goLazybug: function() {
+            window.open(LAZYBUG_URL, '_blank').focus();
         },
         goExternal: function() {
             const showInfo = this.$store.state.nonEmbeddableVideoSelected;
