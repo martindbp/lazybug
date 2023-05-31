@@ -110,6 +110,7 @@ async function isStoragePersisted() {
 store = new Vuex.Store({
     state: {
         cssLoaded: false,
+        hasLazybugExtension: false,
         fetchedAllPublicResources: false,
         url: null,
         isExtension: BROWSER_EXTENSION,
@@ -187,6 +188,9 @@ store = new Vuex.Store({
         options: Vue.ref(OPTIONS_DEFAULT),
     },
     mutations: {
+        setHasLazybugExtension(state) {
+            state.hasLazybugExtension = true;
+        },
         setShowTooltip(state, val) {
             state.showTooltip[val.tooltip] = val.value;
         },
@@ -673,6 +677,16 @@ else {
         if (document.styleSheets.length === numCss) {
             clearInterval(checkCssInterval);
             store.commit('setCssLoaded');
+            if (document.querySelector('#haslazybugextension')) {
+                store.commit('setHasLazybugExtension');
+            }
         }
     }, 100);
+
+    let checkExtensionInterval = setInterval(function() {
+        if (document.querySelector('#haslazybugextension')) {
+            clearInterval(checkExtensionInterval);
+            store.commit('setHasLazybugExtension');
+        }
+    }, 300);
 }

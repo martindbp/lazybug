@@ -60,6 +60,15 @@
         },
         {
             "matches": [
+                "*://lazybug.ai/*"
+            ],
+            "run_at": "document_end",
+            "js": [
+                "ext_in_web.js"
+            ]
+        },
+        {
+            "matches": [
                 "https://www.deepl.com/translator*"
             ],
             "run_at": "document_end",
