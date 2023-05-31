@@ -80,6 +80,7 @@ export default {
                 for (const row of data) {
                     const showId = row.showId;
                     row.showInfo = self.showList[showId];
+                    if (!row.showInfo) continue;
                     const showName = resolveShowName(row.showInfo.name);
                     const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
                     const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);

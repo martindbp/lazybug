@@ -463,6 +463,7 @@ export default {
                         }
                         else {
                             const showInfo = this.$store.state.showList[session.showId];
+                            if (! showInfo) continue;
                             eventData[1].showName = resolveShowName(showInfo.name);
                             eventData[1].seasonName = getSeasonName(showInfo, session.seasonIdx);
                             eventData[1].episodeName = getEpisodeName(showInfo, session.seasonIdx, session.episodeIdx);

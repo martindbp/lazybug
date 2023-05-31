@@ -752,7 +752,11 @@ function getSeasonName(showInfo, seasonIdx) {
 
 function getEpisodeName(showInfo, seasonIdx, episodeIdx) {
     const season = showInfo.seasons[seasonIdx];
-    episodeName = season.episodes[episodeIdx].name;
+    const episode = season.episodes[episodeIdx];
+    if (! episode) {
+        return `E${pad(episodeIdx + 1, 2)}`;
+    }
+    let episodeName = episode.name;
     if (! episodeName) {
         episodeName = `E${pad(episodeIdx + 1, 2)}`;
     }
