@@ -1002,7 +1002,7 @@ def caption_lines_to_json(lines, frame_size, params, video_length, conditional_p
     json_lines = []
 
     for line in lines:
-        char_probs = [float(prob) for prob in line.char_probs] if line.char_probs is not None else None
+        char_probs = [float(prob) for prob in line.char_probs] if isinstance(line.char_probs, list) else None
         json_lines.append([
             line.text,
             line.t0,

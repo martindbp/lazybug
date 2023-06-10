@@ -256,7 +256,7 @@ class CnOcrShim(CnOcr):
             prob_distribution = line['prob_distributions'].squeeze(0)
             prob_distribution = prob_distribution[..., :-1]
             prob_distributions.append(prob_distribution)
-            char_probs.append(prob_distribution.max(axis=-1))
+            char_probs.append(prob_distribution.max(axis=-1) if len(prob_distribution) > 0 else [])
             chars, prob = line['preds'][0]
             chars = [c if c != '<space>' else ' ' for c in chars]
             probs.append(prob)
