@@ -188,10 +188,9 @@
 	"ocr_params": [
 		{
 			"type": "hanzi",
-			"caption_top": 0.8791666666666667,
-			"caption_bottom": 0.9375,
-			"start_time": 93,
-			"refine_bounding_rect": true
+            "caption_top": 0.8833333333333333,
+            "caption_bottom": 0.9430555555555555,
+			"start_time": 0
 		}
 	],
 	"discourse_topic_id": 201,
