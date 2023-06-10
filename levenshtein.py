@@ -54,7 +54,6 @@ def weighted_levenshtein(
     best_ops = np.zeros((from_len + 1, to_len + 1), dtype=np.int64)
     best_ops[1 : from_len + 1, 0] = 1
     best_ops[0, 1 : to_len + 1] = 2
-    print('init best_ops', best_ops)
     for from_idx in range(from_len):
         for to_idx in range(to_len):
             # NOTE: it's less confusing to keep two sets of indices,
