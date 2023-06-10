@@ -10,6 +10,7 @@
             v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
+            v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:nextCaption="nextCaption"
             v-bind:currTime="currTime"
             v-bind:paused="paused"

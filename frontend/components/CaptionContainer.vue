@@ -36,7 +36,7 @@
         <CaptionContent
             v-else
             v-bind:data="showData"
-            v-bind:currentCaptionIdx="currIdx"
+            v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:videoAPI="videoAPI"
         />
         <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>

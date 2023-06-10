@@ -21,12 +21,39 @@
                     v-for="(py, i) in wordData.py"
                     :key="i"
                     :style="tdStyle"
+                    :ref="'pyExercise'+i"
                 >
+                    <div
+                        v-if="pyInputSubmitted[i] !== null"
+                    >
+                        <span v-if="pyInputs[i].distance <= 2" v-for="charclass in pyInputs[i].chars" :class="charclass[1]">{{ charclass[0] }}</span>
+                        <div style="display: inline" v-else>
+                            <span class="delete">{{ pyInputs[i].orig }}</span>
+                            <span class="insert">{{ py }}</span>
+                        </div>
+                        <q-btn
+                            :color="pyInputSubmitted[i] === true ? 'green' : 'red'"
+                            :icon="pyInputSubmitted[i] === true ? 'done' : 'close'"
+                            @click="flipAnswer(pyInputSubmitted, i)"
+                            round
+                        />
+                    </div>
                     <span
-                        v-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.py[i] && starredStates.words[i]"
+                        v-else-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.py[i] && starredStates.words[i]"
                         class="cardcontent"
                     >
-                        <q-input @keyup.enter="onEnterPyInput" class="starinput" borderless dark v-model="pyInput" label="" />
+                        <q-input
+                            :autofocus="i == 0"
+                            spellcheck="false"
+                            @keyup.enter="onPyInputEnter(i)"
+                            @keydown.tab.stop.prevent="onInputTab('py', i)"
+                            :ref="'pyInput_'+i"
+                            class="starinput"
+                            borderless
+                            dark
+                            v-model="pyInputs[i]"
+                            label=""
+                        />
                     </span>
                     <span
                         v-else
@@ -64,9 +91,9 @@
                     <span
                         class="cardcontent"
                         :style="{opacity: hiddenAndNotPeeking.hz[i] && !$store.state.peekStates.rows.hz ? 0 : 1}"
+                        :ref="'hzSpan'+i"
                     >
                         {{ sm2tr(hz) }}
-                        <q-badge v-if="starredStates.words[i]" class="starbadge" color="transparent" rounded floating v-html="smallStarIcon"></q-badge>
                     </span>
                     <span v-if="hiddenAndNotPeeking.hz[i] || (hiddenStates.hz[i] && !$store.state.peekStates.hz[i] && $store.state.peekStates.rows.hz)" class="iconcard peek" v-html="eyecon"></span>
                     <span v-else-if="purePeekStates.hz[i] && !mouseHasNotMovedAfterPeeking" class="iconcard peek" v-html="pinIcon"></span>
@@ -121,12 +148,39 @@
                     v-for="(tr, i) in wordData.tr"
                     :key="i"
                     :style="tdStyle"
+                    :ref="'trExercise'+i"
                 >
+                    <div
+                        v-if="trInputSubmitted[i] !== null"
+                    >
+                        <span v-if="trInputs[i].distance <= 2" v-for="charclass in trInputs[i].chars" :class="charclass[1]">{{ charclass[0] }}</span>
+                        <div style="display: inline" v-else>
+                            <span class="delete">{{ trInputs[i].orig }}</span>
+                            <span class="insert">{{ tr }}</span>
+                        </div>
+                        <q-btn
+                            :color="trInputSubmitted[i] === true ? 'green' : 'red'"
+                            :icon="trInputSubmitted[i] === true ? 'done' : 'close'"
+                            @click="flipAnswer(trInputSubmitted, i)"
+                            round
+                        />
+                    </div>
                     <span
-                        v-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.tr[i] && starredStates.words[i]"
+                        v-else-if="$store.state.options.starWordExercisesOn && hiddenAndNotPeeking.tr[i] && starredStates.words[i]"
                         class="cardcontent"
                     >
-                        <q-input @keyup.enter="onEnterTrInput" class="starinput" borderless dark v-model="trInput" label="" />
+                        <q-input
+                            :tabindex="i*2 + 1"
+                            spellcheck="false"
+                            @keyup.enter="onTrInputEnter(i)"
+                            @keydown.tab.stop.prevent="onInputTab('tr', i)"
+                            :ref="'trInput_'+i"
+                            class="starinput"
+                            borderless
+                            dark
+                            v-model="trInputs[i]"
+                            label=""
+                        />
                     </span>
                     <span
                         v-else
@@ -198,6 +252,7 @@ export default {
         data: { default: null },
         currentCaptionIdx: { default: null },
         videoAPI: { default: null },
+        pyCorrectDistanceThreshold: { default: 1.0 },
     },
     data: function () { return {
         eyecon: getIconSvg("eye", 18),
@@ -207,9 +262,12 @@ export default {
         smallStarIcon: getIconSvg("star", 10, 'darkorange'),
         timeouts: [],
         mouseHasNotMovedAfterPeeking: false,
-        exerciseOn: true,
-        pyInput: '',
-        trInput: '',
+        pyInputs: Vue.ref([]),
+        trInputs: Vue.ref([]),
+        pyInputSubmitted: Vue.ref([]),  // null if not submitted, true if correct, false if incorrect
+        trInputSubmitted: Vue.ref([]),
+        hasStarred: false,
+        lastPausedExerciseIdxTime: null,
     }},
     computed: {
         smart: function() {
@@ -283,8 +341,23 @@ export default {
         if (! this.smart) return;
 
         // New text may have changed the size of the caption, so need to update width of full translation table
+        // Also, set width of any exercise inputs
         const self = this;
         this.$nextTick(function () {
+            for (let i = 0; i < this.wordData.py.length; i++) {
+                if (
+                    self.$store.state.options.starWordExercisesOn &&
+                    self.hiddenAndNotPeeking.py[i] &&
+                    self.starredStates.words[i]
+                ) {
+                    const pyRef = self.$refs['pyExercise'+i];
+                    const trRef = self.$refs['trExercise'+i];
+                    const hzSpanRef = self.$refs['hzSpan'+i];
+                    const hzSpanWidth = hzSpanRef.clientWidth;
+                    pyRef.style.width = trRef.style.width = hzSpanWidth + 'px';
+                }
+            }
+
             if ([null, undefined].includes(self.$refs.captioncontent) || [null, undefined].includes(self.$refs.fulltranslation)) {
                 return;
             }
@@ -297,8 +370,18 @@ export default {
         });
     },
     watch: {
-        pyInput: function() {
-            this.pyInput = normalizedToDiacritical(this.pyInput);
+        pyInputs: {
+            deep: true,
+            handler: function() {
+                // Convert pys to diacritical
+                for (let i = 0; i < this.pyInputs.length; i++) {
+                    if (this.pyInputSubmitted[i] !== null) continue;
+                    const diacritical = normalizedToDiacritical(this.pyInputs[i]);
+                    if (diacritical !== this.pyInputs[i]) {
+                        this.pyInputs[i] = diacritical;
+                    }
+                }
+            },
         },
         data: {
             immediate: true,
@@ -316,19 +399,148 @@ export default {
                         this.applySimpleCompounds();
                     }
                     this.applyPinnedRows();
+
+                    this.hasStarred = false;
+                    for (let i = 0; i < this.hiddenAndNotPeeking.py.length; i++) {
+                        if (this.hiddenAndNotPeeking.py[i] && this.starredStates.words[i]) {
+                            this.hasStarred = true;
+                            this.$store.commit('setPeekState', {'type': 'hz', 'i': i, value: true});
+                        }
+                    }
+                    this.lastPausedExerciseIdxTime = null;
+                    this.pyInputs.length = 0;
+                    this.pyInputSubmitted.length = 0;
+                    this.trInputs.length = 0;
+                    this.trInputSubmitted.length = 0;
+                    this.mouseHasNotMovedAfterPeeking = [];
+                    for (let i = 0; i < this.wordData.hz.length; i++) {
+                        this.mouseHasNotMovedAfterPeeking.push(false);
+                        this.pyInputs.push('');
+                        this.pyInputSubmitted.push(null);
+                        this.trInputs.push('');
+                        this.trInputSubmitted.push(null);
+                    }
                 }
 
-                this.mouseHasNotMovedAfterPeeking = [];
-                for (let i = 0; i < this.wordData.hz.length; i++) this.mouseHasNotMovedAfterPeeking.push(false);
             },
         },
     },
+    mounted: function() {
+        const self = this;
+
+        let lastTime = 0;
+        setInterval(() => {
+            const currentTime = self.videoAPI.getCurrentTime();
+            if (currentTime < lastTime) {
+                self.lastPausedExerciseIdxTime = null;
+            }
+            lastTime = currentTime;
+
+            if (
+                self.data !== null &&
+                self.$store.state.options.starWordExercisesOn &&
+                self.hasStarred &&
+                self.data.t1 - currentTime < 0.10 &&
+                self.data.t1 - currentTime > -0.10 &&
+                (
+                    !self.lastPausedExerciseIdxTime ||
+                    self.lastPausedExerciseIdxTime.idx !== self.currentCaptionIdx /*||
+                    currentTime < self.lastPausedExerciseIdxTime.time*/
+                )
+            ) {
+                self.videoAPI.pause();
+                self.lastPausedExerciseIdxTime = {idx: self.currentCaptionIdx, time: currentTime};
+            }
+
+        }, 5);
+    },
     methods: {
-        onEnterPyInput: function() {
-
+        flipAnswer: function(submitted, i) {
+            submitted[i] = !submitted[i]
+            if (submitted[i]) {
+                this.$q.notify({
+                    type: 'positive',
+                    message: 'Overridden as correct',
+                });
+            }
         },
-        onEnterTrInput: function() {
+        getChars: function(ops) {
+            let chars = [];
+            for (const op of ops) {
+                if (op.type == 1) {
+                    chars.push([op.from_seq[op.from_idx], 'delete']);
+                }
+                if (op.type == 2) {
+                    chars.push([op.to_seq[op.to_idx], 'insert']);
+                }
+                if (op.type == 3) {
+                    if (op.delta >= 1) {
+                        chars.push([op.to_seq[op.to_idx], 'badmiss']);
+                    }
+                    else if (op.delta > 0) {
+                        chars.push([op.to_seq[op.to_idx], 'nearmiss']);
+                    }
+                    else {
+                        chars.push([op.from_seq[op.from_idx], 'substitute']);
+                    }
+                }
+            }
+            return chars;
+        },
+        onPyInputEnter: function(idx) {
+            const result = weightedLevenshtein(this.pyInputs[idx], this.wordData.py[idx], function(a, b) {
+                if (a === b) return 0.0
+                else if (removeDiacriticals(a) === removeDiacriticals(b)) {
+                    return 0.5;
+                }
+                return 1.0;
+            }, null, null, true);
 
+            const orig = this.pyInputs[idx];
+            this.pyInputs[idx] = {
+                distance: result.distance,
+                chars: this.getChars(result.ops),
+                orig: orig,
+            };
+            this.pyInputSubmitted[idx] = result.distance <= this.pyCorrectDistanceThreshold;
+            this.onInputTab('py', idx);
+        },
+        onTrInputEnter: function(idx) {
+            const dictEntries = dictItemsToDict(this.$store.state.DICT[this.wordData.hz[idx]]);
+            let possibleTranslations = dictEntries.map((entry) => entry.translations);
+            possibleTranslations = [].concat.apply([], possibleTranslations);
+            possibleTranslations.push(this.wordData.tr[idx]);
+            let minResult = null;
+            for (const translation of possibleTranslations) {
+                const result = weightedLevenshtein(this.trInputs[idx], translation, null, null, null, true);
+                if (minResult === null || result.distance < minResult.distance) {
+                    minResult = result;
+                }
+            }
+
+            const orig = this.trInputs[idx];
+            this.trInputs[idx] = {
+                distance: minResult.distance,
+                chars: this.getChars(minResult.ops),
+                orig: orig,
+            };
+            this.trInputSubmitted[idx] = minResult.distance <= this.trCorrectDistanceThreshold;
+            this.onInputTab('tr', idx);
+        },
+        onInputTab: function(type, idx) {
+            const nextType = type === 'py' ? 'tr' : 'py';
+            let nextIdx = idx;
+            if (nextType === 'py') {
+                const numWords = this.starredStates.words.length;
+                for (let i = (idx+1) % (numWords-1); i < numWords; i++) {
+                    if (this.starredStates.words[i]) {
+                        nextIdx = i;
+                        break;
+                    }
+                }
+            }
+
+            this.$refs[`${nextType}Input_${nextIdx}`].focus();
         },
         mouseMove: function() {
             for (let i = 0; i < this.mouseHasNotMovedAfterPeeking.length; i++) {
@@ -491,8 +703,13 @@ export default {
                     this.mouseHasNotMovedAfterPeeking[i] = true;
                 }
 
-                for (const t of ['py', 'hz', 'tr']) {
-                    this.$store.commit('setPeekState', {'type': t, 'i': i, value: peekValue});
+                this.$store.commit('setPeekState', {'type': 'hz', 'i': i, value: peekValue});
+
+                // Only peek py/tr if we're not having an exercise here
+                if (! (this.$store.state.options.starWordExercisesOn && this.starredStates.words[i])) {
+                    for (const t of ['py', 'tr']) {
+                        this.$store.commit('setPeekState', {'type': t, 'i': i, value: peekValue});
+                    }
                 }
             }
             else {
@@ -806,10 +1023,6 @@ export default {
     background-color: rgb(30, 30, 30);
 }
 
-.centerrow .captioncardhidden.starred:not(.pinned)  {
-    border: 1px solid darkorange !important;
-}
-
 .centerrow .captioncard {
     padding-top: 3px;
     padding-bottom: 3px;
@@ -933,8 +1146,52 @@ export default {
 }
 
 .starinput input {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    text-align: center;
+    border-radius: 0.4em;
+    box-shadow: 0 0 0 1px rgba(255, 165 , 0, .3);
+}
+
+.starinput input:focus {
+    border-radius: 0.4em;
+    box-shadow: 0 0 0 2px rgba(255, 165 , 0, 1.0);
+}
+
+.captioncontent .q-field__control {
+    height: unset;
+    font-size: unset;
+}
+
+.captioncontent .q-field {
+    font-size: unset;
+}
+
+.insert {
+}
+
+.substitute {
+    color: lightgreen;
+}
+
+.nearmiss {
+    color: yellow;
+}
+
+.badmiss {
+    color: red;
+}
+
+.delete {
+    color: red;
+    text-decoration: line-through;
+}
+
+.captioncard .q-btn--round {
+    min-height: 1.25em;
+    min-width: 1.25em;
+    margin-top: 3px;
+    margin-left: 3px;
 }
 
 </style>

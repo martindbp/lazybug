@@ -40,3 +40,20 @@ function normalizedToDiacritical(pinyin) {
         return convertToDiacritical([match, p1, p2, p3]);
     });
 }
+
+const DIACRITICAL_TABLE = {
+    '\u0304': '1',
+    '\u0301': '2',
+    '\u030C': '3',
+    '\u0300': '4'
+};
+
+function translateDiacriticalToNumber(s) {
+    return s.normalize("NFD").split('').map(function(char) {
+        return DIACRITICAL_TABLE[char] || char;
+    }).join('');
+}
+
+function removeDiacriticals(s) {
+    return translateDiacriticalToNumber(s).replace(/[0-5]/g, '');
+}

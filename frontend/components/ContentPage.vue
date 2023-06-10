@@ -9,6 +9,7 @@
     >
         <q-tab name="shows" label="Shows" />
         <q-tab name="movies" label="Movies" />
+        <q-tab name="shorts" label="Shorts" />
         <q-tab name="other" label="Other" />
 
     </q-tabs>
@@ -18,6 +19,9 @@
         </q-tab-panel>
         <q-tab-panel name="movies">
             <ShowTable type="movie" />
+        </q-tab-panel>
+        <q-tab-panel name="shorts">
+            <ShowTable type="short" />
         </q-tab-panel>
         <q-tab-panel name="other">
             <ShowTable type="other" />
