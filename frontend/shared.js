@@ -5,6 +5,11 @@ const CDN_URL = LOCAL ? "/cdn/" : "https://cdn.lazybug.ai/file/";
 const CAPTION_FADEOUT_TIME = 5;
 const CHINESE_NUMBERS_REGEX = /^[一二三四五六七八九十百千万个]+$/;
 const SESSION_ID = uuidv4();
+
+// Hidden/Star/Explicit vs implicit/py+hz+tr correct answer count
+const DEFAULT_WORD_STATE = [0, 0, false, 0, 0, 0];
+const STATE_ORDER = ['py', 'hz', 'tr'];
+
 let nextRequestId = 1;
 const requestCallbacks = {}; // map between SESSION_ID+request_id to a callback handler
 
@@ -49,6 +54,7 @@ const events = [
     'EVENT_UNSTAR_WORD',
     'EVENT_UNSTAR_TRANSLATION',
     'EVENT_BLUR',
+    'EVENT_ANSWER',
 ];
 
 const eventsMap = {};
@@ -304,8 +310,8 @@ function findVideoInShowInfo(showInfo, captionId) {
     return [null, null];
 }
 
-function captionArrayToDict(arr, captionData) {
-    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments, lineTimingOffset] = arr;
+function captionArrayToDict(lines, idx, captionData) {
+    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments, lineTimingOffset] = lines[idx];
 
     if (boundingRects.length === 1 && boundingRects[0] === null) {
         // The video has soft captions
@@ -341,6 +347,7 @@ function captionArrayToDict(arr, captionData) {
         data_hash: data_hash,
         translations: translations,
         alignments: alignments,
+        idx: idx,
     };
 }
 
@@ -375,7 +382,7 @@ function getStates(states, wordData, compareTo, defaultValue, defaultValueTransl
     const translationState = getState(states, wordDataStateKey(wordData, 'translation'), compareTo, defaultValueTranslation)
     const statesOut = {'py': [], 'hz': [], 'tr': [], 'translation': translationState === compareTo};
     for (let i = 0; i < wordData.hz.length; i++) {
-        for (var type of ['hz', 'py', 'tr']) {
+        for (var type of STATE_ORDER) {
             const state = getState(states, wordDataStateKey(wordData, 'word', i), compareTo, defaultValue);
             statesOut[type].push(state === compareTo);
         }
@@ -407,9 +414,31 @@ function getStateKey(type, hz, pys, tr, translation) {
             return `word-${hz}-${pysWithoutTonesLower.join('/')}`;
         }
     }
-    else if (type == 'translation') {
+    else if (type === 'translation') {
         return `tr-${translation}`;
     }
+}
+
+function updateCorrect(diff, states, type, hz, pys, tr, syncIndexedDb = false) {
+    const key = getStateKey('word', hz, pys, tr, null);
+    const currData = states[key] ? states[key] : DEFAULT_WORD_STATE;
+    currData[3 + STATE_ORDER.indexOf(type)] += diff;
+    states[key] = currData;
+    if (syncIndexedDb) {
+        setIndexedDbData('states', [key], [currData], function() {});
+    }
+}
+
+function getNumCorrect(states, wordData) {
+    const numCorrect = {'py': [], 'hz': [], 'tr': []};
+    for (const type of STATE_ORDER) {
+        for (let i = 0; i < wordData.hz.length; i++) {
+            const key = wordDataStateKey(wordData, 'word', i);
+            const counts = states[key] ? states[key].slice(3) : [0, 0, 0];
+            numCorrect[type].push(counts[STATE_ORDER.indexOf(type)]);
+        }
+    }
+    return numCorrect;
 }
 
 function applyState(DICT, states, type, hz, pys, tr, translation, stateType, stateVal, explicit, syncIndexedDb = false) {
@@ -417,7 +446,7 @@ function applyState(DICT, states, type, hz, pys, tr, translation, stateType, sta
     const vals = [];
 
     let keyType = type;
-    if (['py', 'hz', 'tr'].includes(type)) keyType = 'word'; // convert everything but 'translation' to 'word' for keys
+    if (STATE_ORDER.includes(type)) keyType = 'word'; // convert everything but 'translation' to 'word' for keys
     let key = getStateKey(keyType, hz, pys, tr, translation);
     keys.push(key);
     vals.push(setState(states, key, stateType, stateVal, explicit));
@@ -458,7 +487,8 @@ const StateStarred = 2;
 function setState(dict, key, stateType, newState, explicit) {
     let currData = dict[key];
     if (currData === undefined) {
-        currData = [0, 0, false]; // Hidden/Star/Explicit vs implicit
+        // Hidden/Star/Explicit vs implicit/correct answer count
+        currData = deepCopy(DEFAULT_WORD_STATE);
     }
 
     const currExplicit = currData[2];
@@ -576,7 +606,7 @@ const getYoutubeEmbedCode = (id, t0, t1, autoplay = false, width = 560, height =
 function captionToAnkiCloze(wordData, hiddenStates, captionIdx, type, i, captionId = null, captionHash = null, t0 = null, t1 = null, escape = false) {
     let html = `<table id="${captionId} hash="${captionHash} idx="${captionIdx}" type="${type}" i="${i}">\n`;
     let nextClozeIdx = 0;
-    for (const rowType of ['py', 'hz', 'tr']) {
+    for (const rowType of STATE_ORDER) {
         let row = '\t<tr>\n';
         for (let j = 0; j < wordData[rowType].length; j++) {
             let data = wordData[rowType][j];
@@ -996,4 +1026,8 @@ function getCookie(cname) {
 
 function eraseCookie(name) {
     document.cookie = name+'=; Max-Age=-99999999;';
+}
+
+function deepCopy(json) {
+    return JSON.parse(JSON.stringify(json));
 }

@@ -46,7 +46,7 @@ export default {
         // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
         const videoAPI = this.$store.state.videoAPI;
         this.focusInterval = setInterval(function() {
-            if (document.activeElement.tagName === 'IFRAME' && ! videoAPI.isPaused()) {
+            if (document.activeElement.tagName === 'IFRAME' && videoAPI && ! videoAPI.isPaused()) {
                 focus(self.$refs.embeddedcaption);
             }
         }, 100);
@@ -95,7 +95,7 @@ export default {
                 return;
             }
 
-            const line = captionArrayToDict(captionData.lines[captionIdx], captionData);
+            const line = captionArrayToDict(captionData.lines, captionIdx, captionData);
             this.$store.commit('setNavigateToCaptionIdx', null);
             setTimeout(function() {
                 console.log('Setting videoAPI time', line.t0);

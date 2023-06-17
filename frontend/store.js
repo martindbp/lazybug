@@ -1,6 +1,9 @@
 const BLOOM_FILTER_N = 287552;
 const BLOOM_FILTER_K = 13;
 const DEFAULT_FONT_SIZE = 35;
+const DEFAULT_EXERCISES_KNOWN_THRESHOLD = 3;
+const DEFAULT_PY_EXERCISE_DISTANCE_THRESHOLD = 1.0;
+const DEFAULT_TR_EXERCISE_DISTANCE_RATIO_THRESHOLD = 0.15;
 const DEFAULT_SHORTCUTS = {
     next: 'ArrowRight',
     prev: 'ArrowLeft',
@@ -24,7 +27,10 @@ const OPTIONS_DEFAULT = {
     doneIntro: localStorage.getItem('doneIntro', 'false') === 'true',
     useSmartSubtitles: true,
     autoPause: 'off', // 'off', 'basic' or 'WPS'
-    starWordExercisesOn: true,
+    exercisesOn: true,
+    exercisesKnownThreshold: DEFAULT_EXERCISES_KNOWN_THRESHOLD,
+    pyExerciseDistanceThreshold: DEFAULT_PY_EXERCISE_DISTANCE_THRESHOLD,
+    trExerciseDistanceRatioThreshold: DEFAULT_TR_EXERCISE_DISTANCE_RATIO_THRESHOLD,
     WPSThreshold: 2.0,
     characterSet: 'sm',
     blurCaptions: true,
@@ -168,6 +174,7 @@ store = new Vuex.Store({
         isSyncing: false,
         syncProgress: [],
         syncError: null,
+        submittedExercises: {},
         options: Vue.ref(OPTIONS_DEFAULT),
     },
     mutations: {
@@ -407,7 +414,7 @@ store = new Vuex.Store({
                 },
             };
             for (let i = 0; i < val; i++) {
-                for (const type of ['py', 'hz', 'tr']) {
+                for (const type of STATE_ORDER) {
                     state.peekStates[type].push(false);
                 }
             }
@@ -465,6 +472,9 @@ store = new Vuex.Store({
         setAnkiCardsClozeIncludeHint(state, val) {
             state.options.anki.clozeIncludeHint = val;
             syncOptionsDebounced(state);
+        },
+        setSubmittedExercises(state, val) {
+            state.submittedExercises[val.key] = val.value;
         },
         setPage(state, val) {
             let url = '/' + val;

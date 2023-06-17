@@ -10,7 +10,6 @@
             v-bind:firstCaption="firstCaption"
             v-bind:prevCaption="prevCaption"
             v-bind:currCaption="currCaption"
-            v-bind:currentCaptionIdx="currentCaptionIdx"
             v-bind:nextCaption="nextCaption"
             v-bind:currTime="currTime"
             v-bind:paused="paused"
@@ -164,11 +163,11 @@ export default {
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const prevIdx = this.currentCaptionIdx[0];
                 if (prevIdx !== null) {
-                    this.prevCaption = captionArrayToDict(captionData.lines[prevIdx], captionData);
+                    this.prevCaption = captionArrayToDict(captionData.lines, prevIdx, captionData);
                 }
             }
             else if (this.currentCaptionIdx > 0) {
-                this.prevCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx - 1], captionData);
+                this.prevCaption = captionArrayToDict(captionData.lines, this.currentCaptionIdx - 1, captionData);
             }
             else {
                 this.prevCaption = null;
@@ -181,7 +180,7 @@ export default {
                 }
             }
             else {
-                this.currCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx], captionData);
+                this.currCaption = captionArrayToDict(captionData.lines, this.currentCaptionIdx, captionData);
                 this.minHeight = null;  // when the caption changes we reset any min height set
                 this.automaticallyPausedThisCaption = false;
                 const dt = Date.now() - this.$store.state.sessionTime;
@@ -194,11 +193,11 @@ export default {
             else if (Array.isArray(this.currentCaptionIdx)) {
                 const nextIdx = this.currentCaptionIdx[1];
                 if (nextIdx !== null) {
-                    this.nextCaption = captionArrayToDict(captionData.lines[nextIdx], captionData);
+                    this.nextCaption = captionArrayToDict(captionData.lines, nextIdx, captionData);
                 }
             }
             else if (this.currentCaptionIdx < captionData.lines.length - 1) {
-                this.nextCaption = captionArrayToDict(captionData.lines[this.currentCaptionIdx + 1], captionData);
+                this.nextCaption = captionArrayToDict(captionData.lines, this.currentCaptionIdx + 1, captionData);
             }
             else {
                 this.nextCaption = null;
@@ -234,7 +233,7 @@ export default {
 
                 self.$store.commit('setCaptionIdDataHash', message);
                 // Append the initial pinned peek values
-                for (const type of ['py', 'hz', 'tr', 'translation']) {
+                for (const type of [...STATE_ORDER, 'translation']) {
                     if (self.$store.state.options.pin[type] === true) {
                         self.appendSessionLog([getEvent('pin_row', type), true]);
                     }
@@ -368,7 +367,7 @@ export default {
             if (captionData === null) return null;
 
             const lines = captionData.lines;
-            const lastSeenCaption = captionArrayToDict(lines[lastCaptionIdxGlobal], captionData);
+            const lastSeenCaption = captionArrayToDict(lines, lastCaptionIdxGlobal, captionData);
             const lastSeenCaptionT0 = lastSeenCaption.t0 + (withTimingOffset ? lastSeenCaption.timingOffset : 0);
             if (this.currTime < lastSeenCaptionT0) {
                 // Start over search from the beginning
@@ -376,9 +375,9 @@ export default {
             }
 
             for (let i = lastCaptionIdxGlobal; i < lines.length; i++) {
-                let caption = captionArrayToDict(lines[i], captionData);
+                let caption = captionArrayToDict(lines, i, captionData);
                 let captionT0 = caption.t0 + (withTimingOffset ? caption.timingOffset : 0)
-                let prevCaption = i > 0 ? captionArrayToDict(lines[i-1], captionData) : null;
+                let prevCaption = i > 0 ? captionArrayToDict(lines, i-1, captionData) : null;
                 if (this.currTime >= captionT0 && this.currTime <= caption.t1) {
                     lastCaptionIdxGlobal = i;
                     return i;
@@ -395,8 +394,8 @@ export default {
                 }
             }
 
-            const firstCaption = captionArrayToDict(lines[0], captionData)
-            const lastCaption = captionArrayToDict(lines[lines.length - 1], captionData)
+            const firstCaption = captionArrayToDict(lines, 0, captionData)
+            const lastCaption = captionArrayToDict(lines, lines.length - 1, captionData)
             const firstCaptionT0 = firstCaption.t0 + (withTimingOffset ? firstCaption.timingOffset : 0);
             const lastCaptionT1 = lastCaption.t1 + (withTimingOffset ? lastCaption.timingOffset : 0);
             if (this.currTime < firstCaptionT0) {
@@ -421,7 +420,7 @@ export default {
         firstCaption: function() {
             const data = this.$store.state.captionData;
             if (data !== null && data.lines.length > 0) {
-                return captionArrayToDict(data.lines[0], this.$store.state.captionData);
+                return captionArrayToDict(data.lines, 0, this.$store.state.captionData);
             }
         },
         isLoading: function() {

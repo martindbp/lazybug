@@ -95,6 +95,32 @@ const PERSONAL_DB_VERSIONS = {
             });
         });
     },
+    '7': function(personalDb) {
+        // Add "exercise correct answer count" to states for hz, py, tr
+        personalDb.version(7).stores({
+            states: 'id',
+        }).upgrade(trans => {
+            return trans.states.toCollection().modify(item => {
+                for (let i = 0; i < 6 - item.value.length; i++) {
+                    item.value.push(0);
+                }
+            });
+        });
+
+        // Add "exercisesOn" and "exercisesKnownThreshold" to options
+        personalDb.version(7).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.exercisesOn = true;
+                    item.value.exercisesKnownThreshold = 5;
+                    item.value.pyExerciseDistanceThreshold = 1.0;
+                    item.value.trExerciseDistanceThreshold = 0.15;
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null, name = 'lazybug-personal') {

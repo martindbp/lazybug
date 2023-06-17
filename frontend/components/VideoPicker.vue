@@ -182,7 +182,7 @@ export default {
                 window.open(this.baseDiscourseURL, '_blank');
                 return;
             }
-            const dict = captionArrayToDict(d.lines[captionIdx], d);
+            const dict = captionArrayToDict(d.lines, captionIdx, d);
             const wordData = getWordData(dict, this.$store.state.options.displayTranslation, captionIdx);
             const hz = wordData.hz.join(' ');
             const py = wordData.py.join(' ');

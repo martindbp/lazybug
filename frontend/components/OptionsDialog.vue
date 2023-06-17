@@ -8,6 +8,7 @@
               class="text-white shadow-2"
             >
                 <q-tab dark name="subtitle" label="Subtitles" />
+                <q-tab dark name="learning" label="Learning" />
                 <q-tab dark name="keyboard" label="Keyboard" />
                 <q-tab dark name="other" label="Other" />
             </q-tabs>
@@ -86,6 +87,35 @@
                         />
                     </div>
                     -->
+                </q-tab-panel>
+                <q-tab-panel class="no-scroll" name="learning" style="width: 400px">
+                    <q-item-label header>Star Word Exercises</q-item-label>
+                    <q-btn-toggle
+                        push
+                        glossy
+                        v-model="exercisesOn"
+                        toggle-color="primary"
+                        :options="[
+                            {label: 'On', value: true},
+                            {label: 'Off', value: false}
+                        ]"
+                    />
+                    <q-item-label header>How many correct answers counts as known?</q-item-label>
+                    <q-item dense>
+                        <q-item-section>
+                            <q-slider
+                                color="teal"
+                                v-model="exercisesKnownThreshold"
+                                :min="1"
+                                :max="15"
+                                :step="1"
+                                :label-value="exercisesKnownThreshold"
+                                label
+                                snap
+                                markers
+                            />
+                        </q-item-section>
+                    </q-item>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="keyboard" style="width: 400px">
                     <div class="q-gutter-sm">
@@ -198,6 +228,14 @@ export default {
             get: function() { return this.$store.state.timingOffset; },
             set: function(val) { this.$store.commit('setTimingOffset', val); },
         },
+        exercisesOn: {
+            get: function() { return this.$store.state.options.exercisesOn; },
+            set: function(val) { this.$store.commit('setOption', {key: 'exercisesOn', value: val}); },
+        },
+        exercisesKnownThreshold: {
+            get: function() { return this.$store.state.options.exercisesKnownThreshold; },
+            set: function(val) { this.$store.commit('setOption', {key: 'exercisesKnownThreshold', value: val}); },
+        },
         useSmartSubtitles: {
             get: function() { return this.$store.state.options.useSmartSubtitles; },
             set: function(val) { this.$store.commit('setOption', {key: 'useSmartSubtitles', value: val}); },
@@ -257,8 +295,7 @@ export default {
             let srtOut = '';
             const captionData = this.$store.state.captionData;
             for (let i = 0; i < captionData.lines.length; i++) {
-                const line = captionData.lines[i];
-                const data = captionArrayToDict(line, captionData);
+                const data = captionArrayToDict(captionData.lines, i, captionData);
                 srtOut += `${i+1}\n`;
                 const t0 = srtTimestamp(data.t0);
                 const t1 = srtTimestamp(data.t1);

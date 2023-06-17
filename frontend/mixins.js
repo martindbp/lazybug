@@ -585,8 +585,9 @@ const mixin = {
         videoWordStats: function() {
             if (this.$store.state.captionData === null) return {};
             const wordStats = {};
-            for (let line of this.$store.state.captionData.lines) {
-                line = captionArrayToDict(line, this.$store.state.captionData);
+            for (let idx = 0; idx < this.$store.state.captionData.lines.length; idx++) {
+                let line = this.$store.state.captionData.lines[idx];
+                line = captionArrayToDict(this.$store.state.captionData.lines, idx, this.$store.state.captionData);
                 for (let alignment of line.alignments) {
                     const hz = alignment[2];
                     const py = alignment[3].map((item) => item[0]).join('');
