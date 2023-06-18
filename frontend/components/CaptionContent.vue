@@ -460,7 +460,10 @@ export default {
                 )
             ) {
                 self.videoAPI.pause();
-                self.onInputTab();  // focus the first input
+                let inputInFocus = false;
+                if (! (document.activeElement && document.activeElement.tagName === 'INPUT')) {
+                    self.onInputTab();  // focus the first input
+                }
                 self.lastPausedExerciseIdxTime = {idx: self.currentCaptionIdx, time: currentTime};
             }
 
@@ -553,9 +556,20 @@ export default {
         },
         onTrInputEnter: function(idx) {
             const hz = this.wordData.hz[idx];
-            const dictEntries = this.$store.state.DICT[hz] || [];
-            let possibleTranslations = dictEntries.map((entry) => dictArrayToDict(entry).translations);
-            possibleTranslations = [].concat.apply([], possibleTranslations);
+            const py = this.wordData.pys[idx].join('').toLowerCase();
+            const pyDiacritical = this.wordData.py[idx].toLowerCase();
+            const cedictEntries = this.$store.state.DICT[hz] || [];
+            let cedictTranslations = [];
+            for (let entry of cedictEntries) {
+                entry = dictArrayToDict(entry);
+                const entryPy = entry.pys.join('').toLowerCase();
+                if (entryPy === py) {
+                    cedictTranslations = cedictTranslations.concat(entry.translations)
+                }
+            }
+            const showDictEntries = this.$store.state.SHOWS_DICTIONARY[hz] || [];
+            const showDictTranslations = showDictEntries[pyDiacritical] || [];
+            let possibleTranslations = cedictTranslations.concat(showDictTranslations);
             possibleTranslations.push(this.wordData.tr[idx]);
             let minResult = null;
             for (const translation of possibleTranslations) {

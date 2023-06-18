@@ -132,6 +132,7 @@ store = new Vuex.Store({
         videoList: null, // only for browser extension
         discourseCommentsForShow: null,
         DICT: null,
+        SHOWS_DICTIONARY: {},
         HSK_WORDS: null,
         SIMPLE_CHARS: null,
         STRINGS: null,
@@ -457,6 +458,9 @@ store = new Vuex.Store({
             state.HSK_WORDS = words;
             createSetBloomFilterDebounced(this, state, BLOOM_FILTER_N, BLOOM_FILTER_K);
         },
+        setShowsDictionary(state, dict) {
+            state.SHOWS_DICTIONARY = dict;
+        },
         setAnkiAdvancedCards(state, val) {
             state.options.anki.advancedCards = val;
             syncOptionsDebounced(state);
@@ -584,6 +588,7 @@ const FETCH_PUBLIC_RESOURCES = [
     ['simple_chars.json', 'simple chars list', 'setSimpleCharsList', false],
     ['public_cedict.json', 'dictionary', 'setDict', false],
     ['hsk_words.json', 'HSK word list', 'setHskWords', false],
+    ['shows_dictionary.json', 'Show word dictionary', 'setShowsDictionary', false],
 ];
 
 

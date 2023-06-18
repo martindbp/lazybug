@@ -124,9 +124,9 @@ def get_show_stats(subtitle_paths, word_probs, min_prob):
 
 
 @task
-def get_sum_information(words, word_probs, min_prob):
+def get_sum_information(dictionary_counts, word_probs, min_prob):
     sum_information = 0
-    for hz in words:
+    for hz in dictionary_counts.keys():
         prob = word_probs.get(hz, 0.01*min_prob)
         information = -np.log(prob)
         sum_information += information
@@ -139,7 +139,7 @@ def get_words_and_stats(subtitle_paths):
     sum_line_time = 0
     sum_video_time = 0
     num_lines = 0
-    words = []
+    dictionary_counts = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
     hours = 0
     for subtitle_file in subtitle_paths:
         with open(subtitle_file) as f:
@@ -152,6 +152,7 @@ def get_words_and_stats(subtitle_paths):
             max_line_information = 0
             max_line_word = None
             for word in alignments:
+                pys = word[3]
                 hz = word[2]
                 tr = word[-1]
                 if len(word[-1]) == 0:
@@ -161,7 +162,8 @@ def get_words_and_stats(subtitle_paths):
                 if is_name:
                     continue
 
-                words.append(hz)
+                py = ''.join([py[0] for py in pys]).lower()
+                dictionary_counts[hz][py][tr] += 1
 
             if i < len(data['lines']) - 1:
                 next_line = data['lines'][i+1]
@@ -179,13 +181,14 @@ def get_words_and_stats(subtitle_paths):
             print(subtitle_file, 'has no lines')
             pass
 
-    return words, sum_line_time, sum_video_time, num_lines
+    return dictionary_counts, sum_line_time, sum_video_time, num_lines
 
 
 CHINESE_NUMBERS_REGEX = '^[一二三四五六七八九十百千万个]+$'
 
 @task(deps=[FileRef('generate_bloom_filter.js')])
-def get_bloom_filter(words, n, k, cedict, simple_chars):
+def get_bloom_filter(dictionary_counts, n, k, cedict, simple_chars):
+    words = dictionary_counts.keys()
 
     # Dedupe words
     words = list(set(words))
@@ -288,6 +291,7 @@ def make_shows_list():
     bloom_filters = {'shows': {}, 'n': BLOOM_FILTER_N, 'k': BLOOM_FILTER_K}
     unreleased = []
     scores = []
+    show_dictionaries = []
     for filename in glob.glob('data/git/shows/*.json'):
         with open(filename, 'r') as f:
             show_name = filename.split('/')[-1].split('.')[0]
@@ -329,12 +333,12 @@ def make_shows_list():
                     subtitle_file = f'data/remote/public/subtitles/{vid}-{hash}.json'
                     subtitle_paths.append(FileRef(subtitle_file))
 
-            words, sum_line_time, sum_video_time, num_lines = get_words_and_stats(subtitle_paths)
+            dictionary_counts, sum_line_time, sum_video_time, num_lines = get_words_and_stats(subtitle_paths)
             sum_line_time = sum_line_time.eval()
             sum_video_time = sum_video_time.eval()
             num_lines = num_lines.eval()
 
-            score = get_sum_information(words, word_probs, min_prob).eval() / sum_line_time if sum_line_time != 0 else None
+            score = get_sum_information(dictionary_counts, word_probs, min_prob).eval() / sum_line_time if sum_line_time != 0 else None
             if score is not None:
                 show['num_processed'] = f'{num_processed}/{num_total}'
                 print(show_name, 'score:', score)
@@ -347,7 +351,7 @@ def make_shows_list():
                 'sum_video_time': sum_video_time,
             }
             bloom_filters['shows'][show_name]['bloom'] = get_bloom_filter(
-                words,
+                dictionary_counts,
                 n=BLOOM_FILTER_N,
                 k=BLOOM_FILTER_K,
                 cedict=cedict,
@@ -361,6 +365,7 @@ def make_shows_list():
                     episode['processed'] = processed
 
             released_shows[show_name] = show
+            show_dictionaries.append(dictionary_counts)
 
     scores = np.array(scores)
     mean_scores = scores.mean()
@@ -386,3 +391,24 @@ def make_shows_list():
     print('Unreleased shows:')
     for show in unreleased:
         print(show)
+
+    # Create the show dictionary file
+    dictionary_counts = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
+    for show_dict_counts in show_dictionaries:
+        show_dict_counts = show_dict_counts.eval()
+        for hz, pys in show_dict_counts.items():
+            for py, translations in pys.items():
+                for translation, count in translations.items():
+                    dictionary_counts[hz][py][translation] += count
+
+
+    # Find words that have occurred at least twice
+    shows_dictionary = defaultdict(lambda: defaultdict(list))
+    for hz, pys in dictionary_counts.items():
+        for py, translations in pys.items():
+            for translation, count in translations.items():
+                if count >= 2:
+                    shows_dictionary[hz][py].append(translation)
+
+    with open('data/remote/public/shows_dictionary.json', 'w') as f:
+        json.dump(shows_dictionary, f)
