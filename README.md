@@ -144,13 +144,14 @@ The "Import Episode" creates a new episode and adds the current video id as its 
     * `caption_bottom` - bottom y value
     * `caption_left` [optional] - left x value, can set this to speed up processing
     * `caption_right` [optional] - right x value
+    * `caption_font_height` [optional] - in case the caption position is not static, set caption_top/bottom to the full area and set caption_font_height to the observed font height to frame height ratio (e.g. 3% -> 0.03), so that the image can be scaled correctly for OCR
     * `start_time` [optional] - time in seconds when to start processing
     * `end_time` [optional] - time in seconds when to end processing
     * `refine_bounding_rect` [optional] - if true will first do a refining pass to improve caption bounding box (expensive)
     * `filter_out_too_many_low_prob_chars` [optional] - use if there are many noisy lines
     * `ocr_engine` [optional] - "cnocr" (default) or "easyocr"
     * `use_bert_prior` [optional] - if true uses a Chinese BERT model as word prior to correct errors
-    * `height_buffer_px` [optional] - useful if caption moves around vertically by some small amount
+    * `extra_height_buffer_px` [optional] - useful if caption moves around vertically by some small amount
     * `id` [optional] - an id for this specific caption (for dependent captions), e.g. "hanzi-top"/"hanzi-bottom"
     * `depends_on` [optional] - id of other caption this one depends on, if set, OCR will only be done on this bounding box when there is another caption 
     * `action` [optional] - action to take if `depends_on` caption happens

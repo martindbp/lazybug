@@ -317,6 +317,12 @@ def find_sync_point(video_path):
     cap.release()
 
 
+def get_video_frame_size(video_path: str):
+    cap = cv2.VideoCapture(video_path)
+    ret, frame = cap.read()
+    return frame.shape
+
+
 def get_video_caption_area(
     video_path: str,
     caption_top: float,
@@ -327,7 +333,7 @@ def get_video_caption_area(
     end_time_s: float=None,
     out_height=80,
     font_height=60,
-    height_buffer_px=0,
+    extra_height_buffer_px=0,
 ):
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_POS_MSEC, start_time_s*1000)
@@ -365,12 +371,12 @@ def get_video_caption_area(
 
         padding = (out_height - font_height) // 2
 
-        top = top_resized-padding-height_buffer_px
-        bottom = top + out_height + 2*height_buffer_px
+        top = top_resized-padding-extra_height_buffer_px
+        bottom = top + out_height + 2*extra_height_buffer_px
         crop = resized[top:bottom, left_resized:right_resized]
-        if crop.shape[0] != out_height + 2*height_buffer_px:
+        if crop.shape[0] != out_height + 2*extra_height_buffer_px:
             breakpoint()
-        assert crop.shape[0] == out_height + 2*height_buffer_px
+        assert crop.shape[0] == out_height + 2*extra_height_buffer_px
 
         curr_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
         if curr_time > 0 and last_time > 0:
@@ -413,7 +419,7 @@ def filter_components(mask, small_threshold=25):
     return new_mask > 0
 
 
-def frames_diff(frame, last_frame, dominant_caption_color, height_buffer_px):
+def frames_diff(frame, last_frame, dominant_caption_color, extra_height_buffer_px):
     if dominant_caption_color is None:
         return mean_frame_diff(frame, last_frame) < 1.0
 
@@ -437,13 +443,13 @@ def frames_diff(frame, last_frame, dominant_caption_color, height_buffer_px):
     return intersection_over_union < 0.97
 
 
-def find_next_diff(line, buffer_frames, threshold=10, height_buffer_px=0):
+def find_next_diff(line, buffer_frames, threshold=10, extra_height_buffer_px=0):
     # Go back through the frame buffer to determine the change if any
     frame_blur = cv2.blur(line.img, (3,3))
 
     for i, (buffer_t, buffer_frame) in enumerate(buffer_frames):
-        if height_buffer_px > 0:
-            buffer_frame = buffer_frame[height_buffer_px:-height_buffer_px, ...]
+        if extra_height_buffer_px > 0:
+            buffer_frame = buffer_frame[extra_height_buffer_px:-extra_height_buffer_px, ...]
         buffer_frame_blur = cv2.blur(buffer_frame, (3,3))
         mean_diff = mean_frame_diff(buffer_frame_blur, frame_blur, line.mask)
         if mean_diff > threshold:
@@ -454,7 +460,7 @@ def find_next_diff(line, buffer_frames, threshold=10, height_buffer_px=0):
 
 net = _get_latest_net()
 
-def predict_line(frame, frame_t, font_height, conditional_caption_idx=None, height_buffer_px=0):
+def predict_line(frame, frame_t, font_height, conditional_caption_idx=None, extra_height_buffer_px=0):
     mask, probs = predict_img_pipeline(frame, net)
     mask.cache = None
     probs.cache = None
@@ -463,10 +469,10 @@ def predict_line(frame, frame_t, font_height, conditional_caption_idx=None, heig
     text, char_probs, prob_distributions = predict_chars(mask, probs, frame)
 
     # Remove the height buffer that was added when extracting the frames from the video
-    if height_buffer_px > 0:
-        frame = frame[height_buffer_px:-height_buffer_px, ...]
-        mask = mask[height_buffer_px:-height_buffer_px, ...]
-        probs = probs[height_buffer_px:-height_buffer_px, ...]
+    if extra_height_buffer_px > 0:
+        frame = frame[extra_height_buffer_px:-extra_height_buffer_px, ...]
+        mask = mask[extra_height_buffer_px:-extra_height_buffer_px, ...]
+        probs = probs[extra_height_buffer_px:-extra_height_buffer_px, ...]
 
     logprob = None
     if char_probs is not None:
@@ -691,13 +697,13 @@ def replace_or_add_line(
     return new_line
 
 
-def extract_lines_from_framebuffer(last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, height_buffer_px=0):
+def extract_lines_from_framebuffer(last_line, frame_buffer, font_height, line=None, frame_t=None, threshold=10, extra_height_buffer_px=0):
     if len(frame_buffer) == 0:
         return []
 
     if line is None:
         frame_t, frame = frame_buffer.pop(-1)
-        line = predict_line(frame, frame_t, font_height, height_buffer_px=height_buffer_px)
+        line = predict_line(frame, frame_t, font_height, extra_height_buffer_px=extra_height_buffer_px)
 
     if line.text == '':
         if last_line is None:
@@ -708,18 +714,18 @@ def extract_lines_from_framebuffer(last_line, frame_buffer, font_height, line=No
             return [line]
 
         # Go forwards from last_line
-        diff_idx = find_next_diff(last_line, frame_buffer, threshold=threshold, height_buffer_px=height_buffer_px)
+        diff_idx = find_next_diff(last_line, frame_buffer, threshold=threshold, extra_height_buffer_px=extra_height_buffer_px)
         if diff_idx is None:
             print(f'{last_line} --> no diff ({frame_t})')
             return [line]  # didn't find any diff
 
         diff_t, diff_frame = frame_buffer[diff_idx]
-        diff_line = predict_line(diff_frame, diff_t, font_height, height_buffer_px=height_buffer_px)
+        diff_line = predict_line(diff_frame, diff_t, font_height, extra_height_buffer_px=extra_height_buffer_px)
         print(f'last_line: {last_line} --> diff_line: {diff_line} --> ? --> E ({frame_t})')
-        return [diff_line] + extract_lines_from_framebuffer(diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
+        return [diff_line] + extract_lines_from_framebuffer(diff_line, frame_buffer[diff_idx:], font_height, line, frame_t, threshold=threshold, extra_height_buffer_px=extra_height_buffer_px) + [line]
     else:
         # Go backwards from line
-        diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold, height_buffer_px=height_buffer_px)
+        diff_idx = find_next_diff(line, reversed(frame_buffer), threshold=threshold, extra_height_buffer_px=extra_height_buffer_px)
 
         if diff_idx is None:
             print(f'no diff <- O ({frame_t})')
@@ -727,7 +733,7 @@ def extract_lines_from_framebuffer(last_line, frame_buffer, font_height, line=No
 
         print(f'last_line {last_line} <-- ? <-- {line} ({frame_t})')
         frames_left = list(reversed(list(reversed(frame_buffer))[diff_idx:]))
-        return extract_lines_from_framebuffer(last_line, frames_left, font_height, threshold=threshold, height_buffer_px=height_buffer_px) + [line]
+        return extract_lines_from_framebuffer(last_line, frames_left, font_height, threshold=threshold, extra_height_buffer_px=extra_height_buffer_px) + [line]
 
 
 @task(deps=[net])
@@ -738,11 +744,12 @@ def extract_video_captions(
     caption_bottom: float,
     caption_left: float=0.0,
     caption_right: float=1.0,
+    caption_font_height: float=None,
     start_time_s: float=0,
     end_time_s: float=None,
     out_height=80,
-    font_height=60,
-    height_buffer_px=0,
+    ocr_font_height=60,
+    extra_height_buffer_px=0,
     replace_levenshtein_threshold=1.0,
     filter_out_too_many_low_prob_chars=True,
     zero_out_numpy=True,
@@ -762,7 +769,7 @@ def extract_video_captions(
         raise NotImplemented()
 
     if cnocr is None:
-        cnocr = CnOcrShim(traditional=traditional, input_font_height=font_height)
+        cnocr = CnOcrShim(traditional=traditional, input_font_height=ocr_font_height)
 
     if screen_recording_video_timings is not None:
         print('Screen recording video timings provided, trying to find sync point')
@@ -773,10 +780,20 @@ def extract_video_captions(
         caption_right = sync_right / sync_width
 
     # Find the text bounding rects of a bunch of frames and adjust caption_top/bottom
-    frame_size = None
+    frame_size = get_video_frame_size(video_path)
     iters = 1 if refine_bounding_rect else 0
     subsample_frames_until_first_seen = 30*15 # 25 seconds
     subsample_frames_after_first_seen = 30*2 # 2 seconds
+    if caption_font_height is not None:
+        caption_top_px = caption_top * frame_size[0]
+        caption_bottom_px = caption_bottom * frame_size[0]
+        caption_font_height_px = caption_font_height * frame_size[0]
+        resize_image_height = int((caption_bottom_px - caption_top_px) * (ocr_font_height / caption_font_height_px))
+        resize_font_height = resize_image_height
+    else:
+        resize_font_height = ocr_font_height
+        resize_image_height = out_height
+
     for j in range(iters):
         best_top_bottom = None
         best_logprob_sum = -float('inf')
@@ -785,7 +802,7 @@ def extract_video_captions(
         for y_offset in offsets:
             y_offset /= 500
             caption_images = get_video_caption_area(
-                video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height, height_buffer_px
+                video_path, caption_top+y_offset, caption_bottom+y_offset, caption_left, caption_right, start_time_s, end_time_s, resize_image_height, resize_font_height, extra_height_buffer_px
             )
             num_added = 0
             sum_log_prob = 0
@@ -799,10 +816,7 @@ def extract_video_captions(
                     print('Skipping has seen first')
                     continue
 
-                if frame_size is None:
-                    frame_size = frame.shape[:2]
-
-                line = predict_line(crop, frame_time, font_height, height_buffer_px=height_buffer_px)
+                line = predict_line(crop, frame_time, ocr_font_height, extra_height_buffer_px=extra_height_buffer_px)
                 print(line.text)
                 if (len(filter_text_hanzi(line.text)) > 1 or len(line.text) > 5) and line.bounding_rect is not None:
                     sum_log_prob += line.logprob
@@ -822,8 +836,8 @@ def extract_video_captions(
 
         caption_top_px = int(caption_top * frame.shape[0])
         caption_bottom_px = int(caption_bottom * frame.shape[0])
-        crop_scale = (caption_bottom_px - caption_top_px) / font_height
-        expected_crop_caption_top = (out_height - font_height) / 2
+        crop_scale = (caption_bottom_px - caption_top_px) / ocr_font_height
+        expected_crop_caption_top = (out_height - ocr_font_height) / 2
         expected_crop_caption_bottom = out_height - expected_crop_caption_top
 
         caption_top += best_offset
@@ -834,7 +848,7 @@ def extract_video_captions(
         caption_bottom += bottom_diff_px / frame_size[0]
 
     caption_images = get_video_caption_area(
-        video_path, caption_top, caption_bottom, caption_left, caption_right, start_time_s, end_time_s, out_height, font_height, height_buffer_px
+        video_path, caption_top, caption_bottom, caption_left, caption_right, start_time_s, end_time_s, resize_image_height, resize_font_height, extra_height_buffer_px
     )
 
     frame_buffer = []
@@ -862,7 +876,7 @@ def extract_video_captions(
                         line = CaptionLine('', cond_start, cond_end, 0, None, None, None, None, None)
                     else:
                         frame_t, frame = frame_buffer[len(frame_buffer) // 2]
-                        line = predict_line(frame, frame_t, font_height, curr_conditional_caption_idx, height_buffer_px=height_buffer_px)
+                        line = predict_line(frame, frame_t, ocr_font_height, curr_conditional_caption_idx, extra_height_buffer_px=extra_height_buffer_px)
 
                     frame_buffer_lines = [line]
 
@@ -881,14 +895,14 @@ def extract_video_captions(
                     continue
 
                 check_diff_against_frame = last_processed_frame if last_processed_frame is not None else frame_buffer[0][1]
-                if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color, height_buffer_px) and len(frame_buffer) < 40:
+                if i != 0 and not frames_diff(crop, check_diff_against_frame, dominant_caption_color, extra_height_buffer_px) and len(frame_buffer) < 40:
                     print('no diff')
                     continue
 
                 print('diff')
 
                 last_line = caption_lines[-1] if len(caption_lines) > 0 else None
-                frame_buffer_lines = extract_lines_from_framebuffer(last_line, frame_buffer, font_height, height_buffer_px=height_buffer_px)
+                frame_buffer_lines = extract_lines_from_framebuffer(last_line, frame_buffer, ocr_font_height, extra_height_buffer_px=extra_height_buffer_px)
 
             for line in frame_buffer_lines:
                 if line.text != '':
@@ -900,8 +914,8 @@ def extract_video_captions(
 
                 if line.bounding_rect:
                     # Transform bounding rect from local coordinates (in the scaled cropped image fed to OCR), to global
-                    padding = (out_height - font_height) // 2
-                    scale_factor = font_height / (caption_bottom_px - caption_top_px)
+                    padding = (out_height - ocr_font_height) // 2
+                    scale_factor = ocr_font_height / (caption_bottom_px - caption_top_px)
                     min_x, max_x, min_y, max_y = line.bounding_rect
                     min_y -= padding
                     max_y -= padding
@@ -1502,6 +1516,7 @@ def process_show_captions(
                 param['caption_bottom'],
                 param.get('caption_left', 0.0),
                 param.get('caption_right', 1.0),
+                param.get('caption_font_height', None),
                 param.get('start_time', None),
                 param.get('end_time', None),
                 replace_levenshtein_threshold=1.0,
@@ -1511,7 +1526,7 @@ def process_show_captions(
                 use_bert_prior=param.get('use_bert_prior', False),
                 conditional_captions=conditional_captions,
                 refine_bounding_rect=param.get('refine_bounding_rect', False),
-                height_buffer_px=param.get('height_buffer_px', 0),
+                extra_height_buffer_px=param.get('extra_height_buffer_px', 0),
                 screen_recording_video_timings=param.get('screen_recording_video_timings', None),
             )
 

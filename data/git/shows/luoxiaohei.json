@@ -1,105 +1,169 @@
 {
-  "name": "Luo Xiao Hei",
-  "description": "",
+  "name": {
+    "hz": "罗小黑战记",
+    "py": "Luōxiǎohēi zhànjì",
+    "en": "The Legend of Luo Xiaohei (web series)"
+  },
+  "date_added": "2023-06-23",
+  "douban": 9.6,
+  "year": "2011",
+  "type": "tv",
+  "genres": ["donghua"],
+  "synopsis": "Popular webtoon about a cat spirit named Luo Xiaohei",
+  "caption_source": "hard",
+  "translation_source": "machine",
+  "released": true,
   "seasons": [
     {
-      "name": "罗小黑战记 新篇章正在周更！（每周六）",
-      "playlist_id": "PLWJWeJT_v21uucMrB6Q_kcB0Tg2hBcoV7",
       "episodes": [
         {
-          "id": "youtube-hJa2eABl8MQ"
+          "id": "youtube-NNHcgyx2Cdw"
         },
         {
-          "id": "youtube-d4-Gi1MR_og"
+          "id": "youtube-ZXb_v7MJvng"
         },
         {
-          "id": "youtube-DI39ZGOLSYg"
+          "id": "youtube-BTOk12hEsPI"
         },
         {
-          "id": "youtube-VPRpWWB6cWE"
+          "id": "youtube-11yOpn45Kfo"
         },
         {
-          "id": "youtube-9d3SbCoSHSI"
+          "id": "youtube-O8qMneWBW3M"
         },
         {
-          "id": "youtube-l7BvxQB8qAQ"
+          "id": "youtube-a1G0TdP4ue0"
         },
         {
-          "id": "youtube-iDPZqzEE0mM"
+          "id": "youtube-8qZl9-pjKqw"
         },
         {
-          "id": "youtube-d-u2D5vsTGU"
+          "id": "youtube-5QtS9kJNU1I"
         },
         {
-          "id": "youtube-OriODQkTBKo"
+          "id": "youtube-lm2rqoi2AkY"
         },
         {
-          "id": "youtube-rQZ2VBScwug"
+          "id": "youtube-xXmsZ1Y29Hc"
         },
         {
-          "id": "youtube--4wvItDl-M0"
+          "id": "youtube-NCgMRSUgON8"
         },
         {
-          "id": "youtube-tDEp_IMhfIE"
+          "id": "youtube-_942fS9KXCA"
         },
         {
-          "id": "youtube-z_kJyQvUPy0"
+          "id": "youtube-bhFRB6OlXr8"
         },
         {
-          "id": "youtube-eW2EM6_eVhU"
+          "id": "youtube-kA8opJwW4v0"
         },
         {
-          "id": "youtube-PJ122wdthr0"
+          "id": "youtube-0hjteczMoSE"
         },
         {
-          "id": "youtube-roI_wG_FKi8"
+          "id": "youtube-4ffw6O6FJ2k"
         },
         {
-          "id": "youtube-HxiYssFgUCs"
+          "id": "youtube-W9XDLJldzPw"
         },
         {
-          "id": "youtube-D48dXnQA9n8"
+          "id": "youtube-eshvVvaIeHQ"
         },
         {
-          "id": "youtube-83HXWq5YNAo"
+          "id": "youtube-Sbrpevu6qgc"
         },
         {
-          "id": "youtube-8B_QOxMb96k"
+          "id": "youtube-0ShaL2Y5-Jk"
         },
         {
-          "id": "youtube-plzEtlnoNPY"
+          "id": "youtube-9fQegTV3lp8"
         },
         {
-          "id": "youtube-6d3GGXI_DeE"
+          "id": "youtube-sf0BRw9ekKE"
         },
         {
-          "id": "youtube--38K3_NUalU"
+          "id": "youtube-0UTswgQWXnE"
         },
         {
-          "id": "youtube-HFH_YpmkJbA"
+          "id": "youtube-NEBy-4Ad1gM"
         },
         {
-          "id": "youtube-CFxTU_5zkgg"
+          "id": "youtube-VCIVYmp_BC4"
         },
         {
-          "id": "youtube-dmpPe960A00"
+          "id": "youtube-1M_6YOgh2Hk"
         },
         {
-          "id": "youtube-h53WfBbP4sM"
+          "id": "youtube-X7pt4j8uo_0"
         },
         {
-          "id": "youtube-nHYprx-L9NM"
+          "id": "youtube-uqutdTcNxgE"
+        },
+        {
+          "id": "youtube-ZVoqcBTj34U"
+        },
+        {
+          "id": "youtube-DyTFycUjzNE"
+        },
+        {
+          "id": "youtube-GW7nOVrVYEY"
+        },
+        {
+          "id": "youtube-vSZFdrctsws"
+        },
+        {
+          "id": "youtube-0pDiYDjcEyA"
+        },
+        {
+          "id": "youtube-TYEmhUrrrQM"
+        },
+        {
+          "id": "youtube-MauKVExATmE"
+        },
+        {
+          "id": "youtube-kJlNmJlr5wo"
+        },
+        {
+          "id": "youtube-2vv3kVk48d8"
+        },
+        {
+          "id": "youtube-Ssp0qGom5po"
+        },
+        {
+          "id": "youtube-StiGKp-oY8M"
+        },
+        {
+          "id": "youtube-LhCeNeftNG4"
+        },
+        {
+          "id": "youtube-hM5ST1-btWs"
+        },
+        {
+          "id": "youtube-kTGEVUDBAis"
+        },
+        {
+          "id": "youtube-Lp2l7hgEWDQ"
+        },
+        {
+          "id": "youtube-U27LfvvxyUk"
+        },
+        {
+          "id": "youtube-ajrHJLz5R2E"
         }
-      ]
+      ],
+      "playlist_id": "PLK-ys7c4EcnrR4UiA9n1hRox8b0EJ88gx"
     }
   ],
   "ocr_params": [
     {
       "type": "hanzi",
-      "caption_top": 0.9430555555555555,
-      "caption_bottom": 0.9805555555555555,
-      "start_time": 80
+      "caption_top": 0.8525390625,
+      "caption_bottom": 0.9970703125,
+      "caption_left": 0.001953125,
+      "caption_right": 0.994921875,
+      "start_time": 0,
+      "caption_font_height": 0.03
     }
   ]
 }
-

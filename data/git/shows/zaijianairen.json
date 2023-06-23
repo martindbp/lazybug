@@ -112,7 +112,7 @@
 			"caption_left": 0.38984375,
 			"caption_right": 0.709375,
 			"start_time": 43,
-			"height_buffer_px": 15,
+			"extra_height_buffer_px": 15,
 			"refine_bounding_rect": true
 		},
 		{
@@ -127,7 +127,7 @@
 			"caption_bottom": 0.9277777777777778,
 			"caption_left": 0.29375,
 			"caption_right": 0.37734375,
-			"height_buffer_px": 15,
+			"extra_height_buffer_px": 15,
 			"start_time": 43
 		}
 	],
