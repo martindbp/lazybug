@@ -31,6 +31,11 @@ const OPTIONS_DEFAULT = {
     exercisesKnownThreshold: DEFAULT_EXERCISES_KNOWN_THRESHOLD,
     pyExerciseDistanceThreshold: DEFAULT_PY_EXERCISE_DISTANCE_THRESHOLD,
     trExerciseDistanceRatioThreshold: DEFAULT_TR_EXERCISE_DISTANCE_RATIO_THRESHOLD,
+    seenTooltips: {
+        pinyin: false,
+        grading: false,
+        finalHelp: false,
+    },
     WPSThreshold: 2.0,
     characterSet: 'sm',
     blurCaptions: true,
@@ -151,6 +156,9 @@ store = new Vuex.Store({
             embeddable: false,
             intro: false,
         }),
+        showTooltip: Vue.ref({
+            options: false,
+        }),
         peekStates: Vue.ref({
             py: [],
             hz: [],
@@ -179,6 +187,9 @@ store = new Vuex.Store({
         options: Vue.ref(OPTIONS_DEFAULT),
     },
     mutations: {
+        setShowTooltip(state, val) {
+            state.showTooltip[val.tooltip] = val.value;
+        },
         setCloseAllDialogs(state) {
             for (const key of Object.keys(state.showDialog)) {
                 state.showDialog[key] = false;

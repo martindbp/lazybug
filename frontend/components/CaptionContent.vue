@@ -37,6 +37,10 @@
                             @click="flipAnswer(pyInputSubmitted, 'py', i)"
                             round
                         />
+                        <q-tooltip v-if="showTooltipIdx === i" anchor="center right" self="center left" v-model="showPinyinGradingTooltip">
+                            <div v-if="!lastAnswerCorrect">You can override the grading by clicking the mark</div>
+                            <div>This exercise disappears after {{$store.state.options.exercisesKnownThreshold}} correct answers</div>
+                        </q-tooltip>
                     </div>
                     <span
                         v-else-if="showExercise('py', i)"
@@ -54,6 +58,10 @@
                             v-model="pyInputs[i]"
                             label=""
                         />
+                        <q-tooltip v-if="showTooltipIdx === i" anchor="center right" self="center left" v-model="showPinyinTooltip">
+                            <div>You starred a word, can you remeber the pinyin?</div>
+                            <div>Type 1-5 after a syllable to get tonal marks</div>
+                        </q-tooltip>
                     </span>
                     <span
                         v-else
@@ -164,6 +172,10 @@
                             @click="flipAnswer(trInputSubmitted, 'tr', i)"
                             round
                         />
+                        <q-tooltip v-if="showTooltipIdx === i" anchor="center right" self="center left" v-model="showTranslationGradingTooltip">
+                            <div v-if="!lastAnswerCorrect">You can override the grading by clicking the mark</div>
+                            <div>This exercise disappears after {{$store.state.options.exercisesKnownThreshold}} correct answers</div>
+                        </q-tooltip>
                     </div>
                     <span
                         v-else-if="showExercise('tr', i)"
@@ -268,6 +280,12 @@ export default {
         trInputSubmitted: Vue.ref([]),
         hasExercises: false,
         lastPausedExerciseIdxTime: null,
+        showTooltipIdx: -1,
+        showPinyinTooltip: false,
+        showPinyinGradingTooltip: false,
+        showTranslationGradingTooltip: false,
+        showFinalHelpTooltip: false,
+        lastAnswerCorrect: false,
     }},
     computed: {
         currentCaptionIdx: function() {
@@ -375,6 +393,13 @@ export default {
                         clearTimeout(timeout);
                     }
                     this.timeouts = [];
+
+                    this.showTooltipIdx = -1;
+                    this.showPinyinTooltip = false;
+                    this.showPinyinGradingTooltip = false;
+                    this.showTranslationGradingTooltip = false;
+                    this.showFinalHelpTooltip = false;
+
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     if (this.$store.state.options.useSmartSubtitles) {
                         this.applyLvlStates();
@@ -553,6 +578,12 @@ export default {
             this.updateSubmittedExercises();
             this.onInputTab('py', idx);
             this.applyAnswer(correct, input, 'py', idx);
+            this.lastAnswerCorrect = correct;
+            if (! correct && ! this.$store.state.options.seenTooltips.grading) {
+                this.showPinyinGradingTooltip = true;
+                this.showTooltipIdx = idx;
+                this.$store.commit('setDeepOption', {key: 'seenTooltips', key2: 'grading', value: true});
+            }
         },
         onTrInputEnter: function(idx) {
             const hz = this.wordData.hz[idx];
@@ -597,6 +628,12 @@ export default {
             this.updateSubmittedExercises();
             this.onInputTab('tr', idx);
             this.applyAnswer(correct, input, 'tr', idx);
+            this.lastAnswerCorrect = correct;
+            if (! correct && ! this.$store.state.options.seenTooltips.grading) {
+                this.showTranslationGradingTooltip = true;
+                this.showTooltipIdx = idx;
+                this.$store.commit('setDeepOption', {key: 'seenTooltips', key2: 'grading', value: true});
+            }
         },
         updateSubmittedExercises: function() {
             this.$store.commit('setSubmittedExercises', {
@@ -705,6 +742,11 @@ export default {
                 this.$nextTick(function () {
                     self.$refs[`pyInput_${i}`].focus();
                 });
+                if (! this.$store.state.options.seenTooltips.pinyin) {
+                    this.showPinyinTooltip = true;
+                    this.showTooltipIdx = i;
+                    this.$store.commit('setDeepOption', {key: 'seenTooltips', key2: 'pinyin', value: true});
+                }
 
                 self.$q.notify({
                     type: 'positive',

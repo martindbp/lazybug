@@ -117,6 +117,11 @@ const PERSONAL_DB_VERSIONS = {
                     item.value.exercisesKnownThreshold = 5;
                     item.value.pyExerciseDistanceThreshold = 1.0;
                     item.value.trExerciseDistanceThreshold = 0.15;
+                    item.value.seenTooltips = {
+                        pinyin: false,
+                        grading: false,
+                        finalHelp: false,
+                    };
                 }
             });
         });
