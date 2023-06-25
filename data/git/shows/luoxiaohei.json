@@ -1,169 +1,179 @@
 {
-  "name": {
-    "hz": "罗小黑战记",
-    "py": "Luōxiǎohēi zhànjì",
-    "en": "The Legend of Luo Xiaohei (web series)"
-  },
-  "date_added": "2023-06-23",
-  "douban": 9.6,
-  "year": "2011",
-  "type": "tv",
-  "genres": ["donghua"],
-  "synopsis": "Popular webtoon about a cat spirit named Luo Xiaohei",
-  "caption_source": "hard",
-  "translation_source": "machine",
-  "released": true,
-  "seasons": [
-    {
-      "episodes": [
-        {
-          "id": "youtube-NNHcgyx2Cdw"
-        },
-        {
-          "id": "youtube-ZXb_v7MJvng"
-        },
-        {
-          "id": "youtube-BTOk12hEsPI"
-        },
-        {
-          "id": "youtube-11yOpn45Kfo"
-        },
-        {
-          "id": "youtube-O8qMneWBW3M"
-        },
-        {
-          "id": "youtube-a1G0TdP4ue0"
-        },
-        {
-          "id": "youtube-8qZl9-pjKqw"
-        },
-        {
-          "id": "youtube-5QtS9kJNU1I"
-        },
-        {
-          "id": "youtube-lm2rqoi2AkY"
-        },
-        {
-          "id": "youtube-xXmsZ1Y29Hc"
-        },
-        {
-          "id": "youtube-NCgMRSUgON8"
-        },
-        {
-          "id": "youtube-_942fS9KXCA"
-        },
-        {
-          "id": "youtube-bhFRB6OlXr8"
-        },
-        {
-          "id": "youtube-kA8opJwW4v0"
-        },
-        {
-          "id": "youtube-0hjteczMoSE"
-        },
-        {
-          "id": "youtube-4ffw6O6FJ2k"
-        },
-        {
-          "id": "youtube-W9XDLJldzPw"
-        },
-        {
-          "id": "youtube-eshvVvaIeHQ"
-        },
-        {
-          "id": "youtube-Sbrpevu6qgc"
-        },
-        {
-          "id": "youtube-0ShaL2Y5-Jk"
-        },
-        {
-          "id": "youtube-9fQegTV3lp8"
-        },
-        {
-          "id": "youtube-sf0BRw9ekKE"
-        },
-        {
-          "id": "youtube-0UTswgQWXnE"
-        },
-        {
-          "id": "youtube-NEBy-4Ad1gM"
-        },
-        {
-          "id": "youtube-VCIVYmp_BC4"
-        },
-        {
-          "id": "youtube-1M_6YOgh2Hk"
-        },
-        {
-          "id": "youtube-X7pt4j8uo_0"
-        },
-        {
-          "id": "youtube-uqutdTcNxgE"
-        },
-        {
-          "id": "youtube-ZVoqcBTj34U"
-        },
-        {
-          "id": "youtube-DyTFycUjzNE"
-        },
-        {
-          "id": "youtube-GW7nOVrVYEY"
-        },
-        {
-          "id": "youtube-vSZFdrctsws"
-        },
-        {
-          "id": "youtube-0pDiYDjcEyA"
-        },
-        {
-          "id": "youtube-TYEmhUrrrQM"
-        },
-        {
-          "id": "youtube-MauKVExATmE"
-        },
-        {
-          "id": "youtube-kJlNmJlr5wo"
-        },
-        {
-          "id": "youtube-2vv3kVk48d8"
-        },
-        {
-          "id": "youtube-Ssp0qGom5po"
-        },
-        {
-          "id": "youtube-StiGKp-oY8M"
-        },
-        {
-          "id": "youtube-LhCeNeftNG4"
-        },
-        {
-          "id": "youtube-hM5ST1-btWs"
-        },
-        {
-          "id": "youtube-kTGEVUDBAis"
-        },
-        {
-          "id": "youtube-Lp2l7hgEWDQ"
-        },
-        {
-          "id": "youtube-U27LfvvxyUk"
-        },
-        {
-          "id": "youtube-ajrHJLz5R2E"
-        }
-      ],
-      "playlist_id": "PLK-ys7c4EcnrR4UiA9n1hRox8b0EJ88gx"
-    }
-  ],
-  "ocr_params": [
-    {
-      "type": "hanzi",
-      "caption_top": 0.8525390625,
-      "caption_bottom": 0.9970703125,
-      "caption_left": 0.001953125,
-      "caption_right": 0.994921875,
-      "start_time": 0,
-      "caption_font_height": 0.03
-    }
-  ]
+	"name": {
+		"hz": "罗小黑战记",
+		"py": "Luōxiǎohēi zhànjì",
+		"en": "The Legend of Luo Xiaohei (web series)"
+	},
+	"date_added": "2023-06-23",
+	"douban": 9.6,
+	"year": "2011",
+	"type": "tv",
+	"genres": [
+		"donghua"
+	],
+	"synopsis": "Popular webtoon about a cat spirit named Luo Xiaohei",
+	"caption_source": "hard",
+	"translation_source": "machine",
+	"released": true,
+	"fixed_translations": {
+		"风息": "Wind Breath",
+		"妖精": "spirit",
+		"罗小黑": "Luo Xiao Hei",
+		"无限": "Infinity"
+	},
+	"seasons": [
+		{
+			"episodes": [
+				{
+					"id": "youtube-NNHcgyx2Cdw"
+				},
+				{
+					"id": "youtube-ZXb_v7MJvng"
+				},
+				{
+					"id": "youtube-BTOk12hEsPI"
+				},
+				{
+					"id": "youtube-11yOpn45Kfo"
+				},
+				{
+					"id": "youtube-O8qMneWBW3M"
+				},
+				{
+					"id": "youtube-a1G0TdP4ue0"
+				},
+				{
+					"id": "youtube-8qZl9-pjKqw"
+				},
+				{
+					"id": "youtube-5QtS9kJNU1I"
+				},
+				{
+					"id": "youtube-lm2rqoi2AkY"
+				},
+				{
+					"id": "youtube-xXmsZ1Y29Hc"
+				},
+				{
+					"id": "youtube-NCgMRSUgON8"
+				},
+				{
+					"id": "youtube-_942fS9KXCA"
+				},
+				{
+					"id": "youtube-bhFRB6OlXr8"
+				},
+				{
+					"id": "youtube-kA8opJwW4v0"
+				},
+				{
+					"id": "youtube-0hjteczMoSE"
+				},
+				{
+					"id": "youtube-4ffw6O6FJ2k"
+				},
+				{
+					"id": "youtube-W9XDLJldzPw"
+				},
+				{
+					"id": "youtube-eshvVvaIeHQ"
+				},
+				{
+					"id": "youtube-Sbrpevu6qgc"
+				},
+				{
+					"id": "youtube-0ShaL2Y5-Jk"
+				},
+				{
+					"id": "youtube-9fQegTV3lp8"
+				},
+				{
+					"id": "youtube-sf0BRw9ekKE"
+				},
+				{
+					"id": "youtube-0UTswgQWXnE"
+				},
+				{
+					"id": "youtube-NEBy-4Ad1gM"
+				},
+				{
+					"id": "youtube-VCIVYmp_BC4"
+				},
+				{
+					"id": "youtube-1M_6YOgh2Hk"
+				},
+				{
+					"id": "youtube-X7pt4j8uo_0"
+				},
+				{
+					"id": "youtube-uqutdTcNxgE"
+				},
+				{
+					"id": "youtube-ZVoqcBTj34U"
+				},
+				{
+					"id": "youtube-DyTFycUjzNE"
+				},
+				{
+					"id": "youtube-GW7nOVrVYEY"
+				},
+				{
+					"id": "youtube-vSZFdrctsws"
+				},
+				{
+					"id": "youtube-0pDiYDjcEyA"
+				},
+				{
+					"id": "youtube-TYEmhUrrrQM"
+				},
+				{
+					"id": "youtube-MauKVExATmE"
+				},
+				{
+					"id": "youtube-kJlNmJlr5wo"
+				},
+				{
+					"id": "youtube-2vv3kVk48d8"
+				},
+				{
+					"id": "youtube-Ssp0qGom5po"
+				},
+				{
+					"id": "youtube-StiGKp-oY8M"
+				},
+				{
+					"id": "youtube-LhCeNeftNG4"
+				},
+				{
+					"id": "youtube-hM5ST1-btWs"
+				},
+				{
+					"id": "youtube-kTGEVUDBAis"
+				},
+				{
+					"id": "youtube-Lp2l7hgEWDQ"
+				},
+				{
+					"id": "youtube-U27LfvvxyUk"
+				},
+				{
+					"id": "youtube-ajrHJLz5R2E"
+				}
+			],
+			"playlist_id": "PLK-ys7c4EcnrR4UiA9n1hRox8b0EJ88gx"
+		}
+	],
+	"ocr_params": [
+		{
+			"type": "hanzi",
+			"caption_top": 0.8525390625,
+			"caption_bottom": 0.9970703125,
+			"caption_left": 0.001953125,
+			"caption_right": 0.994921875,
+			"start_time": 0,
+			"caption_font_height": 0.03
+		}
+	],
+	"discourse_topic_id": 283,
+	"discourse_topic_slug": "luoxi-ohei-zhanji-the-legend-of-luo-xiaohei-web-series"
 }
