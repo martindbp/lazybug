@@ -239,10 +239,10 @@ class CnOcrShim(CnOcr):
             imgs = sorted_img_list[idx * batch_size : (idx + 1) * batch_size]
             try:
                 batch_out = _predict(model, imgs)
+                sorted_out.append(batch_out)
+                idx += 1
             except Exception as e:
-                batch_out = {'preds': [([''], 0.0)] * len(imgs)}
-            sorted_out.append(batch_out)
-            idx += 1
+                pass
 
         out = [None] * len(sorted_out)
         for idx, pred in zip(sorted_idx_list, sorted_out):
