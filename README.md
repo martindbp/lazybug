@@ -274,7 +274,7 @@ To generate a local certificate authority and the certificate and keys, run:
 make local-ssl-cert
 ```
 Any passphrase such as "1234" is fine, since it's for local use only.
-After this command you need to import the CA.pem in the browser you use. In Chrome it's under "Settings"->"Security And Privacy"->"Security"->"Manage Certificates"->"Authorities"->"Import", then select `lazybug/data/local/ssl_certA/CA.pem`.
+After this command you need to import the CA.pem in the browser you use. In Chrome it's under "Settings"->"Security And Privacy"->"Security"->"Manage Certificates"->"Authorities"->"Import", then select `lazybug/data/local/ssl_cert/CA.pem`.
 
 To run a local only version of the frontend and server, run:
 ```
