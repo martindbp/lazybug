@@ -515,7 +515,7 @@ store = new Vuex.Store({
 
                 this.commit('setVideoId', extractCurrentVideoId(state.STRINGS, url.href)); // eslint-disable-line
                 this.commit('setCaptionId', extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href));
-                if (state.captionData === null) return;
+                if ([null, undefined].includes(state.captionData) || [null, undefined].includes(state.showInfo)) return;
                 const showInfo = getShowInfo(null, state);
                 const [season, episode] = findVideoInShowInfo(showInfo, state.captionId);
                 state.playingShowId = showInfo.showId;

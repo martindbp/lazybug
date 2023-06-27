@@ -21,15 +21,15 @@
                 Lazybug is not optimized for mobile yet, subtitles may not work well
             </div>
             <div v-else>
-                <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
-                <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
+                <div v-if="showInfo">Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
+                <div v-if="showInfo && showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
                 <br/>
                 <q-btn color="primary" label="Go to first subtitle" @click="clickFirst"/>
             </div>
         </div>
         <div class="initialcontent" v-else-if="showData === null">
-            <div>Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
-            <div v-if="showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
+            <div v-if="showInfo">Video has <i>{{ showInfo.translation_source }}</i> sentence translations</div>
+            <div v-if="showInfo && showInfo.caption_source === 'hard'">Hanzi provided from OCR, may contain errors</div>
             <br/>
             <q-btn color="primary" label="Go to next subtitle" @click="clickNext"/>
         </div>

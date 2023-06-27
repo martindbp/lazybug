@@ -354,6 +354,7 @@ export default {
         updateCaptionPositionBlur: function() {
             if ([null, undefined].includes(this.AVElement) || [null, undefined].includes(this.$refs.captionroot)) return;
             let videoRect = this.AVElement.getBoundingClientRect();
+            if ([null, undefined].includes(videoRect)) return;
             let scrollY = getClosestParentScroll(this.$refs.captionroot.$el, 'y');
             let scrollX = getClosestParentScroll(this.$refs.captionroot.$el, 'x');
             this.$refs.captionroot.$el.style.left = ((videoRect.left+scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';

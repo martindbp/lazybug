@@ -299,6 +299,7 @@ function dictItemsToDict(items) {
 }
 
 function findVideoInShowInfo(showInfo, captionId) {
+    if (! showInfo) return [null, null];
     for (let i = 0; i < showInfo.seasons.length; i++) {
         for (let j = 0; j < showInfo.seasons[i].episodes.length; j++) {
             if (showInfo.seasons[i].episodes[j].id === captionId) {

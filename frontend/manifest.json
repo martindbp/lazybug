@@ -50,6 +50,8 @@
                 "vuex.global.js",
                 "quasar.umd.prod.js",
                 "shared.js",
+                "nlp_utils.js",
+                "levenshtein.js",
                 "store.js",
                 "mixins.js",
                 "ExtensionCaption.umd.js",
