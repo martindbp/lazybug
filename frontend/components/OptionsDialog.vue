@@ -168,6 +168,8 @@
 import HSKLevelSlider from './HSKLevelSlider.vue'
 
 export default {
+    props: ['playerId'],
+    mixins: [mixin],
     components: {
         HSKLevelSlider,
     },
@@ -293,7 +295,7 @@ export default {
         },
         exportSrt: function(type) {
             let srtOut = '';
-            const captionData = this.$store.state.captionData;
+            const captionData = this.captionData;
             for (let i = 0; i < captionData.lines.length; i++) {
                 const data = captionArrayToDict(captionData.lines, i, captionData);
                 srtOut += `${i+1}\n`;
@@ -309,7 +311,7 @@ export default {
                 srtOut += '\n\n';
             }
 
-            let [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(this.$store), this.$store.state.captionId);
+            let [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(this.playerId, this.$store), this.captionId);
             let name = `${showName.hz || showName}`;
             if (seasonName) name += `-${seasonName}`;
             name += `-${episodeName}`;

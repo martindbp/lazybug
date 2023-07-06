@@ -3,10 +3,10 @@
         <div ref="videocontainer" class="videocontainer">
             <div v-show="!playerReady" class="videoloading" />
             <div v-if="$store.state.isMovingCaption && !$store.state.isLocal" class="dragsurface" />
-            <div ref="player" :id="playerID" class="player">
+            <div :ref="playerId" :id="playerId" class="player">
                 <div v-if="$store.state.isLocal" style="position: absolute; bottom: 0; left: 0; right: 0;">
                     <div style="margin-left: 20%">
-                        <q-slider vertical-middle style="width: 80%" color="red" dark v-model="mockTime" :min="0" :max="captionDuration" :step="0.5" />
+                        <q-slider vertical-middle style="width: 80%" color="red" dark v-model="mockTime" :min="0" :max="videoDuration" :step="0.5" />
                         <q-btn vertical-middle dark color="red" v-if="mockPlaying" label="Pause" @click="setMockPlaying(false)" />
                         <q-btn vertical-middle dark color="green" v-else label="Play" @click="setMockPlaying(true)"/>
                         <span class="timelabel">{{currentTimeLabel()}}</span>
@@ -14,7 +14,13 @@
                 </div>
             </div>
         </div>
-        <EmbeddedCaption class="embeddedcaption" ref="embeddedcaption" v-show="playerReady" />
+        <EmbeddedCaption
+            class="embeddedcaption"
+            ref="embeddedcaption"
+            v-show="playerReady"
+            v-bind:playerId="playerId"
+            v-bind:reviewCaptionIndices="reviewCaptionIndices"
+        />
     </div>
 </template>
 
@@ -25,14 +31,15 @@ const MOCK_CLOCK_SPEED = 0.01; // s
 let lastT = null;
 
 export default {
-    props: ['captionId', 'width', 'height'],
+    mixins: [mixin],
+    props: ['playerId', 'width', 'height', 'reviewCaptionIndices'],
     components: {
         EmbeddedCaption,
     },
     data: function() {
         return {
-            playerID: 'player'+uuidv4().replaceAll('-', ''),
-            player: null,
+            uuid: null,
+            initializing: false,
             playerReady: false,
             focusInterval: null,
             // Mock variables are used if LOCAL is true (i.e. no youtube available)
@@ -43,10 +50,11 @@ export default {
     },
     mounted: function(){
         const self = this;
+        this.uuid = uuidv4();
+        this.initYoutube();
         // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
-        const videoAPI = this.$store.state.videoAPI;
         this.focusInterval = setInterval(function() {
-            if (document.activeElement.tagName === 'IFRAME' && videoAPI && ! videoAPI.isPaused()) {
+            if (document.activeElement.tagName === 'IFRAME' && this.videoAPI && ! this.videoAPI.isPaused()) {
                 focus(self.$refs.embeddedcaption);
             }
         }, 100);
@@ -55,8 +63,8 @@ export default {
             this.sustitueClock = setInterval(function() {
                 if (self.mockPlaying) {
                     self.mockTime += MOCK_CLOCK_SPEED;
-                    if (self.mockTime > self.captionDuration) {
-                        self.mockTime = self.captionDuration;
+                    if (self.mockTime > self.videoDuration) {
+                        self.mockTime = self.videoDuration;
                         self.mockPlaying = false;
                     }
                 }
@@ -69,7 +77,6 @@ export default {
                 self.$refs.videocontainer.style.height = `calc(100% - ${captionRect.height}px)`;
             });
         });
-        this.resizeObserver.observe(this.$refs.embeddedcaption.$el);
     },
     beforeUnmount: function() {
         this.destroyYoutube();
@@ -77,43 +84,41 @@ export default {
         this.focusInterval = null;
     },
     watch: {
-        youtubeAPIReady: {
-            immediate: true,
-            handler: function() {
-                this.initYoutube();
-            },
-        },
-        captionId: function() {
-            this.destroyYoutube();
-            this.initYoutube();
-        },
-        navigateToCaptionIdx: function() {
-            const captionData = this.$store.state.captionData;
-            const captionIdx = this.$store.state.navigateToCaptionIdx;
-            const videoAPI = this.$store.state.videoAPI;
-            if (! this.playerReady || captionData === null || [null, undefined].includes(captionIdx) || videoAPI === null) {
+        navigateToCaptionIdxKey: function() {
+            if (! this.playerReady || this.captionData === null || [null, undefined].includes(this.navigateToCaptionIdx) || this.videoAPI === null) {
                 return;
             }
 
-            const line = captionArrayToDict(captionData.lines, captionIdx, captionData);
-            this.$store.commit('setNavigateToCaptionIdx', null);
+            const line = captionArrayToDict(this.captionData.lines, this.navigateToCaptionIdx, this.captionData);
+            this.$store.commit('setPlayerData', {playerId: this.playerId, navigateToCaptionIdx: null});
+            const self = this;
             setTimeout(function() {
                 console.log('Setting videoAPI time', line.t0);
-                videoAPI.setCurrentTime(line.t0 + 0.001);
+                self.videoAPI.setCurrentTime(line.t0 + 0.001);
                 //videoAPI.play();
             }, 1000);
         },
+        playerReady: function() {
+            if (!this.playerReady) return;
+            if (this.$refs.embeddedcaption && this.$refs.embeddedcaption.$el) {
+                this.resizeObserver.observe(this.$refs.embeddedcaption.$el);
+            }
+        },
+        captionId: function() {
+            if (this.initializing || this.playerReady) return;
+            this.initYoutube();
+        },
     },
     computed: {
-        navigateToCaptionIdx: function() {
-            return `${this.playerReady}|${this.$store.state.navigateToCaptionIdx}|${this.$store.state.captionData}|${this.$store.state.videoAPI}`;
+        navigateToCaptionIdxKey: function() {
+            return `${this.playerReady}|${this.navigateToCaptionIdx}|${this.captionData}|${this.videoAPI}`;
         },
         youtubeAPIReady: function() {
             return this.$store.state.youtubeAPIReady;
         },
         captionDuration: function() {
-            if (this.$store.state.captionData === null) return 0;
-            return this.$store.state.captionData.video_length;
+            if (this.captionData === null) return 0;
+            return this.captionData.video_length;
         }
     },
     methods: {
@@ -137,12 +142,13 @@ export default {
         },
         initYoutube: function() {
             const self = this;
-            if (! this.$store.state.youtubeAPIReady) return;
+            if (! this.$store.state.youtubeAPIReady || ! this.captionId || this.playerReady || this.initializing) return;
 
             if (! LOCAL) {
-                console.log('initing initYoutube', this.playerID, this.captionId, document.querySelectorAll('#' + this.playerID));
+                this.initializing = true;
                 this.$nextTick(() => { // nextTick because player element may not be done
-                    this.player = new YT.Player(this.playerID, {
+                    console.log('initing initYoutube', this.uuid, this.playerId, this.captionId, document.querySelectorAll('#' + this.playerId));
+                    this.player = new YT.Player(this.playerId, {
                         width: this.width,
                         height: this.height,
                         videoId: videoIdFromCaptionId(this.captionId),
@@ -171,21 +177,21 @@ export default {
                 pause: this.pause,
                 isPaused: this.isPaused,
             };
-            this.$store.commit('setCaptionId', this.captionId);
-            this.$store.commit('setVideoAPI', videoAPI);
+            this.$store.commit('setPlayerData', {playerId: this.playerId, videoAPI: videoAPI});
             if (LOCAL) {
                 this.onReady();
             }
         },
         onReady: function() {
-            let $el = document.getElementById(this.playerID);
-            this.$store.commit('setAVElement', $el);
-            this.$store.commit('setVideoDuration', this.getDuration());
+            let $el = document.getElementById(this.playerId);
+            this.$store.commit('setPlayerData', {playerId: this.playerId, AVElement: $el});
+            this.$store.commit('setPlayerData', {playerId: this.playerId, videoDuration: this.getDuration()});
             const self = this;
             // Wait a bit before setting playerReady to remove flickering because iframe hasn't fully rendered yet
             setTimeout(function() {
-                console.log('playerReady');
+                console.log('playerReady', self.playerId);
                 self.playerReady = true;
+                self.initializing = false;
             }, 100);
         },
         onPlayerError: function(error) {
@@ -218,7 +224,7 @@ export default {
         },
         getDuration: function() {
             if (! this.playerReady) return 0;
-            if (LOCAL) return this.captionDuration; // we have no youtube iframe, so use the time we get from caption data
+            if (LOCAL) return this.videoDuration; // we have no youtube iframe, so use the time we get from caption data
             return this.player.getDuration();
         },
         play: function() {
@@ -243,12 +249,12 @@ export default {
             return this.player.getPlayerState() === 2;
         },
         onPlayerStateChange: function(event) {
-            if ([null, undefined].includes(this.$store.state.AVElement)) return;
+            if ([null, undefined].includes(this.AVElement)) return;
             if (event.data === YT.PlayerState.PLAYING) {
-                this.$store.state.AVElement.dispatchEvent(new Event('play'));
+                this.AVElement.dispatchEvent(new Event('play'));
             }
             else if (event.data === YT.PlayerState.PAUSED) {
-                this.$store.state.AVElement.dispatchEvent(new Event('pause'));
+                this.AVElement.dispatchEvent(new Event('pause'));
             }
         },
     },

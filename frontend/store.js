@@ -84,16 +84,16 @@ const OPTIONS_DEFAULT = {
 
 const syncOptionsDebounced = debounce((state) => syncOptions(state));
 
-function getShowInfo(store, state = null) {
+function getShowInfo(playerId, store, state = null) {
     if (state === null) state = store.state;
     if (
         (
-            [null, undefined].includes(state.playingShowId) &&
-            [null, undefined].includes(state.captionData)
+            [null, undefined].includes(state.playerData[playerId].showId) &&
+            [null, undefined].includes(state.playerData[playerId].captionData)
         ) || [null, undefined].includes(state.showList)
     ) return null;
 
-    return state.showList[state.playingShowId || state.captionData.show_name];
+    return state.showList[state.playerData[playerId].showId || state.playerData[playerId].captionData.show_name];
 }
 
 // For persisting IndexedDB (see https://dexie.org/docs/StorageManager)
@@ -119,18 +119,8 @@ store = new Vuex.Store({
         loggedInThisSession: false, // used to add an iframe to Discourse to automatically log in there
         accessToken: getCookie('jwt'),
         accountEmail: getCookie('email'),
-        captionId: null, // captionId of the currently viewed video
-        videoId: null, // videoId of the currently viewed video
         captionDocked: ['true', null].includes(localStorage.getItem('captionDocked')) && ! BROWSER_EXTENSION,
         localVideoHash: null,
-        AVElement: null,
-        videoAPI: null,
-        videoDuration: null,
-        sessionTime: null,
-        fetchedCaptionId: null, // captionId of the currently fetched captionData/captionHash (may differ from store.state.captionId)
-        captionData: null,
-        captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
-        resourceFetchErrors: [],
         youtubeAPIReady: LOCAL, // if local only we don't use youtube, so set to true
         showList: null,
         showBloomFilters: null, // only for web app
@@ -174,18 +164,32 @@ store = new Vuex.Store({
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
         page: 'content',
-        playingShowId: null,
-        playingSeason: null,
-        playingEpisode: null,
-        playingCaptionIdx: null,
-        navigateToCaptionIdx: null,
         lastSyncDate: localStorage.getItem('lastSyncDate'),
         needSync: localStorage.getItem('needSync', 'false') === 'true',
         isSyncing: false,
         syncProgress: [],
         syncError: null,
-        submittedExercises: {},
         options: Vue.ref(OPTIONS_DEFAULT),
+
+        resourceFetchErrors: [],
+        // Player data for each session, both for regular viewing and review
+        playerData: Vue.ref({
+            //playerId: {
+                //AVElement: null,
+                //videoAPI: null,
+                //videoDuration: null,
+                //sessionTime: null,?
+                //submittedExercises
+                //captionId: null, // captionId of the currently viewed video
+                //captionData: null,
+                //captionHash: null, // use this for event log. Equals 'fetching' if in the process of fetching
+                //showId: null,
+                //season: null,
+                //episode: null,
+                //captionIdx: null,
+                //navigateToCaptionIdx: null,
+            //}
+        }),
     },
     mutations: {
         setHasLazybugExtension(state) {
@@ -265,47 +269,25 @@ store = new Vuex.Store({
             this.commit('setLastSyncDate', null);
             this.commit('setOptions', JSON.parse(JSON.stringify(OPTIONS_DEFAULT)));
             this.commit('setStates', {});
-            this.commit('setPlayingShowId', null);
-            this.commit('setPlayingSeason', null);
-            this.commit('setPlayingEpisode', null);
-            this.commit('setPlayingCaptionIdx', null);
-            this.commit('setNavigateToCaptionIdx', null);
+            state.playerData = {};
         },
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
         },
-        setPlayingShowId(state, val) {
-            state.playingShowId = val;
-        },
-        setPlayingSeason(state, season) {
-            state.playingSeason = season;
-        },
-        setPlayingEpisode(state, episode) {
-            state.playingEpisode = episode;
-        },
-        setPlayingCaptionIdx(state, captionIdx) {
-            state.playingCaptionIdx = captionIdx;
-        },
-        setNavigateToCaptionIdx(state, captionIdx) {
-            state.navigateToCaptionIdx = captionIdx;
-        },
-        setVideoAPI(state, api) {
-            state.videoAPI = api;
-        },
-        setAVElement(state, el) {
-            state.AVElement = el;
-        },
-        setVideoDuration(state, duration) {
-            state.videoDuration = duration;
+        setPlayerData(state, val) {
+            if (!state.playerData[val.playerId]) {
+                state.playerData[val.playerId] = {};
+            }
+            for (const key of Object.keys(val)) {
+                if (key === 'playerId') continue;
+                state.playerData[val.playerId][key] = val[key];
+            }
         },
         setYoutubeAPIReady(state) {
             state.youtubeAPIReady = true;
         },
         switchTranslation(state) {
             state.options.displayTranslation = (state.options.displayTranslation + 1) % 2;
-        },
-        setVideoId(state, val) {
-            state.videoId = val
         },
         setVideoList(state, val) {
             state.videoList = new Set(val);
@@ -316,9 +298,7 @@ store = new Vuex.Store({
                 val[key].showId = key;
             }
             state.showList = val;
-            if (BROWSER_EXTENSION) {
-                this.commit('setURL', state.url); // in case this was loaded after URL
-            }
+            this.commit('setURL', state.url); // in case this was loaded after URL
         },
         setSimpleCharsList(state, val) {
             state.SIMPLE_CHARS = val;
@@ -331,7 +311,7 @@ store = new Vuex.Store({
             }
         },
         resetResourceFetchError(state, val) {
-            // We only reset it if the currente error holds this resource type
+            // We only reset it if the current error holds this resource type
             // (not some other resource)
             if (state.resourceFetchErrors.includes(val)) {
                 state.resourceFetchErrors.splice(state.resourceFetchErrors.indexOf(val), 1);
@@ -347,18 +327,21 @@ store = new Vuex.Store({
             state.timingOffset = val;
         },
         setCaptionId(state, val) {
-            if (state.captionId === val) return;
-            const prev = state.captionId;
-            state.captionId = val;
-            state.sessionTime = Date.now();
+            const prev = state.playerData[val.playerId] ? state.playerData[val.playerId].captionId : null;
+            if (prev === val.value) return;
+            if (! state.playerData[val.playerId]) {
+                state.playerData[val.playerId] = {};
+            }
+            state.playerData[val.playerId].captionId = val.value;
+            state.playerData[val.playerId].sessionTime = Date.now();
+            state.playerData[val.playerId].submittedExercises = {};
             if (BROWSER_EXTENSION && prev === null) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
             }
         },
         setCaptionIdDataHash(state, val) {
-            state.captionData = val.data;
-            state.captionHash = val.hash;
-            state.fetchedCaptionId = val.id;
+            state.playerData[val.playerId].captionData = val.data;
+            state.playerData[val.playerId].captionHash = val.hash;
             if (BROWSER_EXTENSION) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
             }
@@ -372,6 +355,7 @@ store = new Vuex.Store({
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
                     appendSessionLog(
+                        'player',
                         this,
                         [eventsMap['EVENT_SHOW_DICTIONARY_RANGE'], val.range[0], val.range[1]]
                     );
@@ -441,7 +425,7 @@ store = new Vuex.Store({
         setBlur(state, val) {
             state.options.blurCaptions = val;
             syncOptionsDebounced(state);
-            appendSessionLog(this, [eventsMap['EVENT_BLUR'], val]);
+            appendSessionLog('player', this, [eventsMap['EVENT_BLUR'], val]);
         },
         setOptions(state, options) {
             state.options = options;
@@ -493,12 +477,15 @@ store = new Vuex.Store({
             syncOptionsDebounced(state);
         },
         setSubmittedExercises(state, val) {
-            state.submittedExercises[val.key] = val.value;
+            state.playerData[val.playerId].submittedExercises[val.key] = val.value;
         },
         setPage(state, val) {
             let url = '/' + val;
             if (val === 'player') {
-                url += `/${state.playingShowId}/${state.playingSeason + 1}/${state.playingEpisode + 1}`;
+                const showId = state.playerData.player.showId;
+                const season = state.playerData.player.season;
+                const episode = state.playerData.player.episode;
+                url += `/${showId}/${season + 1}/${episode + 1}`;
             }
             window.history.pushState(null, '', url);
             state.page = val;
@@ -506,25 +493,29 @@ store = new Vuex.Store({
         },
         setURL(state, url) {
             state.url = {href: url.href, pathname: url.pathname};
+            if (
+                url === null ||
+                state.STRINGS === null ||
+                state.showList === null
+                // NOTE: if you add another state condition here, need to call setURL again when it's set
+            ) return;
+
             if (BROWSER_EXTENSION) {
                 //
                 // Browser Extension Logic
                 //
-                if (
-                    url === null ||
-                    state.STRINGS === null ||
-                    state.showList === null
-                    // NOTE: if you add another state condition here, need to call setURL again when it's set
-                ) return;
 
-                this.commit('setVideoId', extractCurrentVideoId(state.STRINGS, url.href)); // eslint-disable-line
-                this.commit('setCaptionId', extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href));
-                const showInfo = getShowInfo(null, state);
+                this.commit('setCaptionId', {playerId: 'player', value: extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href)});
+                const showInfo = getShowInfo('player', null, state);
                 if ([null, undefined].includes(state.captionData) || [null, undefined].includes(showInfo)) return;
-                const [season, episode] = findVideoInShowInfo(showInfo, state.captionId);
-                this.commit('setPlayingShowId', showInfo.showId);
-                this.commit('setPlayingSeason', season);
-                this.commit('setPlayingEpisode', episode);
+                const [season, episode] = findVideoInShowInfo(showInfo, state.playerData[val.playerId].captionId);
+
+                this.commit('setPlayerData', {
+                    playerId: 'player',
+                    showId: showInfo.showId,
+                    season: season,
+                    episode: episode,
+                });
             } else {
                 //
                 // Website Routing Logic
@@ -533,31 +524,45 @@ store = new Vuex.Store({
 
                 if (parts[0] === 'player') {
                     const showId = parts[1];
-                    state.playingShowId = showId;
-
                     if (parts.length >= 4) {
                         // Pattern: player/show/season/episode/(caption)
                         const seasonIdx = parseInt(parts[2]) - 1;
                         const episodeIdx = parseInt(parts[3]) - 1;
+                        let captionIdx = null;
                         if (parts.length === 5) {
-                            const captionIdx = parseInt(parts[4]) - 1;
-                            state.navigateToCaptionIdx = captionIdx;
+                            captionIdx = parseInt(parts[4]) - 1;
                         }
-                        state.playingSeason = seasonIdx;
-                        state.playingEpisode = episodeIdx;
+                        this.commit('setPlayerData', {
+                            playerId: 'player',
+                            showId: showId,
+                            season: seasonIdx,
+                            episode: episodeIdx,
+                            navigateToCaptionIdx: captionIdx,
+                        });
                     }
                     else if (parts.length === 2) {
                         // Pattern: player/movie/
-                        state.playingSeason = 0;
-                        state.playingEpisode = 0;
+                        this.commit('setPlayerData', {
+                            playerId: 'player',
+                            showId: showId,
+                            season: 0,
+                            episode: 0,
+                        });
                     }
                     else if (parts.length === 3) {
                         // Pattern: player/movie/caption
                         const captionIdx = parseInt(parts[2]) - 1;
-                        state.navigateToCaptionIdx = captionIdx;
-                        state.playingSeason = 0;
-                        state.playingEpisode = 0;
+                        this.commit('setPlayerData', {
+                            playerId: 'player',
+                            showId: showId,
+                            season: 0,
+                            episode: 0,
+                            navigateToCaptionIdx: captionIdx,
+                        });
                     }
+
+                    const playerData = state.playerData.player; 
+                    this.commit('setCaptionId', {playerId: 'player', value: state.showList[playerData.showId].seasons[playerData.season].episodes[playerData.episode].id});
                 }
                 else if (state.accountEmail === null && parts[0] === 'account' && parts.length === 2 && ['register', 'login'].includes(parts[1])) {
                     state.showDialog.account = parts[1];

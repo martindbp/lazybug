@@ -40,7 +40,7 @@
                 />
             </q-fab>
         </div>
-        <div v-if="$store.state.playingCaptionIdx !== null">
+        <div v-if="captionIdx !== null">
             <q-fab
                 ref="commentselector"
                 class="commentselector"
@@ -79,6 +79,7 @@ import CommentsDialog from './CommentsDialog.vue'
 export default {
     mixins: [mixin],
     props: {
+        playerId: { default: null },
         hidden: { default: false },
     },
     components: {
@@ -161,7 +162,7 @@ export default {
     },
     methods: {
         playEpisode: function(i) {
-            this.setPlaying(this.showInfo.showId, this.$store.state.playingSeason, i);
+            this.setPlaying(this.showId, this.season, i);
         },
         goDiscourse: function() {
             window.open(this.baseDiscourseURL, '_blank');
@@ -182,7 +183,7 @@ export default {
         askQuestion: function() {
             this.commentsAreOpen = false;
             const d = this.$store.state.captionData;
-            let captionIdx = this.$store.state.playingCaptionIdx;
+            let captionIdx = this.captionIdx;
             if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];
             if (captionIdx === null) {
                 window.open(this.baseDiscourseURL, '_blank');
@@ -193,12 +194,9 @@ export default {
             const hz = wordData.hz.join(' ');
             const py = wordData.py.join(' ');
             const translation = wordData.translation;
-            const showId = this.$store.state.playingShowId;
-            const season = this.$store.state.playingSeason;
-            const episode = this.$store.state.playingEpisode;
             const timestamp = secondsToTimestamp(dict.t0);
-            const header = (this.showInfo.type === 'movie'? '' : `${getSeasonName(this.showInfo, season)}${getEpisodeName(this.showInfo, season, episode)} - `) + timestamp
-            const quote = `> [${header}](https://lazybug.ai/${showId}/${season+1}/${episode+1}/${captionIdx+1})\n${hz}\n${py}\n${translation}\n`;
+            const header = (this.showInfo.type === 'movie'? '' : `${getSeasonName(this.showInfo, this.season)}${getEpisodeName(this.showInfo, this.season, this.episode)} - `) + timestamp
+            const quote = `> [${header}](https://lazybug.ai/${this.showId}/${this.season+1}/${this.episode+1}/${this.captionIdx+1})\n${hz}\n${py}\n${translation}\n`;
             const URL = `${this.baseDiscourseURL}?reply_quote=${encodeURIComponent(quote)}`;
             window.open(URL, '_blank');
         },

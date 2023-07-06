@@ -30,7 +30,7 @@ import DictionaryDialog from './DictionaryDialog.vue'
 
 export default {
     mixins: [mixin],
-    props: ['prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused', 'videoAPI'],
+    props: ['playerId', 'prevCaption', 'currCaption', 'nextCaption', 'data', 'currTime', 'paused'],
     components: {
         SvgButton,
         DictionaryDialog,

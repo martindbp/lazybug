@@ -42,6 +42,7 @@ function rectsUnion(rects) {
 export default {
     mixins: [mixin],
     props: {
+        playerId: { default: null },
         measureRect: { default: null }, // if measure rect set this, otherwise the props below
         prevCaption: { default: null },
         currCaption: { default: null },
@@ -78,9 +79,9 @@ export default {
             return rectsUnion(rects);
         },
         realAspectRatio: function() {
-            if (this.$store.state.captionData === null) return null;
+            if (this.captionData === null) return null;
 
-            const [height, width] = this.$store.state.captionData['frame_size'];
+            const [height, width] = this.captionData['frame_size'];
             return width / height;
         },
         AVElementParentSelector: function() {

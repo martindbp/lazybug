@@ -36,7 +36,7 @@
         <CaptionContent
             v-else
             v-bind:data="showData"
-            v-bind:videoAPI="videoAPI"
+            v-bind:playerId="playerId"
         />
         <div ref="pauseProgressBar" v-if="pauseDuration !== null" class="pauseprogressbar" style="width: 50%"></div>
     </div>
@@ -49,13 +49,13 @@ import CaptionContent from './CaptionContent.vue'
 export default {
     mixins: [mixin],
     props: [
+        'playerId',
         'firstCaption',
         'prevCaption',
         'currCaption',
         'nextCaption',
         'currTime',
         'paused',
-        'videoAPI',
         'isLoading',
         'isLikelyAnAd',
         'pauseDuration',

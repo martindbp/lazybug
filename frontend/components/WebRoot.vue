@@ -28,7 +28,7 @@
                   :width="mini ? 0 : 250"
               />
               <q-list padding>
-                <q-item v-if="$store.state.playingShowId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
+                <q-item v-if="$store.state.playerData.player && $store.state.playerData.player.showId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
                     <q-icon name="tv" />
                   </q-item-section>
@@ -47,6 +47,17 @@
                     Content
                   </q-item-section>
                 </q-item>
+
+                <q-item :active="page === 'review'" clickable @click="clickPage('review')" v-ripple>
+                  <q-item-section avatar>
+                    <q-icon name="school" />
+                  </q-item-section>
+
+                  <q-item-section>
+                    Review
+                  </q-item-section>
+                </q-item>
+
 
                 <q-item :active="page === 'history'" clickable @click="clickPage('history')" v-ripple>
                   <q-item-section avatar>
@@ -107,10 +118,11 @@
               </q-list>
           </q-drawer>
 
-          <q-page-container :class="{nopadding: page === 'player' && isMobile}" >
-            <q-page :padding="page !== 'player' && isDesktop">
+          <q-page-container :class="{nopadding: ['player', 'review'].includes(page) && isMobile}" >
+            <q-page :padding="!['player', 'review'].includes(page) && isDesktop">
                 <PlayerPage class="playerpage" v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ContentPage v-show="page === 'content'" />
+                <ReviewPage class="playerpage" v-show="page === 'review'" />
                 <HistoryPage v-if="page === 'history'" />
                 <WordTable v-if="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
@@ -150,6 +162,7 @@
 </template>
 
 <script>
+import ReviewPage from './ReviewPage.vue'
 import ContentPage from './ContentPage.vue'
 import WordTable from './WordTable.vue'
 import AccountPage from './AccountPage.vue'
@@ -162,6 +175,7 @@ import IntroDialog from './IntroDialog.vue'
 export default {
     mixins: [mixin],
     components: {
+        ReviewPage,
         ContentPage,
         WordTable,
         AccountPage,

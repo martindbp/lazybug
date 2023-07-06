@@ -1,7 +1,7 @@
 <template>
-    <div ref="playerpage" v-if="showInfo" style="position: relative">
-        <EmbeddedVideo ref="video" width="100%" height="100%" :captionId="captionId" />
-        <VideoPicker :hidden="hidden" />
+    <div ref="playerpage" style="position: relative">
+        <EmbeddedVideo playerId="player" ref="video" width="100%" height="100%" />
+        <VideoPicker playerId="player" :hidden="hidden" />
     </div>
 </template>
 
@@ -10,7 +10,6 @@ import EmbeddedVideo from './EmbeddedVideo.vue'
 import VideoPicker from './VideoPicker.vue'
 
 export default {
-    mixins: [mixin],
     components: {
         EmbeddedVideo,
         VideoPicker,

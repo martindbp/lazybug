@@ -510,6 +510,19 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             sendResponse({data: data});
         });
     }
+    else if (message.type === 'getAnswerHistory') {
+        personalDb.log
+        .where('eventIds').between(events.indexOf('EVENT_ANSWER_PY'), events.indexOf('EVENT_ANSWER_TR') + 1)
+        .reverse()
+        .sortBy('sessionTime')
+        .then(function(data) {
+            sendResponse({data: data});
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
+    }
     else if (message.type === 'getLoginCredentials') {
         if (getCookie('jwt')) {
             sendResponse({data: {email: getCookie('email'), accessToken: getCookie('jwt')}});

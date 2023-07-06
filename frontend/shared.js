@@ -75,6 +75,23 @@ function uuidv4() {
   );
 }
 
+function getRandomPlayerId() {
+    return 'player'+uuidv4().replaceAll('-', '');
+}
+
+function isStarredWordActive(states, hz, pys, tr, exercisesKnownThreshold) {
+    const stateKey = getStateKey('word', hz, pys, tr, null);
+    const isStarred = getState(states, stateKey, StateStarred, StateNone) == StateStarred;
+
+    const numCorrectPerType = getNumCorrectForKey(states, stateKey);
+    let oneActive = true;
+    for (const type of STATE_ORDER) {
+        oneActive = oneActive || (numCorrectPerType[type] < exercisesKnownThreshold);
+    }
+
+    return isStarred && oneActive;
+}
+
 function getEvent(eventName, contentType) {
     return eventsMap[`EVENT_${eventName.toUpperCase()}_${contentType.toUpperCase()}`];
 }
@@ -211,18 +228,20 @@ function fetchPersonalDataToStore(store, callback = null) {
     }, false); // don't notify failure since it's to be expected
 }
 
-function appendSessionLog($store, data) {
+function appendSessionLog(playerId, $store, data) {
     if ([null, undefined].includes($store.state.captionData)) return;
 
-    const showId = $store.state.captionData.show_name;
-    const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(null, $store.state), $store.state.captionId);
-    console.log('Append log', $store.state.captionId, $store.state.captionHash, $store.state.sessionTime, data, showName, seasonName, episodeName);
+    const showId = $store.state.playerData[playerId].captionData.show_name;
+    const playerData = $store.state.playerData[playerId];
+    const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(playerId, null, $store.state), playerData.captionId);
+    const sessionTime = playerData.sessionTime;
+    console.log('Append log', playerData.captionId, playerData.captionHash, sessionTime, data, showName, seasonName, episodeName);
     sendMessageToBackground({
         type: 'appendSessionLog',
         sessionData: {
-            captionId: $store.state.captionId,
-            captionHash: $store.state.captionHash,
-            sessionTime: $store.state.sessionTime,
+            captionId: playerData.captionId,
+            captionHash: playerData.captionHash,
+            sessionTime: sessionTime,
             showId: showId,
             seasonIdx: seasonIdx,
             episodeIdx: episodeIdx,
@@ -252,6 +271,12 @@ function getViewingHistory(offset, limit, callback) {
         offset: offset,
         limit: limit,
         dedupeLast: true,
+    }, callback);
+}
+
+function getAnswerHistory(callback) {
+    return sendMessageToBackground({
+        type: 'getAnswerHistory',
     }, callback);
 }
 
@@ -434,13 +459,22 @@ function updateCorrect(diff, states, type, hz, pys, tr, syncIndexedDb = false) {
     }
 }
 
+function getNumCorrectForKey(states, stateKey) {
+    const numCorrect = {'py': 0, 'hz': 0, 'tr': 0};
+    for (const type of STATE_ORDER) {
+        const counts = states[stateKey] ? states[stateKey].slice(3) : [0, 0, 0];
+        numCorrect[type] = counts[STATE_ORDER.indexOf(type)];
+    }
+    return numCorrect;
+}
+
 function getNumCorrect(states, wordData) {
     const numCorrect = {'py': [], 'hz': [], 'tr': []};
-    for (const type of STATE_ORDER) {
-        for (let i = 0; i < wordData.hz.length; i++) {
-            const key = wordDataStateKey(wordData, 'word', i);
-            const counts = states[key] ? states[key].slice(3) : [0, 0, 0];
-            numCorrect[type].push(counts[STATE_ORDER.indexOf(type)]);
+    for (let i = 0; i < wordData.hz.length; i++) {
+        const key = wordDataStateKey(wordData, 'word', i);
+        const correctForIdx = getNumCorrectForKey(states, key);
+        for (const type of STATE_ORDER) {
+            numCorrect[type].push(correctForIdx[type]);
         }
     }
     return numCorrect;

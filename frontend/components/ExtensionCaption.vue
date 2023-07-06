@@ -1,12 +1,13 @@
 <template>
     <Caption
         v-if="displayCaption"
-        v-bind:captionId="$store.state.captionId"
-        v-bind:AVElement="$store.state.AVElement"
-        v-bind:videoDuration="$store.state.videoDuration"
+        playerId="extension"
+        v-bind:captionId="captionId"
+        v-bind:AVElement="AVElement"
+        v-bind:videoDuration="videoDuration"
         v-bind:videoAPI="videoAPI"
     />
-    <VideoPicker v-if="displayCaption" />
+    <VideoPicker v-if="displayCaption" playerId="extension" />
     <DevtoolsDialog v-if="$store.state.extensionOn" />
 </template>
 
@@ -17,6 +18,7 @@ import VideoPicker from './VideoPicker.vue'
 
 export default {
     mixins: [mixin],
+    props: ['playerId'],
     components: {
         Caption,
         DevtoolsDialog,
@@ -45,8 +47,7 @@ export default {
 
             const AVElement = document.querySelector(this.AVElementSelector);
             if (AVElement) {
-                this.$store.commit('setAVElement', AVElement);
-                this.$store.commit('setVideoDuration', AVElement.duration);
+                this.$store.commit('setPlayerData', {playerId: 'extension', AVElement: AVElement, videoDuration: AVElement.duration});
             }
         }
     },
@@ -55,28 +56,28 @@ export default {
     },
     methods: {
         getCurrentTime: function() {
-            if (! this.$store.state.AVElement) return 0;
-            return this.$store.state.AVElement.currentTime;
+            if (! this.AVElement) return 0;
+            return this.AVElement.currentTime;
         },
         setCurrentTime: function(t) {
-            if (! this.$store.state.AVElement) return;
-            this.$store.state.AVElement.currentTime = t;
+            if (! this.AVElement) return;
+            this.AVElement.currentTime = t;
         },
         getDuration: function() {
-            if (! this.$store.state.AVElement) return 0;
-            return this.$store.state.AVElement.duration;
+            if (! this.AVElement) return 0;
+            return this.AVElement.duration;
         },
         play: function() {
-            if (! this.$store.state.AVElement) return;
-            this.$store.state.AVElement.play();
+            if (! this.AVElement) return;
+            this.AVElement.play();
         },
         pause: function() {
-            if (! this.$store.state.AVElement) return;
-            this.$store.state.AVElement.pause();
+            if (! this.AVElement) return;
+            this.AVElement.pause();
         },
         isPaused: function() {
-            if (! this.$store.state.AVElement) return;
-            return this.$store.state.AVElement.paused;
+            if (! this.AVElement) return;
+            return this.AVElement.paused;
         },
         setObserversAndHandlers: function() {
             const self = this;
@@ -84,21 +85,21 @@ export default {
             // Observe position changes of the video element.
             this.mutationObserver = new MutationObserver((mutations) => {
                 // If a video element has been added, we update the reference
-                if (self.$store.state.AVElement == null) {
+                if (self.AVElement == null) {
                     for (let mutation of mutations) {
                         for (let node of mutation.addedNodes) {
                             if (node.nodeType !== 1) continue;
                             if (node.matches(self.AVElementSelector)) {
-                                self.$store.commit('setAVElement', node);
+                                self.$store.commit('setPlayerData', {playerId: 'extension', AVElement: node});
                                 break;
                             }
                             else if (node.querySelector(self.AVElementSelector)) {
-                                self.$store.commit('setAVElement', node.querySelector(self.AVElementSelector));
+                                self.$store.commit('setPlayerData', {playerId: 'extension', AVElement: node.querySelector(self.AVElementSelector)});
                                 break;
                             }
                         }
                         for (let node of mutation.removedNodes) {
-                            if (node == self.$store.state.AVElement) {
+                            if (node == self.AVElement) {
                                 break;
                             }
                         }
@@ -106,13 +107,13 @@ export default {
                 }
                 else {
                     // in case video changed (ad)
-                    self.$store.commit('setVideoDuration', this.$store.state.AVElement.duration);
+                    self.$store.commit('setPlayerData', {playerId: 'extension', videoDuration: this.AVElement.duration});
                 }
             })
             this.mutationObserver.observe(document, {subtree: true, childList: true});
 
             document.addEventListener('DOMContentLoaded', () => {
-                self.$store.commit('setAVElement', document.querySelector(self.AVElementSelector));
+                self.$store.commit('setPlayerData', {playerId: 'extension', AVElement: document.querySelector(self.AVElementSelector)});
             });
         },
     },
@@ -122,11 +123,11 @@ export default {
         },
         displayCaption: function() {
             return (
-                this.$store.state.AVElement &&
                 this.$store.state.extensionOn &&
-                this.$store.state.captionId &&
+                this.AVElement &&
+                this.captionId &&
                 this.$store.state.videoList &&
-                this.$store.state.videoList.has(this.$store.state.captionId)
+                this.$store.state.videoList.has(this.captionId)
             );
         },
     },

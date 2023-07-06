@@ -1,11 +1,13 @@
 <template>
     <Caption
         class="lazybug"
-        v-if="$store.state.captionId && $store.state.youtubeAPIReady"
-        v-bind:captionId="$store.state.captionId"
-        v-bind:AVElement="$store.state.AVElement"
-        v-bind:videoDuration="$store.state.videoDuration"
-        v-bind:videoAPI="$store.state.videoAPI"
+        v-if="captionId && $store.state.youtubeAPIReady"
+        v-bind:playerId="playerId"
+        v-bind:captionId="captionId"
+        v-bind:AVElement="AVElement"
+        v-bind:videoDuration="videoDuration"
+        v-bind:videoAPI="videoAPI"
+        v-bind:reviewCaptionIndices="reviewCaptionIndices"
     />
 </template>
 
@@ -13,6 +15,8 @@
 import Caption from './Caption.vue'
 
 export default {
+    mixins: [mixin],
+    props: ['playerId', 'reviewCaptionIndices'],
     components: {
         Caption,
     },

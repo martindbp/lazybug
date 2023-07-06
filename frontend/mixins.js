@@ -30,8 +30,8 @@ const mixin = {
         },
         showInfo: function(newData, oldData) { // fetch Discourse comments for show
             if (
-                this.$store.state.playingSeason === null ||
-                this.$store.state.playingEpisode === null
+                this.season === null ||
+                this.episode === null
             ) {
                 return;
             }
@@ -45,9 +45,9 @@ const mixin = {
                 type: 'getDiscourseTopicComments',
                 data: topicId,
                 // Following fields are for testing
-                showId: this.$store.state.playingShowId,
-                season: this.$store.state.playingSeason,
-                episode: this.$store.state.playingEpisode,
+                showId: this.showId,
+                season: this.season,
+                episode: this.episode,
             };
             const self = this;
             self.$store.commit('setShowDiscourseComments', topicId);  // set as fetching
@@ -64,8 +64,8 @@ const mixin = {
     methods: {
         getSeasonName: function(i) {
             if (
-                this.$store.state.playingSeason === null ||
-                this.$store.state.playingEpisode === null
+                this.season === null ||
+                this.episode === null
             ) {
                 return;
             }
@@ -73,8 +73,8 @@ const mixin = {
         },
         getEpisodeName: function(i) {
             if (
-                this.$store.state.playingSeason === null ||
-                this.$store.state.playingEpisode === null
+                this.season === null ||
+                this.episode === null
             ) {
                 return;
             }
@@ -345,10 +345,11 @@ const mixin = {
             });
         },
         setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
-            this.$store.commit('setPlayingShowId', showId);
-            if (this.showInfo.embeddable === false) {
+            this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
+            const showInfo = getShowInfo('player', this.$store);
+            if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
-                this.$store.commit('setPlayingShowId', null);
+                this.$store.commit('setPlayerData', {playerId: 'player', showId: null});
                 if (this.$store.state.hasLazybugExtension) {
                     this.goExternal();
                 }
@@ -357,8 +358,9 @@ const mixin = {
                 }
                 return;
             }
-            this.$store.commit('setPlayingSeason', seasonIdx);
-            this.$store.commit('setPlayingEpisode', episodeIdx);
+            this.$store.commit('setPlayerData', {playerId: 'player', season: seasonIdx, episode: episodeIdx});
+            const showList = this.$store.state.showList;
+            this.$store.commit('setCaptionId', {playerId: 'player', value: showList[showId].seasons[seasonIdx].episodes[episodeIdx].id});
             if (BROWSER_EXTENSION) {
                 document.location = this.getVideoURL(seasonIdx, episodeIdx);
             }
@@ -384,8 +386,7 @@ const mixin = {
             this.$store.commit('setShowDialog', {dialog: 'embeddable', value: false});
         },
         getVideoURL: function(seasonIdx, episodeIdx) {
-            const captionId = this.showInfo.seasons[seasonIdx].episodes[episodeIdx].id;
-            const videoId = videoIdFromCaptionId(captionId);
+            const videoId = videoIdFromCaptionId(this.captionId);
             const template = this.getSiteString('urlTemplates').videoId;
             const url = template.replace('${id}', videoId);
             return url;
@@ -419,7 +420,7 @@ const mixin = {
             return trText;
         },
         appendSessionLog(data) {
-            appendSessionLog(this.$store, data);
+            appendSessionLog(this.playerId, this.$store, data);
         },
         createSession() {
             createSession(this.$store.state);
@@ -531,7 +532,7 @@ const mixin = {
     },
     computed: {
         currentCaptionIdx: function() {
-            const idx = this.$store.state.playingCaptionIdx;
+            const idx = this.captionIdx;
             return Array.isArray(idx) ? idx[0] : idx;
         },
         site: function() {
@@ -544,27 +545,66 @@ const mixin = {
         applicationReady: function() {
             return this.$store.state.cssLoaded && this.$store.state.fetchedAllPublicResources;
         },
+        playerData: function() {
+            if (!this.playerId) return null;
+            return this.$store.state.playerData[this.playerId];
+        },
         showInfo: function() {
-            return getShowInfo(this.$store);
+            if (!this.playerId || !this.playerData) return null;
+            const info = getShowInfo(this.playerId, this.$store);
+            return info;
         },
         showName: function() {
-            if (! this.showInfo.name) return null;
+            if (!this.showInfo || ! this.showInfo.name) return null;
             if (typeof this.showInfo.name === 'object') {
                 return `${this.showInfo.name.hz} - ${this.showInfo.name.en}`;
             }
             return this.showInfo.name;
         },
         season: {
-            get: function() { return this.$store.state.playingSeason; },
-            set: function(val) { this.$store.commit('setPlayingSeason', val); },
+            get: function() { return this.playerId ? this.playerData.season : null; },
+            set: function(val) { this.$store.commit('setPlayerData', {playerId: this.playerId, season: val}); },
         },
         episode: {
-            get: function() { return this.$store.state.playingEpisode; },
-            set: function(val) { this.$store.commit('setPlayingEpisode', val); },
+            get: function() { return this.playerId ? this.playerData.episode : null; },
+            set: function(val) { this.$store.commit('setPlayerData', {playerId: this.playerId, episode: val}); },
+        },
+        captionIdx: {
+            get: function() { return this.playerData ? this.playerData.captionIdx : null; },
+            set: function(val) { this.$store.commit('setPlayerData', {playerId: this.playerId, captionIdx: val}); },
+        },
+        seasonName: function() {
+            return getSeasonName(this.showInfo, this.season);
+        },
+        episodeName: function() {
+            return getSeasonName(this.showInfo, this.season);
         },
         captionId: function() {
-            if ([null, undefined].includes(this.showInfo)) return null;
-            return this.showInfo.seasons[this.season].episodes[this.episode].id;
+            return this.playerData ? this.playerData.captionId : null;
+        },
+        captionData: function() {
+            return this.playerData ? this.playerData.captionData : null;
+        },
+        captionHash: function() {
+            return this.playerData ? this.playerData.captionHash : null;
+        },
+        navigateToCaptionIdx: function() {
+            return this.playerData ? this.playerData.navigateToCaptionIdx : null;
+        },
+        videoAPI: function() {
+            return this.playerData ? this.playerData.videoAPI : null;
+        },
+        videoDuration: function() {
+            return this.playerData ? this.playerData.videoDuration : null;
+        },
+        sessionTime: function() {
+            return this.playerData ? this.playerData.sessionTime : null;
+        },
+        submittedExercises: function() {
+            return this.playerData ? this.playerData.submittedExercises : null;
+        },
+        AVElement: function() {
+            return this.playerData ? this.playerData.AVElement : null;
         },
         accessTokenPlusNeedSync: function() {
             return `${this.accessToken}|${this.needSync}`;
@@ -606,11 +646,11 @@ const mixin = {
             return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
         },
         videoWordStats: function() {
-            if (this.$store.state.captionData === null) return {};
+            if (this.captionData === null) return {};
             const wordStats = {};
-            for (let idx = 0; idx < this.$store.state.captionData.lines.length; idx++) {
-                let line = this.$store.state.captionData.lines[idx];
-                line = captionArrayToDict(this.$store.state.captionData.lines, idx, this.$store.state.captionData);
+            for (let idx = 0; idx < this.captionData.lines.length; idx++) {
+                let line = this.captionData.lines[idx];
+                line = captionArrayToDict(this.captionData.lines, idx, this.captionData);
                 for (let alignment of line.alignments) {
                     const hz = alignment[2];
                     const py = alignment[3].map((item) => item[0]).join('');
@@ -641,25 +681,19 @@ const mixin = {
         videoComments: function() {
             const c = this.$store.state.discourseCommentsForShow;
             if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
-            const showId = this.$store.state.playingShowId;
-            const season = this.$store.state.playingSeason;
-            const episode = this.$store.state.playingEpisode;
             // Look for a link to this video
-            let regex = `https://lazybug\.ai/${showId}/${season+1}/${episode+1}.*`;
+            let regex = `https://lazybug\.ai/${this.showId}/${this.season+1}/${this.episode+1}.*`;
             return c.filter((post) => post.cooked.match(regex) !== null);
         },
         captionComments: function() {
             const c = this.$store.state.discourseCommentsForShow;
             if ([null, undefined, 'error'].includes(c) || Number.isInteger(c)) return;
-            const showId = this.$store.state.playingShowId;
-            const season = this.$store.state.playingSeason;
-            const episode = this.$store.state.playingEpisode;
-            let captionIdx = this.$store.state.playingCaptionIdx;
+            let captionIdx = this.captionIdx;
             if (captionIdx === null) return [];
             if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];
             if (captionIdx === null) return []; // could be null again if before first caption
             // Look for a link to this caption
-            let regex = `https://lazybug\.ai/${showId}/${season+1}/${episode+1}/${captionIdx+1}.*`;
+            let regex = `https://lazybug\.ai/${this.showId}/${this.season+1}/${this.episode+1}/${this.captionIdx+1}.*`;
             return c.filter((post) => post.cooked.match(regex) !== null);
         },
     },

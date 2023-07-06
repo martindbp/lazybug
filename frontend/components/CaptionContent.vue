@@ -261,8 +261,8 @@ export default {
         ContentContextMenu,
     },
     props: {
+        playerId: { default: null },
         data: { default: null },
-        videoAPI: { default: null },
         pyCorrectDistanceThreshold: { default: 1.0 },
         trCorrectDistanceThreshold: { default: 1.0 },
     },
@@ -423,11 +423,11 @@ export default {
                         this.trInputSubmitted.push(null);
                     }
 
-                    if (this.$store.state.submittedExercises[newData.idx]) {
-                        this.pyInputSubmitted = deepCopy(this.$store.state.submittedExercises[newData.idx].pyInputSubmitted);
-                        this.trInputSubmitted = deepCopy(this.$store.state.submittedExercises[newData.idx].trInputSubmitted);
-                        this.pyInputs = deepCopy(this.$store.state.submittedExercises[newData.idx].pyInputs);
-                        this.trInputs = deepCopy(this.$store.state.submittedExercises[newData.idx].trInputs);
+                    if (this.submittedExercises[newData.idx]) {
+                        this.pyInputSubmitted = deepCopy(this.submittedExercises[newData.idx].pyInputSubmitted);
+                        this.trInputSubmitted = deepCopy(this.submittedExercises[newData.idx].trInputSubmitted);
+                        this.pyInputs = deepCopy(this.submittedExercises[newData.idx].pyInputs);
+                        this.trInputs = deepCopy(this.submittedExercises[newData.idx].trInputs);
                     }
 
                     this.hasExercises = false;
@@ -637,6 +637,7 @@ export default {
         },
         updateSubmittedExercises: function() {
             this.$store.commit('setSubmittedExercises', {
+                playerId: this.playerId,
                 key: this.currentCaptionIdx,
                 value: {
                     'pyInputSubmitted': deepCopy(this.pyInputSubmitted),
@@ -811,7 +812,7 @@ export default {
         },
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
-            const dt = Date.now() - this.$store.state.sessionTime;
+            const dt = Date.now() - this.sessionTime;
             return {
                 data: this.data,
                 translationIdx: this.translationIdx,
