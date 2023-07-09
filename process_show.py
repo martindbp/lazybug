@@ -19,7 +19,6 @@ import webvtt
 
 os.environ["TRANSFORMERS_CACHE"] = "./data/local/huggingface-models/"
 #os.environ["TRANSFORMERS_OFFLINE"] = "1"
-from easyocr import Reader
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 from merkl import task, pipeline, HashMode, FileRef, Future
 
