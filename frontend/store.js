@@ -88,9 +88,9 @@ function getShowInfo(playerId, store, state = null) {
     if (state === null) state = store.state;
     if (
         (
-            [null, undefined].includes(state.playerData[playerId].showId) &&
-            [null, undefined].includes(state.playerData[playerId].captionData)
-        ) || [null, undefined].includes(state.showList)
+            isNone(state.playerData[playerId].showId) &&
+            isNone(state.playerData[playerId].captionData)
+        ) || isNone(state.showList)
     ) return null;
 
     return state.showList[state.playerData[playerId].showId || state.playerData[playerId].captionData.show_name];
@@ -332,16 +332,44 @@ store = new Vuex.Store({
             if (! state.playerData[val.playerId]) {
                 state.playerData[val.playerId] = {};
             }
-            state.playerData[val.playerId].captionId = val.value;
-            state.playerData[val.playerId].sessionTime = Date.now();
-            state.playerData[val.playerId].submittedExercises = {};
+            const playerData = state.playerData[val.playerId];
+            playerData.captionId = val.value;
+            playerData.sessionTime = Date.now();
+            playerData.lastCaptionIdx = 0;
+            playerData.submittedExercises = {};
+            playerData.lastCaptionIdx = 0;
+            if (prev) {
+                playerData.showId = null;
+                playerData.season = null;
+                playerData.episode = null;
+                playerData.navigateToCaptionIdx = null;
+                playerData.captionData = null;
+                playerData.captionHash = null;
+            }
             if (BROWSER_EXTENSION && prev === null) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
             }
         },
         setCaptionIdDataHash(state, val) {
-            state.playerData[val.playerId].captionData = val.data;
-            state.playerData[val.playerId].captionHash = val.hash;
+            const playerData = state.playerData[val.playerId];
+            if (val.data && playerData.reviewCaptionIndices) {
+                val.data.lines = val.data.lines.filter((line, index, arr) => {
+                    if (line.length == 9) line.push(undefined); // lineTimingOffset
+                    line.push(index);
+                    return playerData.reviewCaptionIndices.includes(index);
+                });
+            }
+
+            playerData.captionData = val.data;
+            playerData.captionHash = val.hash;
+            if (! isNone(playerData.captionData)) {
+                playerData.showId = playerData.captionData.show_name;
+                const showInfo = getShowInfo(val.playerId, this);
+                let [seasonIdx, episodeIdx] = findVideoInShowInfo(showInfo, playerData.captionId);
+                playerData.season = seasonIdx;
+                playerData.episode = episodeIdx;
+            }
+            playerData.lastCaptionIdx = 0;
             if (BROWSER_EXTENSION) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
             }
@@ -350,7 +378,7 @@ store = new Vuex.Store({
             state.showDialog[val.dialog] = val.value;
         },
         setShowDictionary(state, val) {
-            if (! [null, undefined].includes(val.value)) state.showDialog.dictionary = val.value;
+            if (! isNone(val.value)) state.showDialog.dictionary = val.value;
             if (val.range) {
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
@@ -387,7 +415,7 @@ store = new Vuex.Store({
         },
         setPeekState(state, val) {
             console.assert([true, false, 'temporaryPeek', 'hiddenAfterTemporaryPeek'].includes(val.value));
-            if ([undefined, null].includes(val.i)) {
+            if (isNone(val.i)) {
                 if (val.type === 'translation') {
                     state.peekStates[val.type] = val.value;
                     state.peekStates.rows[val.type] = val.value;
@@ -507,7 +535,7 @@ store = new Vuex.Store({
 
                 this.commit('setCaptionId', {playerId: 'player', value: extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href)});
                 const showInfo = getShowInfo('player', null, state);
-                if ([null, undefined].includes(state.captionData) || [null, undefined].includes(showInfo)) return;
+                if (isNone(state.captionData) || isNone(showInfo)) return;
                 const [season, episode] = findVideoInShowInfo(showInfo, state.playerData[val.playerId].captionId);
 
                 this.commit('setPlayerData', {

@@ -125,6 +125,13 @@ const PERSONAL_DB_VERSIONS = {
                 }
             });
         });
+
+        // Add isReview index
+        personalDb.version(8).stores({
+            states: 'id',
+            other: 'id',
+            log: '[captionId+captionHash+sessionTime], sessionTime, captionHash, *eventIds, synced, isReview',
+        });
     },
 };
 

@@ -182,7 +182,7 @@ export default {
         },
         askQuestion: function() {
             this.commentsAreOpen = false;
-            const d = this.$store.state.captionData;
+            const d = this.captionData;
             let captionIdx = this.captionIdx;
             if (Array.isArray(captionIdx)) captionIdx = captionIdx[0];
             if (captionIdx === null) {

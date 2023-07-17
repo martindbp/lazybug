@@ -247,7 +247,7 @@ def get_bloom_filter(dictionary_counts, n, k, cedict, simple_chars):
         if max_split is not None:
             for w in max_split:
                 new_words.add(w)
-            print(f'Splitting {word} -> {max_split}')
+            #print(f'Splitting {word} -> {max_split}')
         else:
             new_words.add(word)
 
@@ -376,6 +376,7 @@ def make_shows_list():
         if 'difficulty' not in show:
             if 'difficulty_manual' not in show:
                 print('ERROR', name, 'has no difficulty score, need to set difficulty_manual')
+                print('Could also be because we\'re missing some subtitles, try make pull-public')
                 sys.exit(1)
             continue
         score = (min(max(-2, (show['difficulty'] - mean_scores) / 4), 2) + 2) / 4

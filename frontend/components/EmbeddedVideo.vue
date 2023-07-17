@@ -19,7 +19,6 @@
             ref="embeddedcaption"
             v-show="playerReady"
             v-bind:playerId="playerId"
-            v-bind:reviewCaptionIndices="reviewCaptionIndices"
         />
     </div>
 </template>
@@ -32,7 +31,7 @@ let lastT = null;
 
 export default {
     mixins: [mixin],
-    props: ['playerId', 'width', 'height', 'reviewCaptionIndices'],
+    props: ['playerId', 'width', 'height'],
     components: {
         EmbeddedCaption,
     },
@@ -40,7 +39,7 @@ export default {
         return {
             uuid: null,
             initializing: false,
-            playerReady: false,
+            playerReadyCaptionId: false,
             focusInterval: null,
             // Mock variables are used if LOCAL is true (i.e. no youtube available)
             mockPlaying: false,
@@ -85,39 +84,47 @@ export default {
     },
     watch: {
         navigateToCaptionIdxKey: function() {
-            if (! this.playerReady || this.captionData === null || [null, undefined].includes(this.navigateToCaptionIdx) || this.videoAPI === null) {
+            if (! this.playerReady || isNone(this.captionData) || isNone(this.navigateToCaptionIdx) || isNone(this.videoAPI)) {
                 return;
             }
 
             const line = captionArrayToDict(this.captionData.lines, this.navigateToCaptionIdx, this.captionData);
+            console.log('Setting videoAPI time', this.captionData.lines, line.t0, this.navigateToCaptionIdx, line);
             this.$store.commit('setPlayerData', {playerId: this.playerId, navigateToCaptionIdx: null});
+            this.videoAPI.setCurrentTime(line.t0 + 0.001);
+            /*
             const self = this;
             setTimeout(function() {
-                console.log('Setting videoAPI time', line.t0);
+                console.log('Setting videoAPI time', line.t0, self.navigateToCaptionIdx, line);
                 self.videoAPI.setCurrentTime(line.t0 + 0.001);
                 //videoAPI.play();
             }, 1000);
+            */
         },
-        playerReady: function() {
-            if (!this.playerReady) return;
+        playerReadyCaptionId: function() {
+            if (!this.playerReadyCaptionId) return;
             if (this.$refs.embeddedcaption && this.$refs.embeddedcaption.$el) {
                 this.resizeObserver.observe(this.$refs.embeddedcaption.$el);
             }
         },
         captionId: function() {
             if (this.initializing || this.playerReady) return;
+            if (this.playerReadyCaptionId) this.destroyYoutube();
             this.initYoutube();
         },
     },
     computed: {
+        playerReady: function() {
+            return this.playerReadyCaptionId && this.playerReadyCaptionId === this.captionId;
+        },
         navigateToCaptionIdxKey: function() {
-            return `${this.playerReady}|${this.navigateToCaptionIdx}|${this.captionData}|${this.videoAPI}`;
+            return `${this.playerReadyCaptionId}|${this.navigateToCaptionIdx}|${this.captionData}|${this.videoAPI}`;
         },
         youtubeAPIReady: function() {
             return this.$store.state.youtubeAPIReady;
         },
         captionDuration: function() {
-            if (this.captionData === null) return 0;
+            if (isNone(this.captionData)) return 0;
             return this.captionData.video_length;
         }
     },
@@ -136,7 +143,7 @@ export default {
                 this.player.destroy();
                 this.player = null;
             }
-            this.playerReady = false;
+            this.playerReadyCaptionId = false;
             this.mockTime = 0;
             this.mockPlaying = false;
         },
@@ -187,12 +194,12 @@ export default {
             this.$store.commit('setPlayerData', {playerId: this.playerId, AVElement: $el});
             this.$store.commit('setPlayerData', {playerId: this.playerId, videoDuration: this.getDuration()});
             const self = this;
-            // Wait a bit before setting playerReady to remove flickering because iframe hasn't fully rendered yet
-            setTimeout(function() {
-                console.log('playerReady', self.playerId);
-                self.playerReady = true;
+            // Wait a bit before setting playerReadyCaptionId to remove flickering because iframe hasn't fully rendered yet
+            setTimeout((function(captionId) { return function() {
+                console.log('playerReadyCaptionId', self.playerId);
+                self.playerReadyCaptionId = captionId;
                 self.initializing = false;
-            }, 100);
+            }})(this.captionId), 100);
         },
         onPlayerError: function(error) {
             console.log(error);

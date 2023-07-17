@@ -62,7 +62,7 @@ export default {
             if (
                 self.$store.state.showDialog.options ||
                 ! self.$store.state.options.keyboardShortcutsToggle ||
-                ! self.$store.state.captionData ||
+                ! self.captionData ||
                 ! self.$store.state.extensionOn
             ) {
                 return;

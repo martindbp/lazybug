@@ -1,12 +1,32 @@
 <template>
     <div ref="reviewpage" v-if="reviewCaptionId" style="position: relative">
+        <q-carousel
+            dark
+            class="reviewpicker shadow-1 rounded-borders"
+            v-model="currentReviewCaptionIdx"
+            transition-prev="scale"
+            transition-next="scale"
+            swipeable
+            animated
+            padding
+            arrows
+         >
+             <q-carousel-slide v-for="(captionId, i) in captionsList" :name="i" class="column no-wrap flex-center">
+                 <div class="text-h6 text-center">
+                     {{ captionTitle }}
+                 </div>
+             </q-carousel-slide>
+        </q-carousel>
         <EmbeddedVideo
+            v-if="! isLoading && currentReviewCaptionIdx !== null"
             ref="reviewvideo"
             playerId="review"
             width="100%"
             height="100%"
-            v-bind:reviewCaptionIndices="reviewCaptionIndices"
         />
+        <div v-if="! isLoading && currentReviewCaptionIdx === null">
+            No reviews to be done
+        </div>
     </div>
 </template>
 
@@ -19,10 +39,10 @@ export default {
         EmbeddedVideo,
     },
     data: function() { return {
+        playerId: 'review',
         isLoading: true,
         hidden: false,
         reviewCaptionId: null,
-        reviewCaptionIndices: [],
         currentReviewCaptionIdx: null,
         captionsList: [],
         captionIdIndices: {},
@@ -43,8 +63,26 @@ export default {
         showList: function() {
             return this.$store.state.showList;
         },
+        captionTitle: function() {
+            if (isNone(this.showInfo) || isNone(this.season) || isNone(this.episode)) return '';
+            if (this.showInfo.type !== 'tv') {
+                return resolveShowName(this.showInfo.name);
+            }
+            return `${resolveShowName(this.showInfo.name)} - ${getSeasonName(this.showInfo, this.season)} - ${getEpisodeName(this.showInfo, this.season, this.episode)}`;
+        },
     },
     watch: {
+        AVElement: {
+            immediate: true,
+            handler: function(newValue, oldValue) {
+                if (! newValue) return;
+                const self = this;
+                console.log('Listening to ', newValue);
+                newValue.addEventListener('nextVideo', function() {
+                    self.onNextVideo();
+                });
+            },
+        },
         showList: {
             immediate: true,
             handler: function(newData) {
@@ -55,17 +93,24 @@ export default {
         currentReviewCaptionIdx: function() {
             if (this.currentReviewCaptionIdx === null) return;
             this.reviewCaptionId = this.captionsList[this.currentReviewCaptionIdx];
-            this.reviewCaptionIndices = this.captionIdIndices[this.reviewCaptionId].sort(function(a, b) {
+            const reviewCaptionIndices = this.captionIdIndices[this.reviewCaptionId].sort(function(a, b) {
               return a - b;
             });
+            console.log('new currentReviewCaptionIdx', this.currentReviewCaptionIdx);
             this.$store.commit('setCaptionId', {playerId: 'review', value: this.reviewCaptionId});
             this.$store.commit('setPlayerData', {
                 playerId: 'review',
-                navigateToCaptionIdx: this.captionIdIndices[this.reviewCaptionId][0],
+                navigateToCaptionIdx: 0,
+                reviewCaptionIndices: reviewCaptionIndices,
             });
         },
     },
     methods: {
+        onNextVideo: function() {
+            const self = this;
+            self.currentReviewCaptionIdx = (self.currentReviewCaptionIdx + 1) % self.captionsList.length;
+            console.log('new currentReviewCaptionIdx', self.currentReviewCaptionIdx);
+        },
         updateExercises: function() {
             // 1. Go through event log, find answered exercises
             // 2. Check if they're still active and haven't been answered this session
@@ -94,15 +139,17 @@ export default {
                         if (row.eventIds[i] >= fromEventId && row.eventIds[i] <= toEventId) {
                             if (row.eventData[i].length != 6) continue;
                             const [hz, pys, tr, correct, captionIdx, answer] = row.eventData[i];
-                            if (self.submittedExercises && self.submittedExercises[captionIdx]) continue; // already did this session
+                            //if (self.submittedExercises && self.submittedExercises[captionIdx]) continue; // already did this session
                             if (! isStarredWordActive(states, hz, pys, tr, threshold)) continue;
 
                             const stateKey = getStateKey('word', hz, pys, tr, null);
                             if (seenStateKeys.has(stateKey)) continue;
                             seenStateKeys.add(stateKey);
 
-                            captions.push(row.captionId);
-                            if (! exercises[row.captionId]) exercises[row.captionId] = [];
+                            if (! exercises[row.captionId]) {
+                                captions.push(row.captionId);
+                                exercises[row.captionId] = [];
+                            }
                             exercises[row.captionId].push(captionIdx);
                         }
                     }
@@ -123,3 +170,16 @@ export default {
     },
 };
 </script>
+<style>
+.reviewpicker {
+    position: fixed !important;
+    top: 0 !important;
+    height: 70px !important;
+    width: 25vw;
+    z-index: 999;
+    left: 50%;
+    transform: translate(-50%, -0%);
+    color: #fff;
+    background: var(--q-dark) !important;
+}
+</style>

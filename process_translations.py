@@ -139,7 +139,25 @@ def _get_translations(all_lines, automated=True):
             httpd.serve_forever()
         except KeyboardInterrupt:
             print('Shutdown, have translation: ', translation)
-            input_translation_lines = [t.strip() for t in translation.split('\n')]
+            input_translation_lines = [t.strip() for t in re.split('\r|\n',translation)]
+
+            # NOTE: here's a hack for when deepl joins two lines, like:
+            # "A Confucian who could speak the Shangshu"1. could 2. speak 7. a Confucian"The court immediately invited him to the capital"
+            split_lines = []
+            for line in input_translation_lines:
+                # TODO: replace with regex
+                for i in range(5):
+                    try:
+                        idx = line.index(f'"{i}.')
+                    except:
+                        idx = None
+                    if idx is not None and idx > 2:  # should be at least "X"1.
+                        split_lines.append(line[:idx])
+                        split_lines.append(line[idx:])
+                        break
+                else:
+                    split_lines.append(line)
+            input_translation_lines = split_lines
 
     else:  # manual copy/paste
         print('\n'.join(all_lines))
@@ -160,6 +178,7 @@ def _get_translations(all_lines, automated=True):
             continue
         cleaned_input_translation_lines.append(t)
 
+    orig_input_translation_lines = input_translation_lines
     input_translation_lines = cleaned_input_translation_lines
 
     if len(input_translation_lines) != len(all_lines):
@@ -167,6 +186,7 @@ def _get_translations(all_lines, automated=True):
         input_translation_lines = [t for t in input_translation_lines if len(t.strip()) > 0]
         if len(input_translation_lines) != len(all_lines):
             # If they still don't match, raise
+            breakpoint()
             raise Exception
 
     return input_translation_lines

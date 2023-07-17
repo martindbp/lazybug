@@ -512,7 +512,9 @@ function backgroundMessageHandler(message, sender, sendResponse) {
     }
     else if (message.type === 'getAnswerHistory') {
         personalDb.log
-        .where('eventIds').between(events.indexOf('EVENT_ANSWER_PY'), events.indexOf('EVENT_ANSWER_TR') + 1)
+        .where('eventIds')
+        .between(events.indexOf('EVENT_ANSWER_PY'), events.indexOf('EVENT_ANSWER_TR') + 1)
+        .and(item => ! item.isReview)
         .reverse()
         .sortBy('sessionTime')
         .then(function(data) {

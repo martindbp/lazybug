@@ -288,6 +288,9 @@ export default {
         lastAnswerCorrect: false,
     }},
     computed: {
+        exercisesOn: function() {
+            return this.$store.state.options.exercisesOn || this.isReviewSession;
+        },
         currentCaptionIdx: function() {
             return this.data.idx;
         },
@@ -474,7 +477,7 @@ export default {
 
             if (
                 self.data !== null &&
-                self.$store.state.options.exercisesOn &&
+                self.exercisesOn &&
                 self.hasExercises &&
                 self.data.t1 - currentTime < 0.10 &&
                 self.data.t1 - currentTime > -0.10 &&
@@ -517,7 +520,7 @@ export default {
         },
         showExercise: function(type, i) {
             return (
-                this.$store.state.options.exercisesOn &&
+                this.exercisesOn &&
                 this.hiddenAndNotPeeking[type][i] &&
                 this.starredStates.words[i] &&
                 this.numCorrect[type][i] < this.$store.state.options.exercisesKnownThreshold
@@ -786,7 +789,8 @@ export default {
             const tr = i === null ? null : this.wordData.tr[i];
 
             updateCorrect(correct ? 1 : -1, k, type, hz, pys, tr, true);
-            this.appendSessionLog([getEvent('answer', type), hz, pys, tr, correct, this.currentCaptionIdx, answer]);
+            const idx = this.data.origIdx || this.currentCaptionIdx;
+            this.appendSessionLog([getEvent('answer', type), hz, pys, tr, correct, idx, answer]);
         },
         applyState: function(type, i, stateType, setState) {
             const d = this.$store.state.DICT;
@@ -813,12 +817,13 @@ export default {
         getCurrentState: function() {
             // We add dt so that we can uniquely identify this event state
             const dt = Date.now() - this.sessionTime;
+            const idx = this.data.origIdx || this.currentCaptionIdx;
             return {
                 data: this.data,
                 translationIdx: this.translationIdx,
                 hidden: this.hiddenStates,
                 dt: dt,
-                captionIdx: this.currentCaptionIdx,
+                captionIdx: idx,
             };
         },
         click: function(type, i = null) {

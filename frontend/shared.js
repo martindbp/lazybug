@@ -84,8 +84,8 @@ function isStarredWordActive(states, hz, pys, tr, exercisesKnownThreshold) {
     const isStarred = getState(states, stateKey, StateStarred, StateNone) == StateStarred;
 
     const numCorrectPerType = getNumCorrectForKey(states, stateKey);
-    let oneActive = true;
-    for (const type of STATE_ORDER) {
+    let oneActive = false;
+    for (const type of ['py', 'tr']) {
         oneActive = oneActive || (numCorrectPerType[type] < exercisesKnownThreshold);
     }
 
@@ -162,6 +162,10 @@ if (BROWSER_EXTENSION && !BACKGROUND_SCRIPT) {
     });
 }
 
+function isNone(val) {
+    return [null, undefined].includes(val);
+}
+
 function fetchCaptions(captionId, callback) {
     sendMessageToBackground({type: 'getCaptions',  'data': {
         'captionId': captionId,
@@ -229,10 +233,10 @@ function fetchPersonalDataToStore(store, callback = null) {
 }
 
 function appendSessionLog(playerId, $store, data) {
-    if ([null, undefined].includes($store.state.captionData)) return;
-
-    const showId = $store.state.playerData[playerId].captionData.show_name;
     const playerData = $store.state.playerData[playerId];
+    if ([null, undefined].includes(playerData.captionData)) return;
+
+    const showId = playerData.captionData.show_name;
     const [showName, seasonIdx, seasonName, episodeIdx, episodeName] = getShowSeasonEpisode(getShowInfo(playerId, null, $store.state), playerData.captionId);
     const sessionTime = playerData.sessionTime;
     console.log('Append log', playerData.captionId, playerData.captionHash, sessionTime, data, showName, seasonName, episodeName);
@@ -242,6 +246,7 @@ function appendSessionLog(playerId, $store, data) {
             captionId: playerData.captionId,
             captionHash: playerData.captionHash,
             sessionTime: sessionTime,
+            isReview: !!playerData.reviewCaptionIndices,
             showId: showId,
             seasonIdx: seasonIdx,
             episodeIdx: episodeIdx,
@@ -341,7 +346,7 @@ function findVideoInShowInfo(showInfo, captionId) {
 }
 
 function captionArrayToDict(lines, idx, captionData) {
-    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments, lineTimingOffset] = lines[idx];
+    let [texts, t0s, t1s, boundingRects, charProbs, logprob, data_hash, translations, alignments, lineTimingOffset, origIdx] = lines[idx];
 
     if (boundingRects.length === 1 && boundingRects[0] === null) {
         // The video has soft captions
@@ -378,6 +383,7 @@ function captionArrayToDict(lines, idx, captionData) {
         translations: translations,
         alignments: alignments,
         idx: idx,
+        origIdx: origIdx,
     };
 }
 

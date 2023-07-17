@@ -42,8 +42,6 @@ import OptionsDialog from './OptionsDialog.vue'
 const DEFAULT_WIDTH = 916;
 const CAPTION_END_BUFFER_TIME = 1;
 
-let lastCaptionIdxGlobal = 0;
-
 export default {
     mixins: [mixin],
     components: {
@@ -51,7 +49,12 @@ export default {
         CaptionRect,
         OptionsDialog,
     },
-    props: ['playerId', 'AVElement', 'captionId', 'videoDuration', 'reviewCaptionIndices'],
+    props: [
+        'playerId',
+        'AVElement',
+        'captionId',
+        'videoDuration',
+    ],
     data: function() {
         return {
             currTime: -1000.5,
@@ -69,6 +72,7 @@ export default {
             translationSource: null, // human vs. machine
             pauseDuration: null,
             keyboardListener: null,
+            sentNextVideoEvent: false,
         };
     },
     mounted: function() {
@@ -85,9 +89,9 @@ export default {
         if (this.resizeObserver !== null) this.resizeObserver.disconnect();
     },
     beforeUpdate: function() {
-        if ([null, undefined].includes(this.$refs.captionroot) || [null, undefined].includes(this.$refs.captionroot.$el)) return;
+        if (isNone(this.$refs.captionroot) || isNone(this.$refs.captionroot.$el)) return;
 
-        if (this.currCaption === null && this.minHeight === null) {
+        if (isNone(this.currCaption) && isNone(this.minHeight)) {
             // Since we're changing to an empty caption from a non-empty one, we transfer the min height to the empty one,
             // so it doesn't collapse
             let rect = this.$refs.captionroot.$el.getBoundingClientRect();
@@ -101,10 +105,10 @@ export default {
             self.updateCaptionPositionBlur();
             if (
                 ! self.$store.state.captionDocked &&
-                ! [null, undefined].includes(self.$refs.captionroot) &&
-                ! [null, undefined].includes(self.$refs.captionroot.$el)
+                ! isNone(self.$refs.captionroot) &&
+                ! isNone(self.$refs.captionroot.$el)
             ) {
-                self.$refs.captionroot.$el.style.minHeight = self.minHeight === null ? '0px' : self.minHeight + 'px';
+                self.$refs.captionroot.$el.style.minHeight = isNone(self.minHeight) ? '0px' : self.minHeight + 'px';
 
                 // Make sure the root is always as wide as the menu
                 const menuWidth = self.$refs.captionroot.$refs.menu.$el.getBoundingClientRect().width;
@@ -117,7 +121,7 @@ export default {
             immediate: true,
             handler: function() {
                 this.fetchCaptionMaybe();
-                lastCaptionIdxGlobal = 0;
+                this.currTime = -1000.5;
             }
         },
         AVElement: {
@@ -153,12 +157,32 @@ export default {
             this.updateCaptionPositionBlur();
         },
         currentCaptionIdx: function(newIdx, oldIdx) {
-            if (newIdx === oldIdx) return;
-            this.$store.commit('setPlayerData', {playerId: this.playerId, captionIdx: newIdx});
+            if (JSON.stringify(newIdx) === JSON.stringify(oldIdx)) return;
+            console.log('currentCaptionIdx', newIdx, oldIdx);
 
             const captionData = this.captionData;
 
-            if (captionData === null || this.currentCaptionIdx === null) {
+            if (this.playerData.reviewCaptionIndices && Array.isArray(newIdx)) {
+                if (newIdx[1] !== null) {
+                    // Go straight to next caption
+                    const nextLine = captionArrayToDict(captionData.lines, newIdx[1], captionData);
+                    this.videoAPI.setCurrentTime(nextLine.t0 + 1e-3);
+                }
+                else if (! this.sentNextVideoEvent) {
+                    this.videoAPI.pause();
+                    this.paused = true;
+                    console.log('Caption', oldIdx, newIdx, this.AVElement);
+                    this.sentNextVideoEvent = true;
+                    this.AVElement.dispatchEvent(new Event('nextVideo'));
+                }
+            }
+            else if (this.sentNextVideoEvent && newIdx !== null) {
+                this.sentNextVideoEvent = false;
+            }
+
+            this.$store.commit('setPlayerData', {playerId: this.playerId, captionIdx: newIdx});
+
+            if (isNone(captionData) || isNone(this.currentCaptionIdx)) {
                 this.prevCaption = null;
             }
             else if (this.findPrevNextCaptionIdx(-1) !== null) {
@@ -169,7 +193,7 @@ export default {
                 this.prevCaption = null;
             }
 
-            if (captionData === null || this.currentCaptionIdx === null || Array.isArray(this.currentCaptionIdx)) {
+            if (isNone(captionData) || isNone(this.currentCaptionIdx) || Array.isArray(this.currentCaptionIdx)) {
                 if (this.currCaption !== null) {
                     this.currCaption = null;
                     this.minHeight = null;  // when the caption changes we reset any min height set
@@ -183,7 +207,7 @@ export default {
                 this.appendSessionLog([eventsMap['EVENT_SHOW_CAPTION_IDX'], this.currentCaptionIdx, dt]);
             }
 
-            if (captionData === null || this.currentCaptionIdx === null) {
+            if (isNone(captionData) || isNone(this.currentCaptionIdx)) {
                 this.nextCaption = null;
             }
             else if (this.findPrevNextCaptionIdx(1) !== null) {
@@ -197,23 +221,14 @@ export default {
     methods: {
         findPrevNextCaptionIdx: function(direction = -1) {
             const captionData = this.captionData;
-            let currIdx = Array.isArray(this.currentCaptionIdx) ? this.currentCaptionIdx[0] === null ? this.currentCaptionIdx[1] : this.currentCaptionIdx[0] : this.currentCaptionIdx;
-            if (currIdx === null) return null;
-            if (this.reviewCaptionIndices) {
-                let currentReviewIdx = this.reviewCaptionIndices.indexOf(currIdx);
-                if (currentReviewIdx < 0) return null;
-                if (direction < 0 && currentReviewIdx == 0) return null;
-                if (direction > 0 && currentReviewIdx == this.reviewCaptionIndices.length - 1) return null;
-                return this.reviewCaptionIndices[currentReviewIdx + direction];
-            }
-            else {
-                if (direction < 0 && currIdx == 0) return null;
-                if (direction > 0 && currIdx == captionData.lines.length - 1) return null;
-                return currIdx + direction;
-            }
+            let currIdx = Array.isArray(this.currentCaptionIdx) ? isNone(this.currentCaptionIdx[0]) ? this.currentCaptionIdx[1] : this.currentCaptionIdx[0] : this.currentCaptionIdx;
+            if (isNone(currIdx)) return null;
+            if (direction < 0 && currIdx == 0) return null;
+            if (direction > 0 && currIdx == captionData.lines.length - 1) return null;
+            return currIdx + direction;
         },
         fetchCaptionMaybe: function() {
-            if (this.captionId === null) {
+            if (isNone(this.captionId)) {
                 this.$store.commit('setCaptionIdDataHash', {playerId: this.playerId, id: null, data: null, hash: null});
                 return;
             }
@@ -301,7 +316,7 @@ export default {
         setUpdateInterval: function() {
             const self = this;
             self.currentTimeInterval = setInterval(() => {
-                if (self.captionData === null || [null, undefined].includes(self.videoAPI)) return;
+                if (isNone(self.captionData) || isNone(self.videoAPI)) return;
                 const newTime = self.videoAPI.getCurrentTime();
                 if (self.paused && self.automaticallyPausedThisCaption && ! (self.seeked || self.seekedFromMenu)) {
                     return;
@@ -357,9 +372,9 @@ export default {
             }, 10);
         },
         updateCaptionPositionBlur: function() {
-            if ([null, undefined].includes(this.AVElement) || [null, undefined].includes(this.$refs.captionroot)) return;
+            if (isNone(this.AVElement) || isNone(this.$refs.captionroot)) return;
             let videoRect = this.AVElement.getBoundingClientRect();
-            if ([null, undefined].includes(videoRect)) return;
+            if (isNone(videoRect)) return;
             let scrollY = getClosestParentScroll(this.$refs.captionroot.$el, 'y');
             let scrollX = getClosestParentScroll(this.$refs.captionroot.$el, 'x');
             this.$refs.captionroot.$el.style.left = ((videoRect.left+scrollX) + 0.1 * videoRect.width + this.captionOffset[0]) + 'px';
@@ -370,27 +385,27 @@ export default {
         },
         getCurrentCaptionIdxRange: function(withTimingOffset) {
             const captionData = this.captionData;
-            if (captionData === null) return null;
+            if (isNone(captionData)) return null;
 
             const lines = captionData.lines;
-            const lastSeenCaption = captionArrayToDict(lines, lastCaptionIdxGlobal, captionData);
+            const lastSeenCaption = captionArrayToDict(lines, this.lastCaptionIdx, captionData);
             const lastSeenCaptionT0 = lastSeenCaption.t0 + (withTimingOffset ? lastSeenCaption.timingOffset : 0);
             if (this.currTime < lastSeenCaptionT0) {
                 // Start over search from the beginning
-                lastCaptionIdxGlobal = 0;
+                this.lastCaptionIdx = 0;
             }
 
-            for (let i = lastCaptionIdxGlobal; i < lines.length; i++) {
+            for (let i = this.lastCaptionIdx; i < lines.length; i++) {
                 let caption = captionArrayToDict(lines, i, captionData);
                 let captionT0 = caption.t0 + (withTimingOffset ? caption.timingOffset : 0)
                 let prevCaption = i > 0 ? captionArrayToDict(lines, i-1, captionData) : null;
                 if (this.currTime >= captionT0 && this.currTime <= caption.t1) {
-                    lastCaptionIdxGlobal = i;
+                    this.lastCaptionIdx = i;
                     return i;
                 }
                 else if (prevCaption && this.currTime > prevCaption.t1 && this.currTime < captionT0) {
                     // In between two lines
-                    lastCaptionIdxGlobal = i-1;
+                    this.lastCaptionIdx = i-1;
 
                     // If we're still close to the prevCaption, we keep it
                     if (this.currTime < Math.min(prevCaption.t1 + CAPTION_END_BUFFER_TIME, captionT0)) {
@@ -415,7 +430,7 @@ export default {
     },
     computed: {
         isLikelyAnAd: function() {
-            if ([null, undefined, 0, NaN].includes(this.videoDuration) || this.captionData === null) return false;
+            if ([null, undefined, 0, NaN].includes(this.videoDuration) || isNone(this.captionData)) return false;
 
             const captionDuration = this.captionData.video_length;
             // Youtube iFrame API has a duration resolution of 1s
@@ -432,10 +447,10 @@ export default {
         isLoading: function() {
             return (
                 this.captionId !== null && (
-                    getShowInfo(this.playerId, this.$store) === null ||
-                    this.captionData === null ||
-                    this.$store.state.DICT === null ||
-                    this.$store.state.HSK_WORDS === null
+                    isNone(getShowInfo(this.playerId, this.$store)) ||
+                    isNone(this.captionData) ||
+                    isNone(this.$store.state.DICT) ||
+                    isNone(this.$store.state.HSK_WORDS)
                 )
             );
         },
@@ -443,7 +458,7 @@ export default {
         captionOffset: function() { return this.$store.state.captionOffset; },
         captionFontScale: function() { return this.$store.state.captionFontScale; },
         videoFrameSize: function() {
-            if (this.captionData === null) return null;
+            if (isNone(this.captionData)) return null;
             return this.captionData['frame_size'];
         },
         currentCaptionIdx: function() {

@@ -29,10 +29,7 @@ const mixin = {
             }
         },
         showInfo: function(newData, oldData) { // fetch Discourse comments for show
-            if (
-                this.season === null ||
-                this.episode === null
-            ) {
+            if (isNone(this.season) || isNone(this.episode)) {
                 return;
             }
 
@@ -62,6 +59,9 @@ const mixin = {
         },
     },
     methods: {
+        log: function(str) {
+            console.log(str);
+        },
         getSeasonName: function(i) {
             if (
                 this.season === null ||
@@ -348,7 +348,7 @@ const mixin = {
             this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
             const showInfo = getShowInfo('player', this.$store);
             if (showInfo.embeddable === false) {
-                this.$store.commit('setNonEmbeddableVideoSelected', this.showInfo);
+                this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
                 this.$store.commit('setPlayerData', {playerId: 'player', showId: null});
                 if (this.$store.state.hasLazybugExtension) {
                     this.goExternal();
@@ -573,6 +573,10 @@ const mixin = {
             get: function() { return this.playerData ? this.playerData.captionIdx : null; },
             set: function(val) { this.$store.commit('setPlayerData', {playerId: this.playerId, captionIdx: val}); },
         },
+        lastCaptionIdx: {
+            get: function() { return this.playerData ? this.playerData.lastCaptionIdx : null; },
+            set: function(val) { this.$store.commit('setPlayerData', {playerId: this.playerId, lastCaptionIdx: val}); },
+        },
         seasonName: function() {
             return getSeasonName(this.showInfo, this.season);
         },
@@ -599,6 +603,9 @@ const mixin = {
         },
         sessionTime: function() {
             return this.playerData ? this.playerData.sessionTime : null;
+        },
+        isReviewSession: function() {
+            return this.playerData ? this.playerData.reviewCaptionIndices : null;
         },
         submittedExercises: function() {
             return this.playerData ? this.playerData.submittedExercises : null;

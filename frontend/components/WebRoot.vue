@@ -122,7 +122,7 @@
             <q-page :padding="!['player', 'review'].includes(page) && isDesktop">
                 <PlayerPage class="playerpage" v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ContentPage v-show="page === 'content'" />
-                <ReviewPage class="playerpage" v-show="page === 'review'" />
+                <ReviewPage class="playerpage" v-if="page === 'review'" />
                 <HistoryPage v-if="page === 'history'" />
                 <WordTable v-if="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
