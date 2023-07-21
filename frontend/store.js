@@ -274,6 +274,23 @@ store = new Vuex.Store({
         setNonEmbeddableVideoSelected(state, val) {
             state.nonEmbeddableVideoSelected = val;
         },
+        resetPlayerData(state, playerId) {
+            if (!state.playerData[playerId]) {
+                state.playerData[playerId] = {};
+            }
+            const playerData = state.playerData[playerId];
+            playerData.captionId = null;
+            playerData.sessionTime = null;
+            playerData.lastCaptionIdx = null;
+            playerData.submittedExercises = null;
+            playerData.lastCaptionIdx = null;
+            playerData.showId = null;
+            playerData.season = null;
+            playerData.episode = null;
+            playerData.navigateToCaptionIdx = null;
+            playerData.captionData = null;
+            playerData.captionHash = null;
+        },
         setPlayerData(state, val) {
             if (!state.playerData[val.playerId]) {
                 state.playerData[val.playerId] = {};
@@ -338,14 +355,6 @@ store = new Vuex.Store({
             playerData.lastCaptionIdx = 0;
             playerData.submittedExercises = {};
             playerData.lastCaptionIdx = 0;
-            if (prev) {
-                playerData.showId = null;
-                playerData.season = null;
-                playerData.episode = null;
-                playerData.navigateToCaptionIdx = null;
-                playerData.captionData = null;
-                playerData.captionHash = null;
-            }
             if (BROWSER_EXTENSION && prev === null) {
                 this.commit('setURL', state.url); // in case this was loaded after URL
             }
@@ -533,6 +542,7 @@ store = new Vuex.Store({
                 // Browser Extension Logic
                 //
 
+                this.commit('resetPlayerData', 'player');
                 this.commit('setCaptionId', {playerId: 'player', value: extractCurrentCaptionId(state.STRINGS, state.localVideoHash, url.href)});
                 const showInfo = getShowInfo('player', null, state);
                 if (isNone(state.captionData) || isNone(showInfo)) return;
@@ -551,6 +561,7 @@ store = new Vuex.Store({
                 const parts = url.pathname.split('/').filter((s) => s.length > 0);
 
                 if (parts[0] === 'player') {
+                    this.commit('resetPlayerData', 'player');
                     const showId = parts[1];
                     if (parts.length >= 4) {
                         // Pattern: player/show/season/episode/(caption)

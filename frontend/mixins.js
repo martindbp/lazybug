@@ -345,6 +345,7 @@ const mixin = {
             });
         },
         setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
+            this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
             const showInfo = getShowInfo('player', this.$store);
             if (showInfo.embeddable === false) {
@@ -548,6 +549,10 @@ const mixin = {
         playerData: function() {
             if (!this.playerId) return null;
             return this.$store.state.playerData[this.playerId];
+        },
+        showId: function() {
+            if (!this.playerId || !this.playerData) return null;
+            return this.playerData.showId;
         },
         showInfo: function() {
             if (!this.playerId || !this.playerData) return null;

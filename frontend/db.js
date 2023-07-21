@@ -125,7 +125,8 @@ const PERSONAL_DB_VERSIONS = {
                 }
             });
         });
-
+    },
+    '8': function(personalDb) {
         // Add isReview index
         personalDb.version(8).stores({
             states: 'id',

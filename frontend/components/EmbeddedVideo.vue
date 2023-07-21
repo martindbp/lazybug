@@ -53,7 +53,7 @@ export default {
         this.initYoutube();
         // If the video iframe gets focus, we keyboard shortcuts stop working, so we need to refocus the caption
         this.focusInterval = setInterval(function() {
-            if (document.activeElement.tagName === 'IFRAME' && this.videoAPI && ! this.videoAPI.isPaused()) {
+            if (document.activeElement.tagName === 'IFRAME' && self.videoAPI && ! self.videoAPI.isPaused()) {
                 focus(self.$refs.embeddedcaption);
             }
         }, 100);

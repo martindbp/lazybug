@@ -47,6 +47,7 @@ export default {
 
             const AVElement = document.querySelector(this.AVElementSelector);
             if (AVElement) {
+                this.$store.commit('resetPlayerData', 'extension');
                 this.$store.commit('setPlayerData', {playerId: 'extension', AVElement: AVElement, videoDuration: AVElement.duration});
             }
         }

@@ -97,6 +97,7 @@ export default {
               return a - b;
             });
             console.log('new currentReviewCaptionIdx', this.currentReviewCaptionIdx);
+            this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setCaptionId', {playerId: 'review', value: this.reviewCaptionId});
             this.$store.commit('setPlayerData', {
                 playerId: 'review',

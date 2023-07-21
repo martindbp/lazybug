@@ -104,7 +104,7 @@
                         {{ sm2tr(hz) }}
                     </span>
                     <span v-if="hiddenAndNotPeeking.hz[i] || (hiddenStates.hz[i] && !$store.state.peekStates.hz[i] && $store.state.peekStates.rows.hz)" class="iconcard peek" v-html="eyecon"></span>
-                    <span v-else-if="purePeekStates.hz[i] && !mouseHasNotMovedAfterPeeking" class="iconcard peek" v-html="pinIcon"></span>
+                    <span v-else-if="purePeekStates.hz[i] && !mouseHasNotMovedAfterPeeking[i]" class="iconcard peek" v-html="pinIcon"></span>
                     <span v-else-if="!hiddenStates.hz[i]" class="iconcard peek" v-html="hideIcon"></span>
                     <ContentContextMenu
                         type="word"
