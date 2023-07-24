@@ -116,6 +116,9 @@
                             />
                         </q-item-section>
                     </q-item>
+                    <q-item dense>
+                        <q-btn label="Clear Personal Translations" @click="clearPersonalExerciseTranslations" />
+                    </q-item>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="keyboard" style="width: 400px">
                     <div class="q-gutter-sm">
@@ -271,6 +274,9 @@ export default {
         },
     },
     methods: {
+        clearPersonalExerciseTranslations: function() {
+            this.$store.commit('setOption', {key: 'personalExerciseTranslations', value: {}});
+        },
         clickClose: function(event) {
             // Remove the "lazybugquasardialog" class from the dialog parent, otherwise there's some flickering
             let dialog = document.querySelector('.lazybugquasardialog');

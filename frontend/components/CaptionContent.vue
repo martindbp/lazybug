@@ -528,14 +528,27 @@ export default {
         },
         flipAnswer: function(submitted, type, i) {
             submitted[i] = !submitted[i]
+            const input = type === 'py'? this.pyInputs[i].input : this.trInputs[i].input;
             if (submitted[i]) {
+                const hz = this.wordData.hz[i];
+                const pyDiacritical = this.wordData.py[i].toLowerCase();
+                const key = `${hz}-${pyDiacritical}-${type}`;
+                let translations = this.$store.state.options.personalExerciseTranslations[key];
+                if (translations) {
+                    translations.push(input);
+                }
+                else {
+                    translations = [input];
+                }
+
+                this.$store.commit('setDeepOption', {key: 'personalExerciseTranslations', key2: key, value: translations});
                 this.$q.notify({
                     type: 'positive',
                     message: 'Overridden as correct',
                     position: 'top',
                 });
             }
-            this.applyAnswer(submitted[i], this.pyInputs[i].input, type, i);
+            this.applyAnswer(submitted[i], input, type, i);
         },
         getChars: function(ops) {
             let chars = [];
@@ -603,7 +616,8 @@ export default {
             }
             const showDictEntries = this.$store.state.SHOWS_DICTIONARY[hz] || [];
             const showDictTranslations = showDictEntries[pyDiacritical] || [];
-            let possibleTranslations = cedictTranslations.concat(showDictTranslations);
+            const personalExerciseTranslations = this.$store.state.options.personalExerciseTranslations[`${hz}-${pyDiacritical}-tr`] || [];
+            let possibleTranslations = cedictTranslations.concat(showDictTranslations).concat(personalExerciseTranslations);
             possibleTranslations.push(this.wordData.tr[idx]);
             let minResult = null;
             for (const translation of possibleTranslations) {

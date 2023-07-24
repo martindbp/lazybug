@@ -31,6 +31,8 @@ const OPTIONS_DEFAULT = {
     exercisesKnownThreshold: DEFAULT_EXERCISES_KNOWN_THRESHOLD,
     pyExerciseDistanceThreshold: DEFAULT_PY_EXERCISE_DISTANCE_THRESHOLD,
     trExerciseDistanceRatioThreshold: DEFAULT_TR_EXERCISE_DISTANCE_RATIO_THRESHOLD,
+    personalExerciseTranslations: {},
+    personalKnownVocabulary: [],
     seenTooltips: {
         pinyin: false,
         grading: false,

@@ -134,6 +134,19 @@ const PERSONAL_DB_VERSIONS = {
             log: '[captionId+captionHash+sessionTime], sessionTime, captionHash, *eventIds, synced, isReview',
         });
     },
+    '9': function(personalDb) {
+        // Add personal exercise translations and personal known vocabulary list
+        personalDb.version(9).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.personalExerciseTranslations = {};
+                    item.value.personalKnownVocabulary = [];
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null, name = 'lazybug-personal') {
