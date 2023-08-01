@@ -391,7 +391,7 @@ store = new Vuex.Store({
                 state.showDictionaryRange = val.range;
                 if (val.range[0] >= 0) {
                     appendSessionLog(
-                        'player',
+                        val.playerId,
                         this,
                         [eventsMap['EVENT_SHOW_DICTIONARY_RANGE'], val.range[0], val.range[1]]
                     );

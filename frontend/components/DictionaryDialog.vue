@@ -88,7 +88,7 @@ export default {
         },
         showRange: {
             get: function() { return this.$store.state.showDictionaryRange; },
-            set: function(val) { this.$store.commit('setShowDictionary', {range: val}); },
+            set: function(val) { this.$store.commit('setShowDictionary', {range: val, playerId: this.playerId}); },
         },
         dictEntries: function() {
             if (this.$store.state.DICT === null || this.showRange[0] < 0) return [];

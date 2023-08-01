@@ -782,7 +782,7 @@ export default {
 
             if (action === 'dict') {
                 let [startIdx, endIdx, ...rest] = this.data.alignments[i];
-                this.$store.commit('setShowDictionary', {value: true, range: [startIdx, endIdx]});
+                this.$store.commit('setShowDictionary', {value: true, range: [startIdx, endIdx], playerId: this.playerId});
             }
             else if (action === 'copy') {
                 if (type === 'translation') {

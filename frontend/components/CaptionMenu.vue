@@ -124,7 +124,7 @@ export default {
         },
         showDictionary: function(event) {
             if (this.data) {
-                this.$store.commit('setShowDictionary', {value: true});
+                this.$store.commit('setShowDictionary', {value: true, playerId: this.playerId});
             }
         },
         moveMouseDown: function(event) {
