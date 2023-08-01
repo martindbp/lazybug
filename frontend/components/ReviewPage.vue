@@ -68,7 +68,10 @@ export default {
             if (this.showInfo.type !== 'tv') {
                 return resolveShowName(this.showInfo.name);
             }
-            return `${resolveShowName(this.showInfo.name)} - ${getSeasonName(this.showInfo, this.season)} - ${getEpisodeName(this.showInfo, this.season, this.episode)}`;
+            const captionStr = `${resolveShowName(this.showInfo.name)} - ${getSeasonName(this.showInfo, this.season)} - ${getEpisodeName(this.showInfo, this.season, this.episode)}`;
+
+            const idxStr = `${this.currentCaptionIdx + 1}/${this.captionData.lines.length}`;
+            return `${captionStr} - ${idxStr}`;
         },
     },
     watch: {
