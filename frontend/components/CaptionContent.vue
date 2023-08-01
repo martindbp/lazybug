@@ -406,6 +406,7 @@ export default {
                     this.$store.commit('resetPeekStates', this.wordData.hz.length);
                     if (this.$store.state.options.useSmartSubtitles) {
                         this.applyLvlStates();
+                        this.applyPersonalKnownVocab();
                         this.applyComponents();
                         this.applyCompoundWordsNotInDict();
                         this.applySimpleCompounds();
@@ -896,13 +897,37 @@ export default {
         autoHideWord: function(i) {
             this.appendSessionLog([getEvent('hide_auto', 'word'), i]);
         },
+        applyPersonalKnownVocab: function() {
+            const d = this.$store.state.DICT;
+            const personalKnownVocabulary = this.$store.state.options.personalKnownVocabulary;
+            const k = this.$store.state.states;
+            if (isNone(d) || isNone(k) || isNone(personalKnownVocabulary)) return;
+
+            for (let i = 0; i < this.wordData.hz.length; i++) {
+                const hz = this.wordData.pys[i] === null ? '' : this.wordData.hz[i];
+                if (hz.length === 0) continue;
+                const pys = this.wordData.pys[i];
+                const tr = this.wordData.tr[i];
+                const key = this.stateKey('word', i);
+                if (
+                    getState(k, key, StateHidden, null) === null &&
+                    (
+                        getState(this.personalKnownVocabularyStates, key, StateHidden, StateNone) === StateHidden
+                    )
+                ) {
+                    console.log('PERSONAL VOCAB: Marking', 'word', hz, pys, tr, 'as hidden');
+                    this.autoHideWord(i);
+                    applyState(d, k, 'word', hz, pys, tr, this.wordData.translation, StateHidden, StateHidden, true, true);
+                }
+            }
+        },
         applyLvlStates: function() {
             const d = this.$store.state.DICT;
             const k = this.$store.state.states;
-            if (d === null || k === null) return;
+            if (isNone(d) || isNone(k)) return;
 
             for (let i = 0; i < this.wordData.hz.length; i++) {
-                const hz = this.wordData.pys[i] == null ? '' : this.wordData.hz[i];
+                const hz = this.wordData.pys[i] === null ? '' : this.wordData.hz[i];
                 if (hz.length === 0) continue;
                 const pys = this.wordData.pys[i];
                 const tr = this.wordData.tr[i];

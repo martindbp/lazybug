@@ -16,9 +16,8 @@
         <SvgButton title="Go to next line" @click="next" name="play-track-next" style="margin-right: 10px" />
         <SvgButton title="Peek all" @click="peekAll" name="eye" style="margin-right: 10px" />
         <SvgButton title="Dictionary" @click="showDictionary" name="dictionary" style="margin-right: 10px"/>
-        <span :class="{highlightbutton: showOptionsTooltip}">
+        <span >
             <SvgButton title="Options" @click="showOptions" name="options"/>
-            <q-tooltip bg-amber text-black shadow-4 v-model="showOptionsTooltip">You can turn off exercises in the options</q-tooltip>
         </span>
         <DictionaryDialog v-bind:caption="data" />
     </div>
@@ -208,10 +207,6 @@ export default {
     },
     computed: {
         captionOffset: function() { return this.$store.state.captionOffset; },
-        showOptionsTooltip: {
-            get: function() { return this.$store.state.showTooltip.options; },
-            set: function(val) { this.$store.commit('setShowTooltip', {tooltip: 'options', value: val}); },
-        },
     }
 };
 </script>
@@ -246,9 +241,5 @@ export default {
 
 #extroot .captionmenu .svgbutton {
     top: -5px; /* WHYYYY? */
-}
-
-.highlightbutton {
-    outline: 1px solid yellow;
 }
 </style>

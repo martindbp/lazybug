@@ -57,3 +57,26 @@ function translateDiacriticalToNumber(s) {
 function removeDiacriticals(s) {
     return translateDiacriticalToNumber(s).replace(/[0-5]/g, '');
 }
+
+function isHanzi(char) {
+    let ranges = [['\u4E00', '\u9FFF'], ['\u3400', '\u4DBF'], ['\uF900', '\uFAFF']];
+    for(let i = 0; i < ranges.length; i++) {
+        let start = ranges[i][0].charCodeAt(0);
+        let end = ranges[i][1].charCodeAt(0);
+        if(char.charCodeAt(0) >= start && char.charCodeAt(0) <= end) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function filterTextHanzi(text) {
+    let result = '';
+    for(let i = 0; i < text.length; i++) {
+        let char = text.charAt(i);
+        if(isHanzi(char)) {
+            result += char;
+        }
+    }
+    return result;
+}

@@ -15,26 +15,27 @@
 
             <q-tab-panels dark v-model="tab">
                 <q-tab-panel class="no-scroll" name="subtitle" style="width: 400px">
-                    <q-item-label header>Chinese characters</q-item-label>
                     <q-btn-toggle
+                        size="sm"
                         push
                         glossy
                         v-model="characterSet"
                         toggle-color="primary"
                         :options="[
-                            {label: 'Simplified', value: 'sm'},
-                            {label: 'Traditional', value: 'tr'}
+                            {label: 'Simplified Characters', value: 'sm'},
+                            {label: 'Traditional Characters', value: 'tr'}
                         ]"
                     />
-                    <q-item-label header>Prefer translation (if available)</q-item-label>
+                    <q-item-label header>Prefer</q-item-label>
                     <q-btn-toggle
+                        size="sm"
                         push
                         glossy
                         v-model="displayTranslation"
                         toggle-color="primary"
                         :options="[
-                            {label: 'Human', value: 0},
-                            {label: 'Machine', value: 1}
+                            {label: 'Human translations', value: 0},
+                            {label: 'Machine translations', value: 1}
                         ]"
                     />
                     <q-item-label header>Smart Subtitles</q-item-label>
@@ -42,13 +43,20 @@
                         <q-checkbox v-model="useSmartSubtitles" label="Use Smart Subtitles" />
                     </div>
                     <div v-if="useSmartSubtitles">
-                        Select the HSK level for the words you want to hide automatically
+                        <q-item-label header>Your HSK level</q-item-label>
                         <q-item dense>
                             <q-item-section>
                                 <HSKLevelSlider />
                             </q-item-section>
                         </q-item>
 
+                        <q-item-label header>Add word list</q-item-label>
+                        <q-item dense>
+                            <q-btn color="primary" label="Upload Word List" @click="uploadWordList" size="sm" />
+                            <q-btn style="margin-left: 5px" v-if="$store.state.options.personalKnownVocabulary.length > 0" color="red" label="Clear Words" @click="clearWordList" size="sm" />
+                        </q-item>
+
+                        <q-item-label header>Show</q-item-label>
                         <q-checkbox v-model="showPy" label="Show pinyin row" />
                         <!--<q-checkbox v-model="showHz" label="Show hanzi row" />-->
                         <q-checkbox v-model="showTr" label="Show translation row" />
@@ -117,7 +125,7 @@
                         </q-item-section>
                     </q-item>
                     <q-item dense>
-                        <q-btn label="Clear Personal Translations" @click="clearPersonalExerciseTranslations" />
+                        <q-btn color="primary" label="Clear Personal Translations" @click="clearPersonalExerciseTranslations" />
                     </q-item>
                 </q-tab-panel>
                 <q-tab-panel class="no-scroll" name="keyboard" style="width: 400px">
@@ -274,6 +282,53 @@ export default {
         },
     },
     methods: {
+        clearWordList: function() {
+            const count = this.$store.state.options.personalKnownVocabulary.length;
+            this.$store.commit('setOption', {key: 'personalKnownVocabulary', value: []});
+            this.$q.dialog({
+                title: 'Done',
+                message: `Cleared ${count} words`,
+            });
+        },
+        uploadWordList: function() {
+            var fileChooser = document.createElement("input");
+            fileChooser.style.display = 'none';
+            fileChooser.type = 'file';
+
+            const self = this;
+            fileChooser.addEventListener('change', function (evt) {
+                var f = evt.target.files[0];
+                if(f) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        const lines = e.target.result.split('\n');
+                        const hanzis = [];
+                        for (const line of lines) {
+                            const hanzi = filterTextHanzi(line);
+                            if (hanzi.length > 0) hanzis.push(hanzi);
+                        }
+
+
+                        const currWords = new Set(self.$store.state.options.personalKnownVocabulary);
+                        const newWords = new Set(hanzis);
+
+                        const union = new Set([...currWords, ...hanzis]);
+                        const numAdded = union.size - currWords.size;
+                        const duplicates = newWords.size - numAdded;
+
+                        self.$store.commit('setOption', {key: 'personalKnownVocabulary', value: [...union]});
+                        self.$q.dialog({
+                            title: 'Success',
+                            message: `Added ${numAdded} words, ${duplicates} duplicates`,
+                        });
+                    }
+                    reader.readAsText(f);
+                }
+            });
+
+            document.body.appendChild(fileChooser);
+            fileChooser.click();
+        },
         clearPersonalExerciseTranslations: function() {
             this.$store.commit('setOption', {key: 'personalExerciseTranslations', value: {}});
         },

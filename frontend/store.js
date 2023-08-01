@@ -197,9 +197,6 @@ store = new Vuex.Store({
         setHasLazybugExtension(state) {
             state.hasLazybugExtension = true;
         },
-        setShowTooltip(state, val) {
-            state.showTooltip[val.tooltip] = val.value;
-        },
         setCloseAllDialogs(state) {
             for (const key of Object.keys(state.showDialog)) {
                 state.showDialog[key] = false;

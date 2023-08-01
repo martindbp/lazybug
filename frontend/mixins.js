@@ -426,10 +426,40 @@ const mixin = {
         createSession() {
             createSession(this.$store.state);
         },
-        getLvlStates: function(type, greaterThan, level) {
+        getStatesFromHanzis: function(type, hanzis) {
             if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
             const d = this.$store.state.DICT;
             const states = {};
+
+            for (const hz of hanzis) {
+                let entries = d[hz];
+                let entryPys = [];
+                if (entries === undefined) {
+                    // No entry, so pick all combinations of single char pys
+                    const charPyOptions = [];
+                    for (const c of hz) {
+                        const charEntryPys = [];
+                        for (let entry of d[c]) {
+                            charEntryPys.push(dictArrayToDict(entry).pys)
+                        }
+                        charPyOptions.push(charEntryPys);
+                    }
+                    combinations(charPyOptions, entryPys);
+                }
+                else {
+                    for (const entry of entries) {
+                        entryPys.push(dictArrayToDict(entry).pys);
+                    }
+                }
+
+                for (const pys of entryPys) {
+                    applyState(d, states, type, hz, pys, null, null, StateHidden, StateHidden, true, false);
+                }
+            }
+            return states;
+        },
+        getLvlStates: function(type, greaterThan, level) {
+            let states = {};
             for (let lvl = 1; lvl <= 6; lvl++) {
                 let apply = false;
                 if (greaterThan) apply = lvl > level;
@@ -437,31 +467,8 @@ const mixin = {
 
                 if (!apply) continue;
 
-                for (const hz of this.$store.state.HSK_WORDS[lvl-1]) {
-                    let entries = d[hz];
-                    let entryPys = [];
-                    if (entries === undefined) {
-                        // No entry, so pick all combinations of single char pys
-                        const charPyOptions = [];
-                        for (const c of hz) {
-                            const charEntryPys = [];
-                            for (let entry of d[c]) {
-                                charEntryPys.push(dictArrayToDict(entry).pys)
-                            }
-                            charPyOptions.push(charEntryPys);
-                        }
-                        combinations(charPyOptions, entryPys);
-                    }
-                    else {
-                        for (const entry of entries) {
-                            entryPys.push(dictArrayToDict(entry).pys);
-                        }
-                    }
-
-                    for (const pys of entryPys) {
-                        applyState(d, states, type, hz, pys, null, null, StateHidden, StateHidden, true, false);
-                    }
-                }
+                const lvlStates = this.getStatesFromHanzis(type, this.$store.state.HSK_WORDS[lvl-1]);
+                states = Object.assign({}, states, lvlStates);
             }
             return states;
         },
@@ -656,6 +663,9 @@ const mixin = {
         },
         hideWordsLevelStates: function() {
             return this.getLvlStates('word', false, this.$store.state.options.hideWordsLevel);
+        },
+        personalKnownVocabularyStates: function() {
+            return this.getStatesFromHanzis('word', this.$store.state.options.personalKnownVocabulary);
         },
         videoWordStats: function() {
             if (this.captionData === null) return {};
