@@ -620,6 +620,14 @@ export default {
             const personalExerciseTranslations = this.$store.state.options.personalExerciseTranslations[`${hz}-${pyDiacritical}-tr`] || [];
             let possibleTranslations = cedictTranslations.concat(showDictTranslations).concat(personalExerciseTranslations);
             possibleTranslations.push(this.wordData.tr[idx]);
+            const possibleTranslationsWithoutStopWords = [];
+            for (const translation of possibleTranslations) {
+                const translationWithoutStopWords = filterStopWords(translation);
+                if (translationWithoutStopWords !== translation) possibleTranslationsWithoutStopWords.push(translationWithoutStopWords);
+            }
+
+            possibleTranslations = possibleTranslations.concat(possibleTranslationsWithoutStopWords);
+
             let minResult = null;
             for (const translation of possibleTranslations) {
                 const result = weightedLevenshtein(this.trInputs[idx], translation, function(a, b) {
