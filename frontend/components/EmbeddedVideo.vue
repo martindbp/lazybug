@@ -93,14 +93,15 @@ export default {
             console.log('Setting videoAPI time', this.captionData.lines, line.t0, this.navigateToCaptionIdx, line);
             this.$store.commit('setPlayerData', {playerId: this.playerId, navigateToCaptionIdx: null});
             this.videoAPI.setCurrentTime(line.t0 + 0.001);
-            /*
             const self = this;
-            setTimeout(function() {
-                console.log('Setting videoAPI time', line.t0, self.navigateToCaptionIdx, line);
-                self.videoAPI.setCurrentTime(line.t0 + 0.001);
-                //videoAPI.play();
-            }, 1000);
-            */
+            const setCurrentTimeInterval = setInterval(function() {
+                if (self.videoAPI.getCurrentTime() - line.t0 + 0.001 < 0.01) {
+                    clearInterval(setCurrentTimeInterval);
+                }
+                else {
+                    self.videoAPI.setCurrentTime(line.t0 + 0.001);
+                }
+            }, 100);
         },
         playerReadyCaptionId: function() {
             if (!this.playerReadyCaptionId) return;
