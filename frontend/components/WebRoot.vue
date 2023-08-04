@@ -112,9 +112,11 @@
                 <q-item v-if="$store.state.accessToken && $store.state.needSync">
                     <q-btn color="green" flat @click="showModalAndSync">{{ mini ? 'Sync' : 'Sync Changes' }}</q-btn>
                 </q-item>
+                <!--
                 <q-item v-if="!mini && ! $store.state.hasLazybugExtension" class="row justify-center">
                     <q-btn color="green" @click="goExtensionInstall">Extension</q-btn>
                 </q-item>
+                -->
               </q-list>
           </q-drawer>
 

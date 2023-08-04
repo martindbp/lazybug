@@ -1,6 +1,20 @@
 <template>
-    <div ref="reviewpage" v-if="reviewCaptionId" style="position: relative">
+    <div class="noreviews" v-if="! isLoading && currentReviewCaptionIdx === null">
+        <q-dialog seamless v-model="showDone">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h5">All Done</div>
+                </q-card-section>
+
+                <q-card-section class="q-pt-none text-h6">
+                    There are no more videos to review for now, check back after you've watched more videos!
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+    </div>
+    <div ref="reviewpage" v-else-if="reviewCaptionId" style="position: relative">
         <q-carousel
+            v-if="currentReviewCaptionIdx !== null"
             dark
             class="reviewpicker shadow-1 rounded-borders"
             v-model="currentReviewCaptionIdx"
@@ -24,9 +38,6 @@
             width="100%"
             height="100%"
         />
-        <div v-if="! isLoading && currentReviewCaptionIdx === null">
-            No reviews to be done
-        </div>
     </div>
 </template>
 
@@ -42,6 +53,7 @@ export default {
         playerId: 'review',
         isLoading: true,
         hidden: false,
+        showDone: true,
         reviewCaptionId: null,
         currentReviewCaptionIdx: null,
         captionsList: [],
@@ -80,7 +92,6 @@ export default {
             handler: function(newValue, oldValue) {
                 if (! newValue) return;
                 const self = this;
-                console.log('Listening to ', newValue);
                 newValue.addEventListener('nextVideo', function() {
                     self.onNextVideo();
                 });
@@ -99,7 +110,6 @@ export default {
             const reviewCaptionIndices = this.captionIdIndices[this.reviewCaptionId].sort(function(a, b) {
               return a - b;
             });
-            console.log('new currentReviewCaptionIdx', this.currentReviewCaptionIdx);
             this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setCaptionId', {playerId: 'review', value: this.reviewCaptionId});
             this.$store.commit('setPlayerData', {
@@ -111,9 +121,13 @@ export default {
     },
     methods: {
         onNextVideo: function() {
-            const self = this;
-            self.currentReviewCaptionIdx = (self.currentReviewCaptionIdx + 1) % self.captionsList.length;
-            console.log('new currentReviewCaptionIdx', self.currentReviewCaptionIdx);
+            if (this.currentReviewCaptionIdx === null) return;
+            if (this.currentReviewCaptionIdx === this.captionsList.length - 1) {
+                this.currentReviewCaptionIdx = null;
+            }
+            else {
+                this.currentReviewCaptionIdx = (this.currentReviewCaptionIdx + 1) % this.captionsList.length;
+            }
         },
         updateExercises: function() {
             // 1. Go through event log, find answered exercises
@@ -185,5 +199,15 @@ export default {
     transform: translate(-50%, -0%);
     color: #fff;
     background: var(--q-dark) !important;
+}
+
+.noreviews {
+    z-index: 98;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
 }
 </style>
