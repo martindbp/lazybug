@@ -81,6 +81,7 @@ export default {
         this.destroyYoutube();
         clearInterval(this.focusInterval);
         this.focusInterval = null;
+        this.resizeObserver.disconnect();
     },
     watch: {
         navigateToCaptionIdxKey: function() {
