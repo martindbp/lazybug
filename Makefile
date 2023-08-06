@@ -47,6 +47,10 @@ push-private:
 push-raw-captions:
 	b2 sync data/remote/private/caption_data/raw_captions b2://lazybug-private/caption_data/raw_captions --skipNewer
 
+.PHONY: pull-private-essentials
+push-private-essentials:
+	b2 sync data/remote/private b2://lazybug-private --skipNewer --excludeRegex '.*caption_data.*'
+
 .PHONY: pull-public
 pull-public:
 	b2 sync b2://lazybug-public data/remote/public --skipNewer
