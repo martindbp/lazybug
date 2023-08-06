@@ -59,6 +59,61 @@ const mixin = {
         },
     },
     methods: {
+        updateExercises: function() {
+            // 1. Go through event log, find answered exercises
+            // 2. Check if they're still active and haven't been answered this session
+            // 3. Collect them, group them by captionId
+            // 4. Sort by answer date, latest first
+
+            const showList = this.$store.state.showList;
+            if (showList === null) return;
+
+            const self = this;
+            const fromEventId = getEvent('answer', 'py');
+            const toEventId = getEvent('answer', 'tr');
+            const states = this.$store.state.states;
+            const threshold = this.$store.state.options.exercisesKnownThreshold;
+
+            getAnswerHistory(function(data) {
+                // NOTE: returned event rows are sorted in descending sessionTime order
+                const exercises = {};
+                const captions = [];
+                const seenStateKeys = new Set();
+                data = data.filter((row) => row.seasonIdx !== null);  // bogus data that was probably added because of a bug
+                for (const row of data) {
+                    const showId = row.showId;
+                    row.showInfo = showList[showId];
+                    if (!row.showInfo) continue;
+
+                    for (let i = 0; i < row.eventIds.length; i++) {
+                        if (row.eventIds[i] >= fromEventId && row.eventIds[i] <= toEventId) {
+                            if (row.eventData[i].length != 6) continue;
+                            const [hz, pys, tr, correct, captionIdx, answer] = row.eventData[i];
+                            //if (self.submittedExercises && self.submittedExercises[captionIdx]) continue; // already did this session
+                            if (! isStarredWordActive(states, hz, pys, tr, threshold)) continue;
+
+                            const stateKey = getStateKey('word', hz, pys, tr, null);
+                            if (seenStateKeys.has(stateKey)) continue;
+                            seenStateKeys.add(stateKey);
+
+                            if (! exercises[row.captionId]) {
+                                captions.push(row.captionId);
+                                exercises[row.captionId] = [];
+                            }
+                            exercises[row.captionId].push(captionIdx);
+                        }
+                    }
+                }
+
+                self.$store.commit('setReviewCaptions', {list: captions, indices: exercises});
+                if (captions.length > 0) {
+                    self.currentReviewCaptionIdx = 0;
+                }
+                else {
+                    self.currentReviewCaptionIdx = null;
+                }
+            });
+        },
         log: function(str) {
             console.log(str);
         },

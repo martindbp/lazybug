@@ -163,6 +163,8 @@ store = new Vuex.Store({
                 translation: false,
             }
         }),
+        reviewCaptionsList: [],
+        reviewCaptionIdIndices: {},
         showDictionaryRange: [-1, -1],
         timingOffset: 0,
         page: 'content',
@@ -194,6 +196,10 @@ store = new Vuex.Store({
         }),
     },
     mutations: {
+        setReviewCaptions(state, val) {
+            state.reviewCaptionsList = val.list;
+            state.reviewCaptionIdIndices = val.indices;
+        },
         setHasLazybugExtension(state) {
             state.hasLazybugExtension = true;
         },
