@@ -94,12 +94,13 @@ export default {
             this.$store.commit('setPlayerData', {playerId: this.playerId, navigateToCaptionIdx: null});
             this.videoAPI.setCurrentTime(line.t0 + 0.001);
             const self = this;
+            const setTime = line.t0 + 0.001;
             const setCurrentTimeInterval = setInterval(function() {
-                if (self.videoAPI.getCurrentTime() - line.t0 + 0.001 < 0.01) {
+                if (Math.abs(self.videoAPI.getCurrentTime() - setTime) < 0.015) {
                     clearInterval(setCurrentTimeInterval);
                 }
                 else {
-                    self.videoAPI.setCurrentTime(line.t0 + 0.001);
+                    self.videoAPI.setCurrentTime(setTime);
                 }
             }, 100);
         },
