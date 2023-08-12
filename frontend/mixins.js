@@ -487,7 +487,7 @@ const mixin = {
             createSession(this.$store.state);
         },
         getStatesFromHanzis: function(type, hanzis) {
-            if (this.$store.state.DICT === null || this.$store.state.HSK_WORDS === null) return {};
+            if (isNone(this.$store.state.DICT) || isNone(this.$store.state.HSK_WORDS)) return {};
             const d = this.$store.state.DICT;
             const states = {};
 
@@ -499,10 +499,16 @@ const mixin = {
                     const charPyOptions = [];
                     for (const c of hz) {
                         const charEntryPys = [];
+                        if (d[c] === undefined) continue;
                         for (let entry of d[c]) {
-                            charEntryPys.push(dictArrayToDict(entry).pys)
+                            const pys = dictArrayToDict(entry).pys;
+                            charEntryPys.push(pys);
                         }
                         charPyOptions.push(charEntryPys);
+
+                        // For long words we just pick first entry to avoid
+                        // combinatorial explosion
+                        if (hz.length > 3) break;
                     }
                     combinations(charPyOptions, entryPys);
                 }
