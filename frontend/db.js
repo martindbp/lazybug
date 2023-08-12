@@ -147,6 +147,18 @@ const PERSONAL_DB_VERSIONS = {
             });
         });
     },
+    '10': function(personalDb) {
+        // Add lastViewed to options for resuming watching
+        personalDb.version(10).stores({
+            other: 'id',
+        }).upgrade(trans => {
+            return trans.other.toCollection().modify(item => {
+                if (item.id === 'options') {
+                    item.value.lastViewed = null;
+                }
+            });
+        });
+    },
 };
 
 function initPersonalDb(untilVersion = null, name = 'lazybug-personal') {

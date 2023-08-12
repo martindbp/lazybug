@@ -30,12 +30,20 @@
               <q-list padding>
                 <q-item v-if="$store.state.playerData.player && $store.state.playerData.player.showId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
-                    <q-icon name="tv" />
+                      <q-icon name="tv" />
                   </q-item-section>
 
                   <q-item-section>
-                    Player
+                      Player
                   </q-item-section>
+                </q-item>
+                <q-item v-else-if="$store.state.options.lastViewed !== null">
+                    <q-item-section avatar>
+                        <q-icon name="tv" />
+                    </q-item-section>
+                    <q-item-section>
+                        <q-btn style="width: 75px;" size="md" color="secondary" no-caps label="Resume" @click="resumeViewing" />
+                    </q-item-section>
                 </q-item>
 
                 <q-item :active="page === 'content'" clickable @click="clickPage('content')" v-ripple>
@@ -220,6 +228,11 @@ export default {
         }
     },
     methods: {
+        resumeViewing: function() {
+            const lastViewed = this.$store.state.options.lastViewed;
+            if (lastViewed === null) return;
+            this.setPlaying(lastViewed.showId, lastViewed.season, lastViewed.episode);
+        },
         onIframeLoaded: function() {
             if (this.iframeLoaded) return;
             this.iframeLoaded = true;

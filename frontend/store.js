@@ -22,6 +22,7 @@ function syncOptions(state) {
 }
 
 const OPTIONS_DEFAULT = {
+    lastViewed: null,
     referrer: document.referrer, // store this to see where user came from when registering
     okReceiveEmails: true,
     doneIntro: localStorage.getItem('doneIntro', 'false') === 'true',
