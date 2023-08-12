@@ -803,6 +803,11 @@ export default {
                 // Star and hide
                 this.applyState(type, i, StateStarred, StateStarred);
                 this.applyState(type, i, StateHidden, StateHidden);
+                // Unpeek py/tr if peeked
+                for (const t of ['py', 'tr']) {
+                    this.$store.commit('setPeekState', {'type': t, 'i': i, value: false});
+                }
+
                 // Peek hz
                 this.$store.commit('setPeekState', {'type': 'hz', 'i': i, value: true});
                 // Focus the input
