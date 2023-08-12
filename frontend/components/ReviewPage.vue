@@ -53,6 +53,7 @@ export default {
         EmbeddedVideo,
     },
     data: function() { return {
+        isLoading: true,
         playerId: 'review',
         hidden: false,
         showDone: true,
@@ -123,6 +124,7 @@ export default {
                 navigateToCaptionIdx: 0,
                 reviewCaptionIndices: reviewCaptionIndices,
             });
+            this.isLoading = false;
         },
     },
     methods: {
