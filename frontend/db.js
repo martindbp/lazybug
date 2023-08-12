@@ -101,7 +101,8 @@ const PERSONAL_DB_VERSIONS = {
             states: 'id',
         }).upgrade(trans => {
             return trans.states.toCollection().modify(item => {
-                for (let i = 0; i < 6 - item.value.length; i++) {
+                const addNum = 6 - item.value.length;
+                for (let i = 0; i < addNum; i++) {
                     item.value.push(0);
                 }
             });
@@ -155,6 +156,19 @@ const PERSONAL_DB_VERSIONS = {
             return trans.other.toCollection().modify(item => {
                 if (item.id === 'options') {
                     item.value.lastViewed = null;
+                }
+            });
+        });
+    },
+    '11': function(personalDb) {
+        // Fix missing
+        personalDb.version(11).stores({
+            states: 'id',
+        }).upgrade(trans => {
+            return trans.states.toCollection().modify(item => {
+                const addNum = 6 - item.value.length;
+                for (let i = 0; i < addNum; i++) {
+                    item.value.push(0);
                 }
             });
         });
