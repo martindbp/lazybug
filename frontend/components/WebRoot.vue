@@ -234,6 +234,11 @@ export default {
             const lastViewed = this.$store.state.options.lastViewed;
             if (lastViewed === null) return;
             this.setPlaying(lastViewed.showId, lastViewed.season, lastViewed.episode);
+            const captionId = getCaptionIdFromShowData(this.$store.state.showList, lastViewed.showId, lastViewed.season, lastViewed.episode);
+            getLastViewingPosition(captionId, (captionIdx) => {
+                if (captionIdx < 0) return;
+                this.setPlaying(lastViewed.showId, lastViewed.season, lastViewed.episode, captionIdx);
+            });
         },
         onIframeLoaded: function() {
             if (this.iframeLoaded) return;

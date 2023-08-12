@@ -406,7 +406,7 @@ const mixin = {
                 }
             });
         },
-        setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
+        setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0, captionIdx = null) {
             this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
             const showInfo = getShowInfo('player', this.$store);
@@ -423,9 +423,9 @@ const mixin = {
                 }
                 return;
             }
-            this.$store.commit('setPlayerData', {playerId: 'player', season: seasonIdx, episode: episodeIdx});
+            this.$store.commit('setPlayerData', {playerId: 'player', season: seasonIdx, episode: episodeIdx, navigateToCaptionIdx: captionIdx});
             const showList = this.$store.state.showList;
-            this.$store.commit('setCaptionId', {playerId: 'player', value: showList[showId].seasons[seasonIdx].episodes[episodeIdx].id});
+            this.$store.commit('setCaptionId', {playerId: 'player', value: getCaptionIdFromShowData(showList, showId, seasonIdx, episodeIdx)});
             if (BROWSER_EXTENSION) {
                 document.location = this.getVideoURL(seasonIdx, episodeIdx);
             }

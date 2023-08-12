@@ -510,6 +510,28 @@ function backgroundMessageHandler(message, sender, sendResponse) {
             sendResponse({data: data});
         });
     }
+    else if (message.type === 'getLastViewingPosition') {
+        personalDb.log
+        .where('captionId')
+        .equals(message.captionId)
+        .reverse()
+        .sortBy('sessionTime')
+        .then(function(data) {
+            let maxIdx = -1;
+            for (const row of data) {
+                for (let i = 0; i < row.eventIds.length; i++) {
+                    if (row.eventIds[i] === events.indexOf('EVENT_SHOW_CAPTION_IDX')) {
+                        maxIdx = Math.max(maxIdx, row.eventData[i][0]);
+                    }
+                }
+            }
+            sendResponse({data: maxIdx});
+        })
+        .catch(function(error) {
+            console.log(error);
+            sendResponse('error');
+        });
+    }
     else if (message.type === 'getAnswerHistory') {
         personalDb.log
         .where('eventIds')

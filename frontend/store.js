@@ -607,7 +607,7 @@ store = new Vuex.Store({
                     }
 
                     const playerData = state.playerData.player; 
-                    this.commit('setCaptionId', {playerId: 'player', value: state.showList[playerData.showId].seasons[playerData.season].episodes[playerData.episode].id});
+                    this.commit('setCaptionId', {playerId: 'player', value: getCaptionIdFromShowData(state.showList, playerData.showId, playerData.season, playerData.episode)});
                 }
                 else if (state.accountEmail === null && parts[0] === 'account' && parts.length === 2 && ['register', 'login'].includes(parts[1])) {
                     state.showDialog.account = parts[1];

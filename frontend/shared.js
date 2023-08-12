@@ -1,3 +1,4 @@
+
 const EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/category/extensions';
 const LAZYBUG_URL = 'https://lazybug.ai';
 const DISCOURSE_URL = 'https://discourse.lazybug.ai';
@@ -283,6 +284,17 @@ function getAnswerHistory(callback) {
     return sendMessageToBackground({
         type: 'getAnswerHistory',
     }, callback);
+}
+
+function getLastViewingPosition(captionId, callback) {
+    return sendMessageToBackground({
+        type: 'getLastViewingPosition',
+        captionId: captionId,
+    }, callback);
+}
+
+function getCaptionIdFromShowData(showList, showId, season, episode) {
+    return showList[showId].seasons[season].episodes[episode].id;
 }
 
 function getLogRows(callback) {
