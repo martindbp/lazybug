@@ -388,7 +388,7 @@ function captionArrayToDict(lines, idx, captionData) {
 }
 
 function isName(tr) {
-    // NOTE: we say it's a name if there is _any_ capitalzied character, e.g. "lao Ni"
+    // NOTE: we say it's a name if there is _any_ capitalized character, e.g. "lao Ni"
     // Should match "Henry", but not "TV" or "chair"
     return /^[A-Z][^A-Z]+/.test(tr) && !(tr.startsWith('I') || tr.startsWith("I'"));
 }

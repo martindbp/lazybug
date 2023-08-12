@@ -32,8 +32,8 @@
                             <span class="insert">{{ py }}</span>
                         </div>
                         <q-btn
-                            :color="pyInputSubmitted[i] === true ? 'green' : 'red'"
-                            :icon="pyInputSubmitted[i] === true ? 'done' : 'close'"
+                            :color="getAnswerColor(pyInputSubmitted[i])"
+                            :icon="pyInputSubmitted[i] >= 0 ? 'done' : 'close'"
                             @click="flipAnswer(pyInputSubmitted, 'py', i)"
                             round
                         />
@@ -167,8 +167,8 @@
                             <span class="insert">{{ tr }}</span>
                         </div>
                         <q-btn
-                            :color="trInputSubmitted[i] === true ? 'green' : 'red'"
-                            :icon="trInputSubmitted[i] === true ? 'done' : 'close'"
+                            :color="getAnswerColor(trInputSubmitted[i])"
+                            :icon="trInputSubmitted[i] >= 0 ? 'done' : 'close'"
                             @click="flipAnswer(trInputSubmitted, 'tr', i)"
                             round
                         />
@@ -263,7 +263,6 @@ export default {
     props: {
         playerId: { default: null },
         data: { default: null },
-        pyCorrectDistanceThreshold: { default: 1.0 },
         trCorrectDistanceThreshold: { default: 1.0 },
     },
     data: function () { return {
@@ -276,7 +275,7 @@ export default {
         mouseHasNotMovedAfterPeeking: false,
         pyInputs: Vue.ref([]),
         trInputs: Vue.ref([]),
-        pyInputSubmitted: Vue.ref([]),  // null if not submitted, true if correct, false if incorrect
+        pyInputSubmitted: Vue.ref([]),  // null if not submitted, delta (-1, 0, 1) if submitted
         trInputSubmitted: Vue.ref([]),
         hasExercises: false,
         lastPausedExerciseIdxTime: null,
@@ -288,6 +287,17 @@ export default {
         lastAnswerCorrect: false,
     }},
     computed: {
+        allExercisesAnswered: function() {
+            for (let i = 0; i < this.pyInputSubmitted.length; i++) {
+                const sub = this.pyInputSubmitted[i];
+                if (sub === null && this.showExercise('py', i)) return false;
+            }
+            for (let i = 0; i < this.trInputSubmitted.length; i++) {
+                const sub = this.trInputSubmitted[i];
+                if (sub === null && this.showExercise('tr', i)) return false;
+            }
+            return true;
+        },
         exercisesOn: function() {
             return this.$store.state.options.exercisesOn || this.isReviewSession;
         },
@@ -480,6 +490,7 @@ export default {
                 self.data !== null &&
                 self.exercisesOn &&
                 self.hasExercises &&
+                ! self.allExercisesAnswered &&
                 self.data.t1 - currentTime < 0.10 &&
                 self.data.t1 - currentTime > -0.10 &&
                 (
@@ -499,6 +510,11 @@ export default {
         }, 5);
     },
     methods: {
+        getAnswerColor: function(answer) {
+            if (answer === 1) return 'green';
+            else if (answer === -1) return 'red';
+            else if (answer === 0) return 'orange';
+        },
         updateWidths: function() {
             for (let i = 0; i < this.wordData.py.length; i++) {
                 const pyRef = this.$refs['pyExercise'+i];
@@ -527,10 +543,11 @@ export default {
                 this.numCorrect[type][i] < this.$store.state.options.exercisesKnownThreshold
             );
         },
-        flipAnswer: function(submitted, type, i) {
-            submitted[i] = !submitted[i]
+        flipAnswer: function(deltas, type, i) {
+            if (deltas[i] <= 0) deltas[i] = 1;
+            else deltas[i] = -1;
             const input = type === 'py'? this.pyInputs[i].input : this.trInputs[i].input;
-            if (submitted[i]) {
+            if (deltas[i] > 0) {
                 const hz = this.wordData.hz[i];
                 const pyDiacritical = this.wordData.py[i].toLowerCase();
                 const key = `${hz}-${pyDiacritical}-${type}`;
@@ -549,7 +566,7 @@ export default {
                     position: 'top',
                 });
             }
-            this.applyAnswer(submitted[i], input, type, i);
+            this.applyAnswer(deltas[i], input, type, i);
         },
         getChars: function(ops) {
             let chars = [];
@@ -590,13 +607,16 @@ export default {
                 input: input,
                 target: this.wordData.py[idx],
             };
-            const correct = result.distance <= this.pyCorrectDistanceThreshold;
-            this.pyInputSubmitted[idx] = correct;
+            let delta = null;
+            if (result.distance === 0) delta = 1;
+            else if (result.distance <= 1) delta = 0;
+            else delta = -1;
+            this.pyInputSubmitted[idx] = delta;
             this.updateSubmittedExercises();
             this.onInputTab('py', idx);
-            this.applyAnswer(correct, input, 'py', idx);
-            this.lastAnswerCorrect = correct;
-            if (! correct && ! this.$store.state.options.seenTooltips.grading) {
+            this.applyAnswer(delta, input, 'py', idx);
+            this.lastAnswerCorrect = delta > 0;
+            if (delta < 0 && ! this.$store.state.options.seenTooltips.grading) {
                 this.showPinyinGradingTooltip = true;
                 this.showTooltipIdx = idx;
                 this.$store.commit('setDeepOption', {key: 'seenTooltips', key2: 'grading', value: true});
@@ -649,13 +669,13 @@ export default {
             };
             const distanceRatio = minResult.distance / minResult.target.length;
             console.log('distanceRatio', distanceRatio);
-            const correct = distanceRatio <= this.$store.state.options.trExerciseDistanceRatioThreshold;
-            this.trInputSubmitted[idx] = correct;
+            const delta = distanceRatio <= this.$store.state.options.trExerciseDistanceRatioThreshold ? 1 : -1;
+            this.trInputSubmitted[idx] = delta;
             this.updateSubmittedExercises();
             this.onInputTab('tr', idx);
-            this.applyAnswer(correct, input, 'tr', idx);
-            this.lastAnswerCorrect = correct;
-            if (! correct && ! this.$store.state.options.seenTooltips.grading) {
+            this.applyAnswer(delta, input, 'tr', idx);
+            this.lastAnswerCorrect = delta > 0;
+            if (delta < 0 && ! this.$store.state.options.seenTooltips.grading) {
                 this.showTranslationGradingTooltip = true;
                 this.showTooltipIdx = idx;
                 this.$store.commit('setDeepOption', {key: 'seenTooltips', key2: 'grading', value: true});
@@ -675,7 +695,7 @@ export default {
         },
         onInputTab: function(currentType = null, currentIdx = 0) {
             const numWords = this.starredStates.words.length;
-            for (let i = currentIdx % (numWords-1); i < numWords; i++) {
+            for (let i = currentIdx % numWords; i < numWords; i++) {
                 if (!this.starredStates.words[i]) continue;
 
                 let found = false;
@@ -805,15 +825,17 @@ export default {
                 this.$store.commit('switchTranslation');
             }
         },
-        applyAnswer: function(correct, answer, type, i) {
+        applyAnswer: function(delta, answer, type, i) {
+            if (delta === 0) return;
+
             const k = this.$store.state.states;
             const pys = i === null ? null : this.wordData.pys[i];
             const hz = i === null ? null : this.wordData.hz[i];
             const tr = i === null ? null : this.wordData.tr[i];
 
-            updateCorrect(correct ? 1 : -1, k, type, hz, pys, tr, true);
+            updateCorrect(delta, k, type, hz, pys, tr, true);
             const idx = this.data.origIdx || this.currentCaptionIdx;
-            this.appendSessionLog([getEvent('answer', type), hz, pys, tr, correct, idx, answer]);
+            this.appendSessionLog([getEvent('answer', type), hz, pys, tr, delta, idx, answer]);
         },
         applyState: function(type, i, stateType, setState) {
             const d = this.$store.state.DICT;

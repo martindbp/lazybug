@@ -2,12 +2,15 @@
     <div class="noreviews" v-if="! isLoading && currentReviewCaptionIdx === null">
         <q-dialog seamless v-model="showDone">
             <q-card>
-                <q-card-section>
-                    <div class="text-h5">All Done</div>
+                <q-card-section class="row items-center">
+                    <q-avatar icon="done" color="primary" text-color="white" />
+                    <span class="q-ml-lg">All Done</span>
                 </q-card-section>
-
-                <q-card-section class="q-pt-none text-h6">
-                    There are no more videos to review for now, check back after you've watched more videos!
+                <q-card-section >
+                    <div>
+                        There are no more videos to review for now, check back after you've watched more videos!
+                    </div>
+                    <q-btn color="green" label="OK" @click="clickPage('content')" />
                 </q-card-section>
             </q-card>
         </q-dialog>

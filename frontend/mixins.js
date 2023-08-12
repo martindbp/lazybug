@@ -59,6 +59,10 @@ const mixin = {
         },
     },
     methods: {
+        clickPage: function(page) {
+            this.$store.commit('setPage', page);
+            if (this.isMobile) this.drawer = false; // close after tap if on mobile
+        },
         updateExercises: function() {
             // 1. Go through event log, find answered exercises
             // 2. Check if they're still active and haven't been answered this session

@@ -50,7 +50,11 @@
 
                 <q-item :active="page === 'review'" clickable @click="clickPage('review')" v-ripple>
                   <q-item-section avatar>
-                    <q-icon name="school" />
+                    <div class="relative-position">
+                        <q-icon name="school" size="24px">
+                        </q-icon>
+                        <q-badge class="reviewsbadge" v-if="reviewCaptionsList.length > 0" color="red" floating>{{ reviewCaptionsList.length }}</q-badge>
+                    </div>
                   </q-item-section>
 
                   <q-item-section>
@@ -225,10 +229,6 @@ export default {
         clickAbout: function() {
             window.open('https://github.com/martindbp/lazybug#readme', '_blank');
         },
-        clickPage: function(page) {
-            this.$store.commit('setPage', page);
-            if (this.isMobile) this.drawer = false; // close after tap if on mobile
-        },
         clickDiscuss: function() {
             window.open(DISCOURSE_URL, '_blank');
         },
@@ -251,6 +251,9 @@ export default {
         }
     },
     computed: {
+        reviewCaptionsList: function() {
+            return this.$store.state.reviewCaptionsList;
+        },
         mini: function() {
             return ! this.isMobile && ! this.mouseOverDrawer && this.page === 'player';
         },
@@ -265,6 +268,14 @@ export default {
         showNonEmbeddableDialog: {
             get: function() { return this.$store.state.showDialog.embeddable; },
             set: function(val) { this.$store.commit('setShowDialog', {dialog: 'embeddable', value: val}); },
+        },
+        updateExercisesTrigger: function() {
+            return `${this.$store.state.showList}|${this.$store.state.states}`;
+        },
+    },
+    watch: {
+        updateExercisesTrigger: function() {
+            this.updateExercises();
         },
     },
 };
@@ -291,5 +302,9 @@ export default {
 
 .playerpage {
     overflow: hidden;
+}
+
+.reviewsbadge {
+    right: -12px !important;
 }
 </style>

@@ -164,7 +164,7 @@ export default {
                         playerVars: {
                             'playsinline': 1,
                             'rel': 0,
-                            'cc_load_policy': 3,
+                            'cc_load_policy': 0,
                             'autoplay': 1,
                             'enablejsapi': 1,
                             'origin': 'https://lazybug.ai',
