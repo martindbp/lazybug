@@ -406,8 +406,9 @@ const mixin = {
         setPlaying: function(showId, seasonIdx = 0, episodeIdx = 0) {
             this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
-            this.$store.commit('setOption', {key: 'lastViewed', value: {showId: showId, season: seasonIdx, episode: episodeIdx}});
             const showInfo = getShowInfo('player', this.$store);
+            const showName = getShowName(showInfo);
+            this.$store.commit('setOption', {key: 'lastViewed', value: {showId: showId, showName: showName, season: seasonIdx, episode: episodeIdx}});
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
                 this.$store.commit('setPlayerData', {playerId: 'player', showId: null});
@@ -633,11 +634,7 @@ const mixin = {
             return info;
         },
         showName: function() {
-            if (!this.showInfo || ! this.showInfo.name) return null;
-            if (typeof this.showInfo.name === 'object') {
-                return `${this.showInfo.name.hz} - ${this.showInfo.name.en}`;
-            }
-            return this.showInfo.name;
+            return getShowName(this.showInfo);
         },
         season: {
             get: function() { return this.playerId ? this.playerData.season : null; },

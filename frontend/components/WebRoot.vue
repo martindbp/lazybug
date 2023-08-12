@@ -42,7 +42,9 @@
                         <q-icon name="tv" />
                     </q-item-section>
                     <q-item-section>
-                        <q-btn style="width: 75px;" size="md" color="secondary" no-caps label="Resume" @click="resumeViewing" />
+                        <q-btn style="width: 75px;" size="md" color="secondary" no-caps label="Resume" @click="resumeViewing">
+                            <q-tooltip>{{ $store.state.options.lastViewed.showName }}</q-tooltip>
+                        </q-btn>
                     </q-item-section>
                 </q-item>
 

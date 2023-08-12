@@ -761,6 +761,14 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
+function getShowName(showInfo) {
+    if (!showInfo || ! showInfo.name) return null;
+    if (typeof showInfo.name === 'object') {
+        return `${showInfo.name.hz} - ${showInfo.name.en}`;
+    }
+    return showInfo.name;
+}
+
 function getShowSeasonEpisode(showInfo, captionId) {
     let showName = null;
     if (showInfo) {
