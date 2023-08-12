@@ -551,20 +551,41 @@ export default {
                 const hz = this.wordData.hz[i];
                 const pyDiacritical = this.wordData.py[i].toLowerCase();
                 const key = `${hz}-${pyDiacritical}-${type}`;
-                let translations = this.$store.state.options.personalExerciseTranslations[key];
-                if (translations) {
+                let origTranslations = this.$store.state.options.personalExerciseTranslations[key];
+                let translations = origTranslations ? deepCopy(origTranslations) : [];
+                if (origTranslations) {
                     translations.push(input);
                 }
                 else {
                     translations = [input];
                 }
 
+                translations = [...new Set(translations)]; // dedupe
+
                 this.$store.commit('setDeepOption', {key: 'personalExerciseTranslations', key2: key, value: translations});
-                this.$q.notify({
-                    type: 'positive',
-                    message: 'Overridden as correct',
-                    position: 'top',
-                });
+                if (type === 'tr') {
+                    this.$q.notify({
+                        type: 'positive',
+                        message: `Overridden as correct, added "${this.trInputs[i].input}" as acceptable translation`,
+                        position: 'top',
+                        actions: [
+                            {
+                                label: 'Undo new translation',
+                                color: 'white',
+                                handler: () => {
+                                    this.$store.commit('setDeepOption', {key: 'personalExerciseTranslations', key2: key, value: origTranslations});
+                                }
+                            }
+                        ]
+                    });
+                }
+                else {
+                    this.$q.notify({
+                        type: 'positive',
+                        message: 'Overridden as correct',
+                        position: 'top',
+                    });
+                }
             }
             this.applyAnswer(deltas[i], input, type, i);
         },
