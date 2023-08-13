@@ -155,7 +155,8 @@ const PERSONAL_DB_VERSIONS = {
         }).upgrade(trans => {
             return trans.other.toCollection().modify(item => {
                 if (item.id === 'options') {
-                    item.value.lastViewed = null;
+                    // Removed this in later version
+                    //item.value.lastViewed = null;
                 }
             });
         });

@@ -286,13 +286,6 @@ function getAnswerHistory(callback) {
     }, callback);
 }
 
-function getLastViewingPosition(captionId, callback) {
-    return sendMessageToBackground({
-        type: 'getLastViewingPosition',
-        captionId: captionId,
-    }, callback);
-}
-
 function getCaptionIdFromShowData(showList, showId, season, episode) {
     return showList[showId].seasons[season].episodes[episode].id;
 }

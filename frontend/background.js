@@ -469,12 +469,7 @@ function backgroundMessageHandler(message, sender, sendResponse) {
                 if (message.dedupeLast && session.captionId === lastCaptionId) continue;
                 if ([null, undefined].includes(session.showId)) continue;
 
-                videos.push({
-                    captionId: session.captionId,
-                    showId: session.showId,
-                    seasonIdx: session.seasonIdx,
-                    episodeIdx: session.episodeIdx,
-                });
+                videos.push(session);
 
                 seen.add(session.captionId);
                 lastCaptionId = session.captionId;
@@ -508,28 +503,6 @@ function backgroundMessageHandler(message, sender, sendResponse) {
         .count()
         .then(function(data) {
             sendResponse({data: data});
-        });
-    }
-    else if (message.type === 'getLastViewingPosition') {
-        personalDb.log
-        .where('captionId')
-        .equals(message.captionId)
-        .reverse()
-        .sortBy('sessionTime')
-        .then(function(data) {
-            let maxIdx = -1;
-            for (const row of data) {
-                for (let i = 0; i < row.eventIds.length; i++) {
-                    if (row.eventIds[i] === events.indexOf('EVENT_SHOW_CAPTION_IDX')) {
-                        maxIdx = Math.max(maxIdx, row.eventData[i][0]);
-                    }
-                }
-            }
-            sendResponse({data: maxIdx});
-        })
-        .catch(function(error) {
-            console.log(error);
-            sendResponse('error');
         });
     }
     else if (message.type === 'getAnswerHistory') {

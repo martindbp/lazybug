@@ -411,7 +411,6 @@ const mixin = {
             this.$store.commit('setPlayerData', {playerId: 'player', showId: showId});
             const showInfo = getShowInfo('player', this.$store);
             const showName = getShowName(showInfo);
-            this.$store.commit('setOption', {key: 'lastViewed', value: {showId: showId, showName: showName, season: seasonIdx, episode: episodeIdx}});
             if (showInfo.embeddable === false) {
                 this.$store.commit('setNonEmbeddableVideoSelected', showInfo);
                 this.$store.commit('setPlayerData', {playerId: 'player', showId: null});

@@ -28,6 +28,22 @@
                   :width="mini ? 0 : 250"
               />
               <q-list padding>
+                <q-item v-if="resumeShows !== null && resumeShows.length > 0">
+                    <q-item-section v-if="mini" avatar>
+                        <q-icon name="redo" />
+                    </q-item-section>
+                    <q-item-section>
+                       <q-btn-dropdown style="width: 100px" class="q-ml-sm" size="md" color="secondary" no-caps label="Resume">
+                          <q-list>
+                            <q-item v-for="item in resumeShows" clickable v-close-popup @click="resumeViewing(item)">
+                              <q-item-section>
+                                  <q-item-label>{{ item.name }}</q-item-label>
+                              </q-item-section>
+                            </q-item>
+                          </q-list>
+                        </q-btn-dropdown>
+                    </q-item-section>
+                </q-item>
                 <q-item v-if="$store.state.playerData.player && $store.state.playerData.player.showId" :active="page === 'player'" clickable @click="clickPage('player')" v-ripple>
                   <q-item-section avatar>
                       <q-icon name="tv" />
@@ -36,16 +52,6 @@
                   <q-item-section>
                       Player
                   </q-item-section>
-                </q-item>
-                <q-item v-else-if="$store.state.options.lastViewed !== null">
-                    <q-item-section avatar>
-                        <q-icon name="tv" />
-                    </q-item-section>
-                    <q-item-section>
-                        <q-btn style="width: 75px;" size="md" color="secondary" no-caps label="Resume" @click="resumeViewing">
-                            <q-tooltip>{{ $store.state.options.lastViewed.showName }}</q-tooltip>
-                        </q-btn>
-                    </q-item-section>
                 </q-item>
 
                 <q-item :active="page === 'content'" clickable @click="clickPage('content')" v-ripple>
@@ -72,16 +78,6 @@
                   </q-item-section>
                 </q-item>
 
-
-                <q-item :active="page === 'history'" clickable @click="clickPage('history')" v-ripple>
-                  <q-item-section avatar>
-                    <q-icon name="history" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    History
-                  </q-item-section>
-                </q-item>
 
                 <q-item :active="page === 'words'" clickable @click="clickPage('words')" v-ripple>
                   <q-item-section avatar>
@@ -139,7 +135,6 @@
                 <PlayerPage class="playerpage" v-show="page === 'player'" /> <!-- use v-show to keep alive video iframe -->
                 <ContentPage v-show="page === 'content'" />
                 <ReviewPage class="playerpage" v-if="page === 'review'" />
-                <HistoryPage v-if="page === 'history'" />
                 <WordTable v-if="page === 'words'" />
                 <AccountPage v-show="page === 'account'" />
             </q-page>
@@ -183,10 +178,12 @@ import ContentPage from './ContentPage.vue'
 import WordTable from './WordTable.vue'
 import AccountPage from './AccountPage.vue'
 import PlayerPage from './PlayerPage.vue'
-import HistoryPage from './HistoryPage.vue'
 import AccountDialog from './AccountDialog.vue'
 import SyncDialog from './SyncDialog.vue'
 import IntroDialog from './IntroDialog.vue'
+
+const MAX_RESUME_SHOWS = 5;
+const MIN_RESUME_SHOW_EVENTS = 10;
 
 export default {
     mixins: [mixin],
@@ -196,7 +193,6 @@ export default {
         WordTable,
         AccountPage,
         PlayerPage,
-        HistoryPage,
         AccountDialog,
         SyncDialog,
         IntroDialog,
@@ -206,6 +202,7 @@ export default {
         iframeLoaded: false,
         inactivityTimer: null,
         mouseOverDrawer: false,
+        resumeShows: null,
     }},
     mounted: function() {
         const self = this;
@@ -228,17 +225,66 @@ export default {
                 }
             }, 60*60*1000); // 1 hour
         }
+
+        this.updateResumeShows();
     },
     methods: {
-        resumeViewing: function() {
-            const lastViewed = this.$store.state.options.lastViewed;
-            if (lastViewed === null) return;
-            this.setPlaying(lastViewed.showId, lastViewed.season, lastViewed.episode);
-            const captionId = getCaptionIdFromShowData(this.$store.state.showList, lastViewed.showId, lastViewed.season, lastViewed.episode);
-            getLastViewingPosition(captionId, (captionIdx) => {
-                if (captionIdx < 0) return;
-                this.setPlaying(lastViewed.showId, lastViewed.season, lastViewed.episode, captionIdx);
+        updateResumeShows: function() {
+            const self = this;
+            const showList = this.$store.state.showList;
+            if (! showList) return;
+            getViewingHistory(0, null, function(data) {
+                data = data.filter((row) => row.seasonIdx !== null);  // bogus data that was probably added because of a bug
+
+                const showMeta = {};
+                for (const row of data) {
+                    if (row.eventIds.length < MIN_RESUME_SHOW_EVENTS) continue;
+                    const showId = row.showId;
+                    row.showInfo = showList[showId];
+                    if (!row.showInfo) continue;
+                    const showName = resolveShowName(row.showInfo.name);
+                    const seasonName = getSeasonName(row.showInfo, row.seasonIdx);
+                    const episodeName = getEpisodeName(row.showInfo, row.seasonIdx, row.episodeIdx);
+                    row.name = `${showName} - ${seasonName} ${episodeName}`;
+                    let maxCaptionIdx = -1;
+                    for (const row of data) {
+                        for (let i = 0; i < row.eventIds.length; i++) {
+                            if (row.eventIds[i] === events.indexOf('EVENT_SHOW_CAPTION_IDX')) {
+                                maxCaptionIdx = Math.max(maxCaptionIdx, row.eventData[i][0]);
+                            }
+                        }
+                    }
+
+                    if (showMeta[showId] === undefined) {
+                        showMeta[showId] = {
+                            name: row.name,
+                            showId: showId,
+                            captionId: row.captionId,
+                            maxSeason: 0,
+                            maxEpisode: 0,
+                            maxCaptionIdx: 0,
+                            lastViewedSession: 0,
+                        };
+                    }
+                    if (showMeta[showId].maxSeason <= row.seasonIdx) {
+                        showMeta[showId].maxSeason = row.seasonIdx;
+                        if (showMeta[showId].maxEpisode <= row.episodeIdx) {
+                            showMeta[showId].maxEpisode = row.episodeIdx;
+                            if (showMeta[showId].maxCaptionIdx <= maxCaptionIdx) {
+                                showMeta[showId].maxCaptionIdx = maxCaptionIdx;
+                            }
+                        }
+                    }
+                    showMeta[showId].lastViewedSession = Math.max(showMeta[showId].lastViewedSession, row.sessionTime);
+                }
+
+                self.resumeShows = Object.values(showMeta).sort((a, b) => {
+                    return b.lastViewedSession - a.lastViewedSession;
+                }).slice(0, MAX_RESUME_SHOWS);
             });
+        },
+        resumeViewing: function(show) {
+            this.setPlaying(show.showId, show.maxSeason, show.maxEpisode, show.maxCaptionIdx);
         },
         onIframeLoaded: function() {
             if (this.iframeLoaded) return;
@@ -296,6 +342,7 @@ export default {
     watch: {
         updateExercisesTrigger: function() {
             this.updateExercises();
+            this.updateResumeShows();
         },
     },
 };
