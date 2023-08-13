@@ -1,16 +1,36 @@
 <template>
-    <div class="noreviews" v-if="! isLoading && currentReviewCaptionIdx === null">
+    <div class="noreviews" v-if="! userHasStarredAtLeastOneWord">
+        <q-dialog seamless v-model="showNoReviews">
+            <q-card>
+                <q-card-section class="row items-center">
+                    <q-avatar icon="error" color="orange" text-color="white" />
+                    <span class="q-ml-lg">Nothing To Review</span>
+                </q-card-section>
+                <q-card-section >
+                    <div>
+                        There are no starred words yet, star a word like this (and do the exercise)
+                        <video autoplay loop style="width: 100%">
+                            <source src="https://cdn.lazybug.ai/file/lazybug-public/images/starringword.webm" type="video/webm">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <q-btn class="q-mt-md" color="green" label="Take me to the content" @click="clickPage('content')" />
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+    </div>
+    <div class="noreviews" v-else-if="! isLoading && currentReviewCaptionIdx === null">
         <q-dialog seamless v-model="showDone">
             <q-card>
                 <q-card-section class="row items-center">
-                    <q-avatar icon="done" color="primary" text-color="white" />
+                    <q-avatar icon="done" color="green" text-color="white" />
                     <span class="q-ml-lg">All Done</span>
                 </q-card-section>
                 <q-card-section >
                     <div>
                         There are no more videos to review for now, check back after you've watched more videos!
                     </div>
-                    <q-btn color="green" label="OK" @click="clickPage('content')" />
+                    <q-btn color="green" label="Take me to the content" @click="clickPage('content')" />
                 </q-card-section>
             </q-card>
         </q-dialog>
@@ -57,6 +77,7 @@ export default {
         playerId: 'review',
         hidden: false,
         showDone: true,
+        showNoReviews: true,
         reviewCaptionId: null,
         currentReviewCaptionIdx: null,
     }},
@@ -73,6 +94,13 @@ export default {
         }
     },
     computed: {
+        userHasStarredAtLeastOneWord: function() {
+            for (const key of Object.keys(this.$store.state.states)) {
+                const state = getState(this.$store.state.states, key, StateStarred, StateNone);
+                if (state === StateStarred) return true;
+            }
+            return false;
+        },
         showList: function() {
             return this.$store.state.showList;
         },
