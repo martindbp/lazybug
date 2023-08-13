@@ -83,7 +83,6 @@ const mixin = {
                 // but the events themselves are still in ascending order
                 const exercises = {};
                 const captions = [];
-                const seenStateKeys = new Set();
                 data = data.filter((row) => row.seasonIdx !== null);  // bogus data that was probably added because of a bug
                 for (const row of data) {
                     const showId = row.showId;
@@ -97,19 +96,31 @@ const mixin = {
                             //if (self.submittedExercises && self.submittedExercises[captionIdx]) continue; // already did this session
                             if (! isStarredWordActive(states, hz, pys, tr, threshold)) continue;
 
-                            const stateKey = getStateKey('word', hz, pys, tr, null);
-                            if (seenStateKeys.has(stateKey)) continue;
-                            seenStateKeys.add(stateKey);
-
                             if (! exercises[row.captionId]) {
                                 captions.push(row.captionId);
-                                exercises[row.captionId] = [];
+                                exercises[row.captionId] = {};
                             }
-                            exercises[row.captionId].push(captionIdx);
+                            const stateKey = getStateKey('word', hz, pys, tr, null);
+                            if (exercises[row.captionId][stateKey] === undefined) {
+                                exercises[row.captionId][stateKey] = [];
+                            }
+                            exercises[row.captionId][stateKey].push(captionIdx);
                         }
                     }
+                }
 
-                    exercises[row.captionId] = exercises[row.captionId].sort((a, b) => a - b);
+
+                // For each stateKey (word), pick a random captionIdx (if it occurred multiple times)
+                // and sort
+                for (const captionId of Object.keys(exercises)) {
+                    const exerciseIndices = [];
+                    for (const key of Object.keys(exercises[captionId])) {
+                        let indices = exercises[captionId][key];
+                        // Dedupe
+                        indices = [...new Set(indices)];
+                        exerciseIndices.push(indices[Math.floor(Math.random() * indices.length)]);
+                    }
+                    exercises[captionId] = exerciseIndices.sort((a, b) => a - b);
                 }
 
                 self.$store.commit('setReviewCaptions', {list: captions, indices: exercises});
