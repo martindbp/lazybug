@@ -50,6 +50,7 @@
                         <q-img loading="eager" :src="urls.export" />
                     </div>
                 </q-carousel-slide>
+                <!--
                 <q-carousel-slide v-if="! $store.state.hasLazybugExtension" name="extension" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Browser Extension</h5>
@@ -57,6 +58,7 @@
                         <q-btn color="green" @click="goExtensionInstall">Install</q-btn>
                     </div>
                 </q-carousel-slide>
+                -->
                 <q-carousel-slide name="last" class="column no-wrap flex-center">
                     <div class="q-mt-md text-center">
                         <h5>Account</h5>
