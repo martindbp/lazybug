@@ -79,7 +79,8 @@ const mixin = {
             const threshold = this.$store.state.options.exercisesKnownThreshold;
 
             getAnswerHistory(function(data) {
-                // NOTE: returned event rows are sorted in descending sessionTime order
+                // NOTE: returned session rows are sorted in descending sessionTime order
+                // but the events themselves are still in ascending order
                 const exercises = {};
                 const captions = [];
                 const seenStateKeys = new Set();
@@ -107,6 +108,8 @@ const mixin = {
                             exercises[row.captionId].push(captionIdx);
                         }
                     }
+
+                    exercises[row.captionId] = exercises[row.captionId].sort((a, b) => a - b);
                 }
 
                 self.$store.commit('setReviewCaptions', {list: captions, indices: exercises});

@@ -142,9 +142,7 @@ export default {
         currentReviewCaptionIdx: function() {
             if (this.currentReviewCaptionIdx === null) return;
             this.reviewCaptionId = this.reviewCaptionsList[this.currentReviewCaptionIdx];
-            const reviewCaptionIndices = this.reviewCaptionIdIndices[this.reviewCaptionId].sort(function(a, b) {
-              return a - b;
-            });
+            const reviewCaptionIndices = this.reviewCaptionIdIndices[this.reviewCaptionId];
             this.$store.commit('resetPlayerData', 'review');
             this.$store.commit('setCaptionId', {playerId: 'review', value: this.reviewCaptionId});
             this.$store.commit('setPlayerData', {

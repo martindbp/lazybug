@@ -158,7 +158,7 @@ export default {
             if (this.prevCaption === null) return;
 
             const currentTime = this.videoAPI.getCurrentTime();
-            if (event === 'keyboard' && Math.abs(currentTime - this.prevCaption.t0) > 20) {
+            if (event === 'keyboard' && this.playerId !== 'review' && Math.abs(currentTime - this.prevCaption.t0) > 20) {
                 this.videoAPI.setCurrentTime(currentTime - 5);
             }
             else {
