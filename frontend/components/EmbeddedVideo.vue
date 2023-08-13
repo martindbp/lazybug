@@ -96,7 +96,7 @@ export default {
             const self = this;
             const setTime = line.t0 + 0.001;
             const setCurrentTimeInterval = setInterval(function() {
-                if (Math.abs(self.videoAPI.getCurrentTime() - setTime) < 0.015) {
+                if (Math.abs(self.videoAPI.getCurrentTime() - setTime) < 0.1) {
                     clearInterval(setCurrentTimeInterval);
                 }
                 else {
