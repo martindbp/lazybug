@@ -388,6 +388,7 @@ export default {
             if (isNone(captionData)) return null;
 
             const lines = captionData.lines;
+            if (lines.length == 0) return null;
             const lastSeenCaption = captionArrayToDict(lines, this.lastCaptionIdx, captionData);
             const lastSeenCaptionT0 = lastSeenCaption.t0 + (withTimingOffset ? lastSeenCaption.timingOffset : 0);
             if (this.currTime < lastSeenCaptionT0) {
